@@ -1,0 +1,151 @@
+{
+  "name": "jac",
+  "displayName": "JAC",
+  "description": "Remote terminal-style Claude Code interface via WebSocket",
+  "version": "0.2.6",
+  "publisher": "claudiusmaximus",
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "keywords": [
+    "claude",
+    "ai",
+    "remote",
+    "agent"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:claudeUltra.open"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "JAC",
+      "properties": {
+        "claudeUltra.serverUrl": {
+          "type": "string",
+          "default": "wss://mellow-backend.onrender.com",
+          "description": "WebSocket URL of the JAC relay"
+        },
+        "claudeUltra.authToken": {
+          "type": "string",
+          "default": "",
+          "description": "Authentication token for the server"
+        },
+        "claudeUltra.providerMachineId": {
+          "type": "string",
+          "default": "",
+          "description": "Machine ID to bind pair codes to. Leave blank to use hostname. Must match --machine-id of the jac-provider daemon on this machine."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "claudeUltra.open",
+        "title": "JAC: Open"
+      },
+      {
+        "command": "claudeUltra.newConversation",
+        "title": "JAC: New Conversation"
+      },
+      {
+        "command": "claudeUltra.disconnect",
+        "title": "JAC: Disconnect"
+      },
+      {
+        "command": "claudeUltra.music",
+        "title": "JAC: Music"
+      },
+      {
+        "command": "claudeUltra.browser",
+        "title": "JAC: Browser"
+      },
+      {
+        "command": "claudeUltra.cad",
+        "title": "JAC: CAD"
+      },
+      {
+        "command": "claudeUltra.pairPhone",
+        "title": "JAC: Pair Phone"
+      },
+      {
+        "command": "claudeUltra.volumeUp",
+        "title": "JAC: Volume Up"
+      },
+      {
+        "command": "claudeUltra.volumeDown",
+        "title": "JAC: Volume Down"
+      },
+      {
+        "command": "claudeUltra.volumeMute",
+        "title": "JAC: Volume Mute"
+      }
+    ],
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "jac-panel",
+          "title": "JAC",
+          "icon": ""
+        }
+      ]
+    },
+    "views": {
+      "jac-panel": [
+        {
+          "type": "webview",
+          "id": "jacMusic",
+          "name": "Music"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "claudeUltra.open",
+        "key": "ctrl+shift+u",
+        "mac": "cmd+shift+u"
+      },
+      {
+        "command": "claudeUltra.volumeUp",
+        "key": "ctrl+shift+]",
+        "mac": "cmd+shift+]"
+      },
+      {
+        "command": "claudeUltra.volumeDown",
+        "key": "ctrl+shift+[",
+        "mac": "cmd+shift+["
+      },
+      {
+        "command": "claudeUltra.volumeMute",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "webpack --mode production && cp src/webview/styles.css dist/webview/styles.css && cp src/webview/music.css dist/webview/music.css && cp src/webview/browser.css dist/webview/browser.css",
+    "watch": "webpack --mode development --watch",
+    "package": "npm run build && npx @vscode/vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.94.0",
+    "@types/ws": "^8.5.0",
+    "@vscode/vsce": "^3.0.0",
+    "copy-webpack-plugin": "^12.0.0",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.4.0",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "dependencies": {
+    "@types/qrcode": "^1.5.6",
+    "puppeteer-core": "^24.39.1",
+    "qrcode": "^1.5.4",
+    "ws": "^8.16.0"
+  }
+}
