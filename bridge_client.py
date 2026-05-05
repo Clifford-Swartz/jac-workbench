@@ -1827,6 +1827,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                 })
 
                 # Execute each tool call and append results
+                # Parse all tool calls first
+                parsed_calls = []
                 for idx, tc in sorted(tool_calls_acc.items()):
                     tool_id = tc["id"] or f"call_{idx}"
                     tool_name = tc["name"]
@@ -1834,8 +1836,14 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                         args = json.loads(tc["arguments"]) if tc["arguments"] else {}
                     except json.JSONDecodeError:
                         args = {}
+                    parsed_calls.append((tool_id, tool_name, args))
 
-                    # Show tool_use in UI
+                # Tools that don't modify state can run in parallel
+                PARALLEL_SAFE = {"read_file", "list_directory", "glob", "grep", "fetch_url", "view_image"}
+
+                # Notify UI and check permissions sequentially (may involve user prompts)
+                permitted = []
+                for tool_id, tool_name, args in parsed_calls:
                     await send_fn({
                         "type": "tool_use",
                         "tool_use_id": tool_id,
@@ -1843,31 +1851,55 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                         "tool_input": args,
                         "session_id": session_id,
                     })
-
-                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name,
-                             str(args)[:100])
-
-                    # Permission check
+                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name, str(args)[:100])
                     allowed, deny_reason = await _permission_manager.check_tool(
                         tool_name, args, session_id, cwd, send_fn,
                     )
                     if not allowed:
-                        log.info("OR tool denied [%s]: %s — %s",
-                                 session_id[:8], tool_name, deny_reason)
-                        result = f"Permission denied: {deny_reason}"
-                    else:
-                        result = await execute_openrouter_tool(
-                            tool_name, args, cwd,
-                            messages=messages, send_fn=send_fn, session_id=session_id,
-                        )
+                        log.info("OR tool denied [%s]: %s — %s", session_id[:8], tool_name, deny_reason)
+                    permitted.append((tool_id, tool_name, args, allowed, deny_reason))
 
+                # Execute — batch consecutive parallel-safe tools together
+                async def _exec_one(tool_id, tool_name, args, allowed, deny_reason):
+                    if not allowed:
+                        return f"Permission denied: {deny_reason}"
+                    return await execute_openrouter_tool(
+                        tool_name, args, cwd,
+                        messages=messages, send_fn=send_fn, session_id=session_id,
+                    )
+
+                # Group into runs: each run is either all parallel-safe or a single mutating call
+                results_map: dict[str, str] = {}
+                i = 0
+                while i < len(permitted):
+                    tool_id, tool_name, args, allowed, deny_reason = permitted[i]
+                    if tool_name in PARALLEL_SAFE:
+                        # Collect the full run of parallel-safe calls
+                        batch = []
+                        while i < len(permitted) and permitted[i][1] in PARALLEL_SAFE:
+                            batch.append(permitted[i])
+                            i += 1
+                        if len(batch) > 1:
+                            log.info("OR parallel tools [%s]: %s", session_id[:8],
+                                     [t[1] for t in batch])
+                        results = await asyncio.gather(*[
+                            _exec_one(*b) for b in batch
+                        ])
+                        for (tid, *_), result in zip(batch, results):
+                            results_map[tid] = result
+                    else:
+                        results_map[tool_id] = await _exec_one(tool_id, tool_name, args, allowed, deny_reason)
+                        i += 1
+
+                # Emit results and append to messages in original order
+                for tool_id, tool_name, args, _, _ in permitted:
+                    result = results_map[tool_id]
                     await send_fn({
                         "type": "tool_result",
                         "tool_use_id": tool_id,
                         "content": result,
                         "session_id": session_id,
                     })
-
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_id,
