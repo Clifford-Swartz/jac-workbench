@@ -466,6 +466,7 @@ TOOL_RISK = {
     # Mutating — will require approval in strict mode
     "write_file": "write",
     "edit_file": "write",
+    "apply_patch": "write",
     "cad_execute": "write",
     "schematic_command": "write",
     "open_panel": "write",
@@ -546,6 +547,7 @@ FILE_PATH_TOOLS = {
     "read_file": "path",
     "write_file": "path",
     "edit_file": "path",
+    "apply_patch": "path",
     "list_directory": "path",
     "view_image": "path",
     "glob": "cwd",
@@ -936,6 +938,32 @@ OPENROUTER_TOOLS = [
     {
         "type": "function",
         "function": {
+            "name": "apply_patch",
+            "description": (
+                "Apply one or more SEARCH/REPLACE edits to a file. "
+                "Preferred over edit_file for multi-location changes and over write_file for any edit to an existing file. "
+                "Format the `patch` parameter as one or more blocks:\n"
+                "<<<<<<< SEARCH\n"
+                "exact lines to find\n"
+                "=======\n"
+                "replacement lines\n"
+                ">>>>>>> REPLACE\n"
+                "Each SEARCH string must match exactly (including whitespace). "
+                "Blocks are applied top-to-bottom; earlier replacements affect later searches."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "Path to the file to edit"},
+                    "patch": {"type": "string", "description": "One or more SEARCH/REPLACE blocks"},
+                },
+                "required": ["path", "patch"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "fetch_url",
             "description": "Fetch content from a URL via HTTP GET. HTML is stripped to plain text. Use for reading documentation, API responses, READMEs on the web.",
             "parameters": {
@@ -1164,6 +1192,38 @@ async def execute_openrouter_tool(
             with open(path, "w") as f:
                 f.write(new_content)
             return f"{msg} in {path}"
+
+        elif name == "apply_patch":
+            path = args.get("path", "")
+            patch = args.get("patch", "")
+            if not os.path.isabs(path):
+                path = os.path.join(cwd, path)
+            if not os.path.isfile(path):
+                return f"Error: file not found: {path}"
+            # Parse SEARCH/REPLACE blocks
+            block_re = re.compile(
+                r"<{7} SEARCH\n(.*?)\n={7}\n(.*?)\n>{7} REPLACE",
+                re.DOTALL,
+            )
+            blocks = block_re.findall(patch)
+            if not blocks:
+                return "Error: no valid SEARCH/REPLACE blocks found. Format: <<<<<<< SEARCH\\n...\\n=======\\n...\\n>>>>>>> REPLACE"
+            with open(path, "r", errors="replace") as f:
+                content = f.read()
+            applied = 0
+            for search, replace in blocks:
+                if search not in content:
+                    return f"Error: SEARCH block {applied + 1} not found in {path}:\n{search[:200]}"
+                if content.count(search) > 1:
+                    return (
+                        f"Error: SEARCH block {applied + 1} matches {content.count(search)} locations in {path}. "
+                        "Add more surrounding context to make it unique."
+                    )
+                content = content.replace(search, replace, 1)
+                applied += 1
+            with open(path, "w") as f:
+                f.write(content)
+            return f"Applied {applied} patch block(s) to {path}"
 
         elif name == "fetch_url":
             import aiohttp
