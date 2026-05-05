@@ -1774,6 +1774,15 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
             MAX_ITERATIONS = 15
             iteration = 0
 
+            # Loop detection: track (tool_name, sorted_args_json) signatures
+            _loop_last_sig: str | None = None
+            _loop_streak: int = 0
+            LOOP_WARN = 3
+            LOOP_HARD = 5
+
+            def _tool_sig(tool_name: str, args: dict) -> str:
+                return f"{tool_name}:{json.dumps(args, sort_keys=True)}"
+
             # Check upfront whether this model supports tool use
             supports_tools = _openrouter_tool_support.get(model_id, True)
 
@@ -1950,6 +1959,36 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                     else:
                         results_map[tool_id] = await _exec_one(tool_id, tool_name, args, allowed, deny_reason)
                         i += 1
+
+                # Loop detection — check the signature of this batch
+                batch_sig = "|".join(
+                    _tool_sig(t, a) for _, t, a, _, _ in permitted
+                )
+                if batch_sig == _loop_last_sig:
+                    _loop_streak += 1
+                else:
+                    _loop_streak = 1
+                    _loop_last_sig = batch_sig
+
+                if _loop_streak >= LOOP_HARD:
+                    log.warning("OR loop hard-stop [%s]: identical calls x%d", session_id[:8], _loop_streak)
+                    # Inject a hard-stop into the tool results so the model sees it
+                    for tool_id, tool_name, args, _, _ in permitted:
+                        results_map[tool_id] = (
+                            f"LOOP DETECTED: this exact {tool_name} call has been made "
+                            f"{_loop_streak} times in a row with identical arguments. "
+                            "Stop retrying. Summarise what you have learned so far and "
+                            "either ask the user for clarification or report the result."
+                        )
+                elif _loop_streak >= LOOP_WARN:
+                    log.warning("OR loop warning [%s]: identical calls x%d", session_id[:8], _loop_streak)
+                    for tool_id, tool_name, args, _, _ in permitted:
+                        results_map[tool_id] = (
+                            results_map[tool_id] +
+                            f"\n\n[WARNING: you have called {tool_name} with these same arguments "
+                            f"{_loop_streak} times consecutively. Consider whether you are stuck "
+                            "and try a different approach.]"
+                        )
 
                 # Emit results and append to messages in original order
                 for tool_id, tool_name, args, _, _ in permitted:
