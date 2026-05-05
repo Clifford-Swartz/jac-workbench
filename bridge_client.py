@@ -702,7 +702,6 @@ TOOL_RISK = {
     # Mutating — will require approval in strict mode
     "write_file": "write",
     "edit_file": "write",
-    "apply_patch": "write",
     "cad_execute": "write",
     "schematic_command": "write",
     "open_panel": "write",
@@ -783,7 +782,6 @@ FILE_PATH_TOOLS = {
     "read_file": "path",
     "write_file": "path",
     "edit_file": "path",
-    "apply_patch": "path",
     "list_directory": "path",
     "view_image": "path",
     "glob": "cwd",
@@ -1174,32 +1172,6 @@ OPENROUTER_TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "apply_patch",
-            "description": (
-                "Apply one or more SEARCH/REPLACE edits to a file. "
-                "Preferred over edit_file for multi-location changes and over write_file for any edit to an existing file. "
-                "Format the `patch` parameter as one or more blocks:\n"
-                "<<<<<<< SEARCH\n"
-                "exact lines to find\n"
-                "=======\n"
-                "replacement lines\n"
-                ">>>>>>> REPLACE\n"
-                "Each SEARCH string must match exactly (including whitespace). "
-                "Blocks are applied top-to-bottom; earlier replacements affect later searches."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {"type": "string", "description": "Path to the file to edit"},
-                    "patch": {"type": "string", "description": "One or more SEARCH/REPLACE blocks"},
-                },
-                "required": ["path", "patch"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "fetch_url",
             "description": "Fetch content from a URL via HTTP GET. HTML is stripped to plain text. Use for reading documentation, API responses, READMEs on the web.",
             "parameters": {
@@ -1428,38 +1400,6 @@ async def execute_openrouter_tool(
             with open(path, "w") as f:
                 f.write(new_content)
             return f"{msg} in {path}"
-
-        elif name == "apply_patch":
-            path = args.get("path", "")
-            patch = args.get("patch", "")
-            if not os.path.isabs(path):
-                path = os.path.join(cwd, path)
-            if not os.path.isfile(path):
-                return f"Error: file not found: {path}"
-            # Parse SEARCH/REPLACE blocks
-            block_re = re.compile(
-                r"<{7} SEARCH\n(.*?)\n={7}\n(.*?)\n>{7} REPLACE",
-                re.DOTALL,
-            )
-            blocks = block_re.findall(patch)
-            if not blocks:
-                return "Error: no valid SEARCH/REPLACE blocks found. Format: <<<<<<< SEARCH\\n...\\n=======\\n...\\n>>>>>>> REPLACE"
-            with open(path, "r", errors="replace") as f:
-                content = f.read()
-            applied = 0
-            for search, replace in blocks:
-                if search not in content:
-                    return f"Error: SEARCH block {applied + 1} not found in {path}:\n{search[:200]}"
-                if content.count(search) > 1:
-                    return (
-                        f"Error: SEARCH block {applied + 1} matches {content.count(search)} locations in {path}. "
-                        "Add more surrounding context to make it unique."
-                    )
-                content = content.replace(search, replace, 1)
-                applied += 1
-            with open(path, "w") as f:
-                f.write(content)
-            return f"Applied {applied} patch block(s) to {path}"
 
         elif name == "fetch_url":
             import aiohttp
@@ -2011,15 +1951,6 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
             MAX_ITERATIONS = 15
             iteration = 0
 
-            # Loop detection: track (tool_name, sorted_args_json) signatures
-            _loop_last_sig: str | None = None
-            _loop_streak: int = 0
-            LOOP_WARN = 3
-            LOOP_HARD = 5
-
-            def _tool_sig(tool_name: str, args: dict) -> str:
-                return f"{tool_name}:{json.dumps(args, sort_keys=True)}"
-
             # Check upfront whether this model supports tool use
             supports_tools = _openrouter_tool_support.get(model_id, True)
 
@@ -2133,8 +2064,6 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                 })
 
                 # Execute each tool call and append results
-                # Parse all tool calls first
-                parsed_calls = []
                 for idx, tc in sorted(tool_calls_acc.items()):
                     tool_id = tc["id"] or f"call_{idx}"
                     tool_name = tc["name"]
@@ -2142,14 +2071,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                         args = json.loads(tc["arguments"]) if tc["arguments"] else {}
                     except json.JSONDecodeError:
                         args = {}
-                    parsed_calls.append((tool_id, tool_name, args))
 
-                # Tools that don't modify state can run in parallel
-                PARALLEL_SAFE = {"read_file", "list_directory", "glob", "grep", "fetch_url", "view_image"}
-
-                # Notify UI and check permissions sequentially (may involve user prompts)
-                permitted = []
-                for tool_id, tool_name, args in parsed_calls:
+                    # Show tool_use in UI
                     await send_fn({
                         "type": "tool_use",
                         "tool_use_id": tool_id,
@@ -2157,85 +2080,31 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                         "tool_input": args,
                         "session_id": session_id,
                     })
-                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name, str(args)[:100])
+
+                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name,
+                             str(args)[:100])
+
+                    # Permission check
                     allowed, deny_reason = await _permission_manager.check_tool(
                         tool_name, args, session_id, cwd, send_fn,
                     )
                     if not allowed:
-                        log.info("OR tool denied [%s]: %s — %s", session_id[:8], tool_name, deny_reason)
-                    permitted.append((tool_id, tool_name, args, allowed, deny_reason))
-
-                # Execute — batch consecutive parallel-safe tools together
-                async def _exec_one(tool_id, tool_name, args, allowed, deny_reason):
-                    if not allowed:
-                        return f"Permission denied: {deny_reason}"
-                    return await execute_openrouter_tool(
-                        tool_name, args, cwd,
-                        messages=messages, send_fn=send_fn, session_id=session_id,
-                    )
-
-                # Group into runs: each run is either all parallel-safe or a single mutating call
-                results_map: dict[str, str] = {}
-                i = 0
-                while i < len(permitted):
-                    tool_id, tool_name, args, allowed, deny_reason = permitted[i]
-                    if tool_name in PARALLEL_SAFE:
-                        # Collect the full run of parallel-safe calls
-                        batch = []
-                        while i < len(permitted) and permitted[i][1] in PARALLEL_SAFE:
-                            batch.append(permitted[i])
-                            i += 1
-                        if len(batch) > 1:
-                            log.info("OR parallel tools [%s]: %s", session_id[:8],
-                                     [t[1] for t in batch])
-                        results = await asyncio.gather(*[
-                            _exec_one(*b) for b in batch
-                        ])
-                        for (tid, *_), result in zip(batch, results):
-                            results_map[tid] = result
+                        log.info("OR tool denied [%s]: %s — %s",
+                                 session_id[:8], tool_name, deny_reason)
+                        result = f"Permission denied: {deny_reason}"
                     else:
-                        results_map[tool_id] = await _exec_one(tool_id, tool_name, args, allowed, deny_reason)
-                        i += 1
-
-                # Loop detection — check the signature of this batch
-                batch_sig = "|".join(
-                    _tool_sig(t, a) for _, t, a, _, _ in permitted
-                )
-                if batch_sig == _loop_last_sig:
-                    _loop_streak += 1
-                else:
-                    _loop_streak = 1
-                    _loop_last_sig = batch_sig
-
-                if _loop_streak >= LOOP_HARD:
-                    log.warning("OR loop hard-stop [%s]: identical calls x%d", session_id[:8], _loop_streak)
-                    # Inject a hard-stop into the tool results so the model sees it
-                    for tool_id, tool_name, args, _, _ in permitted:
-                        results_map[tool_id] = (
-                            f"LOOP DETECTED: this exact {tool_name} call has been made "
-                            f"{_loop_streak} times in a row with identical arguments. "
-                            "Stop retrying. Summarise what you have learned so far and "
-                            "either ask the user for clarification or report the result."
-                        )
-                elif _loop_streak >= LOOP_WARN:
-                    log.warning("OR loop warning [%s]: identical calls x%d", session_id[:8], _loop_streak)
-                    for tool_id, tool_name, args, _, _ in permitted:
-                        results_map[tool_id] = (
-                            results_map[tool_id] +
-                            f"\n\n[WARNING: you have called {tool_name} with these same arguments "
-                            f"{_loop_streak} times consecutively. Consider whether you are stuck "
-                            "and try a different approach.]"
+                        result = await execute_openrouter_tool(
+                            tool_name, args, cwd,
+                            messages=messages, send_fn=send_fn, session_id=session_id,
                         )
 
-                # Emit results and append to messages in original order
-                for tool_id, tool_name, args, _, _ in permitted:
-                    result = results_map[tool_id]
                     await send_fn({
                         "type": "tool_result",
                         "tool_use_id": tool_id,
                         "content": result,
                         "session_id": session_id,
                     })
+
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_id,
@@ -2682,7 +2551,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                     "token": auth_token,
                     "role": "provider",
                     "machine_id": MACHINE_ID,
-                    "provider_id": f"{MACHINE_ID}-jac",
+                    "provider_id": MACHINE_ID,
                 }))
 
                 raw = await asyncio.wait_for(ws.recv(), timeout=10.0)
@@ -2741,7 +2610,10 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 continue
 
                             cwd = msg.get("cwd") or config.cwd
-                            current_model = config.model
+                            # Each query carries its own model. config.model is just
+                            # the startup default — without this fallback, picking
+                            # a different model on the phone had no effect.
+                            current_model = msg.get("model") or config.model
 
                             # Check if this is a local model
                             def is_local_model(m):
