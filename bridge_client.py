@@ -25,8 +25,14 @@ import socket
 import subprocess
 import sys
 import time
+import urllib.parse
 from pathlib import Path
 from typing import Any
+
+try:
+    import send2trash as _send2trash
+except ImportError:
+    _send2trash = None  # required for fs.trash, install via pip if missing
 
 import anthropic
 import websockets
@@ -153,6 +159,236 @@ def fs_stat(path: str) -> dict[str, Any]:
 
 def fs_home() -> dict[str, Any]:
     return {"type": "fs.home.response", "path": str(Path.home())}
+
+
+# ── Trash (send / list / empty), cross-platform ───────────────────────────────
+# Mirrors jac-provider's helpers verbatim. send-to-trash via send2trash on
+# every OS; listing + emptying are per-OS (macOS reads ~/.Trash, Linux
+# follows the freedesktop spec, Windows shells out to PowerShell + the
+# Shell.Application COM object).
+
+def _trash_dir_size(p: Path, max_files: int = 5000) -> int:
+    total = 0
+    count = 0
+    try:
+        for root, _, files in os.walk(p):
+            for f in files:
+                try:
+                    total += (Path(root) / f).stat().st_size
+                except OSError:
+                    pass
+                count += 1
+                if count >= max_files:
+                    return total
+    except OSError:
+        pass
+    return total
+
+
+def fs_trash(path: str) -> dict[str, Any]:
+    if _send2trash is None:
+        return {"type": "fs.error", "request_type": "fs.trash", "path": path,
+                "error": "send2trash not installed on the daemon"}
+    p = Path(path).expanduser().resolve(strict=False)
+    if not p.exists():
+        return {"type": "fs.error", "request_type": "fs.trash", "path": path, "error": "not found"}
+    try:
+        _send2trash.send2trash(str(p))
+    except Exception as e:
+        return {"type": "fs.error", "request_type": "fs.trash", "path": path, "error": str(e)}
+    return {"type": "fs.trash.response", "path": str(p)}
+
+
+def _trash_list_mac() -> dict[str, Any]:
+    trash = Path.home() / ".Trash"
+    entries: list[dict[str, Any]] = []
+    total = 0
+    if not trash.is_dir():
+        return {"type": "fs.trash.list.response", "platform": "darwin",
+                "entries": entries, "total_size": 0}
+    try:
+        with os.scandir(trash) as it:
+            for entry in it:
+                try:
+                    stat = entry.stat(follow_symlinks=False)
+                except OSError:
+                    continue
+                is_dir = entry.is_dir(follow_symlinks=False)
+                size = _trash_dir_size(Path(entry.path)) if is_dir else stat.st_size
+                entries.append({
+                    "name": entry.name, "path": entry.path,
+                    "is_dir": is_dir, "size": size, "modified": stat.st_mtime,
+                    "original_path": None,
+                })
+                total += size
+    except PermissionError as e:
+        return {"type": "fs.error", "request_type": "fs.trash.list", "error": str(e)}
+    entries.sort(key=lambda e: e["modified"], reverse=True)
+    return {"type": "fs.trash.list.response", "platform": "darwin",
+            "entries": entries, "total_size": total}
+
+
+def _trash_list_linux() -> dict[str, Any]:
+    base = Path(os.environ.get("XDG_DATA_HOME") or (Path.home() / ".local" / "share")) / "Trash"
+    files_dir = base / "files"
+    info_dir = base / "info"
+    entries: list[dict[str, Any]] = []
+    total = 0
+    if not files_dir.is_dir():
+        return {"type": "fs.trash.list.response", "platform": "linux",
+                "entries": entries, "total_size": 0}
+    try:
+        with os.scandir(files_dir) as it:
+            for entry in it:
+                try:
+                    stat = entry.stat(follow_symlinks=False)
+                except OSError:
+                    continue
+                is_dir = entry.is_dir(follow_symlinks=False)
+                size = _trash_dir_size(Path(entry.path)) if is_dir else stat.st_size
+                original = None
+                info_path = info_dir / f"{entry.name}.trashinfo"
+                if info_path.exists():
+                    try:
+                        for line in info_path.read_text().splitlines():
+                            if line.startswith("Path="):
+                                original = urllib.parse.unquote(line[5:])
+                                break
+                    except OSError:
+                        pass
+                entries.append({
+                    "name": entry.name, "path": entry.path,
+                    "is_dir": is_dir, "size": size, "modified": stat.st_mtime,
+                    "original_path": original,
+                })
+                total += size
+    except PermissionError as e:
+        return {"type": "fs.error", "request_type": "fs.trash.list", "error": str(e)}
+    entries.sort(key=lambda e: e["modified"], reverse=True)
+    return {"type": "fs.trash.list.response", "platform": "linux",
+            "entries": entries, "total_size": total}
+
+
+_WIN_TRASH_LIST_PS = r'''
+$ErrorActionPreference = 'SilentlyContinue'
+$shell = New-Object -ComObject Shell.Application
+$bin = $shell.NameSpace(0xA)
+$out = @()
+foreach ($item in $bin.Items()) {
+    $orig = $bin.GetDetailsOf($item, 1)
+    $size = 0
+    try { $size = (Get-Item -LiteralPath $item.Path -Force).Length } catch {}
+    if (-not $size -and $item.IsFolder) {
+        try {
+            $size = (Get-ChildItem -LiteralPath $item.Path -Recurse -Force -ErrorAction SilentlyContinue |
+                     Measure-Object -Property Length -Sum).Sum
+        } catch { $size = 0 }
+    }
+    $out += [PSCustomObject]@{
+        name = $item.Name
+        path = $item.Path
+        is_dir = [bool]$item.IsFolder
+        size = [int64]([double]($size -as [int64]))
+        modified = [int64](([DateTimeOffset]$item.ModifyDate).ToUnixTimeSeconds())
+        original_path = $orig
+    }
+}
+$out | ConvertTo-Json -Compress -Depth 4
+'''
+
+
+def _trash_list_win() -> dict[str, Any]:
+    try:
+        proc = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", _WIN_TRASH_LIST_PS],
+            capture_output=True, text=True, timeout=15,
+        )
+        if proc.returncode != 0:
+            return {"type": "fs.error", "request_type": "fs.trash.list",
+                    "error": (proc.stderr or "powershell failed").strip()}
+        out = (proc.stdout or "").strip() or "[]"
+        try:
+            data = json.loads(out)
+        except json.JSONDecodeError as e:
+            return {"type": "fs.error", "request_type": "fs.trash.list",
+                    "error": f"powershell output not JSON: {e}"}
+        if isinstance(data, dict):
+            data = [data]
+        if not isinstance(data, list):
+            data = []
+        total = sum(int(d.get("size") or 0) for d in data)
+        return {"type": "fs.trash.list.response", "platform": "win32",
+                "entries": data, "total_size": total}
+    except Exception as e:
+        return {"type": "fs.error", "request_type": "fs.trash.list", "error": str(e)}
+
+
+def fs_trash_list() -> dict[str, Any]:
+    if sys.platform == "darwin":
+        return _trash_list_mac()
+    if sys.platform == "win32":
+        return _trash_list_win()
+    if sys.platform.startswith("linux"):
+        return _trash_list_linux()
+    return {"type": "fs.error", "request_type": "fs.trash.list",
+            "error": f"trash listing not supported on {sys.platform}"}
+
+
+def _trash_empty_dirs(dirs: list[Path]) -> dict[str, Any]:
+    items = 0
+    total = 0
+    errors: list[str] = []
+    for d in dirs:
+        if not d.is_dir():
+            continue
+        try:
+            with os.scandir(d) as it:
+                for entry in it:
+                    try:
+                        is_dir = entry.is_dir(follow_symlinks=False)
+                        size = _trash_dir_size(Path(entry.path)) if is_dir else \
+                               entry.stat(follow_symlinks=False).st_size
+                        if is_dir:
+                            shutil.rmtree(entry.path, ignore_errors=True)
+                        else:
+                            os.unlink(entry.path)
+                        items += 1
+                        total += size
+                    except OSError as e:
+                        errors.append(f"{entry.path}: {e}")
+        except OSError as e:
+            errors.append(f"{d}: {e}")
+    resp: dict[str, Any] = {"type": "fs.trash.empty.response", "items": items, "bytes": total}
+    if errors:
+        resp["partial_errors"] = errors[:10]
+    return resp
+
+
+def _trash_empty_win() -> dict[str, Any]:
+    try:
+        proc = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+             "Clear-RecycleBin -Force -ErrorAction SilentlyContinue"],
+            capture_output=True, text=True, timeout=60,
+        )
+        if proc.returncode != 0 and (proc.stderr or "").strip():
+            return {"type": "fs.error", "request_type": "fs.trash.empty",
+                    "error": proc.stderr.strip()}
+        return {"type": "fs.trash.empty.response", "items": -1, "bytes": -1}
+    except Exception as e:
+        return {"type": "fs.error", "request_type": "fs.trash.empty", "error": str(e)}
+
+
+def fs_trash_empty() -> dict[str, Any]:
+    if sys.platform == "darwin":
+        return _trash_empty_dirs([Path.home() / ".Trash"])
+    if sys.platform == "win32":
+        return _trash_empty_win()
+    if sys.platform.startswith("linux"):
+        base = Path(os.environ.get("XDG_DATA_HOME") or (Path.home() / ".local" / "share")) / "Trash"
+        return _trash_empty_dirs([base / "files", base / "info"])
+    return {"type": "fs.error", "request_type": "fs.trash.empty",
+            "error": f"trash empty not supported on {sys.platform}"}
 
 
 # ── environment_details ─────────────────────────────────────────────────────
@@ -1440,6 +1676,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                 cli_path=config.cli_path,
                 send_fn=send_to_ws,
                 session_id=session_id,
+                proxy_mode=config.proxy_mode,
             )
         return sessions[session_id]
 
@@ -2759,6 +2996,12 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 resp = fs_stat(msg.get("path") or "")
                             elif msg_type == "fs.home":
                                 resp = fs_home()
+                            elif msg_type == "fs.trash":
+                                resp = fs_trash(msg.get("path") or "")
+                            elif msg_type == "fs.trash.list":
+                                resp = fs_trash_list()
+                            elif msg_type == "fs.trash.empty":
+                                resp = fs_trash_empty()
                             else:
                                 resp = {"type": "fs.error", "request_type": msg_type,
                                         "error": f"unknown op {msg_type}"}
@@ -2827,6 +3070,12 @@ def main():
         help="Auth token (must match relay's AUTH_TOKEN)",
     )
     parser.add_argument("--model", default=None, help="Claude model to use")
+    parser.add_argument(
+        "--proxy-mode", action="store_true",
+        help="Forward tool calls (Bash/Read/Edit/...) over WS to a connected IDE "
+             "extension instead of executing them on this machine. Default is local "
+             "execution — set this when running alongside the JAC VSCode extension.",
+    )
     args = parser.parse_args()
 
     relay_url = args.relay
@@ -2844,10 +3093,13 @@ def main():
     config.auth_token = auth_token
     if args.model:
         config.model = args.model
+    if args.proxy_mode:
+        config.proxy_mode = True
 
     log.info("Bridge client starting")
     log.info("  Relay: %s", relay_url)
     log.info("  Model: %s", config.model)
+    log.info("  Tool execution: %s", "proxy (forwarded to IDE)" if config.proxy_mode else "local")
 
     loop = asyncio.new_event_loop()
 

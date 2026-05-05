@@ -19,6 +19,11 @@ class ServerConfig:
     permission_mode: str = os.getenv("PERMISSION_MODE", "bypassPermissions")
     cwd: str | None = os.getenv("CWD", None)
     cli_path: str | None = os.getenv("CLAUDE_CLI_PATH", None)
+    # When True, Bash/Read/Edit/etc. tool calls are forwarded over WS for an
+    # IDE extension to execute. When False (default), Claude Agent SDK runs
+    # them locally on this bridge machine — the right mode for the
+    # phone-controls-my-computer flow where no IDE is in the loop.
+    proxy_mode: bool = os.getenv("PROXY_MODE", "").lower() in ("1", "true", "yes")
 
     def validate(self):
         if not self.auth_token:

@@ -217,7 +217,7 @@ class ClaudeBridge:
         cli_path: str | None = None,
         send_fn: Callable[[dict], Awaitable[None]] | None = None,
         session_id: str | None = None,
-        proxy_mode: bool = True,
+        proxy_mode: bool = False,
     ):
         self._model = model
         self._permission_mode = permission_mode
