@@ -21,7 +21,9 @@ import os
 import re
 import shutil
 import signal
+import socket
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -284,23 +286,36 @@ def _fetch_openrouter_models() -> list[dict]:
         return _openrouter_models_cache  # fall back to stale cache if any
 
 # Machine ID for multi-provider routing
-MACHINE_ID = os.getenv("JAC_MACHINE_ID", os.uname().nodename)
+# os.uname() is POSIX-only (crashes on Windows at import). Python evaluates
+# the second arg to getenv before passing it as a default, so the unconditional
+# call would fire even when JAC_MACHINE_ID is set. socket.gethostname() is
+# cross-platform and gives the same value on macOS/Linux.
+MACHINE_ID = os.getenv("JAC_MACHINE_ID") or socket.gethostname()
 
 
 def find_cli(name: str) -> str | None:
-    """Find a CLI binary, checking common locations."""
-    # Standard PATH lookup
-    found = shutil.which(name)
-    if found:
-        return found
-    # Claude is often in the VS Code extension
+    """Find a CLI binary, checking common locations.
+
+    Cross-platform: shutil.which honors PATHEXT on Windows, but only when
+    the lookup name itself includes the extension or matches a PATHEXT entry.
+    Try the bare name first (handles `claude.cmd` shim, native macOS/Linux
+    binaries) then explicit `.exe` / `.cmd` suffixes for Windows.
+    """
+    for candidate in (name, f"{name}.exe", f"{name}.cmd"):
+        found = shutil.which(candidate)
+        if found:
+            return found
+    # VS Code extension fallback. Mac/Linux ship the binary as `claude`,
+    # Windows as `claude.exe`. The extension folder name carries the
+    # platform suffix (`...-darwin-arm64`, `...-win32-x64`), which the glob
+    # unfolds.
     if name == "claude":
         import glob
-        patterns = [
-            os.path.expanduser("~/.vscode/extensions/anthropic.claude-code-*/resources/native-binary/claude"),
-        ]
-        for pattern in patterns:
-            matches = sorted(glob.glob(pattern), reverse=True)
+        base = os.path.expanduser(
+            "~/.vscode/extensions/anthropic.claude-code-*/resources/native-binary/"
+        )
+        for binname in ("claude", "claude.exe", "claude.cmd"):
+            matches = sorted(glob.glob(base + binname), reverse=True)
             if matches:
                 return matches[0]
     return None
@@ -2705,9 +2720,13 @@ def main():
 
     loop = asyncio.new_event_loop()
 
-    # Graceful shutdown on Ctrl+C
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, lambda: loop.stop())
+    # Graceful shutdown on Ctrl+C. add_signal_handler is POSIX-only — Windows'
+    # ProactorEventLoop raises NotImplementedError. There, KeyboardInterrupt
+    # bubbles out of run_until_complete naturally and the existing handler
+    # below catches it.
+    if sys.platform != "win32":
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, lambda: loop.stop())
 
     try:
         loop.run_until_complete(run_bridge(relay_url, auth_token, config))
