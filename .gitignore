@@ -1,0 +1,26 @@
+# Node
+extension/node_modules/
+extension/dist/webview/three.min.js
+extension/dist/webview/OrbitControls.js
+extension/dist/webview/TransformControls.js
+extension/dist/webview/GLTFLoader.js
+extension/*.vsix
+extension/dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Local config / secrets
+.env
+*.log
+cad_out/
+
+# macOS
+.DS_Store
+
+# Bridge history / state
+.jac/history/

@@ -1,0 +1,5 @@
+.env
+genie_demo.db
+__pycache__/
+*.pyc
+.streamlit/
