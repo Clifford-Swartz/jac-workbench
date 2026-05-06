@@ -1982,7 +1982,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
             }
 
             system_prompt = (
-                f"You are JAC, an AI assistant with access to tools for the user's filesystem, "
+                f"You are JAC, an AI assistant powered by {real_model} (via OpenRouter), "
+                f"with access to tools for the user's filesystem, "
                 f"shell, and CAD/schematic panels. Current working directory: {cwd}.\n\n"
                 f"RULES OF BEHAVIOR:\n"
                 f"1. Only do what the user explicitly asks. Do not chain unrelated tasks, "
@@ -2275,6 +2276,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                 "duration_ms": 0,
                 "total_cost_usd": 0,
                 "num_turns": iteration,
+                "model": model_id,
             })
             credits = await check_openrouter_credits()
             if credits:
