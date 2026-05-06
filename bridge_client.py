@@ -702,6 +702,7 @@ TOOL_RISK = {
     # Mutating — will require approval in strict mode
     "write_file": "write",
     "edit_file": "write",
+    "apply_patch": "write",
     "cad_execute": "write",
     "schematic_command": "write",
     "open_panel": "write",
@@ -709,6 +710,12 @@ TOOL_RISK = {
     # Full shell access — always highest scrutiny
     "bash": "dangerous",
 }
+
+# Tools that can run concurrently (no side-effects on shared state).
+# view_image is excluded because it appends to the messages list.
+PARALLEL_SAFE = frozenset({
+    "read_file", "list_directory", "glob", "grep", "fetch_url",
+})
 
 # Patterns that should NEVER execute, regardless of permission mode.
 # These are things a rogue model could do to wreck the bridge machine or
@@ -1266,6 +1273,32 @@ OPENROUTER_TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "apply_patch",
+            "description": (
+                "Apply one or more SEARCH/REPLACE edits to a file in a single call. "
+                "More efficient than multiple edit_file calls. "
+                "Each hunk must use this exact format:\n"
+                "<<<<<<< SEARCH\n"
+                "exact text to find (must be unique in the file)\n"
+                "=======\n"
+                "replacement text\n"
+                ">>>>>>> REPLACE\n"
+                "Multiple hunks are applied top-to-bottom. "
+                "The SEARCH text must appear exactly once in the file."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "Path to the file to edit"},
+                    "diff": {"type": "string", "description": "One or more SEARCH/REPLACE hunks"},
+                },
+                "required": ["path", "diff"],
+            },
+        },
+    },
 ]
 
 
@@ -1539,6 +1572,45 @@ async def execute_openrouter_tool(
                 })
                 return f"Image loaded ({len(img_bytes)} bytes, {mime}). You can now see it."
             return f"Loaded {len(img_bytes)} bytes but no conversation context to attach it to."
+
+        elif name == "apply_patch":
+            path = args.get("path", "")
+            diff = args.get("diff", "")
+            if not os.path.isabs(path):
+                path = os.path.join(cwd, path)
+            try:
+                with open(path, "r", errors="replace") as f:
+                    content = f.read()
+            except FileNotFoundError:
+                return f"Error: file not found: {path}"
+            except OSError as e:
+                return f"Error reading {path}: {e}"
+            hunk_re = re.compile(
+                r"<{7} SEARCH\n(.*?)\n={7}\n(.*?)\n>{7} REPLACE",
+                re.DOTALL,
+            )
+            hunks = hunk_re.findall(diff)
+            if not hunks:
+                return "Error: no SEARCH/REPLACE hunks found in diff"
+            applied = 0
+            errors = []
+            for search_text, replace_text in hunks:
+                if search_text not in content:
+                    errors.append("SEARCH text not found in file")
+                    continue
+                if content.count(search_text) > 1:
+                    errors.append("SEARCH text appears multiple times — add more context to disambiguate")
+                    continue
+                content = content.replace(search_text, replace_text, 1)
+                applied += 1
+            if applied == 0:
+                return f"Error: no hunks applied. {'; '.join(errors)}"
+            with open(path, "w") as f:
+                f.write(content)
+            result_msg = f"Applied {applied}/{len(hunks)} hunk(s) to {path}"
+            if errors:
+                result_msg += f". Errors: {'; '.join(errors)}"
+            return result_msg
 
         elif name == "schematic_command":
             import aiohttp
@@ -1910,7 +1982,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
             }
 
             system_prompt = (
-                f"You are JAC, an AI assistant with access to tools for the user's filesystem, "
+                f"You are JAC, an AI assistant powered by {real_model} (via OpenRouter), "
+                f"with access to tools for the user's filesystem, "
                 f"shell, and CAD/schematic panels. Current working directory: {cwd}.\n\n"
                 f"RULES OF BEHAVIOR:\n"
                 f"1. Only do what the user explicitly asks. Do not chain unrelated tasks, "
@@ -1953,6 +2026,12 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
 
             # Check upfront whether this model supports tool use
             supports_tools = _openrouter_tool_support.get(model_id, True)
+
+            # Loop detection state
+            _last_tool_sig: str | None = None
+            _loop_count: int = 0
+            LOOP_WARN = 3
+            LOOP_STOP = 5
 
             while iteration < MAX_ITERATIONS:
                 iteration += 1
@@ -2064,48 +2143,95 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                     ],
                 })
 
-                # Execute each tool call and append results
-                for idx, tc in sorted(tool_calls_acc.items()):
+                # Loop detection — same batch of tool calls repeated?
+                sorted_calls = sorted(tool_calls_acc.items())
+                cur_sig = json.dumps(
+                    [{"n": tc["name"], "a": tc["arguments"]} for _, tc in sorted_calls],
+                    sort_keys=True,
+                )
+                if cur_sig == _last_tool_sig:
+                    _loop_count += 1
+                else:
+                    _last_tool_sig = cur_sig
+                    _loop_count = 1
+
+                if _loop_count >= LOOP_STOP:
+                    log.warning("OR loop detected [%s], stopping after %d identical calls",
+                                session_id[:8], _loop_count)
+                    for idx, tc in sorted_calls:
+                        tool_id = tc["id"] or f"call_{idx}"
+                        messages.append({
+                            "role": "tool", "tool_call_id": tool_id,
+                            "content": (
+                                "Error: Loop detected — same tool call repeated 5 times. "
+                                "Stop and tell the user what you found so far."
+                            ),
+                        })
+                    break
+                elif _loop_count >= LOOP_WARN:
+                    log.warning("OR near-loop [%s]: same tools %d times: %s",
+                                session_id[:8], _loop_count, cur_sig[:120])
+                    messages.append({
+                        "role": "user",
+                        "content": (
+                            f"[System: You have called the same tool(s) {_loop_count} times in a "
+                            "row with identical arguments. If you're stuck, summarize what you've "
+                            "found and ask the user for clarification instead of retrying.]"
+                        ),
+                    })
+
+                # Execute tools — parallel if all are read-only, sequential otherwise
+                async def _exec_tool(idx: int, tc: dict) -> tuple[str, str]:
                     tool_id = tc["id"] or f"call_{idx}"
                     tool_name = tc["name"]
                     try:
-                        args = json.loads(tc["arguments"]) if tc["arguments"] else {}
+                        t_args = json.loads(tc["arguments"]) if tc["arguments"] else {}
                     except json.JSONDecodeError:
-                        args = {}
+                        t_args = {}
 
-                    # Show tool_use in UI
                     await send_fn({
                         "type": "tool_use",
                         "tool_use_id": tool_id,
                         "tool_name": tool_name,
-                        "tool_input": args,
+                        "tool_input": t_args,
                         "session_id": session_id,
                     })
+                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name, str(t_args)[:100])
 
-                    log.info("OR tool [%s]: %s(%s)", session_id[:8], tool_name,
-                             str(args)[:100])
-
-                    # Permission check
                     allowed, deny_reason = await _permission_manager.check_tool(
-                        tool_name, args, session_id, cwd, send_fn,
+                        tool_name, t_args, session_id, cwd, send_fn,
                     )
                     if not allowed:
                         log.info("OR tool denied [%s]: %s — %s",
                                  session_id[:8], tool_name, deny_reason)
-                        result = f"Permission denied: {deny_reason}"
+                        t_result = f"Permission denied: {deny_reason}"
                     else:
-                        result = await execute_openrouter_tool(
-                            tool_name, args, cwd,
+                        t_result = await execute_openrouter_tool(
+                            tool_name, t_args, cwd,
                             messages=messages, send_fn=send_fn, session_id=session_id,
                         )
 
                     await send_fn({
                         "type": "tool_result",
                         "tool_use_id": tool_id,
-                        "content": result,
+                        "content": t_result,
                         "session_id": session_id,
                     })
+                    return tool_id, t_result
 
+                run_parallel = (
+                    len(sorted_calls) > 1
+                    and all(tc["name"] in PARALLEL_SAFE for _, tc in sorted_calls)
+                )
+                if run_parallel:
+                    log.info("OR parallel tools [%s]: %d calls", session_id[:8], len(sorted_calls))
+                    pairs = await asyncio.gather(*[_exec_tool(i, t) for i, t in sorted_calls])
+                else:
+                    pairs = []
+                    for idx, tc in sorted_calls:
+                        pairs.append(await _exec_tool(idx, tc))
+
+                for tool_id, result in pairs:
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_id,
@@ -2458,8 +2584,10 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
             log.warning("_call_or_simple failed: %s", e)
             return None
 
-    async def run_query(session_id: str, bridge: ClaudeBridge, prompt: str, cwd: str, images: list | None = None) -> None:
+    async def run_query(session_id: str, bridge: ClaudeBridge, prompt: str, cwd: str, images: list | None = None, model: str | None = None) -> None:
         """Run bridge.query() in background, send results to ws."""
+        if model:
+            bridge._model = model
         assistant_response = ""
         try:
             async for protocol_msg in bridge.query(prompt, cwd=cwd, images=images):
@@ -2665,7 +2793,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 log.info("Query [%s] → Claude %s: %.80s... (cwd=%s, images=%d)",
                                          session_id[:8], current_model, prompt, cwd, len(images))
                                 query_tasks[session_id] = asyncio.create_task(
-                                    run_query(session_id, bridge, prompt, cwd, images or None)
+                                    run_query(session_id, bridge, prompt, cwd, images or None, model=current_model)
                                 )
 
                         elif msg_type == "permission_response":
