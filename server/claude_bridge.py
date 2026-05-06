@@ -490,12 +490,14 @@ class ClaudeBridge:
                         "type": "assistant_text_delta",
                         "text": delta.get("text", ""),
                         "session_id": sid,
+                        "model": self._model,
                     }
                 elif delta_type == "thinking_delta":
                     yield {
                         "type": "thinking",
                         "text": delta.get("thinking", ""),
                         "session_id": sid,
+                        "model": self._model,
                     }
 
             elif event_type == "content_block_start":
@@ -548,6 +550,7 @@ class ClaudeBridge:
                 "num_turns": message.num_turns,
                 "is_error": message.is_error,
                 "usage": message.usage,
+                "model": self._model,
             }
 
         elif isinstance(message, SystemMessage):
