@@ -44,8 +44,24 @@ export function registerPairPhoneCommand(
             if (expiryTimer) clearTimeout(expiryTimer);
         });
 
-        const configuredMachineId = vscode.workspace.getConfiguration('claudeUltra').get<string>('providerMachineId');
-        const machineId = (configuredMachineId && configuredMachineId.trim()) || os.hostname();
+        // Resolve the target machine_id. Only honor the override at workspace
+        // scope — User-scope values get pulled across machines by Settings Sync,
+        // which silently makes both laptops generate QRs that pair the phone to
+        // whichever machine the value names (and not the one you're sitting at).
+        // Fall back to os.hostname(), which always matches what the bridge on
+        // this machine registered with (socket.gethostname()).
+        const cfg = vscode.workspace.getConfiguration('claudeUltra');
+        const inspect = cfg.inspect<string>('providerMachineId');
+        const workspaceOverride =
+            inspect?.workspaceFolderValue?.trim() || inspect?.workspaceValue?.trim() || '';
+        const machineId = workspaceOverride || os.hostname();
+        if (inspect?.globalValue && !workspaceOverride) {
+            vscode.window.showWarningMessage(
+                `JAC: ignoring user-level claudeUltra.providerMachineId="${inspect.globalValue}" — ` +
+                'this setting is now workspace-only to keep Settings Sync from sharing it. ' +
+                `Using hostname "${machineId}" instead.`,
+            );
+        }
         ws.sendRaw({ type: 'pair_request', machine_id: machineId });
     });
 }
