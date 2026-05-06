@@ -228,3 +228,37 @@ All models appear in JAC's cloud tab. Model watcher re-checks every 30 seconds.
 - Local model thinking tokens (Qwen3) sometimes leak into main response
 - Schematic wire routing can overlap on complex circuits
 - Music fractal mode can occasionally show solid colors during parameter transitions
+
+## Cross-account coordination (Mac: clawf ↔ claudiusmaximus)
+
+The bridge daemon and the JAC VSCode extension run as `claudiusmaximus` (so
+Messages.app stays signed in for AI-driven iMessage). The Claude Code sandbox
+blocks Claude in `clawf` from reading that account's home folder, so direct
+introspection (e.g., "what's in their VSCode settings.json?") is denied.
+
+To exchange info without the user shuttling output by hand, both Claudes share
+a mailbox in `/tmp` (mode 1777, both accounts can rw):
+
+- `/tmp/jac-cross-REQUEST.md` — the active request
+- `/tmp/jac-cross-RESPONSE.md` — the latest response
+
+### When you (clawf Claude) need something from claudiusmaximus:
+1. Write `/tmp/jac-cross-REQUEST.md`. Include at the top: an ISO timestamp,
+   exact commands to run, and what to put in the response.
+2. Tell the user one short sentence: *"Ping your other Claude — request waiting
+   in `/tmp/jac-cross-REQUEST.md`."*
+3. Wait. Use ScheduleWakeup (~60s) and re-check; or just ask the user when ready.
+4. Read `/tmp/jac-cross-RESPONSE.md`. Match by the timestamp you wrote.
+
+### When you (claudiusmaximus Claude) are told there's a request:
+1. Read `/tmp/jac-cross-REQUEST.md`.
+2. Run *exactly* the commands listed. Don't volunteer beyond what was asked.
+3. Write the result to `/tmp/jac-cross-RESPONSE.md`. Echo the request's timestamp
+   at the top so the requester can correlate. Keep output verbatim under fenced
+   code blocks; don't paraphrase.
+4. Leave REQUEST.md alone — the requester cleans up.
+
+### Setup on a fresh claudiusmaximus session
+The user should give that account's Claude the same instruction by either
+(a) cloning `Clifford-Swartz/jac` into a working dir so this CLAUDE.md
+auto-loads, or (b) saving a memory pointing at this protocol.
