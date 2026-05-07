@@ -627,26 +627,42 @@ def _detect_local_llm_models() -> list[dict]:
 
 
 def get_available_models(cli_path: str | None = None) -> list[dict]:
-    """Discover all available models based on installed AND authenticated CLIs."""
+    """Discover all available models based on installed AND authenticated CLIs.
+
+    Each subsystem is isolated — a failure in one (e.g. a Windows path quirk in
+    find_cli, a hung subprocess in _is_codex_logged_in, a flaky local-LLM probe)
+    must NOT take down model discovery entirely, or the bridge auth's but never
+    sends models_list and silently reconnect-loops forever. We log per-subsystem
+    failures with full stack traces so the actual culprit shows up in the log.
+    """
+    import traceback
     models = []
 
+    def _safe(label: str, fn):
+        try:
+            return fn()
+        except Exception as e:
+            log.warning("get_available_models: %s failed (%s); skipping. Trace:\n%s",
+                        label, e, traceback.format_exc())
+            return None
+
     # ── Claude (via CLI or VS Code extension) ────────────────────────────
-    claude_cli = cli_path or find_cli("claude")
+    claude_cli = cli_path or _safe("find_cli('claude')", lambda: find_cli("claude"))
     if claude_cli:
         models.extend(DEFAULT_CLAUDE_MODELS)
         log.info("Claude CLI found: %s", claude_cli)
 
     # ── OpenAI Codex CLI (only if logged in) ─────────────────────────────
-    codex_cli = find_cli("codex")
-    if codex_cli and _is_codex_logged_in():
+    codex_cli = _safe("find_cli('codex')", lambda: find_cli("codex"))
+    if codex_cli and _safe("_is_codex_logged_in", _is_codex_logged_in):
         models.extend(OPENAI_MODELS)
         log.info("Codex CLI found and authenticated: %s", codex_cli)
     elif codex_cli:
         log.info("Codex CLI found but NOT logged in: %s (run 'codex login')", codex_cli)
 
     # ── Gemini CLI (only if auth configured) ─────────────────────────────
-    gemini_cli = find_cli("gemini")
-    if gemini_cli and _is_gemini_logged_in():
+    gemini_cli = _safe("find_cli('gemini')", lambda: find_cli("gemini"))
+    if gemini_cli and _safe("_is_gemini_logged_in", _is_gemini_logged_in):
         models.extend(GEMINI_MODELS)
         log.info("Gemini CLI found and authenticated: %s", gemini_cli)
     elif gemini_cli:
@@ -654,12 +670,12 @@ def get_available_models(cli_path: str | None = None) -> list[dict]:
 
     # ── OpenRouter (if API key configured) ─────────────────────────────
     if OPENROUTER_API_KEY:
-        or_models = _fetch_openrouter_models()
+        or_models = _safe("_fetch_openrouter_models", _fetch_openrouter_models)
         if or_models:
             models.extend(or_models)
 
     # ── Local/remote LLM servers (llama-server, vLLM, etc.) ──────────────
-    llm_models = _detect_local_llm_models()
+    llm_models = _safe("_detect_local_llm_models", _detect_local_llm_models) or []
     models.extend(llm_models)
 
     return models if models else DEFAULT_CLAUDE_MODELS
@@ -3032,7 +3048,10 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
 
         except Exception as e:
             ws_ref[0] = None
-            log.error("Unexpected error: %s. Reconnecting in %ds...", e, delay)
+            # log.exception captures the full stack trace, which is what we
+            # actually need to debug "auth'd but never sent models_list"
+            # (the bare %s only showed the exception's message, hiding line numbers).
+            log.exception("Unexpected error in bridge connection: %s. Reconnecting in %ds...", e, delay)
             await asyncio.sleep(delay)
             delay = min(delay * 2, RECONNECT_MAX)
 
