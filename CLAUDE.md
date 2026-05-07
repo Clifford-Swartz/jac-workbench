@@ -1,21 +1,12 @@
 # JAC — AI Workbench VSCode Extension
 
-## ⚠️ Two repos, two bridge_client.py files — DO NOT mirror by copy
+## Bridge daemon lives in [Clifford-Swartz/jac-bridge](https://github.com/Clifford-Swartz/jac-bridge)
 
-`Clifford-Swartz/jac` (this monorepo) and `Clifford-Swartz/jac-bridge` (the
-standalone bridge) BOTH have a file called `bridge_client.py` at their root.
-**They are intentionally not identical.** This monorepo's version is the
-leading edge — it carries features the standalone doesn't:
-`apply_patch`, `PARALLEL_SAFE` concurrent reads, loop detection, the fuller
-OR-identity system prompt, etc. The slim `jac-bridge` repo is meant for users
-who just want the daemon and don't need these.
-
-**Do not** `cp` the file from one repo to the other. Doing so silently strips
-features. If a change applies to both, use the Edit tool against each path
-separately, surgically. Verify with `git diff` before commit. A previous
-session got this wrong twice and nuked ~127 lines each time — it's a real
-foot-gun.
-
+ridge_client.py and the server/ daemon code used to live in this repo
+too, duplicated with the standalone. They were consolidated — the canonical
+source is now **jac-bridge**. To run a provider on this machine, clone that
+repo and follow its README. This monorepo keeps the VSCode extension, the
+CAD/PCB tool servers, the relay copy, and ai-genie.
 ## What This Is
 A VSCode extension that provides a unified AI workspace: chat with cloud/local LLMs, 3D CAD modeling, PCB schematic design, music visualization with Spotify, and a browser panel. Everything runs through a WebSocket relay so multiple machines can share providers.
 
