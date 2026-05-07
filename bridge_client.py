@@ -2761,6 +2761,14 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                             # a different model on the phone had no effect.
                             current_model = msg.get("model") or config.model
 
+                            # Phone's autonomy dial → _permission_manager mode for any
+                            # path that goes through it (OpenRouter, local LLM, anything
+                            # using the bridge's manual tool loop). The Claude SDK path
+                            # has its own permission flow we set on the ClaudeBridge below.
+                            phone_mode = msg.get("permission_mode") or "auto-notify"
+                            pm_mode = "strict" if phone_mode == "confirm" else "bypass"
+                            _permission_manager.set_mode(session_id, pm_mode)
+
                             # Check if this is a local model
                             def is_local_model(m):
                                 try:
@@ -2806,13 +2814,9 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                         "session_id": session_id,
                                     }))
                                     continue
-                                # Per-query autonomy from the phone's chip-long-press dial.
-                                # 'confirm' = Claude SDK calls can_use_tool for every tool, the
-                                # bridge surfaces it as permission_request to the phone, user taps
-                                # allow/deny. The two auto modes both map to bypassPermissions —
-                                # they only differ in whether the bridge will (in Phase 2) raise
-                                # push notifications for completion / blocked states.
-                                phone_mode = msg.get("permission_mode") or "auto-notify"
+                                # Phone autonomy dial → Claude SDK mode. (phone_mode was
+                                # computed above at the top of the dispatcher so OR / local
+                                # paths get the parallel _permission_manager treatment.)
                                 sdk_mode = "default" if phone_mode == "confirm" else "bypassPermissions"
                                 bridge.set_permission_mode(sdk_mode)
                                 log.info("Query [%s] → Claude %s (autonomy=%s, sdk=%s): %.80s... (cwd=%s, images=%d)",
