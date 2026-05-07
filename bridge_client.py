@@ -22,10 +22,12 @@ import re
 import shutil
 import signal
 import socket
+import sqlite3
 import subprocess
 import sys
 import time
 import urllib.parse
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -527,6 +529,136 @@ def _fetch_openrouter_models() -> list[dict]:
 # call would fire even when JAC_MACHINE_ID is set. socket.gethostname() is
 # cross-platform and gives the same value on macOS/Linux.
 MACHINE_ID = os.getenv("JAC_MACHINE_ID") or socket.gethostname()
+
+
+# ── Local conversation storage ────────────────────────────────────────────────
+# The bridge owns its own chat history rather than the relay. Keeps state on
+# the user's actual machine; means restarts of mellow can't wipe chats. Each
+# bridge has its own db; conversations are scoped to whoever can connect to
+# this machine (the user's phone for personal setups, the user's VSCode
+# extension for shared/multi-tenant setups).
+
+CONV_DB_PATH = Path(os.environ.get(
+    "JAC_CONV_DB", str(Path.home() / ".jac" / "conversations.db")
+))
+_conv_db: sqlite3.Connection | None = None
+
+
+def conv_db() -> sqlite3.Connection:
+    global _conv_db
+    if _conv_db is None:
+        CONV_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(CONV_DB_PATH), isolation_level=None)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA foreign_keys=ON;")
+        conn.row_factory = sqlite3.Row
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS conversations (
+                id TEXT PRIMARY KEY,
+                title TEXT,
+                created_at REAL NOT NULL,
+                updated_at REAL NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_conv_updated
+                ON conversations(updated_at DESC);
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                conversation_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                model TEXT,
+                created_at REAL NOT NULL,
+                FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS idx_msg_conv
+                ON messages(conversation_id, created_at);
+        """)
+        _conv_db = conn
+        log.info("Conversation DB ready at %s", CONV_DB_PATH)
+    return _conv_db
+
+
+def conv_create(title: str | None = None) -> dict:
+    cid = str(uuid.uuid4())
+    now = time.time()
+    conv_db().execute(
+        "INSERT INTO conversations (id, title, created_at, updated_at) VALUES (?, ?, ?, ?)",
+        (cid, title, now, now),
+    )
+    return {"id": cid, "title": title, "created_at": now, "updated_at": now, "message_count": 0}
+
+
+def conv_list() -> list[dict]:
+    rows = conv_db().execute(
+        "SELECT c.*, "
+        "(SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id) AS message_count "
+        "FROM conversations c ORDER BY c.updated_at DESC"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def conv_get(conversation_id: str) -> tuple[dict | None, list[dict]]:
+    row = conv_db().execute(
+        "SELECT * FROM conversations WHERE id = ?", (conversation_id,),
+    ).fetchone()
+    if not row:
+        return None, []
+    msgs = conv_db().execute(
+        "SELECT id, role, content, model, created_at FROM messages "
+        "WHERE conversation_id = ? ORDER BY created_at, id",
+        (conversation_id,),
+    ).fetchall()
+    return dict(row), [dict(m) for m in msgs]
+
+
+def conv_owns(conversation_id: str) -> bool:
+    """Convenience for guards. Single-user-per-bridge: existence == ownership."""
+    return conv_db().execute(
+        "SELECT 1 FROM conversations WHERE id = ?", (conversation_id,),
+    ).fetchone() is not None
+
+
+def conv_rename(conversation_id: str, title: str) -> bool:
+    cur = conv_db().execute(
+        "UPDATE conversations SET title = ?, updated_at = ? WHERE id = ?",
+        (title, time.time(), conversation_id),
+    )
+    return cur.rowcount > 0
+
+
+def conv_delete(conversation_id: str) -> bool:
+    cur = conv_db().execute(
+        "DELETE FROM conversations WHERE id = ?", (conversation_id,),
+    )
+    return cur.rowcount > 0
+
+
+def conv_touch(conversation_id: str) -> None:
+    conv_db().execute(
+        "UPDATE conversations SET updated_at = ? WHERE id = ?",
+        (time.time(), conversation_id),
+    )
+
+
+def conv_set_title_if_empty(conversation_id: str, title: str) -> None:
+    conv_db().execute(
+        "UPDATE conversations SET title = ? WHERE id = ? AND (title IS NULL OR title = '')",
+        (title, conversation_id),
+    )
+
+
+def msg_append(conversation_id: str, role: str, content: str, model: str | None) -> dict:
+    now = time.time()
+    cur = conv_db().execute(
+        "INSERT INTO messages (conversation_id, role, content, model, created_at) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (conversation_id, role, content, model, now),
+    )
+    conv_touch(conversation_id)
+    return {
+        "id": cur.lastrowid, "conversation_id": conversation_id,
+        "role": role, "content": content, "model": model, "created_at": now,
+    }
 
 
 def find_cli(name: str) -> str | None:
@@ -1682,8 +1814,42 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
     # Mutable container so closures always reference the current websocket
     ws_ref: list = [None]
 
+    # Per-session accumulator so we can persist the assistant turn locally
+    # when streaming completes. Mirrors what mellow used to do — moved here
+    # because the bridge now owns the conversation DB.
+    _pending_responses: dict[str, dict] = {}
+
     async def send_to_ws(msg: dict) -> None:
-        """Callback for bridge to send messages to the relay."""
+        """Callback for bridge to send messages to the relay.
+
+        Also taps the outgoing event stream to accumulate assistant text per
+        session and persist on done/result. Single chokepoint = one place to
+        get persistence right; every code path that streams flows through this.
+        """
+        # Persistence side-channel
+        sid = msg.get("session_id")
+        if sid and sid in _pending_responses:
+            pr = _pending_responses[sid]
+            mtype = msg.get("type")
+            if mtype == "assistant_text_delta":
+                pr["accumulated"] += msg.get("text") or msg.get("delta") or ""
+                if msg.get("model"):
+                    pr["model"] = msg["model"]
+            elif mtype == "assistant_text":
+                text = msg.get("text") or ""
+                if text:
+                    pr["accumulated"] = text
+                if msg.get("model"):
+                    pr["model"] = msg["model"]
+            elif mtype in ("done", "result"):
+                if pr["accumulated"] and conv_owns(pr["conversation_id"]):
+                    try:
+                        msg_append(pr["conversation_id"], "assistant",
+                                   pr["accumulated"], pr.get("model"))
+                    except Exception as e:
+                        log.warning("conv save failed for session %s: %s", sid[:8], e)
+                _pending_responses.pop(sid, None)
+
         ws = ws_ref[0]
         if ws is None:
             log.warning("send_to_ws called with no active connection, dropping message")
@@ -2755,6 +2921,48 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 }))
                                 continue
 
+                            # Local-first conversation persistence. The phone uses
+                            # session_id == conversation_id (mellow used to rewrite
+                            # this); we accept either case and create a row if it
+                            # doesn't exist yet so the user's first message has a
+                            # home. Auto-title from the first ~60 chars.
+                            cid = session_id
+                            if not conv_owns(cid):
+                                conv_db().execute(
+                                    "INSERT INTO conversations (id, title, created_at, updated_at) "
+                                    "VALUES (?, ?, ?, ?)",
+                                    (cid, None, time.time(), time.time()),
+                                )
+                                # Tell the phone we created one so it can update its list.
+                                await send_to_ws({
+                                    "type": "conversation.created",
+                                    "conversation": {
+                                        "id": cid, "title": None,
+                                        "created_at": time.time(), "updated_at": time.time(),
+                                        "message_count": 0,
+                                    },
+                                })
+                            user_prompt_for_storage = prompt.strip()
+                            if user_prompt_for_storage:
+                                try:
+                                    saved = msg_append(cid, "user", user_prompt_for_storage,
+                                                       msg.get("model"))
+                                    conv_set_title_if_empty(cid, user_prompt_for_storage[:60])
+                                    await send_to_ws({
+                                        "type": "conversation.message",
+                                        "conversation_id": cid,
+                                        "message": saved,
+                                    })
+                                except Exception as e:
+                                    log.warning("user msg persist failed: %s", e)
+                            # Track this in-flight reply so send_to_ws can persist
+                            # the assistant turn when streaming finishes.
+                            _pending_responses[session_id] = {
+                                "conversation_id": cid,
+                                "accumulated": "",
+                                "model": msg.get("model"),
+                            }
+
                             cwd = msg.get("cwd") or config.cwd
                             # Each query carries its own model. config.model is just
                             # the startup default — without this fallback, picking
@@ -3016,6 +3224,77 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 await send_to_ws({"type": "local_models_list", "models": models, "session_id": session_id})
                             except Exception as e:
                                 log.error("Failed to browse models: %s", e)
+
+                        elif msg_type and msg_type.startswith("conversations."):
+                            # Bridge owns conversation history locally now (used to
+                            # be the relay's job). Phone sends conversations.* via
+                            # the relay's forwarding path; we answer back the same
+                            # message names with .response suffix that mellow used,
+                            # so the phone's ConversationsAPI keeps working unchanged.
+                            try:
+                                if msg_type == "conversations.list":
+                                    convs = conv_list()
+                                    # Tag each with provider_id so the phone groups
+                                    # by machine in the chats screen even though we
+                                    # don't store it (every conv on this bridge is
+                                    # ours, by definition).
+                                    for c in convs:
+                                        c["provider_id"] = MACHINE_ID
+                                    await ws.send(json.dumps({
+                                        "type": "conversations.list.response",
+                                        "conversations": convs,
+                                    }))
+                                elif msg_type == "conversations.create":
+                                    c = conv_create(msg.get("title"))
+                                    c["provider_id"] = MACHINE_ID
+                                    await ws.send(json.dumps({
+                                        "type": "conversations.create.response",
+                                        "conversation": c,
+                                    }))
+                                elif msg_type == "conversations.get":
+                                    cid = msg.get("conversation_id", "")
+                                    meta, msgs = conv_get(cid)
+                                    if not meta:
+                                        raise ValueError("not found")
+                                    meta["provider_id"] = MACHINE_ID
+                                    await ws.send(json.dumps({
+                                        "type": "conversations.get.response",
+                                        "conversation": meta,
+                                        "messages": msgs,
+                                    }))
+                                elif msg_type == "conversations.rename":
+                                    cid = msg.get("conversation_id", "")
+                                    title = (msg.get("title") or "")[:200]
+                                    ok = conv_rename(cid, title)
+                                    await ws.send(json.dumps({
+                                        "type": "conversations.rename.response",
+                                        "ok": ok, "conversation_id": cid,
+                                    }))
+                                    if ok:
+                                        await ws.send(json.dumps({
+                                            "type": "conversation.updated",
+                                            "conversation_id": cid, "title": title,
+                                        }))
+                                elif msg_type == "conversations.delete":
+                                    cid = msg.get("conversation_id", "")
+                                    ok = conv_delete(cid)
+                                    await ws.send(json.dumps({
+                                        "type": "conversations.delete.response",
+                                        "ok": ok, "conversation_id": cid,
+                                    }))
+                                    if ok:
+                                        await ws.send(json.dumps({
+                                            "type": "conversation.deleted",
+                                            "conversation_id": cid,
+                                        }))
+                                else:
+                                    raise ValueError(f"unknown conversations op {msg_type}")
+                            except Exception as e:
+                                await ws.send(json.dumps({
+                                    "type": "conversations.error",
+                                    "request_type": msg_type,
+                                    "error": str(e),
+                                }))
 
                         elif msg_type and msg_type.startswith("fs."):
                             if msg_type == "fs.list":
