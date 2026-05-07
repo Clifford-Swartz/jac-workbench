@@ -2806,8 +2806,17 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                         "session_id": session_id,
                                     }))
                                     continue
-                                log.info("Query [%s] → Claude %s: %.80s... (cwd=%s, images=%d)",
-                                         session_id[:8], current_model, prompt, cwd, len(images))
+                                # Per-query autonomy from the phone's chip-long-press dial.
+                                # 'confirm' = Claude SDK calls can_use_tool for every tool, the
+                                # bridge surfaces it as permission_request to the phone, user taps
+                                # allow/deny. The two auto modes both map to bypassPermissions —
+                                # they only differ in whether the bridge will (in Phase 2) raise
+                                # push notifications for completion / blocked states.
+                                phone_mode = msg.get("permission_mode") or "auto-notify"
+                                sdk_mode = "default" if phone_mode == "confirm" else "bypassPermissions"
+                                bridge.set_permission_mode(sdk_mode)
+                                log.info("Query [%s] → Claude %s (autonomy=%s, sdk=%s): %.80s... (cwd=%s, images=%d)",
+                                         session_id[:8], current_model, phone_mode, sdk_mode, prompt, cwd, len(images))
                                 query_tasks[session_id] = asyncio.create_task(
                                     run_query(session_id, bridge, prompt, cwd, images or None, model=current_model)
                                 )
