@@ -79,7 +79,6 @@ A VSCode extension that provides a unified AI workspace: chat with cloud/local L
 - `extension/package.json` — Extension manifest, commands, settings
 
 ### Server (Python)
-- `bridge_client.py` — Provider bridge: connects to relay, routes queries to Claude/Codex/Gemini/local LLMs
 - `server/local_models.py` — Model catalog, download management, llama-server start/stop, tok/s estimation
 - `server/cad_tools.py` — build123d geometry execution, tessellation, STL export (port 5050)
 - `server/pcb_tools.py` — Schematic components, A* wire routing, KiCad export (port 5051)
@@ -128,13 +127,7 @@ swiftc -O -framework CoreAudio -framework CoreGraphics -framework Cocoa -framewo
 ```
 
 ### Bridge
-```bash
-# Start the bridge (connects to relay as provider)
-python bridge_client.py --relay wss://mellow-backend.onrender.com
-
-# With custom LLM endpoints
-JAC_LLM_ENDPOINTS="http://192.168.1.50:8787" python bridge_client.py --relay wss://mellow-backend.onrender.com
-```
+The bridge daemon now lives in [jac-bridge](https://github.com/Clifford-Swartz/jac-bridge). Clone and run from there.
 
 ### Tool servers (auto-started by extension, but can run manually)
 ```bash
