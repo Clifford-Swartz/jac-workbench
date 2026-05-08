@@ -2921,47 +2921,49 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 }))
                                 continue
 
-                            # Local-first conversation persistence. The phone uses
-                            # session_id == conversation_id (mellow used to rewrite
-                            # this); we accept either case and create a row if it
-                            # doesn't exist yet so the user's first message has a
-                            # home. Auto-title from the first ~60 chars.
-                            cid = session_id
-                            if not conv_owns(cid):
-                                conv_db().execute(
-                                    "INSERT INTO conversations (id, title, created_at, updated_at) "
-                                    "VALUES (?, ?, ?, ?)",
-                                    (cid, None, time.time(), time.time()),
-                                )
-                                # Tell the phone we created one so it can update its list.
-                                await send_to_ws({
-                                    "type": "conversation.created",
-                                    "conversation": {
-                                        "id": cid, "title": None,
-                                        "created_at": time.time(), "updated_at": time.time(),
-                                        "message_count": 0,
-                                    },
-                                })
-                            user_prompt_for_storage = prompt.strip()
-                            if user_prompt_for_storage:
-                                try:
-                                    saved = msg_append(cid, "user", user_prompt_for_storage,
-                                                       msg.get("model"))
-                                    conv_set_title_if_empty(cid, user_prompt_for_storage[:60])
+                            # Local-first conversation persistence — gated on `persist`.
+                            # Phone clients default to persist=true (chats follow the
+                            # machine that ran them). Extension clients pass
+                            # persist=false because the extension keeps its own chat
+                            # history locally on the dev's machine — no point piling
+                            # somebody else's chats onto the bridge owner's disk.
+                            persist_chat = msg.get("persist", True)
+                            if persist_chat:
+                                cid = session_id
+                                if not conv_owns(cid):
+                                    conv_db().execute(
+                                        "INSERT INTO conversations (id, title, created_at, updated_at) "
+                                        "VALUES (?, ?, ?, ?)",
+                                        (cid, None, time.time(), time.time()),
+                                    )
                                     await send_to_ws({
-                                        "type": "conversation.message",
-                                        "conversation_id": cid,
-                                        "message": saved,
+                                        "type": "conversation.created",
+                                        "conversation": {
+                                            "id": cid, "title": None,
+                                            "created_at": time.time(), "updated_at": time.time(),
+                                            "message_count": 0,
+                                        },
                                     })
-                                except Exception as e:
-                                    log.warning("user msg persist failed: %s", e)
-                            # Track this in-flight reply so send_to_ws can persist
-                            # the assistant turn when streaming finishes.
-                            _pending_responses[session_id] = {
-                                "conversation_id": cid,
-                                "accumulated": "",
-                                "model": msg.get("model"),
-                            }
+                                user_prompt_for_storage = prompt.strip()
+                                if user_prompt_for_storage:
+                                    try:
+                                        saved = msg_append(cid, "user", user_prompt_for_storage,
+                                                           msg.get("model"))
+                                        conv_set_title_if_empty(cid, user_prompt_for_storage[:60])
+                                        await send_to_ws({
+                                            "type": "conversation.message",
+                                            "conversation_id": cid,
+                                            "message": saved,
+                                        })
+                                    except Exception as e:
+                                        log.warning("user msg persist failed: %s", e)
+                                # send_to_ws's persistence side-channel uses this to
+                                # save the assistant turn when streaming completes.
+                                _pending_responses[session_id] = {
+                                    "conversation_id": cid,
+                                    "accumulated": "",
+                                    "model": msg.get("model"),
+                                }
 
                             cwd = msg.get("cwd") or config.cwd
                             # Each query carries its own model. config.model is just
