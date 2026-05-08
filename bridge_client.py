@@ -25,6 +25,7 @@ import socket
 import sqlite3
 import subprocess
 import sys
+import threading
 import time
 import urllib.parse
 import uuid
@@ -529,6 +530,98 @@ def _fetch_openrouter_models() -> list[dict]:
 # call would fire even when JAC_MACHINE_ID is set. socket.gethostname() is
 # cross-platform and gives the same value on macOS/Linux.
 MACHINE_ID = os.getenv("JAC_MACHINE_ID") or socket.gethostname()
+
+
+# ── Voice mode: F5-TTS with reference-wav voice cloning ──────────────────────
+# Set JAC_VOICE_REF_WAV (and optionally JAC_VOICE_REF_TRANSCRIPT) on the bridge
+# machine that should generate audio. F5-TTS clones the voice from the
+# reference. Skip env vars on machines that shouldn't run TTS — voice queries
+# routed there will return an error rather than locking up.
+
+VOICE_REF_AUDIO = os.environ.get("JAC_VOICE_REF_WAV", "")
+VOICE_REF_TRANSCRIPT_PATH = os.environ.get("JAC_VOICE_REF_TRANSCRIPT", "")
+_voice_ref_text: str | None = None
+_f5tts_instance = None
+_tts_lock = threading.Lock()
+
+
+def _voice_ref_text_cached() -> str:
+    """Return the reference transcript, lazy-loaded from disk."""
+    global _voice_ref_text
+    if _voice_ref_text is not None:
+        return _voice_ref_text
+    if VOICE_REF_TRANSCRIPT_PATH and os.path.exists(VOICE_REF_TRANSCRIPT_PATH):
+        try:
+            with open(VOICE_REF_TRANSCRIPT_PATH) as f:
+                _voice_ref_text = f.read().strip()
+        except Exception as e:
+            log.warning("Voice transcript read failed: %s", e)
+            _voice_ref_text = ""
+    else:
+        _voice_ref_text = ""
+    return _voice_ref_text
+
+
+def _get_f5tts():
+    """Return a singleton F5TTS instance, loading lazily on first use.
+    Returns None if F5-TTS isn't installed or no voice reference is configured."""
+    global _f5tts_instance
+    if _f5tts_instance is not None:
+        return _f5tts_instance
+    if not VOICE_REF_AUDIO or not os.path.exists(VOICE_REF_AUDIO):
+        return None
+    try:
+        from f5_tts.api import F5TTS  # type: ignore
+    except ImportError:
+        log.warning("F5-TTS not installed (pip install f5-tts); voice mode unavailable")
+        return None
+    try:
+        _f5tts_instance = F5TTS()
+        log.info("F5-TTS loaded; voice ref=%s", VOICE_REF_AUDIO)
+    except Exception as e:
+        log.warning("F5-TTS init failed: %s", e)
+        return None
+    return _f5tts_instance
+
+
+def synthesize_voice(text: str) -> tuple[bytes, int] | None:
+    """Generate audio bytes (PCM 16-bit) + sample rate for the given text.
+    Returns None if voice mode isn't configured or generation fails."""
+    tts = _get_f5tts()
+    if tts is None:
+        return None
+    ref_text = _voice_ref_text_cached()
+    if not ref_text:
+        log.warning("No reference transcript; F5-TTS needs ref_text. Set JAC_VOICE_REF_TRANSCRIPT.")
+        return None
+    try:
+        with _tts_lock:
+            wav, sr, _ = tts.infer(
+                ref_file=VOICE_REF_AUDIO,
+                ref_text=ref_text,
+                gen_text=text,
+            )
+        # Convert numpy float wav → 16-bit PCM bytes for transport.
+        import numpy as np
+        wav_int16 = np.clip(wav * 32767, -32768, 32767).astype(np.int16)
+        return wav_int16.tobytes(), sr
+    except Exception as e:
+        log.warning("F5-TTS synthesize failed: %s", e)
+        return None
+
+
+def pcm_to_wav_bytes(pcm: bytes, sample_rate: int, channels: int = 1) -> bytes:
+    """Wrap raw PCM 16-bit in a minimal WAV header so the phone can play it
+    without bringing along a separate decoder library."""
+    import struct
+    byte_rate = sample_rate * channels * 2
+    block_align = channels * 2
+    data_len = len(pcm)
+    chunk_size = 36 + data_len
+    header = b"RIFF" + struct.pack("<I", chunk_size) + b"WAVEfmt "
+    header += struct.pack("<IHHIIHH", 16, 1, channels, sample_rate, byte_rate, block_align, 16)
+    header += b"data" + struct.pack("<I", data_len)
+    return header + pcm
 
 
 # ── Local conversation storage ────────────────────────────────────────────────
@@ -1819,6 +1912,33 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
     # because the bridge now owns the conversation DB.
     _pending_responses: dict[str, dict] = {}
 
+    # Per-session voice-mode accumulators. When the phone sends voice=true on
+    # a query, we tap streaming text and synthesize TTS sentence-by-sentence,
+    # streaming audio_chunk events back. First audio plays within ~500ms of
+    # the model's first sentence rather than waiting for the full response.
+    _voice_buffers: dict[str, str] = {}
+    _SENTENCE_END = re.compile(r"[.!?](?:\s|$)|\n\n")
+
+    async def _emit_voice_chunk(session_id: str, text: str) -> None:
+        """Synthesize a chunk of text in a thread (TTS is sync), then send the
+        WAV bytes back as an audio_chunk event."""
+        if not text.strip():
+            return
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, synthesize_voice, text)
+        if not result:
+            return
+        pcm, sr = result
+        wav_bytes = pcm_to_wav_bytes(pcm, sr)
+        await send_to_ws({
+            "type": "audio_chunk",
+            "session_id": session_id,
+            "format": "wav",
+            "sample_rate": sr,
+            "data": base64.b64encode(wav_bytes).decode("ascii"),
+            "text": text.strip(),
+        })
+
     async def send_to_ws(msg: dict) -> None:
         """Callback for bridge to send messages to the relay.
 
@@ -1849,6 +1969,35 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                     except Exception as e:
                         log.warning("conv save failed for session %s: %s", sid[:8], e)
                 _pending_responses.pop(sid, None)
+
+        # Voice-mode side-channel — synthesize per sentence as text streams.
+        # Slice the buffer at sentence boundaries; remainder waits for more
+        # tokens. On done/result, flush whatever's left so the user hears the
+        # last fragment too.
+        if sid and sid in _voice_buffers:
+            mtype = msg.get("type")
+            if mtype in ("assistant_text_delta",):
+                _voice_buffers[sid] += msg.get("text") or msg.get("delta") or ""
+                buf = _voice_buffers[sid]
+                last_split = 0
+                for m in _SENTENCE_END.finditer(buf):
+                    sentence = buf[last_split:m.end()].strip()
+                    if sentence:
+                        asyncio.create_task(_emit_voice_chunk(sid, sentence))
+                    last_split = m.end()
+                if last_split:
+                    _voice_buffers[sid] = buf[last_split:]
+            elif mtype == "assistant_text":
+                # Some routes emit the whole reply at once; just synthesize it
+                # all in one go and skip the streaming buffer.
+                text = (msg.get("text") or "").strip()
+                if text:
+                    asyncio.create_task(_emit_voice_chunk(sid, text))
+                _voice_buffers[sid] = ""
+            elif mtype in ("done", "result"):
+                tail = _voice_buffers.pop(sid, "").strip()
+                if tail:
+                    asyncio.create_task(_emit_voice_chunk(sid, tail))
 
         ws = ws_ref[0]
         if ws is None:
@@ -2964,6 +3113,20 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                     "accumulated": "",
                                     "model": msg.get("model"),
                                 }
+
+                            # Voice mode: opt-in per query. Phone sets voice=true
+                            # when its voice-mode toggle is on. Bridge will
+                            # synthesize text → audio per sentence in send_to_ws.
+                            if msg.get("voice"):
+                                if _get_f5tts() is None:
+                                    await ws.send(json.dumps({
+                                        "type": "error",
+                                        "session_id": session_id,
+                                        "message": "Voice mode unavailable on this bridge "
+                                                   "(set JAC_VOICE_REF_WAV env var + pip install f5-tts)",
+                                    }))
+                                else:
+                                    _voice_buffers[session_id] = ""
 
                             cwd = msg.get("cwd") or config.cwd
                             # Each query carries its own model. config.model is just
