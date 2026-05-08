@@ -212,6 +212,11 @@ export class ClaudeUltraPanel {
                                     prompt,
                                     ...(msg.images?.length && { images: msg.images }),
                                     ...(cwd && { cwd }),
+                                    // Extension keeps its own chat history in VSCode
+                                    // storage; tell the bridge not to persist this query
+                                    // to its conversations.db so a shared bridge owner
+                                    // doesn't end up with someone else's chats on disk.
+                                    persist: false,
                                 });
                             }
                         });
@@ -233,6 +238,7 @@ export class ClaudeUltraPanel {
                             rounds: msg.rounds || 1,
                             session_id: this.wsClient.sessionId,
                             ...(cwd && { cwd }),
+                            persist: false,  // extension owns its own chat history
                         });
                         break;
                     }
