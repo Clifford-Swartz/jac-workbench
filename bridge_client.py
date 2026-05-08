@@ -3390,6 +3390,26 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                             except Exception as e:
                                 log.error("Failed to browse models: %s", e)
 
+                        elif msg_type == "tts.synthesize":
+                            # Phone-orchestrated voice rendering: the phone
+                            # accumulates the assistant's text deltas (from any
+                            # model bridge), slices on sentence boundaries, and
+                            # sends each chunk here. Lets the user run the model
+                            # on one machine and voice on a different one (e.g.
+                            # Sonnet on the Mac, F5-TTS on the GPU desktop).
+                            text = (msg.get("text") or "").strip()
+                            if not text:
+                                continue
+                            if _get_f5tts() is None:
+                                await ws.send(json.dumps({
+                                    "type": "tts.error",
+                                    "session_id": session_id,
+                                    "error": "Voice mode unavailable on this bridge "
+                                             "(set JAC_VOICE_REF_WAV + pip install f5-tts)",
+                                }))
+                                continue
+                            asyncio.create_task(_emit_voice_chunk(session_id, text))
+
                         elif msg_type and msg_type.startswith("conversations."):
                             # Bridge owns conversation history locally now (used to
                             # be the relay's job). Phone sends conversations.* via
