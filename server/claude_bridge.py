@@ -357,8 +357,10 @@ class ClaudeBridge:
                 "mcp__local__AskUserQuestion",
                 "mcp__local__LoadSkill",
             ]
-            import tempfile
-            local_cwd = self._cwd or tempfile.gettempdir()
+            import tempfile, os as _os
+            local_cwd = self._cwd or _os.path.expanduser("~")
+            if not _os.path.isdir(local_cwd):
+                local_cwd = tempfile.gettempdir()
             return ClaudeAgentOptions(
                 model=self._model,
                 permission_mode=self._permission_mode,
@@ -387,11 +389,16 @@ class ClaudeBridge:
             )
         else:
             # Legacy mode: tools execute on the bridge machine
+            import os as _os
+            resolved_cwd = cwd or self._cwd or _os.path.expanduser("~")
+            if not _os.path.isdir(resolved_cwd):
+                log.warning("cwd %r does not exist, falling back to home", resolved_cwd)
+                resolved_cwd = _os.path.expanduser("~")
             return ClaudeAgentOptions(
                 model=self._model,
                 permission_mode=self._permission_mode,
                 cli_path=self._cli_path,
-                cwd=cwd or self._cwd,
+                cwd=resolved_cwd,
                 include_partial_messages=True,
                 system_prompt={"type": "preset", "preset": "claude_code"},
                 can_use_tool=self._can_use_tool,

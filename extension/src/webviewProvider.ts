@@ -398,15 +398,6 @@ export class ClaudeUltraPanel {
     private async getCadContextPrefix(prompt?: string): Promise<string | null> {
         const isSchQuery = prompt && ClaudeUltraPanel.SCH_KEYWORDS.test(prompt);
 
-        // Auto-open CAD panel for schematic queries only — 3D CAD opens when model produces RESULT code
-        if (!CadPanel.currentPanel && isSchQuery) {
-            CadPanel.createOrShow(this.context.extensionUri);
-            for (let i = 0; i < 10; i++) {
-                await new Promise(r => setTimeout(r, 1000));
-                if (CadPanel.currentPanel) break;
-            }
-        }
-
         if (!CadPanel.currentPanel) return null;
 
         // Schematic mode — when Schematic tab is active or query is schematic-related
@@ -434,13 +425,6 @@ export class ClaudeUltraPanel {
     private async autoExecuteCadCode(responseText: string): Promise<void> {
         const hasCadCode = responseText.includes('RESULT') && (responseText.includes('```python') || responseText.includes('```py') || responseText.includes('build123d') || responseText.includes('from build123d'));
         if (!hasCadCode) return;
-        if (!CadPanel.currentPanel) {
-            CadPanel.createOrShow(this.context.extensionUri);
-            for (let i = 0; i < 10; i++) {
-                await new Promise(r => setTimeout(r, 500));
-                if (CadPanel.currentPanel) break;
-            }
-        }
         if (!CadPanel.currentPanel) return;
         // Match code blocks: ```python, ```py, or ``` followed by build123d-like code
         const codeRegex = /```(?:python|py)?\s*\n([\s\S]*?)```/g;
