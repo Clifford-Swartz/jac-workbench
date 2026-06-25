@@ -212,6 +212,7 @@ export class ClaudeUltraPanel {
                                     prompt,
                                     ...(msg.images?.length && { images: msg.images }),
                                     ...(cwd && { cwd }),
+                                    ...(msg.provider_id && { provider_id: msg.provider_id }),
                                     // Extension keeps its own chat history in VSCode
                                     // storage; tell the bridge not to persist this query
                                     // to its conversations.db so a shared bridge owner
@@ -295,6 +296,7 @@ export class ClaudeUltraPanel {
                                 type: 'set_model',
                                 model: msg.model,
                                 local: false,
+                                ...(msg.provider_id && { provider_id: msg.provider_id }),
                             });
                         }
                         break;

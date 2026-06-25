@@ -550,7 +550,11 @@ async def handle(ws):
 
                 if msg_type == "set_model":
                     requested_model = msg.get("model", "")
-                    new_provider = find_provider_for_model(requested_model)
+                    requested_pid = msg.get("provider_id")
+                    if requested_pid:
+                        new_provider = providers.get(requested_pid)
+                    else:
+                        new_provider = find_provider_for_model(requested_model)
 
                     # Phone clients can only reach their paired providers
                     if new_provider and allowed_provider_ids is not None:

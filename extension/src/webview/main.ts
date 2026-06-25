@@ -159,10 +159,11 @@ interface SlashCommand {
 }
 
 let currentModel = 'sonnet';
+let currentProviderId = '';
 let modelPickerTab: 'cloud' | 'local' = 'cloud';
 
 // Dynamic model lists
-let availableModels: Array<{id: string; label: string}> = [
+let availableModels: Array<{id: string; label: string; provider_id?: string; machine_id?: string}> = [
     { id: 'sonnet', label: 'Sonnet' },
     { id: 'opus', label: 'Opus' },
     { id: 'haiku', label: 'Haiku' },
@@ -314,7 +315,7 @@ function showModelPicker(): void {
             }
         };
 
-        const buildCloudItem = (m: {id: string; label: string}): HTMLElement => {
+        const buildCloudItem = (m: {id: string; label: string; provider_id?: string; machine_id?: string}): HTMLElement => {
             const isCurrent = m.id === currentModel;
             const isFav = favoriteModels.has(m.id);
             const isDefault = defaultModel === m.id;
@@ -383,7 +384,8 @@ function showModelPicker(): void {
             item.appendChild(descSpan);
             item.addEventListener('click', () => {
                 currentModel = m.id;
-                vscode.postMessage({ type: 'set_model', model: m.id });
+                currentProviderId = m.provider_id || m.machine_id || '';
+                vscode.postMessage({ type: 'set_model', model: m.id, provider_id: currentProviderId });
                 hideSlashMenu();
                 updateModelButton();
                 removeWelcome();
@@ -811,7 +813,7 @@ function selectSlashCommand(cmd: SlashCommand): void {
         // Send the command as a query
         removeWelcome();
         appendMessage('user', cmd.name);
-        vscode.postMessage({ type: 'query', prompt: cmd.name });
+        vscode.postMessage({ type: 'query', prompt: cmd.name, ...(currentProviderId && { provider_id: currentProviderId }) });
         setStreaming(true);
     }
 }
@@ -877,7 +879,7 @@ function sendPrompt(): void {
                 rounds: 1,
             });
         } else {
-            const msg: Record<string, unknown> = { type: 'query', prompt: text || 'What\'s in this image?' };
+            const msg: Record<string, unknown> = { type: 'query', prompt: text || 'What\'s in this image?', ...(currentProviderId && { provider_id: currentProviderId }) };
             if (pendingImages.length > 0) {
                 msg.images = pendingImages;
             }
@@ -1605,13 +1607,17 @@ window.addEventListener('message', (event) => {
             }
             if (msg.current_model) {
                 currentModel = msg.current_model;
+                const curM = availableModels.find(m => m.id === msg.current_model);
+                if (curM) { currentProviderId = curM.provider_id || curM.machine_id || ''; }
             }
             // Apply saved default model on first models list after startup
             if (pendingDefaultApply && defaultModel
                 && availableModels.some(m => m.id === defaultModel)) {
                 pendingDefaultApply = false;
                 currentModel = defaultModel;
-                vscode.postMessage({ type: 'set_model', model: defaultModel });
+                const defM = availableModels.find(m => m.id === defaultModel);
+                currentProviderId = defM?.provider_id || defM?.machine_id || '';
+                vscode.postMessage({ type: 'set_model', model: defaultModel, provider_id: currentProviderId });
             }
             updateModelButton();
             if (slashMenuVisible && modelPickerTab === 'cloud') {
