@@ -881,6 +881,21 @@ function sendPrompt(): void {
             if (pendingImages.length > 0) {
                 msg.images = pendingImages;
             }
+            // Send last 10 turns of history so the bridge has context even after
+            // a restart or fresh session — fixes "forgetting" between messages.
+            const historyTurns: Array<{role: 'user' | 'assistant', text: string}> = [];
+            for (const child of messagesEl.children) {
+                const el = child as HTMLElement;
+                if (el.classList.contains('message')) {
+                    const role = el.classList.contains('user') ? 'user' as const : 'assistant' as const;
+                    const textEl = el.querySelector('.msg-text');
+                    const raw = textEl?.getAttribute('data-raw') || textEl?.textContent || '';
+                    if (raw) { historyTurns.push({ role, text: raw }); }
+                }
+            }
+            // Exclude the current user message (last item) since it's already in prompt
+            const recentHistory = historyTurns.slice(-21, -1).slice(-20);
+            if (recentHistory.length > 0) { msg.history = recentHistory; }
             vscode.postMessage(msg);
         }
     }

@@ -3150,6 +3150,19 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 except ImportError:
                                     return False
 
+                            # If the client sent conversation history, seed the
+                            # OR/LLM history so context survives bridge restarts
+                            # and fresh VSCode sessions.
+                            client_history = msg.get("history")
+                            if client_history and isinstance(client_history, list):
+                                seeded = [
+                                    {"role": h["role"], "content": h["text"]}
+                                    for h in client_history
+                                    if h.get("role") in ("user", "assistant") and h.get("text")
+                                ]
+                                if seeded:
+                                    _openrouter_history[session_id] = seeded
+
                             # Route to the right adapter based on model
                             if is_openrouter_model(current_model):
                                 log.info("Query [%s] → OpenRouter %s: %.80s...", session_id[:8], current_model, prompt)
