@@ -1417,20 +1417,18 @@ Only use tools when needed. Always respond in English.` };
         const cwd = (input.cwd as string) || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
         if (!fs.existsSync(cwd)) { send(`Working directory does not exist: ${cwd}`, true); return; }
         const timeout = (input.timeout as number) || 120000;
-        try {
-            const result = cp.execSync(command, {
-                cwd,
-                timeout,
-                maxBuffer: 10 * 1024 * 1024,
-                encoding: 'utf-8',
-                stdio: ['pipe', 'pipe', 'pipe'],
-            });
-            send(result || '(no output)');
-        } catch (e: any) {
-            // execSync throws on non-zero exit — include stdout+stderr
-            const output = (e.stdout || '') + (e.stderr || '');
-            send(output || e.message, true);
-        }
+        cp.exec(command, {
+            cwd,
+            timeout,
+            maxBuffer: 10 * 1024 * 1024,
+            encoding: 'utf-8',
+        }, (err, stdout, stderr) => {
+            if (err) {
+                send((stdout || '') + (stderr || '') || err.message, true);
+            } else {
+                send(stdout || '(no output)');
+            }
+        });
     }
 
     private toolGlob(input: Record<string, unknown>, send: (content: string, isError?: boolean) => void): void {
