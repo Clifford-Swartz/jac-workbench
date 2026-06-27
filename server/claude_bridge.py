@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import logging
 import os
 import shutil
 import tempfile
 import uuid
 from typing import Any, AsyncGenerator, Awaitable, Callable
+
+log = logging.getLogger("bridge")
 
 from claude_agent_sdk import (
     AssistantMessage,
@@ -228,6 +231,8 @@ class ClaudeBridge:
         self._busy = False
         self._send_fn = send_fn
         self._proxy_mode = proxy_mode
+        self._client_platform: str | None = None  # "win32", "darwin", "linux"
+        self._client_home: str | None = None       # e.g. "C:\Users\you"
         self._pending_permissions: dict[str, asyncio.Future[bool]] = {}
         self._pending_tool_requests: dict[str, asyncio.Future[dict]] = {}
         self._persistent_client: ClaudeSDKClient | None = None
@@ -235,6 +240,17 @@ class ClaudeBridge:
         self._turn_count: int = 0
         self._compact_summary: str | None = None
         self._conversation_log: list[dict] = []  # [{role, text}] trimmed per turn
+
+    def set_client_platform(self, platform: str, home: str | None = None) -> None:
+        self._client_platform = platform
+        self._client_home = home
+
+    def set_proxy_mode(self, proxy: bool) -> None:
+        if proxy != self._proxy_mode:
+            self._proxy_mode = proxy
+            # Force client reconnect with new options on next query
+            if self._persistent_client:
+                asyncio.create_task(self.cleanup())
 
     COMPACT_AFTER_TURNS = 20
     MAX_LOG_CHARS_PER_TURN = 800
@@ -370,6 +386,14 @@ class ClaudeBridge:
                 system_prompt=_PROXY_SYSTEM_PROMPT + (
                     f"\nThe user's current working directory is: {cwd}\n"
                     if cwd else ""
+                ) + (
+                    f"\nThe user's machine is running {self._client_platform} "
+                    f"(home directory: {self._client_home}). "
+                    "Use appropriate shell commands for their OS: "
+                    "on win32 use PowerShell/cmd syntax (e.g. mkdir, %USERPROFILE%, $env:USERPROFILE); "
+                    "on darwin/linux use bash syntax (e.g. mkdir -p, ~/). "
+                    "Never use Unix paths on Windows or vice versa.\n"
+                    if self._client_platform else ""
                 ),
                 mcp_servers={"local": proxy_server},
                 allowed_tools=mcp_tool_names,

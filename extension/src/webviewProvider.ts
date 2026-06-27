@@ -213,10 +213,8 @@ export class ClaudeUltraPanel {
                                     ...(msg.images?.length && { images: msg.images }),
                                     ...(cwd && { cwd }),
                                     ...(msg.provider_id && { provider_id: msg.provider_id }),
-                                    // Extension keeps its own chat history in VSCode
-                                    // storage; tell the bridge not to persist this query
-                                    // to its conversations.db so a shared bridge owner
-                                    // doesn't end up with someone else's chats on disk.
+                                    client_platform: process.platform,
+                                    client_home: os.homedir(),
                                     persist: false,
                                 });
                             }
@@ -1414,11 +1412,11 @@ Only use tools when needed. Always respond in English.` };
     private toolBash(input: Record<string, unknown>, send: (content: string, isError?: boolean) => void): void {
         const command = input.command as string;
         if (!command) { send('command is required', true); return; }
-        const cwd = (input.cwd as string) || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
-        if (!fs.existsSync(cwd)) { send(`Working directory does not exist: ${cwd}`, true); return; }
+        const cwd = (input.cwd as string) || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || os.homedir();
+        const resolvedCwd = fs.existsSync(cwd) ? cwd : os.homedir();
         const timeout = (input.timeout as number) || 120000;
         cp.exec(command, {
-            cwd,
+            cwd: resolvedCwd,
             timeout,
             maxBuffer: 10 * 1024 * 1024,
             encoding: 'utf-8',

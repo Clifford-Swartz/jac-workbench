@@ -3129,6 +3129,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                     _voice_buffers[session_id] = ""
 
                             cwd = msg.get("cwd") or config.cwd
+                            client_platform = msg.get("client_platform")  # e.g. "win32", "darwin", "linux"
+                            client_home = msg.get("client_home")           # e.g. "C:\Users\you"
                             # Each query carries its own model. config.model is just
                             # the startup default — without this fallback, picking
                             # a different model on the phone had no effect.
@@ -3205,6 +3207,10 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                 # paths get the parallel _permission_manager treatment.)
                                 sdk_mode = "default" if phone_mode == "confirm" else "bypassPermissions"
                                 bridge.set_permission_mode(sdk_mode)
+                                tool_mode = msg.get("tool_mode", "proxy")
+                                bridge.set_proxy_mode(tool_mode == "proxy")
+                                if client_platform:
+                                    bridge.set_client_platform(client_platform, client_home)
                                 log.info("Query [%s] → Claude %s (autonomy=%s, sdk=%s): %.80s... (cwd=%s, images=%d)",
                                          session_id[:8], current_model, phone_mode, sdk_mode, prompt, cwd, len(images))
                                 query_tasks[session_id] = asyncio.create_task(

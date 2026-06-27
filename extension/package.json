@@ -2,7 +2,7 @@
   "name": "jac",
   "displayName": "JAC",
   "description": "Remote terminal-style Claude Code interface via WebSocket",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "publisher": "claudiusmaximus",
   "engines": {
     "vscode": "^1.94.0"
