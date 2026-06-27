@@ -871,12 +871,6 @@ def get_available_models(cli_path: str | None = None) -> list[dict]:
                         label, e, traceback.format_exc())
             return None
 
-    # ── Claude (via CLI or VS Code extension) ────────────────────────────
-    claude_cli = cli_path or _safe("find_cli('claude')", lambda: find_cli("claude"))
-    if claude_cli:
-        models.extend(DEFAULT_CLAUDE_MODELS)
-        log.info("Claude CLI found: %s", claude_cli)
-
     # ── OpenAI Codex CLI (only if logged in) ─────────────────────────────
     codex_cli = _safe("find_cli('codex')", lambda: find_cli("codex"))
     if codex_cli and _safe("_is_codex_logged_in", _is_codex_logged_in):
