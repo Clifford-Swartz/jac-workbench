@@ -257,6 +257,7 @@ export class ClaudeUltraPanel {
                             type: 'model_prefs',
                             favorites: this.context.globalState.get<string[]>('ccu.modelFavorites', []),
                             default: this.context.globalState.get<string>('ccu.defaultModel', ''),
+                            preferred_machine_id: vscode.workspace.getConfiguration('claudeUltra').get<string>('preferredMachineId', ''),
                         });
                         break;
                     case 'set_model_favorites':

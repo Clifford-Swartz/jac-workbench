@@ -2,7 +2,7 @@
   "name": "jac",
   "displayName": "JAC",
   "description": "Remote terminal-style Claude Code interface via WebSocket",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publisher": "claudiusmaximus",
   "engines": {
     "vscode": "^1.94.0"
@@ -40,6 +40,11 @@
           "type": "string",
           "default": "",
           "description": "Machine ID to bind pair codes to. Leave blank to use hostname. Must match --machine-id of the jac-provider daemon on this machine."
+        },
+        "claudeUltra.preferredMachineId": {
+          "type": "string",
+          "default": "Mac.attlocal.net",
+          "description": "Preferred bridge machine ID. Queries will always route to this machine when available."
         }
       }
     },

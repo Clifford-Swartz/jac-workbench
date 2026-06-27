@@ -162,6 +162,14 @@ let currentModel = 'sonnet';
 let currentProviderId = '';
 let modelPickerTab: 'cloud' | 'local' = 'cloud';
 
+function pickProviderId(modelId: string): string {
+    const preferred = preferredMachineId
+        ? availableModels.find(m => m.id === modelId && (m.provider_id === preferredMachineId || m.machine_id === preferredMachineId))
+        : null;
+    const match = preferred || availableModels.find(m => m.id === modelId);
+    return match?.provider_id || match?.machine_id || '';
+}
+
 // Dynamic model lists
 let availableModels: Array<{id: string; label: string; provider_id?: string; machine_id?: string}> = [
     { id: 'sonnet', label: 'Sonnet' },
@@ -174,6 +182,7 @@ let localModels: Array<{id: string; label: string; size: string; status: 'ready'
 // Persisted model prefs (synced from extension globalState)
 let favoriteModels: Set<string> = new Set();
 let defaultModel = '';
+let preferredMachineId = '';
 let modelSearchQuery = '';
 let pendingDefaultApply = false;
 
@@ -384,7 +393,7 @@ function showModelPicker(): void {
             item.appendChild(descSpan);
             item.addEventListener('click', () => {
                 currentModel = m.id;
-                currentProviderId = m.provider_id || m.machine_id || '';
+                currentProviderId = m.provider_id || m.machine_id || '';  // explicit click uses exact model's machine
                 vscode.postMessage({ type: 'set_model', model: m.id, provider_id: currentProviderId });
                 hideSlashMenu();
                 updateModelButton();
@@ -1599,6 +1608,7 @@ window.addEventListener('message', (event) => {
         case 'model_prefs':
             favoriteModels = new Set(msg.favorites || []);
             defaultModel = msg.default || '';
+            preferredMachineId = msg.preferred_machine_id || '';
             pendingDefaultApply = !!defaultModel;
             break;
         case 'models_list':
@@ -1607,16 +1617,21 @@ window.addEventListener('message', (event) => {
             }
             if (msg.current_model) {
                 currentModel = msg.current_model;
-                const curM = availableModels.find(m => m.id === msg.current_model);
-                if (curM) { currentProviderId = curM.provider_id || curM.machine_id || ''; }
+                currentProviderId = pickProviderId(msg.current_model);
+            }
+            // If no current_model from relay, ensure we have a provider for whatever model is active
+            if (!currentProviderId && currentModel) {
+                currentProviderId = pickProviderId(currentModel);
+                if (currentProviderId) {
+                    vscode.postMessage({ type: 'set_model', model: currentModel, provider_id: currentProviderId });
+                }
             }
             // Apply saved default model on first models list after startup
             if (pendingDefaultApply && defaultModel
                 && availableModels.some(m => m.id === defaultModel)) {
                 pendingDefaultApply = false;
                 currentModel = defaultModel;
-                const defM = availableModels.find(m => m.id === defaultModel);
-                currentProviderId = defM?.provider_id || defM?.machine_id || '';
+                currentProviderId = pickProviderId(defaultModel);
                 vscode.postMessage({ type: 'set_model', model: defaultModel, provider_id: currentProviderId });
             }
             updateModelButton();
