@@ -1626,6 +1626,15 @@ window.addEventListener('message', (event) => {
                     vscode.postMessage({ type: 'set_model', model: currentModel, provider_id: currentProviderId });
                 }
             }
+            // Last resort: if still no provider, pin to preferred machine using any model it offers
+            if (!currentProviderId && preferredMachineId && availableModels.length > 0) {
+                const anyFromPreferred = availableModels.find(m => m.provider_id === preferredMachineId || m.machine_id === preferredMachineId);
+                if (anyFromPreferred) {
+                    currentModel = anyFromPreferred.id;
+                    currentProviderId = anyFromPreferred.provider_id || anyFromPreferred.machine_id || '';
+                    vscode.postMessage({ type: 'set_model', model: currentModel, provider_id: currentProviderId });
+                }
+            }
             // Apply saved default model on first models list after startup
             if (pendingDefaultApply && defaultModel
                 && availableModels.some(m => m.id === defaultModel)) {
