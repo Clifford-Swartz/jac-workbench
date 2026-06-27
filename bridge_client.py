@@ -1898,6 +1898,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
     # ── Persistent state (survives reconnects) ─────────────────────────
     sessions: dict[str, ClaudeBridge] = {}     # session_id → bridge
     query_tasks: dict[str, asyncio.Task] = {}  # session_id → task
+    query_queues: dict[str, list] = {}         # session_id → [msg, ...]
     # Mutable container so closures always reference the current websocket
     ws_ref: list = [None]
 
@@ -2016,6 +2017,37 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                 proxy_mode=config.proxy_mode,
             )
         return sessions[session_id]
+
+    def _create_query_task(coro, sid: str) -> asyncio.Task:
+        """Create a query task and wire up queue drain on completion."""
+        task = asyncio.create_task(coro)
+        query_tasks[sid] = task
+        task.add_done_callback(lambda _: asyncio.ensure_future(_drain_queue(sid)))
+        return task
+
+    async def _drain_queue(session_id: str) -> None:
+        """Process the next queued message for a session after a task finishes."""
+        query_tasks.pop(session_id, None)
+        queue = query_queues.get(session_id, [])
+        if not queue:
+            return
+        next_msg = queue.pop(0)
+        model = next_msg.get("model") or config.model
+        prompt = next_msg.get("prompt", "")
+        images = next_msg.get("images") or []
+        cwd = next_msg.get("cwd") or config.cwd
+        if not prompt and not images:
+            return
+        log.info("Queue drain [%s] → %s: %.80s...", session_id[:8], model, prompt)
+        if is_openrouter_model(model):
+            _create_query_task(run_query_openrouter(session_id, model, prompt, send_to_ws, cwd), session_id)
+        elif is_openai_model(model):
+            _create_query_task(run_query_codex(session_id, model, prompt, cwd), session_id)
+        elif is_gemini_model(model):
+            _create_query_task(run_query_gemini(session_id, model, prompt, cwd), session_id)
+        else:
+            # local / LLM / fallback — run_query_local handles llm: prefix
+            _create_query_task(run_query_local(session_id, model, prompt, send_to_ws), session_id)
 
     async def run_query_codex(session_id: str, model: str, prompt: str, cwd: str) -> None:
         """Run a query through the Codex CLI (uses ChatGPT subscription)."""
@@ -3048,11 +3080,8 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
 
                         if msg_type == "query":
                             if session_id in query_tasks:
-                                await ws.send(json.dumps({
-                                    "type": "error",
-                                    "message": "A query is already in progress",
-                                    "session_id": session_id,
-                                }))
+                                query_queues.setdefault(session_id, []).append(msg)
+                                log.info("Query [%s] queued (position %d)", session_id[:8], len(query_queues[session_id]))
                                 continue
 
                             prompt = msg.get("prompt", "")
@@ -3162,43 +3191,41 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                             # Route to the right adapter based on model
                             if is_openrouter_model(current_model):
                                 log.info("Query [%s] → OpenRouter %s: %.80s...", session_id[:8], current_model, prompt)
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query_openrouter(session_id, current_model, prompt, send_to_ws, cwd)
+                                _create_query_task(
+                                    run_query_openrouter(session_id, current_model, prompt, send_to_ws, cwd),
+                                    session_id,
                                 )
                             elif is_local_model(current_model):
                                 log.info("Query [%s] → Local %s: %.80s...", session_id[:8], current_model, prompt)
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query_local(session_id, current_model, prompt, send_to_ws)
+                                _create_query_task(
+                                    run_query_local(session_id, current_model, prompt, send_to_ws),
+                                    session_id,
                                 )
                             elif is_openai_model(current_model):
                                 log.info("Query [%s] → Codex %s: %.80s...", session_id[:8], current_model, prompt)
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query_codex(session_id, current_model, prompt, cwd)
+                                _create_query_task(
+                                    run_query_codex(session_id, current_model, prompt, cwd),
+                                    session_id,
                                 )
                             elif is_gemini_model(current_model):
                                 log.info("Query [%s] → Gemini %s: %.80s...", session_id[:8], current_model, prompt)
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query_gemini(session_id, current_model, prompt, cwd)
+                                _create_query_task(
+                                    run_query_gemini(session_id, current_model, prompt, cwd),
+                                    session_id,
                                 )
                             elif current_model.startswith("llm:"):
-                                # Remote/local LLM server (llama-server, vLLM, etc.)
                                 log.info("Query [%s] → LLM %s: %.80s...", session_id[:8], current_model, prompt)
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query_llm(session_id, current_model, prompt, send_to_ws)
+                                _create_query_task(
+                                    run_query_llm(session_id, current_model, prompt, send_to_ws),
+                                    session_id,
                                 )
                             else:
                                 # Default: Claude via ClaudeBridge
                                 bridge = get_or_create_bridge(session_id)
                                 if bridge.is_busy:
-                                    await ws.send(json.dumps({
-                                        "type": "error",
-                                        "message": "A query is already in progress",
-                                        "session_id": session_id,
-                                    }))
+                                    query_queues.setdefault(session_id, []).append(msg)
+                                    log.info("Claude busy — query [%s] queued", session_id[:8])
                                     continue
-                                # Phone autonomy dial → Claude SDK mode. (phone_mode was
-                                # computed above at the top of the dispatcher so OR / local
-                                # paths get the parallel _permission_manager treatment.)
                                 sdk_mode = "default" if phone_mode == "confirm" else "bypassPermissions"
                                 bridge.set_permission_mode(sdk_mode)
                                 tool_mode = msg.get("tool_mode", "proxy")
@@ -3207,8 +3234,9 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                                     bridge.set_client_platform(client_platform, client_home)
                                 log.info("Query [%s] → Claude %s (autonomy=%s, sdk=%s): %.80s... (cwd=%s, images=%d)",
                                          session_id[:8], current_model, phone_mode, sdk_mode, prompt, cwd, len(images))
-                                query_tasks[session_id] = asyncio.create_task(
-                                    run_query(session_id, bridge, prompt, cwd, images or None, model=current_model)
+                                _create_query_task(
+                                    run_query(session_id, bridge, prompt, cwd, images or None, model=current_model),
+                                    session_id,
                                 )
 
                         elif msg_type == "permission_response":
@@ -3359,8 +3387,9 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                             log.info("Council query [%s] mode=%s models=%s rounds=%d: %.80s...",
                                      session_id[:8], council_mode, council_models, rounds, prompt)
 
-                            query_tasks[session_id] = asyncio.create_task(
-                                run_council(session_id, prompt, council_models, council_mode, rounds, cwd)
+                            _create_query_task(
+                                run_council(session_id, prompt, council_models, council_mode, rounds, cwd),
+                                session_id,
                             )
 
                         elif msg_type == "generate_greeting":
