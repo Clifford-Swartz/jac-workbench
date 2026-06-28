@@ -2,7 +2,7 @@
   "name": "jac",
   "displayName": "JAC",
   "description": "Remote terminal-style Claude Code interface via WebSocket",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "publisher": "claudiusmaximus",
   "engines": {
     "vscode": "^1.94.0"
@@ -91,15 +91,29 @@
       }
     ],
     "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "jac-sidebar",
+          "title": "JAC",
+          "icon": "media/jac.svg"
+        }
+      ],
       "panel": [
         {
           "id": "jac-panel",
           "title": "JAC",
-          "icon": ""
+          "icon": "media/jac.svg"
         }
       ]
     },
     "views": {
+      "jac-sidebar": [
+        {
+          "id": "jacSidebarView",
+          "name": "JAC",
+          "type": "webview"
+        }
+      ],
       "jac-panel": [
         {
           "type": "webview",
@@ -108,6 +122,12 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "jacSidebarView",
+        "contents": "[Open JAC](command:claudeUltra.open)"
+      }
+    ],
     "keybindings": [
       {
         "command": "claudeUltra.open",
