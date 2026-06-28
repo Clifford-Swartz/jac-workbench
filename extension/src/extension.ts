@@ -140,6 +140,14 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
+    // Sidebar activity bar icon — auto-opens main JAC panel on click
+    const sidebarProvider: vscode.TreeDataProvider<never> = { getTreeItem: () => { throw new Error(); }, getChildren: () => [] };
+    const sidebarView = vscode.window.createTreeView('jacSidebarView', { treeDataProvider: sidebarProvider });
+    sidebarView.onDidChangeVisibility(e => {
+        if (e.visible) { vscode.commands.executeCommand('claudeUltra.open'); }
+    });
+    context.subscriptions.push(sidebarView);
+
     // Music panel – registers as a bottom-panel webview view
     const musicProvider = new MusicPanel(context.extensionUri, context);
     context.subscriptions.push(
