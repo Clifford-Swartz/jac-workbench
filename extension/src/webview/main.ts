@@ -1509,18 +1509,9 @@ window.addEventListener('message', (event) => {
             renderToolUse(msg);
             break;
 
-        case 'tool_result': {
-            // Skip results for AskUserQuestion tool calls
-            const blocks = messagesEl.querySelectorAll('.tool-block');
-            let isAskResult = false;
-            for (const b of blocks) {
-                if ((b as HTMLElement).dataset.toolUseId === msg.tool_use_id) {
-                    isAskResult = true; break;
-                }
-            }
-            if (!isAskResult) { renderToolResult(msg); }
+        case 'tool_result':
+            renderToolResult(msg);
             break;
-        }
 
         case 'thinking':
             removeWelcome();
