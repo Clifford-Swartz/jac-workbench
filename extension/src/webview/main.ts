@@ -1621,7 +1621,17 @@ window.addEventListener('message', (event) => {
             break;
         case 'models_list':
             if (msg.models && msg.models.length > 0) {
-                availableModels = msg.models;
+                // Deduplicate by id, preferring preferred machine's entry
+                {
+                    const seen = new Map<string, typeof msg.models[0]>();
+                    for (const m of (msg.models as typeof availableModels)) {
+                        const existing = seen.get(m.id);
+                        if (!existing) { seen.set(m.id, m); continue; }
+                        const mIsPreferred = preferredMachineId && (m.provider_id === preferredMachineId || m.machine_id === preferredMachineId);
+                        if (mIsPreferred) { seen.set(m.id, m); }
+                    }
+                    availableModels = Array.from(seen.values());
+                }
             }
             if (msg.current_model) {
                 currentModel = msg.current_model;
