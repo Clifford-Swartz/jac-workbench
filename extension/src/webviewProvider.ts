@@ -1321,6 +1321,15 @@ Only use tools when needed. Always respond in English.` };
             });
         };
 
+        const sendStream = (content: string) => {
+            this.wsClient.sendRaw({
+                type: 'tool_stream_response',
+                tool_id: toolId,
+                content,
+                session_id: this.wsClient.sessionId,
+            });
+        };
+
         try {
             switch (name) {
                 case 'Read':
@@ -1334,6 +1343,9 @@ Only use tools when needed. Always respond in English.` };
                     break;
                 case 'Bash':
                     this.toolBash(toolInput, sendResult);
+                    break;
+                case 'Monitor':
+                    this.toolMonitor(toolInput, sendStream, sendResult);
                     break;
                 case 'Glob':
                     this.toolGlob(toolInput, sendResult);
@@ -1350,6 +1362,40 @@ Only use tools when needed. Always respond in English.` };
         } catch (e: any) {
             sendResult(e.message || String(e), true);
         }
+    }
+
+    private toolMonitor(
+        input: Record<string, unknown>,
+        sendStream: (content: string) => void,
+        sendResult: (content: string, isError?: boolean) => void,
+    ): void {
+        const command = input.command as string;
+        if (!command) { sendResult('command is required', true); return; }
+        const cwd = (input.cwd as string) || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || os.homedir();
+        const resolvedCwd = fs.existsSync(cwd) ? cwd : os.homedir();
+        const timeoutMs = (input.timeout_ms as number) || 300000;
+
+        const proc = cp.spawn('sh', ['-c', command], { cwd: resolvedCwd });
+        const chunks: string[] = [];
+        let finished = false;
+
+        const finish = (isError: boolean) => {
+            if (finished) { return; }
+            finished = true;
+            clearTimeout(timer);
+            sendResult(chunks.join('') || '(no output)', isError);
+        };
+
+        const timer = setTimeout(() => {
+            proc.kill();
+            chunks.push('\n(timed out)');
+            finish(true);
+        }, timeoutMs);
+
+        proc.stdout.on('data', (d: Buffer) => { const t = d.toString(); chunks.push(t); sendStream(t); });
+        proc.stderr.on('data', (d: Buffer) => { const t = d.toString(); chunks.push(t); sendStream(t); });
+        proc.on('close', (code) => finish(code !== 0));
+        proc.on('error', (e) => { chunks.push(e.message); finish(true); });
     }
 
     private toolRead(input: Record<string, unknown>, send: (content: string, isError?: boolean) => void): void {

@@ -1534,6 +1534,25 @@ OPENROUTER_TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "Monitor",
+            "description": (
+                "Run a command on the user's machine and stream its output live. "
+                "Use for long-running processes: test runners, build watchers, dev servers, npm run dev, etc. "
+                "Output streams back line-by-line as it arrives. Returns all output when the process exits."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "command": {"type": "string", "description": "Shell command to run"},
+                    "timeout_ms": {"type": "integer", "description": "Max runtime in ms (default 300000 = 5 min)"},
+                },
+                "required": ["command"],
+            },
+        },
+    },
 ]
 
 
@@ -1899,6 +1918,7 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
     sessions: dict[str, ClaudeBridge] = {}     # session_id → bridge
     query_tasks: dict[str, asyncio.Task] = {}  # session_id → task
     query_queues: dict[str, list] = {}         # session_id → [msg, ...]
+    _or_pending: dict[str, asyncio.Future] = {}  # tool_id → Future (proxy tool results)
     # Mutable container so closures always reference the current websocket
     ws_ref: list = [None]
 
@@ -2562,6 +2582,28 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                         log.info("OR tool denied [%s]: %s — %s",
                                  session_id[:8], tool_name, deny_reason)
                         t_result = f"Permission denied: {deny_reason}"
+                    elif tool_name == "Monitor":
+                        # Proxy Monitor to the client for streaming output
+                        loop = asyncio.get_running_loop()
+                        future: asyncio.Future = loop.create_future()
+                        _or_pending[tool_id] = future
+                        await send_fn({
+                            "type": "tool_execute",
+                            "tool_id": tool_id,
+                            "tool_name": "Monitor",
+                            "tool_input": t_args,
+                            "session_id": session_id,
+                        })
+                        timeout_s = (t_args.get("timeout_ms") or 300000) / 1000 + 10
+                        try:
+                            res = await asyncio.wait_for(future, timeout=timeout_s)
+                            t_result = res.get("content", "")
+                            if res.get("is_error"):
+                                t_result = f"Error: {t_result}"
+                        except asyncio.TimeoutError:
+                            t_result = "Monitor timed out"
+                        finally:
+                            _or_pending.pop(tool_id, None)
                     else:
                         t_result = await execute_openrouter_tool(
                             tool_name, t_args, cwd,
@@ -3353,20 +3395,36 @@ async def run_bridge(relay_url: str, auth_token: str, config: ServerConfig):
                             }))
                             log.info("Conversation reset [%s]", session_id[:8])
 
+                        elif msg_type == "tool_stream_response":
+                            # Client is streaming output from a Monitor tool — forward to webview
+                            tool_id = msg.get("tool_id", "")
+                            await send_to_ws({
+                                "type": "tool_stream",
+                                "tool_use_id": tool_id,
+                                "content": msg.get("content", ""),
+                                "session_id": session_id,
+                            })
+
                         elif msg_type == "tool_result_response":
                             # Client sends back the result of a tool execution
                             tool_id = msg.get("tool_id", "")
+                            result_payload = {
+                                "content": msg.get("content", ""),
+                                "is_error": msg.get("is_error", False),
+                            }
+                            # Resolve OR proxy pending future (Monitor, etc.)
+                            or_fut = _or_pending.get(tool_id)
+                            if or_fut and not or_fut.done():
+                                or_fut.set_result(result_payload)
+                            # Resolve Claude SDK bridge tool
                             bridge = sessions.get(session_id)
                             if bridge and tool_id:
-                                bridge.resolve_tool_result(tool_id, {
-                                    "content": msg.get("content", ""),
-                                    "is_error": msg.get("is_error", False),
-                                })
-                                log.debug(
-                                    "Tool result [%s]: %s -> %s",
-                                    session_id[:8], tool_id[:8],
-                                    "error" if msg.get("is_error") else "ok",
-                                )
+                                bridge.resolve_tool_result(tool_id, result_payload)
+                            log.debug(
+                                "Tool result [%s]: %s -> %s",
+                                session_id[:8], tool_id[:8],
+                                "error" if msg.get("is_error") else "ok",
+                            )
 
                         elif msg_type == "council_query":
                             # Multi-model deliberation mode

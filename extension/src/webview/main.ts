@@ -1513,6 +1513,23 @@ window.addEventListener('message', (event) => {
             renderToolResult(msg);
             break;
 
+        case 'tool_stream': {
+            const block = [...messagesEl.querySelectorAll('.tool-block')]
+                .find(b => (b as HTMLElement).dataset.toolUseId === msg.tool_use_id) as HTMLElement | undefined;
+            if (block) {
+                let streamEl = block.querySelector('.tool-stream-output') as HTMLPreElement | null;
+                if (!streamEl) {
+                    streamEl = document.createElement('pre');
+                    streamEl.className = 'tool-stream-output';
+                    block.querySelector('.tool-body-inner')?.appendChild(streamEl);
+                    block.querySelector('.tool-body')?.classList.add('open');
+                }
+                streamEl.textContent += msg.content;
+                scrollToBottom();
+            }
+            break;
+        }
+
         case 'thinking':
             removeWelcome();
             renderThinking(msg.text);
@@ -1781,7 +1798,8 @@ function getToolSummary(toolName: string, args: Record<string, unknown>): string
             return (args.file_path as string) || '';
         case 'Write':
             return (args.file_path as string) || '';
-        case 'Bash': {
+        case 'Bash':
+        case 'Monitor': {
             const cmd = (args.command as string) || '';
             return cmd.length > 80 ? cmd.substring(0, 80) + '\u2026' : cmd;
         }

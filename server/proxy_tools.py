@@ -135,6 +135,9 @@ def create_proxy_mcp_server(
     )
     async def bash(args: dict[str, Any]) -> dict:
         timeout = (args.get("timeout") or 120000) / 1000.0 + 5
+        # Drop cwd — it's a Mac path from the bridge machine, not the client's machine.
+        # The extension falls back to its workspace folder which is correct.
+        args = {k: v for k, v in args.items() if k != "cwd"}
         try:
             return _ok(await _remote("Bash", args, timeout=timeout))
         except RuntimeError as e:
@@ -196,6 +199,29 @@ def create_proxy_mcp_server(
     async def list_directory(args: dict[str, Any]) -> dict:
         try:
             return _ok(await _remote("ListDirectory", args))
+        except RuntimeError as e:
+            return _err(str(e))
+
+    @tool(
+        "Monitor",
+        "Run a command on the user's machine and stream its output line-by-line. "
+        "Use for long-running processes: build watchers, test runners, dev servers, etc. "
+        "Returns all output when the process exits or times out.",
+        {
+            "type": "object",
+            "properties": {
+                "command": {"type": "string", "description": "Shell command to run"},
+                "timeout_ms": {"type": "integer", "description": "Max runtime in ms (default 300000 = 5 min)"},
+                "cwd": {"type": "string", "description": "Working directory (optional)"},
+            },
+            "required": ["command"],
+        },
+    )
+    async def monitor(args: dict[str, Any]) -> dict:
+        timeout = (args.get("timeout_ms") or 300000) / 1000.0 + 5
+        args = {k: v for k, v in args.items() if k != "cwd"}
+        try:
+            return _ok(await _remote("Monitor", args, timeout=timeout))
         except RuntimeError as e:
             return _err(str(e))
 
