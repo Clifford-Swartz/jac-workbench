@@ -309,6 +309,9 @@ export class ClaudeUltraPanel {
                     case 'load_history':
                         this.sendHistoryList();
                         break;
+                    case 'load_more_history':
+                        this.loadMoreHistory(msg.id as string, msg.offset as number);
+                        break;
                     case 'restore_conversation':
                         this.restoreConversation(msg.id as string);
                         break;
@@ -1286,16 +1289,38 @@ Only use tools when needed. Always respond in English.` };
         this.panel.webview.postMessage({ type: 'history_list', conversations: index });
     }
 
+    private readonly historyCache = new Map<string, SavedMessage[]>();
+
     private async restoreConversation(id: string): Promise<void> {
         const messages = this.context.globalState.get<SavedMessage[]>(`ccu.conversation.${id}`);
         const meta = this.getIndex().find(c => c.id === id);
         if (messages) {
+            this.historyCache.set(id, messages);
+            const PAGE = 50;
+            const page = messages.slice(-PAGE);
             this.panel.webview.postMessage({
                 type: 'conversation_loaded',
-                messages,
+                messages: page,
                 meta: meta || null,
+                historyTotal: messages.length,
+                historyOffset: messages.length - page.length,
+                conversationId: id,
             });
         }
+    }
+
+    private loadMoreHistory(id: string, offset: number): void {
+        const all = this.historyCache.get(id);
+        if (!all || offset <= 0) { return; }
+        const PAGE = 50;
+        const start = Math.max(0, offset - PAGE);
+        this.panel.webview.postMessage({
+            type: 'more_history',
+            messages: all.slice(start, offset),
+            newOffset: start,
+            historyTotal: all.length,
+            conversationId: id,
+        });
     }
 
     private async deleteConversation(id: string): Promise<void> {

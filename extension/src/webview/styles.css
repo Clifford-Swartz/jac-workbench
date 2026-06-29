@@ -499,45 +499,123 @@ body {
 /* ── Message layout ────────────────────────────────────────────────────────── */
 
 .message {
-    padding: 8px 16px;
     animation: fadeIn 0.2s ease;
     line-height: 1.4;
-    border-bottom: 1px solid transparent;
 }
 
-.message + .message {
-    border-top: none;
-}
-
+/* All messages: flex row, NO top/bottom padding so gutter spans full height */
+.message.assistant,
 .message.user {
-    background: var(--user-bg);
-    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 16px 0 0;
 }
 
-.message.assistant {
-    background: transparent;
+/* Spacing lives on the body, not the row */
+.message.assistant .msg-body {
+    padding: 8px 0;
 }
+
+/* User messages get a subtle box on the body */
+.message.user .msg-body {
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 4px 0;
+}
+
+.msg-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Timeline gutter (dot + connecting line) ─────────────────────────────── */
+
+.msg-gutter {
+    width: 44px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5px;
+    position: relative;
+}
+
+/* Upper segment: gutter top → dot center (connects from previous element) */
+.msg-gutter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5px;
+    background: rgba(255,255,255,0.15);
+    pointer-events: none;
+}
+
+/* Lower segment: dot center → gutter bottom (connects to next element) */
+.msg-gutter::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5px;
+    background: rgba(255,255,255,0.15);
+    pointer-events: none;
+}
+
+/* No stub above the first circle in a chain */
+#messages > :first-child .msg-gutter::before,
+.message.user + .message.assistant .msg-gutter::before,
+.message.user + .tool-wrapper .msg-gutter::before {
+    display: none;
+}
+
+/* No dangling line below the last circle in a chain */
+#messages > :last-child .msg-gutter::after,
+.message.assistant:has(+ .message.user) .msg-gutter::after,
+.tool-wrapper:has(+ .message.user) .msg-gutter::after {
+    display: none;
+}
+
+.msg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.message.assistant .msg-dot {
+    background: #9ca3af;
+}
+
 
 /* Collapse chrome when an assistant message is a continuation of the same
    turn — after a tool call, after another assistant message, or after a
    permission block. Hides the redundant role label and tightens padding. */
-.tool-block + .message.assistant,
+.tool-wrapper + .message.assistant,
 .message.assistant + .message.assistant,
 .permission-block + .message.assistant {
     padding-top: 2px;
     padding-bottom: 2px;
 }
-.tool-block + .message.assistant .role-label,
+.tool-wrapper + .message.assistant .role-label,
 .message.assistant + .message.assistant .role-label,
 .permission-block + .message.assistant .role-label {
     display: none;
 }
 
 /* Also tighten the gap between a message and the tool-block it spawns */
-.message.assistant + .tool-block {
+.message.assistant + .tool-wrapper {
     margin-top: 0;
 }
-.tool-block + .tool-block {
+.tool-wrapper + .tool-wrapper {
     margin-top: 0;
 }
 
@@ -693,8 +771,25 @@ body {
 
 /* ── Tool blocks ───────────────────────────────────────────────────────────── */
 
+.tool-wrapper {
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+}
+
+.tool-wrapper .msg-gutter {
+    padding-top: 5px;
+}
+
+.tool-dot {
+    background: #4ade80;
+    width: 8px;
+    height: 8px;
+}
+
 .tool-block {
-    margin: 3px 16px 3px 16px;
+    flex: 1;
+    margin: 3px 16px 3px 0;
     border: 1px solid var(--border);
     border-radius: 6px;
     overflow: hidden;
@@ -1499,6 +1594,31 @@ body {
     font-size: 12px;
     border-radius: 4px;
     margin: 8px 12px;
+}
+
+.load-earlier-btn {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 6px 12px;
+    padding: 7px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-muted);
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.load-earlier-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--fg);
+}
+
+.load-earlier-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 /* ── AskUserQuestion ─────────────────────────────────────────────────────── */

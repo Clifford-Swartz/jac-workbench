@@ -218,7 +218,13 @@ export async function detectAudioSetup(): Promise<AudioSetupStatus> {
         };
 
     } else if (process.platform === 'win32') {
-        // Windows: needs ffmpeg, WASAPI loopback is built-in
+        // Windows: prefer native Rust binary (WASAPI loopback, no extra setup)
+        const nativeBin = jacAudioBin(_extensionPath);
+        if (fs.existsSync(nativeBin)) {
+            return { ready: true, missing: [], message: '', canAutoInstall: false, source: 'wasapi-loopback' };
+        }
+
+        // Fall back to ffmpeg + DirectShow
         if (!hasFfmpeg) {
             missing.push('ffmpeg');
             const hasWinget = await detectWinget();
@@ -232,13 +238,11 @@ export async function detectAudioSetup(): Promise<AudioSetupStatus> {
             };
         }
 
-        // ffmpeg is available — try to find a loopback device
         const device = await detectWindowsLoopback();
         if (device) {
             return { ready: true, missing: [], message: '', canAutoInstall: false, source: device };
         }
 
-        // No loopback found — may need to enable "Stereo Mix" in Sound settings
         return {
             ready: false,
             missing: ['stereo-mix'],
@@ -342,14 +346,16 @@ function runCmd(cmd: string, args: string[], env?: Record<string, string>): Prom
 // ── macOS Multi-Output Device management via compiled Swift helper ───────────
 
 import * as path from 'path';
+import * as fs from 'fs';
 
-/** Path to the jac-audio native binary (compiled Swift, ships with extension) */
+/** Path to the jac-audio native binary.
+ *  macOS: Swift binary (jac-audio), Windows: Rust binary (jac-audio.exe) */
 function jacAudioBin(extensionPath?: string): string {
-    if (extensionPath) {
-        return path.join(extensionPath, 'native', 'jac-audio');
-    }
-    // Fallback: try relative to this file's location
-    return path.join(__dirname, '..', 'native', 'jac-audio');
+    const dir = extensionPath
+        ? path.join(extensionPath, 'native')
+        : path.join(__dirname, '..', 'native');
+    const name = process.platform === 'win32' ? 'jac-audio.exe' : 'jac-audio';
+    return path.join(dir, name);
 }
 
 let _extensionPath: string | undefined;
@@ -587,7 +593,7 @@ export class AudioCapture {
         const nativeBin = this.findNativeBinary();
         let cmd: string;
         let args: string[];
-        if (this.source === 'screencapture' && nativeBin) {
+        if ((this.source === 'screencapture' || this.source === 'wasapi-loopback') && nativeBin) {
             cmd = nativeBin;
             args = ['capture-audio', String(SAMPLE_RATE)];
         } else {

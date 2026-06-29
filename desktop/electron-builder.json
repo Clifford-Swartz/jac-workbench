@@ -1,0 +1,26 @@
+{
+  "appId": "com.clifford.jac",
+  "productName": "JAC",
+  "icon": "assets/icon",
+  "files": [
+    "dist/main/**/*",
+    "dist/preload/**/*",
+    "dist/preload/package.json",
+    "dist/renderer/**/*",
+    "assets/**/*"
+  ],
+  "afterPack": "scripts/fix-asar-hash.js",
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": [
+      { "target": "dir", "arch": ["arm64"] }
+    ]
+  },
+  "win": {
+    "target": [{ "target": "nsis", "arch": ["x64"] }]
+  },
+  "linux": {
+    "target": [{ "target": "AppImage", "arch": ["x64"] }],
+    "category": "Development"
+  }
+}

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src data: blob: 'self';">
+    <link href="styles.css" rel="stylesheet">
+    <title>JAC</title>
+    <style>
+        @font-face {
+            font-family: 'seti';
+            src: url('./seti.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #191919;
+            color: #d4d4d4;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        /* Traffic light spacer — hiddenInset puts circles at top-left.
+           Pure drag region, no label. */
+        #titlebar {
+            height: 32px;
+            -webkit-app-region: drag;
+            flex-shrink: 0;
+            background: #191919;
+        }
+
+        #main-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* ── Activity Bar ────────────────────────────── */
+        #activity-bar {
+            width: 48px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #191919;
+            border-right: 1px solid #2b2b2b;
+        }
+
+        .activity-btn {
+            width: 48px;
+            height: 48px;
+            background: none;
+            border: none;
+            border-left: 2px solid transparent;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            opacity: 0.55;
+            transition: opacity 0.12s;
+            flex-shrink: 0;
+        }
+        .activity-btn:hover { opacity: 1; background: rgba(255,255,255,0.04); }
+        .activity-btn.active { opacity: 1; border-left-color: #d97757; color: #d4d4d4; }
+
+        /* ── Sidebar ─────────────────────────────────── */
+        #sidebar {
+            width: 240px;
+            min-width: 160px;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            background: #191919;
+            border-right: 1px solid #2b2b2b;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        #sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            background: #191919;
+            border-bottom: 1px solid #2b2b2b;
+            flex-shrink: 0;
+        }
+
+        #sidebar-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #888;
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-icon-btn {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 13px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .sidebar-icon-btn:hover { background: rgba(255,255,255,0.04); color: #d4d4d4; }
+
+        #breadcrumb {
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid #2b2b2b;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        #breadcrumb span {
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #breadcrumb span:hover { color: #d4d4d4; }
+        #back-btn {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 2px;
+            flex-shrink: 0;
+        }
+        #back-btn:hover { color: #d4d4d4; }
+        #back-btn:disabled { opacity: 0.2; cursor: default; }
+
+        #file-tree {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .tree-entry {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #d4d4d4;
+        }
+        .tree-entry:hover { background: rgba(255,255,255,0.04); }
+        .tree-entry.selected {
+            background: rgba(77,170,252,0.12);
+            color: #4daafc;
+        }
+
+        .tree-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'seti';
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .tree-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            color: #d4d4d4;
+        }
+        .tree-entry.is-dir .tree-name { color: #a0a0b8; }
+        .tree-entry.is-dir:hover .tree-name { color: #c0c0cc; }
+        .tree-entry.selected .tree-name { color: #4daafc; }
+
+        .tree-chevron {
+            font-size: 10px;
+            color: #888;
+            flex-shrink: 0;
+            transition: transform 0.1s;
+        }
+
+        .tree-children {
+            padding-left: 14px;
+        }
+
+        #sidebar-footer {
+            border-top: 1px solid #2b2b2b;
+            padding: 8px;
+            flex-shrink: 0;
+        }
+
+        #start-convo-btn {
+            width: 100%;
+            padding: 7px 10px;
+            background: transparent;
+            color: #d97757;
+            border: 1px solid #2b2b2b;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        #start-convo-btn:hover {
+            background: rgba(217,119,87,0.08);
+            border-color: rgba(217,119,87,0.4);
+            color: #e8967a;
+        }
+        #start-convo-btn:active { background: rgba(217,119,87,0.14); }
+
+        /* Resizer */
+        #resizer {
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        #resizer:hover, #resizer.dragging { background: rgba(77,170,252,0.25); }
+
+        /* ── Chat area ───────────────────────────────── */
+        #chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* Override JAC header to remove top padding (we handle it in #titlebar) */
+        #app { display: flex; flex-direction: column; height: 100%; }
+        #header { -webkit-app-region: no-drag; }
+        #messages { flex: 1; overflow-y: auto; }
+
+        #workflow-frame, #models-frame, #music-frame {
+            display: none;
+            flex: 1;
+            border: none;
+            min-width: 0;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="titlebar"></div>
+
+    <div id="main-layout">
+        <!-- Activity Bar -->
+        <div id="activity-bar">
+            <button class="activity-btn active" id="act-explorer" title="Explorer" data-panel="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-workflow" title="Workflow" data-panel="workflow">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <circle cx="3" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+                    <circle cx="15" cy="4" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+                    <circle cx="15" cy="14" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+                    <line x1="5.5" y1="8" x2="12.5" y2="5" stroke="currentColor" stroke-width="1.3"/>
+                    <line x1="5.5" y1="10" x2="12.5" y2="13" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-models" title="Local Models" data-panel="models">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6" rx="1"/>
+                    <line x1="9" y1="1" x2="9" y2="4"/>
+                    <line x1="15" y1="1" x2="15" y2="4"/>
+                    <line x1="9" y1="20" x2="9" y2="23"/>
+                    <line x1="15" y1="20" x2="15" y2="23"/>
+                    <line x1="20" y1="9" x2="23" y2="9"/>
+                    <line x1="20" y1="15" x2="23" y2="15"/>
+                    <line x1="1" y1="9" x2="4" y2="9"/>
+                    <line x1="1" y1="15" x2="4" y2="15"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-music" title="Music" data-panel="music">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- File Explorer Sidebar -->
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <span id="sidebar-title">Explorer</span>
+                <button class="sidebar-icon-btn" id="open-folder-btn" title="Open folder">⊕</button>
+                <button class="sidebar-icon-btn" id="reveal-btn" title="Reveal in Finder">⤤</button>
+            </div>
+            <div id="breadcrumb">
+                <button id="back-btn" disabled>‹</button>
+                <span id="current-path-label">~</span>
+            </div>
+            <div id="file-tree"></div>
+            <div id="sidebar-footer">
+                <button id="start-convo-btn">Start conversation</button>
+            </div>
+        </div>
+
+        <!-- Drag to resize -->
+        <div id="resizer"></div>
+
+        <!-- Workflow panel -->
+        <iframe id="workflow-frame" src="workflow.html"></iframe>
+
+        <!-- Models panel -->
+        <iframe id="models-frame" src="models.html"></iframe>
+        <iframe id="music-frame" src="music.html"></iframe>
+
+        <!-- Existing JAC chat UI -->
+        <div id="chat-area">
+            <div id="app">
+                <div id="header">
+                    <div id="title-wrapper">
+                        <span id="title">JAC</span>
+                        <span id="title-chevron">&#x25BE;</span>
+                        <span id="findings-badge" title="New research findings"></span>
+                        <div id="session-dropdown"></div>
+                    </div>
+                    <div id="header-actions">
+                        <button id="model-btn" title="Change model">Sonnet</button>
+                        <span id="or-credits" style="display:none;font-size:10px;opacity:0.6;margin:0 6px;"></span>
+                        <div id="context-ring" title="Context usage"></div>
+                        <span id="connection-status"></span>
+                        <button id="new-convo-btn" title="New conversation">&#x229E;</button>
+                        <button id="pair-btn" style="display:none" aria-hidden="true"></button>
+                    </div>
+                </div>
+                <div id="messages"></div>
+                <div id="input-area">
+                    <div id="streaming-indicator">
+                        <span class="streaming-dot"></span>
+                        <span id="streaming-label">Responding...</span>
+                    </div>
+                    <div id="slash-menu"></div>
+                    <div id="input-container">
+                        <textarea id="prompt-input" placeholder="Type your message..." rows="1"></textarea>
+                        <div id="image-previews"></div>
+                        <div id="input-toolbar">
+                            <button id="mode-btn" title="Permission mode">Bypass</button>
+                            <span id="input-hint">Shift+Enter for new line</span>
+                            <span class="spacer"></span>
+                            <button id="attach-btn" title="Attach images (Clippy wants to help!)"><img id="clippy-img" alt="Clippy" src="data:image/png;base64,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" /></button>
+                            <button id="send-btn" title="Send">&#x2191;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+    <script src="main.js"></script>
+    <script>
+    (function() {
+        // ── File Explorer ──────────────────────────────────────
+        let currentPath = '';
+        let selectedPath = '';
+        let navStack = [];
+
+        async function init() {
+            currentPath = await window.jac.getHome();
+            selectedPath = currentPath;
+            renderTree();
+        }
+
+        async function renderTree() {
+            const entries = await window.jac.listDir(currentPath);
+            const tree = document.getElementById('file-tree');
+            const label = document.getElementById('current-path-label');
+            const backBtn = document.getElementById('back-btn');
+            label.textContent = currentPath.replace(window._homeDir || '', '~');
+            backBtn.disabled = navStack.length === 0;
+
+            tree.innerHTML = '';
+            for (const entry of entries) {
+                const el = document.createElement('div');
+                el.className = 'tree-entry' + (entry.isDir ? ' is-dir' : '');
+                if (entry.path === selectedPath) el.classList.add('selected');
+
+                const icon = document.createElement('span');
+                icon.className = 'tree-icon';
+                if (entry.isDir) {
+                    icon.innerHTML = getFolderIcon();
+                } else {
+                    var iconData = getFileIcon(entry.name);
+                    icon.textContent = iconData[0];
+                    icon.style.color = iconData[1];
+                }
+
+                const name = document.createElement('span');
+                name.className = 'tree-name';
+                name.textContent = entry.name;
+
+                el.appendChild(icon);
+                el.appendChild(name);
+
+                if (entry.isDir) {
+                    const chev = document.createElement('span');
+                    chev.className = 'tree-chevron';
+                    chev.textContent = '›';
+                    el.appendChild(chev);
+
+                    el.addEventListener('click', () => {
+                        navStack.push(currentPath);
+                        currentPath = entry.path;
+                        selectedPath = entry.path;
+                        renderTree();
+                    });
+                } else {
+                    el.addEventListener('click', () => {
+                        selectedPath = entry.path;
+                        document.querySelectorAll('.tree-entry.selected').forEach(e => e.classList.remove('selected'));
+                        el.classList.add('selected');
+                    });
+                }
+
+                tree.appendChild(el);
+            }
+        }
+
+        // ── Seti file icons (MIT, from VS Code's bundled theme-seti) ──────────
+        // Glyph codes stored as hex strings, decoded at runtime to avoid encoding issues
+        function setiChar(hex) { return String.fromCodePoint(parseInt(hex, 16)); }
+
+        const SETI_EXT={"bsl":["E00A","#cc3e44"],"mdo":["E062","#cc3e44"],"cls":["E083","#519aba"],"apex":["E083","#519aba"],"asm":["E004","#cc3e44"],"s":["E004","#cc3e44"],"bicep":["E008","#519aba"],"bzl":["E007","#8dc149"],"bazel":["E007","#8dc149"],"bazelignore":["E007","#8dc149"],"h":["E00C","#a074c4"],"hh":["E01A","#a074c4"],"hpp":["E01A","#a074c4"],"hxx":["E01A","#a074c4"],"config":["E019","#6d8086"],"cr":["E01B","#d4d7d6"],"cson":["E055","#cbcb41"],"csv":["E01E","#8dc149"],"xls":["E0A4","#8dc149"],"xlsx":["E0A4","#8dc149"],"cake":["E00D","#cc3e44"],"d":["E020","#cc3e44"],"doc":["E0A3","#519aba"],"docx":["E0A3","#519aba"],"ejs":["E027","#cbcb41"],"ex":["E028","#a074c4"],"exs":["E029","#a074c4"],"elm":["E02A","#519aba"],"ico":["E02F","#cbcb41"],"gitconfig":["E034","#41535b"],"gitkeep":["E034","#41535b"],"gitattributes":["E034","#41535b"],"gitmodules":["E034","#41535b"],"gd":["E03B","#519aba"],"godot":["E03B","#cc3e44"],"gradle":["E03C","#519aba"],"gql":["E03E","#f55385"],"graphql":["E03E","#f55385"],"hack":["E041","#e37933"],"haml":["E042","#cc3e44"],"hs":["E044","#a074c4"],"lhs":["E044","#a074c4"],"hx":["E045","#e37933"],"jade":["E04F","#cc3e44"],"class":["E050","#519aba"],"js.map":["E051","#cbcb41"],"spec.js":["E051","#e37933"],"test.js":["E051","#e37933"],"es":["E051","#cbcb41"],"jinja":["E053","#cc3e44"],"jinja2":["E053","#cc3e44"],"kt":["E058","#e37933"],"kts":["E058","#e37933"],"liquid":["E05B","#8dc149"],"mustache":["E063","#e37933"],"nim":["E065","#cbcb41"],"ipynb":["E066","#519aba"],"njk":["E069","#8dc149"],"npmignore":["E067","#cc3e44"],"npmrc":["E067","#cc3e44"],"ml":["E06A","#e37933"],"mli":["E06A","#e37933"],"prisma":["E075","#519aba"],"pp":["E079","#cbcb41"],"purs":["E07A","#d4d7d6"],"spec.jsx":["E07D","#e37933"],"test.jsx":["E07D","#e37933"],"spec.tsx":["E07D","#e37933"],"test.tsx":["E07D","#e37933"],"re":["E07E","#cc3e44"],"res":["E07F","#cc3e44"],"r":["E001","#519aba"],"rmd":["E001","#519aba"],"erb":["E049","#cc3e44"],"sass":["E084","#f55385"],"slim":["E08A","#e37933"],"sbt":["E085","#519aba"],"scala":["E086","#cc3e44"],"sol":["E02D","#519aba"],"styl":["E08E","#8dc149"],"svelte":["E090","#cc3e44"],"tf":["E093","#a074c4"],"tfvars":["E093","#a074c4"],"toml":["E019","#6d8086"],"twig":["E098","#8dc149"],"spec.ts":["E099","#e37933"],"test.ts":["E099","#e37933"],"vala":["E09A","#6d8086"],"vue":["E09D","#8dc149"],"wasm":["E09E","#a074c4"],"zig":["E0A8","#e37933"],"jar":["E0A9","#cc3e44"],"zip":["E0A9","#6d8086"],"ai":["E04B","#cbcb41"],"psd":["E06F","#519aba"],"pdf":["E06D","#cc3e44"],"eot":["E033","#cc3e44"],"ttf":["E033","#cc3e44"],"woff":["E033","#cc3e44"],"woff2":["E033","#cc3e44"],"otf":["E033","#cc3e44"],"avif":["E04C","#a074c4"],"gif":["E04C","#a074c4"],"jpg":["E04C","#a074c4"],"jpeg":["E04C","#a074c4"],"png":["E04C","#a074c4"],"svg":["E091","#a074c4"],"tiff":["E04C","#a074c4"],"webp":["E04C","#a074c4"],"mov":["E09B","#f55385"],"webm":["E09B","#f55385"],"avi":["E09B","#f55385"],"mp4":["E09B","#f55385"],"mp3":["E005","#a074c4"],"ogg":["E005","#a074c4"],"wav":["E005","#a074c4"],"flac":["E005","#a074c4"],"stl":["E091","#519aba"],"obj":["E091","#519aba"],"babelrc":["E006","#cbcb41"],"dockerignore":["E025","#4d5a5e"],"eslintrc":["E02C","#a074c4"],"eslintrc.js":["E02C","#a074c4"],"eslintrc.json":["E02C","#a074c4"],"firebaserc":["E030","#e37933"],"stylelintrc":["E08D","#d4d7d6"],"key":["E05D","#8dc149"],"cert":["E05D","#8dc149"],"cer":["E05D","#8dc149"],"crt":["E05D","#8dc149"],"pem":["E05D","#8dc149"],"js":["E051","#cbcb41"],"mjs":["E051","#cbcb41"],"cjs":["E051","#cbcb41"],"jsx":["E07D","#519aba"],"ts":["E099","#519aba"],"mts":["E099","#519aba"],"cts":["E099","#519aba"],"tsx":["E07D","#519aba"],"py":["E07B","#519aba"],"pyi":["E07B","#519aba"],"rs":["E082","#6d8086"],"go":["E03A","#519aba"],"md":["E060","#519aba"],"markdown":["E060","#519aba"],"mdx":["E060","#519aba"],"json":["E055","#cbcb41"],"jsonc":["E055","#cbcb41"],"json5":["E055","#cbcb41"],"css":["E01D","#519aba"],"scss":["E084","#f55385"],"html":["E048","#e37933"],"htm":["E048","#e37933"],"sh":["E089","#8dc149"],"bash":["E089","#8dc149"],"zsh":["E089","#8dc149"],"fish":["E089","#8dc149"],"c":["E00C","#519aba"],"cc":["E01A","#519aba"],"cpp":["E01A","#519aba"],"cxx":["E01A","#519aba"],"java":["E050","#cc3e44"],"xml":["E0A5","#e37933"],"xsd":["E0A5","#e37933"],"yaml":["E0A7","#a074c4"],"yml":["E0A7","#a074c4"],"php":["E070","#a074c4"],"rb":["E081","#cc3e44"],"gemspec":["E081","#cc3e44"],"swift":["E092","#e37933"],"cs":["E00B","#519aba"],"lua":["E05E","#519aba"],"dart":["E021","#519aba"],"coffee":["E016","#cbcb41"],"ps1":["E074","#519aba"],"pl":["E06E","#519aba"],"pm":["E06E","#519aba"],"dockerfile":["E025","#519aba"],"ini":["E019","#6d8086"],"env":["E019","#6d8086"],"txt":["E023","#d4d7d6"],"lock":["E019","#6d8086"]};
+        const SETI_NAME={"readme.md":["E04D","#519aba"],"readme.txt":["E04D","#519aba"],"readme":["E04D","#519aba"],"changelog.md":["E012","#519aba"],"changelog":["E012","#519aba"],"tsconfig.json":["E097","#519aba"],"vite.config.js":["E09C","#cbcb41"],"vite.config.ts":["E09C","#cbcb41"],"vite.config.mjs":["E09C","#cbcb41"],"swagger.json":["E055","#8dc149"],"swagger.yml":["E055","#8dc149"],"jenkinsfile":["E052","#cc3e44"],"babel.config.js":["E006","#cbcb41"],"babel.config.json":["E006","#cbcb41"],"bower.json":["E009","#e37933"],"docker-healthcheck":["E025","#8dc149"],"eslint.config.js":["E02C","#a074c4"],"firebase.json":["E030","#e37933"],"gruntfile.js":["E03F","#e37933"],"gulpfile.js":["E040","#cc3e44"],"rollup.config.js":["E080","#cc3e44"],"yarn.lock":["E0A6","#519aba"],"webpack.config.js":["E0A0","#519aba"],"webpack.config.ts":["E0A0","#519aba"],"license":["E05A","#cbcb41"],"licence":["E05A","#cbcb41"],"license.txt":["E05A","#cbcb41"],"license.md":["E05A","#cbcb41"],"contributing":["E05A","#cc3e44"],"contributing.md":["E05A","#cc3e44"],"cmakelists.txt":["E05F","#519aba"],"procfile":["E046","#a074c4"],"todo":["E096","#aaaaaa"],"todo.md":["E096","#aaaaaa"],"package.json":["E09C","#cc3e44"],"package-lock.json":["E09C","#cc3e44"],".gitignore":["E034","#41535b"],".env":["E019","#8dc149"],"makefile":["E05F","#8dc149"],"dockerfile":["E025","#519aba"]};
+        const SETI_DEFAULT=["E023","#d4d7d6"];
+
+        function getFileIcon(name) {
+            var lower = name.toLowerCase();
+            var named = SETI_NAME[lower] || SETI_NAME['.' + lower];
+            if (named) return [setiChar(named[0]), named[1]];
+            var parts = lower.split('.');
+            for (var i = 1; i < parts.length; i++) {
+                var suffix = parts.slice(i).join('.');
+                if (SETI_EXT[suffix]) return [setiChar(SETI_EXT[suffix][0]), SETI_EXT[suffix][1]];
+            }
+            return [setiChar(SETI_DEFAULT[0]), SETI_DEFAULT[1]];
+        }
+
+        function getFolderIcon() {
+            return '<svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 3.5h5.5l1.2 1.8H15v7.5H1V3.5z" fill="#dcb67a" fill-opacity="0.25" stroke="#dcb67a" stroke-width="1.1" stroke-linejoin="round"/><path d="M1 3.5h5.5l1.2 1.8" stroke="#dcb67a" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg>';
+        }
+
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            if (navStack.length > 0) {
+                currentPath = navStack.pop();
+                selectedPath = currentPath;
+                renderTree();
+            }
+        });
+
+        document.getElementById('open-folder-btn').addEventListener('click', async () => {
+            const chosen = await window.jac.openFolderDialog();
+            if (chosen) {
+                navStack = [];
+                currentPath = chosen;
+                selectedPath = chosen;
+                renderTree();
+            }
+        });
+
+        document.getElementById('reveal-btn').addEventListener('click', () => {
+            window.jac.openInFinder(selectedPath || currentPath);
+        });
+
+        document.getElementById('start-convo-btn').addEventListener('click', () => {
+            const folder = selectedPath || currentPath;
+            window.jac.sendRaw({ type: 'set_cwd', cwd: folder });
+            const prompt = document.getElementById('prompt-input');
+            if (prompt) prompt.focus();
+        });
+
+        // Resizer drag
+        const resizer = document.getElementById('resizer');
+        const sidebar = document.getElementById('sidebar');
+        let dragging = false, startX = 0, startW = 0;
+        resizer.addEventListener('mousedown', e => {
+            dragging = true;
+            startX = e.clientX;
+            startW = sidebar.offsetWidth;
+            resizer.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            const w = Math.min(400, Math.max(160, startW + e.clientX - startX));
+            sidebar.style.width = w + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            dragging = false;
+            resizer.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+
+        // Findings badge
+        function updateFindingsBadge() {
+            window.jac.getPendingFindings().then(findings => {
+                const badge = document.getElementById('findings-badge');
+                if (!badge) return;
+                const unread = findings.filter(f => !f.read);
+                badge.textContent = unread.length > 0 ? String(unread.length) : '';
+                badge.style.display = unread.length > 0 ? 'inline-block' : 'none';
+            });
+        }
+        window.jac.onTaskComplete(() => updateFindingsBadge());
+
+        // ── Activity Bar ──────────────────────────────────────
+        (function() {
+            var sidebar = document.getElementById('sidebar');
+            var resizer = document.getElementById('resizer');
+            var chatArea = document.getElementById('chat-area');
+            var workflowFrame = document.getElementById('workflow-frame');
+            var modelsFrame = document.getElementById('models-frame');
+            var musicFrame = document.getElementById('music-frame');
+            var savedWidth = 240;
+            var activePanel = 'sidebar';
+            var FULL_PANELS = ['workflow', 'models', 'music'];
+
+            function syncActivityHeight() {
+                var header = document.getElementById('header');
+                var firstBtn = document.getElementById('act-explorer');
+                var sidebarHdr = document.getElementById('sidebar-header');
+                if (header) {
+                    var h = header.offsetHeight + 'px';
+                    if (firstBtn) firstBtn.style.height = h;
+                    if (sidebarHdr) sidebarHdr.style.height = h;
+                }
+            }
+            syncActivityHeight();
+            window.addEventListener('load', syncActivityHeight);
+
+            function showPanel(panel) {
+                document.querySelectorAll('.activity-btn').forEach(function(b) { b.classList.remove('active'); });
+                var btn = document.querySelector('[data-panel="' + panel + '"]');
+                if (btn) btn.classList.add('active');
+
+                var isFull = FULL_PANELS.indexOf(panel) !== -1;
+                if (isFull) {
+                    savedWidth = sidebar.offsetWidth || savedWidth;
+                    sidebar.style.display = 'none';
+                    resizer.style.display = 'none';
+                    chatArea.style.display = 'none';
+                    workflowFrame.style.display = panel === 'workflow' ? 'flex' : 'none';
+                    modelsFrame.style.display   = panel === 'models'   ? 'flex' : 'none';
+                    musicFrame.style.display    = panel === 'music'    ? 'flex' : 'none';
+                } else {
+                    workflowFrame.style.display = 'none';
+                    modelsFrame.style.display   = 'none';
+                    musicFrame.style.display    = 'none';
+                    chatArea.style.display = '';
+                    if (panel === 'sidebar') {
+                        sidebar.style.display = '';
+                        sidebar.style.width = savedWidth + 'px';
+                        resizer.style.display = '';
+                    } else {
+                        sidebar.style.display = 'none';
+                        resizer.style.display = 'none';
+                    }
+                }
+                activePanel = panel;
+            }
+
+            document.querySelectorAll('.activity-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var panel = btn.dataset.panel;
+                    if (!panel) return;
+                    if (activePanel === panel && panel !== 'workflow') {
+                        // Collapse sidebar toggle
+                        savedWidth = sidebar.offsetWidth || savedWidth;
+                        sidebar.style.display = 'none';
+                        resizer.style.display = 'none';
+                        btn.classList.remove('active');
+                        activePanel = null;
+                    } else {
+                        showPanel(panel);
+                    }
+                });
+            });
+        })();
+
+        // Bootstrap
+        window.jac.getHome().then(h => {
+            window._homeDir = h;
+            init();
+        });
+        updateFindingsBadge();
+    })();
+    </script>
+</body>
+</html>

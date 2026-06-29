@@ -1,0 +1,23 @@
+[package]
+name = "jac-audio"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "jac-audio"
+path = "src/main.rs"
+
+[target.'cfg(windows)'.dependencies]
+wasapi = "0.14"
+windows = { version = "0.58", features = [
+    "Win32_Media_Audio",
+    "Win32_System_Com",
+    "Win32_Foundation",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cpal = "0.15"
+
+[profile.release]
+opt-level = 3
+strip = true

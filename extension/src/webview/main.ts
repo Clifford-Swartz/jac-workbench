@@ -24,6 +24,9 @@ const titleWrapper = document.getElementById('title-wrapper')!;
 const sessionDropdown = document.getElementById('session-dropdown')!;
 let dropdownOpen = false;
 let historyForDropdown = false;
+let historyAccum: SerializedMsg[] = [];
+let historyCurrentId = '';
+let historyOffset = 0;
 
 const imagePreviewsEl = document.getElementById('image-previews') as HTMLDivElement;
 
@@ -1326,17 +1329,20 @@ function serializeConversation(): SerializedMsg[] {
                 }
             }
             msgs.push(msg);
-        } else if (el.classList.contains('tool-block')) {
+        } else if (el.classList.contains('tool-wrapper')) {
             // Attach tool info to last assistant message
-            const toolName = el.querySelector('.tool-name')?.textContent || '';
-            const toolId = el.dataset.toolUseId || '';
-            const resultEl = el.querySelector('.result-content pre');
-            const resultText = resultEl?.textContent || '';
-            const isError = !!el.querySelector('.tool-result-block.error');
-            if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
-                const last = msgs[msgs.length - 1];
-                if (!last.tools) { last.tools = []; }
-                last.tools.push({ name: toolName, id: toolId, args: {}, result: resultText, isError });
+            const toolEl = el.querySelector('.tool-block') as HTMLElement | null;
+            if (toolEl) {
+                const toolName = toolEl.querySelector('.tool-name')?.textContent || '';
+                const toolId = toolEl.dataset.toolUseId || '';
+                const resultEl = toolEl.querySelector('.result-content pre');
+                const resultText = resultEl?.textContent || '';
+                const isError = !!toolEl.querySelector('.tool-result-block.error');
+                if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
+                    const last = msgs[msgs.length - 1];
+                    if (!last.tools) { last.tools = []; }
+                    last.tools.push({ name: toolName, id: toolId, args: {}, result: resultText, isError });
+                }
             }
         }
     }
@@ -1436,7 +1442,59 @@ function renderHistoryList(conversations: Array<{id: string; title: string; time
     scrollToBottom();
 }
 
-function renderSavedConversation(messages: SerializedMsg[]): void {
+function renderMsgBlock(msg: SerializedMsg): void {
+    appendMessage(msg.role, msg.text, msg.images);
+    if (msg.tools) {
+        for (const tool of msg.tools) {
+            renderToolUse({ tool_name: tool.name, tool_use_id: tool.id, args: tool.args });
+            if (tool.result !== undefined) {
+                renderToolResult({ tool_use_id: tool.id, content: tool.result, is_error: tool.isError || false });
+            }
+        }
+    }
+}
+
+function makeLoadEarlierBtn(): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.id = 'load-earlier-btn';
+    btn.className = 'load-earlier-btn';
+    btn.textContent = `Load ${Math.min(50, historyOffset)} earlier messages`;
+    btn.addEventListener('click', () => {
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+        vscode.postMessage({ type: 'load_more_history', id: historyCurrentId, offset: historyOffset });
+    });
+    return btn;
+}
+
+function renderSavedConversation(
+    messages: SerializedMsg[],
+    opts?: { historyTotal?: number; historyOffset?: number; conversationId?: string },
+): void {
+    messagesEl.innerHTML = '';
+    historyAccum = messages;
+    historyCurrentId = opts?.conversationId ?? '';
+    historyOffset = opts?.historyOffset ?? 0;
+
+    const banner = document.createElement('div');
+    banner.className = 'history-banner';
+    banner.textContent = 'Viewing saved conversation (read-only)';
+    messagesEl.appendChild(banner);
+
+    if (historyOffset > 0) {
+        messagesEl.appendChild(makeLoadEarlierBtn());
+    }
+
+    for (const msg of messages) { renderMsgBlock(msg); }
+    scrollToBottom();
+}
+
+function prependHistoryMessages(messages: SerializedMsg[], newOffset: number): void {
+    const scrollOffset = messagesEl.scrollHeight - messagesEl.scrollTop;
+
+    historyAccum = [...messages, ...historyAccum];
+    historyOffset = newOffset;
+
     messagesEl.innerHTML = '';
 
     const banner = document.createElement('div');
@@ -1444,18 +1502,13 @@ function renderSavedConversation(messages: SerializedMsg[]): void {
     banner.textContent = 'Viewing saved conversation (read-only)';
     messagesEl.appendChild(banner);
 
-    for (const msg of messages) {
-        appendMessage(msg.role, msg.text, msg.images);
-        if (msg.tools) {
-            for (const tool of msg.tools) {
-                renderToolUse({ tool_name: tool.name, tool_use_id: tool.id, args: tool.args });
-                if (tool.result !== undefined) {
-                    renderToolResult({ tool_use_id: tool.id, content: tool.result, is_error: tool.isError || false });
-                }
-            }
-        }
+    if (newOffset > 0) {
+        messagesEl.appendChild(makeLoadEarlierBtn());
     }
-    scrollToBottom();
+
+    for (const msg of historyAccum) { renderMsgBlock(msg); }
+
+    messagesEl.scrollTop = messagesEl.scrollHeight - scrollOffset;
 }
 
 // ── Receive messages from extension host ─────────────────────────────────────
@@ -1586,7 +1639,18 @@ window.addEventListener('message', (event) => {
             break;
 
         case 'conversation_loaded':
-            renderSavedConversation(msg.messages);
+            renderSavedConversation(msg.messages, {
+                historyTotal: msg.historyTotal as number | undefined,
+                historyOffset: msg.historyOffset as number | undefined,
+                conversationId: msg.conversationId as string | undefined,
+            });
+            break;
+
+        case 'more_history':
+            prependHistoryMessages(
+                msg.messages as SerializedMsg[],
+                msg.newOffset as number,
+            );
             break;
 
         case 'ask_user_question':
@@ -1737,16 +1801,17 @@ function appendMessage(role: 'user' | 'assistant', text: string, images?: Array<
     const el = document.createElement('div');
     el.className = 'message ' + role;
 
-    const label = document.createElement('div');
-    label.className = 'role-label';
-    if (role === 'user') {
-        label.textContent = 'You';
-    } else {
-        const cloud = availableModels.find(m => m.id === currentModel);
-        const local = localModels.find(m => m.id === currentModel);
-        label.textContent = (cloud || local)?.label || currentModel;
+    if (role === 'assistant') {
+        const gutter = document.createElement('div');
+        gutter.className = 'msg-gutter';
+        const dot = document.createElement('div');
+        dot.className = 'msg-dot';
+        gutter.appendChild(dot);
+        el.appendChild(gutter);
     }
-    el.appendChild(label);
+
+    const body = document.createElement('div');
+    body.className = 'msg-body';
 
     // Show image thumbnails in user messages
     if (images && images.length > 0) {
@@ -1757,7 +1822,7 @@ function appendMessage(role: 'user' | 'assistant', text: string, images?: Array<
             imgEl.src = 'data:' + img.mediaType + ';base64,' + img.data;
             strip.appendChild(imgEl);
         }
-        el.appendChild(strip);
+        body.appendChild(strip);
     }
 
     const msgText = document.createElement('div');
@@ -1766,7 +1831,8 @@ function appendMessage(role: 'user' | 'assistant', text: string, images?: Array<
     if (text) {
         msgText.innerHTML = renderMarkdown(text);
     }
-    el.appendChild(msgText);
+    body.appendChild(msgText);
+    el.appendChild(body);
 
     messagesEl.appendChild(el);
     scrollToBottom();
@@ -1890,7 +1956,17 @@ function renderToolUse(msg: { tool_name: string; tool_use_id: string; args: Reco
     body.appendChild(bodyInner);
     block.appendChild(header);
     block.appendChild(body);
-    messagesEl.appendChild(block);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tool-wrapper';
+    const tGutter = document.createElement('div');
+    tGutter.className = 'msg-gutter';
+    const tDot = document.createElement('div');
+    tDot.className = 'msg-dot tool-dot';
+    tGutter.appendChild(tDot);
+    wrapper.appendChild(tGutter);
+    wrapper.appendChild(block);
+    messagesEl.appendChild(wrapper);
     scrollToBottom();
 }
 
@@ -2156,15 +2232,26 @@ function appendError(text: string): void {
     const el = document.createElement('div');
     el.className = 'message assistant error-msg';
 
+    const gutter = document.createElement('div');
+    gutter.className = 'msg-gutter';
+    const dot = document.createElement('div');
+    dot.className = 'msg-dot';
+    gutter.appendChild(dot);
+    el.appendChild(gutter);
+
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+
     const label = document.createElement('div');
     label.className = 'role-label error-label';
     label.textContent = 'Error';
-    el.appendChild(label);
+    body.appendChild(label);
 
     const msgText = document.createElement('div');
     msgText.className = 'msg-text';
     msgText.textContent = text;
-    el.appendChild(msgText);
+    body.appendChild(msgText);
+    el.appendChild(body);
 
     messagesEl.appendChild(el);
     scrollToBottom();

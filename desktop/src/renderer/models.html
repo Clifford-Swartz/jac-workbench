@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JAC Models</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: #191919;
+      color: #d4d4d4;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+    }
+
+    /* ── Toolbar ── */
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #191919;
+      border-bottom: 1px solid #2b2b2b;
+      flex-shrink: 0;
+      -webkit-app-region: drag;
+    }
+    #toolbar > * { -webkit-app-region: no-drag; }
+
+    #ollama-status { display: flex; align-items: center; gap: 6px; }
+    #status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #555; transition: background 0.3s;
+    }
+    #status-dot.connected { background: #50c878; box-shadow: 0 0 5px rgba(80,200,120,0.4); }
+    #status-dot.error     { background: #e06060; }
+    #status-text { color: #888; font-size: 11px; }
+
+    .tb-spacer { flex: 1; }
+
+    #search-input {
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px solid #2b2b2b;
+      border-radius: 4px;
+      color: #d4d4d4;
+      font-size: 12px;
+      width: 160px;
+      outline: none;
+    }
+    #search-input:focus { border-color: #d97757; }
+    #search-input::placeholder { color: #555; }
+
+    .tb-btn {
+      padding: 4px 12px;
+      background: transparent;
+      border: 1px solid #2b2b2b;
+      border-radius: 4px;
+      color: #d4d4d4;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.1s, border-color 0.1s;
+      white-space: nowrap;
+    }
+    .tb-btn:hover { background: rgba(255,255,255,0.04); border-color: #3a3a3a; }
+    .tb-btn:active { background: rgba(255,255,255,0.07); }
+    .tb-btn.primary { background: #d97757; border-color: #d97757; color: #fff; font-weight: 600; }
+    .tb-btn.primary:hover { background: #e08868; border-color: #e08868; }
+    .tb-btn.danger  { color: #e06060; border-color: #4a2020; }
+    .tb-btn.danger:hover { background: #2a1818; border-color: #6a3030; }
+    .tb-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+    /* ── Pull bar ── */
+    #pull-bar {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #141414;
+      border-bottom: 1px solid #2b2b2b;
+      flex-shrink: 0;
+    }
+    #pull-bar.visible { display: flex; }
+
+    #pull-input {
+      flex: 1;
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px solid #2b2b2b;
+      border-radius: 4px;
+      color: #d4d4d4;
+      font-size: 12px;
+      outline: none;
+    }
+    #pull-input:focus { border-color: #d97757; }
+    #pull-input::placeholder { color: #555; }
+
+    #pull-progress-wrap { display: none; align-items: center; gap: 8px; flex: 1; }
+    #pull-progress-wrap.visible { display: flex; }
+    #pull-status-text { font-size: 11px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #pull-bar-bg { width: 120px; height: 4px; background: #2b2b2b; border-radius: 2px; flex-shrink: 0; }
+    #pull-bar-fill { height: 100%; background: #d97757; border-radius: 2px; width: 0%; transition: width 0.2s; }
+
+    /* ── Main layout ── */
+    #main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+    /* ── Model list ── */
+    #model-list-panel {
+      width: 260px;
+      flex-shrink: 0;
+      border-right: 1px solid #2b2b2b;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #list-header {
+      padding: 8px 12px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      border-bottom: 1px solid #2b2b2b;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #list-header span { color: #555; }
+
+    #model-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+    #model-list::-webkit-scrollbar { width: 4px; }
+    #model-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .model-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background 0.1s;
+      user-select: none;
+    }
+    .model-item:hover { background: rgba(255,255,255,0.04); }
+    .model-item.selected { background: rgba(217,119,87,0.08); border-left-color: #d97757; }
+
+    .mdot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #444; flex-shrink: 0; transition: background 0.3s;
+    }
+    .mdot.hot     { background: #50c878; box-shadow: 0 0 4px rgba(80,200,120,0.5); }
+    .mdot.loading { background: #d97757; animation: pulse-dot 0.8s ease-in-out infinite alternate; }
+
+    @keyframes pulse-dot { from { opacity: 0.5; } to { opacity: 1; } }
+
+    .minfo { flex: 1; min-width: 0; }
+    .mname { font-size: 12px; color: #d4d4d4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mmeta { font-size: 10px; color: #666; margin-top: 1px; }
+    .model-item.selected .mname { color: #e8c9b8; }
+
+    #no-models-msg {
+      padding: 24px 12px;
+      text-align: center;
+      font-size: 11px;
+      color: #555;
+      line-height: 1.6;
+      display: none;
+    }
+
+    /* ── Detail panel ── */
+    #detail-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+    #empty-state {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px; color: #555;
+    }
+    #empty-icon { font-size: 36px; opacity: 0.2; }
+    #empty-text { font-size: 12px; }
+
+    #model-detail { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    #model-detail.visible { display: flex; }
+
+    #detail-header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #2b2b2b;
+      flex-shrink: 0;
+    }
+    #detail-name { font-size: 15px; font-weight: 600; color: #e0e0e0; margin-bottom: 8px; }
+    #detail-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .dtag {
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2b2b2b;
+      border-radius: 10px;
+      font-size: 10px;
+      color: #888;
+    }
+
+    #detail-body {
+      flex: 1; overflow-y: auto;
+      padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    #detail-body::-webkit-scrollbar { width: 4px; }
+    #detail-body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .sec-title {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #888; margin-bottom: 8px;
+    }
+
+    #detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    #expires-label { font-size: 10px; color: #666; margin-top: 6px; display: none; }
+
+    /* VRAM */
+    #vram-wrap { display: none; }
+    #vram-wrap.visible { display: block; }
+    .bar-bg { height: 6px; background: #2b2b2b; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, #d97757, #e8a070); border-radius: 3px; transition: width 0.5s; }
+    .bar-label { font-size: 11px; color: #888; }
+
+    /* Stats */
+    #stats-row { display: none; gap: 24px; }
+    #stats-row.visible { display: flex; }
+    .stat { text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 600; color: #d97757; line-height: 1; }
+    .stat-unit { font-size: 10px; color: #888; }
+    .stat-lbl { font-size: 10px; color: #555; margin-top: 3px; }
+
+    /* Quick test */
+    #test-prompt {
+      width: 100%; padding: 7px 9px;
+      background: #141414; border: 1px solid #2b2b2b;
+      border-radius: 4px; color: #d4d4d4;
+      font-size: 12px; font-family: inherit;
+      outline: none; resize: none; min-height: 64px; line-height: 1.5;
+    }
+    #test-prompt:focus { border-color: #d97757; }
+    #test-prompt::placeholder { color: #555; }
+
+    #test-controls { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    #test-hint { font-size: 11px; color: #444; flex: 1; }
+
+    #test-output {
+      background: #111111; border: 1px solid #2b2b2b;
+      border-radius: 4px; padding: 8px 10px;
+      min-height: 80px; max-height: 220px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px; line-height: 1.6; color: #c0c0c0;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    #test-output::-webkit-scrollbar { width: 4px; }
+    #test-output::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    #test-footer { font-size: 10px; color: #555; margin-top: 4px; min-height: 14px; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div id="ollama-status">
+      <div id="status-dot"></div>
+      <span id="status-text">Connecting…</span>
+      <button class="tb-btn" id="start-ollama-btn" style="display:none;margin-left:6px">Start Ollama</button>
+    </div>
+    <div class="tb-spacer"></div>
+    <input id="search-input" type="text" placeholder="Filter models…">
+    <button class="tb-btn" id="pull-btn">+ Pull</button>
+    <button class="tb-btn" id="refresh-btn" title="Refresh">↺</button>
+  </div>
+
+  <!-- Pull bar -->
+  <div id="pull-bar">
+    <input id="pull-input" type="text" placeholder="Model name, e.g. qwen3:30b, llama3.2:3b, phi4…">
+    <div id="pull-progress-wrap">
+      <span id="pull-status-text"></span>
+      <div id="pull-bar-bg"><div id="pull-bar-fill"></div></div>
+    </div>
+    <button class="tb-btn primary" id="pull-go-btn">Pull</button>
+    <button class="tb-btn" id="pull-cancel-btn">Cancel</button>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- Left: model list -->
+    <div id="model-list-panel">
+      <div id="list-header">Local Models <span id="model-count"></span></div>
+      <div id="model-list">
+        <div id="no-models-msg">No models found.<br>Pull one to get started.</div>
+      </div>
+    </div>
+
+    <!-- Right: detail -->
+    <div id="detail-panel">
+
+      <div id="empty-state">
+        <div id="empty-icon">⬡</div>
+        <div id="empty-text">Select a model</div>
+      </div>
+
+      <div id="model-detail">
+        <div id="detail-header">
+          <div id="detail-name"></div>
+          <div id="detail-tags"></div>
+        </div>
+
+        <div id="detail-body">
+
+          <!-- Controls -->
+          <div>
+            <div class="sec-title">Controls</div>
+            <div id="detail-actions">
+              <button class="tb-btn primary" id="load-btn">Load</button>
+              <button class="tb-btn" id="unload-btn">Unload</button>
+              <button class="tb-btn danger" id="delete-btn">Delete</button>
+            </div>
+            <div id="expires-label"></div>
+          </div>
+
+          <!-- VRAM (when hot) -->
+          <div id="vram-wrap">
+            <div class="sec-title">Memory</div>
+            <div class="bar-bg"><div class="bar-fill" id="vram-fill" style="width:0%"></div></div>
+            <div class="bar-label" id="vram-label"></div>
+          </div>
+
+          <!-- Stats (after inference) -->
+          <div id="stats-row">
+            <div class="stat">
+              <div class="stat-val" id="stat-tps">—</div>
+              <div class="stat-unit">tok/s</div>
+              <div class="stat-lbl">Speed</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val" id="stat-tokens">—</div>
+              <div class="stat-unit">tokens</div>
+              <div class="stat-lbl">Generated</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val" id="stat-time">—</div>
+              <div class="stat-unit">sec</div>
+              <div class="stat-lbl">Duration</div>
+            </div>
+          </div>
+
+          <!-- Quick test -->
+          <div>
+            <div class="sec-title">Quick Test</div>
+            <textarea id="test-prompt" placeholder="Enter a prompt… (Cmd+Enter to run)" rows="3"></textarea>
+            <div id="test-controls">
+              <button class="tb-btn primary" id="run-btn">▶ Run</button>
+              <button class="tb-btn" id="stop-btn" style="display:none">■ Stop</button>
+              <span id="test-hint">Streams from Ollama · Cmd+Enter</span>
+            </div>
+          </div>
+
+          <!-- Output -->
+          <div>
+            <div class="sec-title">Output</div>
+            <div id="test-output"><span style="color:#444">Output appears here.</span></div>
+            <div id="test-footer"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function() {
+  var BASE = 'http://localhost:11434';
+  var models   = [];   // /api/tags entries
+  var running  = {};   // name -> /api/ps entry
+  var selected = null;
+  var pollTimer = null;
+  var genAbort  = null;
+  var pullAbort = null;
+  var pulling   = false;
+
+  // ── Utils ────────────────────────────────────────────────────────────────
+
+  function fmtBytes(b) {
+    if (!b) return '';
+    if (b >= 1e9) return (b / 1e9).toFixed(1) + ' GB';
+    if (b >= 1e6) return (b / 1e6).toFixed(0) + ' MB';
+    return b + ' B';
+  }
+
+  function fmtExpires(dateStr) {
+    if (!dateStr) return '';
+    var diff = new Date(dateStr) - Date.now();
+    if (diff <= 0) return 'expired';
+    var m = Math.round(diff / 60000);
+    if (m < 1) return 'expires soon';
+    if (m < 60) return 'expires in ' + m + 'm';
+    return 'expires in ' + Math.round(m / 60) + 'h';
+  }
+
+  // ── Status ───────────────────────────────────────────────────────────────
+
+  function setStatus(ok) {
+    var dot   = document.getElementById('status-dot');
+    var text  = document.getElementById('status-text');
+    var startBtn = document.getElementById('start-ollama-btn');
+    dot.className    = ok ? 'connected' : 'error';
+    text.textContent = ok ? 'Ollama connected' : 'Ollama not running';
+    startBtn.style.display = ok ? 'none' : '';
+  }
+
+  // ── Poll ─────────────────────────────────────────────────────────────────
+
+  async function refresh() {
+    clearTimeout(pollTimer);
+    try {
+      var [tags, ps] = await Promise.all([
+        fetch(BASE + '/api/tags', { signal: AbortSignal.timeout(3000) }).then(r => r.json()),
+        fetch(BASE + '/api/ps',   { signal: AbortSignal.timeout(3000) }).then(r => r.json())
+      ]);
+      models  = (tags.models || []).sort((a, b) => b.size - a.size);
+      running = {};
+      for (var m of (ps.models || [])) running[m.name] = m;
+      setStatus(true);
+      renderList();
+      if (selected) renderDetail();
+    } catch(e) {
+      setStatus(false);
+    }
+    pollTimer = setTimeout(refresh, 5000);
+  }
+
+  // ── List ─────────────────────────────────────────────────────────────────
+
+  function renderList() {
+    var q = document.getElementById('search-input').value.toLowerCase();
+    var filtered = q ? models.filter(m => m.name.toLowerCase().includes(q)) : models;
+    var cnt = document.getElementById('model-count');
+    cnt.textContent = '(' + models.length + ')';
+
+    var list = document.getElementById('model-list');
+    var noMsg = document.getElementById('no-models-msg');
+    noMsg.style.display = filtered.length ? 'none' : 'block';
+
+    // Reconcile DOM items
+    var existing = {};
+    list.querySelectorAll('.model-item').forEach(function(el) { existing[el.dataset.name] = el; });
+
+    // Remove stale
+    for (var n in existing) {
+      if (!filtered.find(function(m) { return m.name === n; })) { existing[n].remove(); delete existing[n]; }
+    }
+
+    // Insert/update in order
+    filtered.forEach(function(m) {
+      var hot = !!running[m.name];
+      var el  = existing[m.name];
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'model-item';
+        el.dataset.name = m.name;
+        el.innerHTML = '<div class="mdot"></div><div class="minfo"><div class="mname"></div><div class="mmeta"></div></div>';
+        el.addEventListener('click', function() { selectModel(m.name); });
+        list.appendChild(el);
+      }
+      el.querySelector('.mdot').className = 'mdot' + (hot ? ' hot' : '');
+      el.querySelector('.mname').textContent = m.name;
+      var parts = [];
+      if (m.details && m.details.parameter_size) parts.push(m.details.parameter_size);
+      parts.push(fmtBytes(m.size));
+      el.querySelector('.mmeta').textContent = parts.join('  ·  ');
+      el.classList.toggle('selected', m.name === selected);
+    });
+  }
+
+  // ── Detail ───────────────────────────────────────────────────────────────
+
+  function selectModel(name) {
+    selected = name;
+    document.getElementById('empty-state').style.display  = 'none';
+    document.getElementById('model-detail').classList.add('visible');
+    document.querySelectorAll('.model-item').forEach(function(el) {
+      el.classList.toggle('selected', el.dataset.name === name);
+    });
+    renderDetail();
+  }
+
+  function renderDetail() {
+    var m  = models.find(function(x) { return x.name === selected; });
+    if (!m) return;
+    var ps = running[selected];
+    var hot = !!ps;
+
+    document.getElementById('detail-name').textContent = m.name;
+
+    // Tags
+    var tags = [];
+    if (m.details) {
+      if (m.details.family)             tags.push(m.details.family);
+      if (m.details.parameter_size)     tags.push(m.details.parameter_size);
+      if (m.details.quantization_level) tags.push(m.details.quantization_level);
+    }
+    tags.push(fmtBytes(m.size));
+    document.getElementById('detail-tags').innerHTML = tags.map(function(t) {
+      return '<span class="dtag">' + t + '</span>';
+    }).join('');
+
+    // Buttons
+    document.getElementById('load-btn').disabled   = hot;
+    document.getElementById('load-btn').textContent = hot ? 'Loaded ✓' : 'Load';
+    document.getElementById('unload-btn').disabled = !hot;
+
+    // Expires
+    var exp = document.getElementById('expires-label');
+    if (hot && ps.expires_at) {
+      exp.textContent   = fmtExpires(ps.expires_at);
+      exp.style.display = 'block';
+    } else {
+      exp.style.display = 'none';
+    }
+
+    // VRAM
+    var vramWrap = document.getElementById('vram-wrap');
+    if (hot && ps.size_vram) {
+      vramWrap.classList.add('visible');
+      var pct = Math.min(100, (ps.size_vram / (24 * 1e9)) * 100).toFixed(1);
+      document.getElementById('vram-fill').style.width = pct + '%';
+      document.getElementById('vram-label').textContent = fmtBytes(ps.size_vram) + ' VRAM';
+    } else {
+      vramWrap.classList.remove('visible');
+    }
+  }
+
+  // ── Load / Unload / Delete ───────────────────────────────────────────────
+
+  async function loadModel(name) {
+    var dot = document.querySelector('[data-name="' + name + '"] .mdot');
+    if (dot) dot.className = 'mdot loading';
+    try {
+      await fetch(BASE + '/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: name, prompt: '', keep_alive: '10m' })
+      });
+    } catch(e) {}
+    refresh();
+  }
+
+  async function unloadModel(name) {
+    try {
+      await fetch(BASE + '/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: name, prompt: '', keep_alive: 0 })
+      });
+    } catch(e) {}
+    refresh();
+  }
+
+  async function deleteModel(name) {
+    if (!confirm('Delete ' + name + '?\nThis removes the model files and cannot be undone.')) return;
+    try {
+      await fetch(BASE + '/api/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+    } catch(e) {}
+    if (selected === name) {
+      selected = null;
+      document.getElementById('model-detail').classList.remove('visible');
+      document.getElementById('empty-state').style.display = '';
+    }
+    refresh();
+  }
+
+  // ── Pull ─────────────────────────────────────────────────────────────────
+
+  function openPullBar() {
+    document.getElementById('pull-bar').classList.add('visible');
+    document.getElementById('pull-input').focus();
+  }
+  function closePullBar() {
+    if (pullAbort) { pullAbort.abort(); pullAbort = null; }
+    pulling = false;
+    var bar = document.getElementById('pull-bar');
+    bar.classList.remove('visible');
+    document.getElementById('pull-input').value = '';
+    document.getElementById('pull-input').style.display = '';
+    document.getElementById('pull-progress-wrap').classList.remove('visible');
+    document.getElementById('pull-go-btn').disabled = false;
+  }
+
+  async function doPull() {
+    var name = document.getElementById('pull-input').value.trim();
+    if (!name || pulling) return;
+    pulling = true;
+    pullAbort = new AbortController();
+
+    var inp   = document.getElementById('pull-input');
+    var prog  = document.getElementById('pull-progress-wrap');
+    var stxt  = document.getElementById('pull-status-text');
+    var fill  = document.getElementById('pull-bar-fill');
+    var goBtn = document.getElementById('pull-go-btn');
+
+    inp.style.display = 'none';
+    prog.classList.add('visible');
+    goBtn.disabled = true;
+    stxt.textContent = 'Starting pull…';
+    fill.style.width = '0%';
+
+    try {
+      var res = await fetch(BASE + '/api/pull', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, stream: true }),
+        signal: pullAbort.signal
+      });
+      var reader  = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buf += decoder.decode(chunk.value, { stream: true });
+        var lines = buf.split('\n');
+        buf = lines.pop();
+        for (var line of lines) {
+          if (!line.trim()) continue;
+          try {
+            var obj = JSON.parse(line);
+            if (obj.status) stxt.textContent = obj.status;
+            if (obj.total && obj.completed) {
+              fill.style.width = Math.round((obj.completed / obj.total) * 100) + '%';
+            }
+          } catch(e) {}
+        }
+      }
+      stxt.textContent = 'Done!';
+      fill.style.width = '100%';
+      setTimeout(closePullBar, 1200);
+      refresh();
+    } catch(e) {
+      if (e.name !== 'AbortError') stxt.textContent = 'Error: ' + e.message;
+      pulling = false;
+      inp.style.display = '';
+      prog.classList.remove('visible');
+      goBtn.disabled = false;
+    }
+    pulling = false;
+  }
+
+  // ── Inference ─────────────────────────────────────────────────────────────
+
+  async function runTest() {
+    var prompt = document.getElementById('test-prompt').value.trim();
+    if (!prompt || !selected) return;
+
+    genAbort = new AbortController();
+    var out     = document.getElementById('test-output');
+    var footer  = document.getElementById('test-footer');
+    var runBtn  = document.getElementById('run-btn');
+    var stopBtn = document.getElementById('stop-btn');
+    var statsRow = document.getElementById('stats-row');
+
+    out.textContent = '';
+    footer.textContent = '';
+    statsRow.classList.remove('visible');
+    runBtn.style.display  = 'none';
+    stopBtn.style.display = '';
+
+    var t0 = Date.now();
+    var text = '';
+
+    try {
+      var res = await fetch(BASE + '/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: selected, prompt, stream: true }),
+        signal: genAbort.signal
+      });
+      var reader  = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buf += decoder.decode(chunk.value, { stream: true });
+        var lines = buf.split('\n');
+        buf = lines.pop();
+        for (var line of lines) {
+          if (!line.trim()) continue;
+          try {
+            var obj = JSON.parse(line);
+            if (obj.response) {
+              text += obj.response;
+              out.textContent = text;
+              out.scrollTop   = out.scrollHeight;
+            }
+            if (obj.done && obj.eval_count) {
+              var dur  = obj.eval_duration ? (obj.eval_duration / 1e9) : (Date.now() - t0) / 1000;
+              var tps  = (obj.eval_count / dur).toFixed(1);
+              var ptps = obj.prompt_eval_duration ? ((obj.prompt_eval_count || 0) / (obj.prompt_eval_duration / 1e9)).toFixed(0) : null;
+
+              document.getElementById('stat-tps').textContent    = tps;
+              document.getElementById('stat-tokens').textContent = obj.eval_count;
+              document.getElementById('stat-time').textContent   = dur.toFixed(1);
+              statsRow.classList.add('visible');
+
+              var hint = tps + ' tok/s  ·  ' + obj.eval_count + ' tokens  ·  ' + dur.toFixed(1) + 's';
+              if (ptps) hint += '  ·  prefill ' + ptps + ' tok/s';
+              footer.textContent = hint;
+            }
+          } catch(e) {}
+        }
+      }
+    } catch(e) {
+      if (e.name !== 'AbortError') out.textContent = '[Error: ' + e.message + ']';
+    }
+
+    genAbort = null;
+    runBtn.style.display  = '';
+    stopBtn.style.display = 'none';
+  }
+
+  // ── Wiring ────────────────────────────────────────────────────────────────
+
+  document.getElementById('pull-btn').addEventListener('click', openPullBar);
+  document.getElementById('pull-cancel-btn').addEventListener('click', closePullBar);
+  document.getElementById('pull-go-btn').addEventListener('click', doPull);
+  document.getElementById('pull-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') doPull(); });
+  document.getElementById('refresh-btn').addEventListener('click', refresh);
+  document.getElementById('search-input').addEventListener('input', renderList);
+
+  document.getElementById('load-btn').addEventListener('click', function() { if (selected) loadModel(selected); });
+  document.getElementById('unload-btn').addEventListener('click', function() { if (selected) unloadModel(selected); });
+  document.getElementById('delete-btn').addEventListener('click', function() { if (selected) deleteModel(selected); });
+
+  document.getElementById('run-btn').addEventListener('click', runTest);
+  document.getElementById('stop-btn').addEventListener('click', function() { if (genAbort) genAbort.abort(); });
+  document.getElementById('test-prompt').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runTest();
+  });
+
+  // ── Start Ollama ──────────────────────────────────────────────────────────
+
+  document.getElementById('start-ollama-btn').addEventListener('click', async function() {
+    var btn  = this;
+    var text = document.getElementById('status-text');
+    btn.disabled = true;
+    text.textContent = 'Starting Ollama…';
+    try {
+      var result = window.parent.jac ? await window.parent.jac.startOllama() : { ok: false, error: 'no IPC' };
+      if (result.ok) {
+        text.textContent = 'Ollama starting…';
+        // Poll more aggressively for the next 15s
+        var attempts = 0;
+        var checkInterval = setInterval(async function() {
+          attempts++;
+          try {
+            await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(1500) });
+            clearInterval(checkInterval);
+            btn.disabled = false;
+            refresh();
+          } catch(e) {
+            if (attempts >= 15) {
+              clearInterval(checkInterval);
+              text.textContent = 'Ollama not responding';
+              btn.disabled = false;
+            }
+          }
+        }, 1000);
+      } else {
+        text.textContent = result.error || 'Failed to start';
+        btn.disabled = false;
+      }
+    } catch(e) {
+      text.textContent = 'Error: ' + e.message;
+      btn.disabled = false;
+    }
+  });
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  refresh();
+})();
+</script>
+</body>
+</html>
