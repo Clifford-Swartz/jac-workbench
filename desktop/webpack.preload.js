@@ -4,7 +4,7 @@ module.exports = {
   target: 'electron-preload',
   entry: './src/main/preload.ts',
   output: {
-    path: path.resolve(__dirname, 'dist/main'),
+    path: path.resolve(__dirname, 'dist/preload'),
     filename: 'preload.js',
   },
   resolve: { extensions: ['.ts', '.js'] },

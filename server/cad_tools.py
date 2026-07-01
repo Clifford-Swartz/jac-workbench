@@ -30,8 +30,32 @@ session_history = []  # list of operations performed
 def _lazy_import():
     """Import build123d on first use to avoid slow startup."""
     global bd, Solid, Location, Axis, scale
-    import build123d as bd
-    from build123d import Solid, Location, Axis, scale
+    # build123d scans the system fonts on import; a single unparseable font (bad sfntVersion,
+    # .fon bitmap, etc.) crashes the whole import on Windows. Filter those out of the glob it
+    # uses so the scan skips them instead of dying. (build123d.text uses `glob.glob`.)
+    import glob as _glob
+    _orig_glob = _glob.glob
+
+    def _safe_glob(pathname, *args, **kwargs):
+        results = _orig_glob(pathname, *args, **kwargs)
+        if str(pathname).lower().endswith(("ttf", "otf", "ttc")):
+            from fontTools.ttLib import TTFont
+            good = []
+            for r in results:
+                try:
+                    TTFont(r).close()
+                    good.append(r)
+                except Exception:
+                    pass  # skip fonts fontTools can't parse
+            return good
+        return results
+
+    _glob.glob = _safe_glob
+    try:
+        import build123d as bd
+        from build123d import Solid, Location, Axis, scale
+    finally:
+        _glob.glob = _orig_glob
     return bd
 
 

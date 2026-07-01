@@ -156,6 +156,22 @@
             overflow-x: hidden;
         }
 
+        /* Right-click context menu */
+        #ctx-menu {
+            position: fixed; z-index: 9999;
+            background: #252526; border: 1px solid #3c3c3c; border-radius: 6px;
+            padding: 4px; min-width: 168px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.45); font-size: 13px;
+        }
+        .ctx-item { padding: 6px 12px; border-radius: 4px; cursor: pointer; color: #ddd; white-space: nowrap; }
+        .ctx-item:hover { background: #094771; color: #fff; }
+        .ctx-item.danger:hover { background: #5a1d1d; color: #fff; }
+        .ctx-sep { height: 1px; background: #3c3c3c; margin: 4px 6px; }
+        .tree-rename-input {
+            flex: 1; min-width: 0; background: #1e1e1e; border: 1px solid #007acc;
+            color: #fff; font-size: 13px; padding: 1px 4px; outline: none; border-radius: 2px;
+        }
+
         .tree-entry {
             display: flex;
             align-items: center;
@@ -255,7 +271,7 @@
         #header { -webkit-app-region: no-drag; }
         #messages { flex: 1; overflow-y: auto; }
 
-        #workflow-frame, #models-frame, #music-frame {
+        #workflow-frame, #models-frame, #music-frame, #mcp-frame, #pcb-frame, #cad-frame {
             display: none;
             flex: 1;
             border: none;
@@ -305,6 +321,25 @@
                     <circle cx="18" cy="16" r="3"/>
                 </svg>
             </button>
+            <button class="activity-btn" id="act-mcp" title="MCP Servers" data-panel="mcp">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4"/><path d="M8 2v4"/><path d="M16 2v4"/>
+                    <rect x="6" y="6" width="12" height="8" rx="2"/>
+                    <path d="M12 14v4a3 3 0 0 0 3 3h1"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-pcb" title="PCB / Schematic" data-panel="pcb">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8" cy="8" r="1.4"/><circle cx="16" cy="16" r="1.4"/>
+                    <path d="M8 8h5a3 3 0 0 1 3 3v5"/><path d="M8 8v4"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-cad" title="CAD" data-panel="cad">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/>
+                </svg>
+            </button>
         </div>
 
         <!-- File Explorer Sidebar -->
@@ -333,6 +368,9 @@
         <!-- Models panel -->
         <iframe id="models-frame" src="models.html"></iframe>
         <iframe id="music-frame" src="music.html"></iframe>
+        <iframe id="mcp-frame" src="mcp.html"></iframe>
+        <iframe id="pcb-frame" src="pcb.html"></iframe>
+        <iframe id="cad-frame" src="cad.html"></iframe>
 
         <!-- Existing JAC chat UI -->
         <div id="chat-area">
@@ -442,9 +480,82 @@
                     });
                 }
 
+                el.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); showCtxMenu(e.clientX, e.clientY, entry, el); });
                 tree.appendChild(el);
             }
         }
+
+        // ── Explorer right-click menu (New Folder / Rename / Delete→Recycle Bin / Reveal) ──
+        function hideCtxMenu() { const m = document.getElementById('ctx-menu'); if (m) m.remove(); }
+        function showCtxMenu(x, y, entry, el) {
+            hideCtxMenu();
+            const menu = document.createElement('div');
+            menu.id = 'ctx-menu';
+            const add = (label, fn, danger) => {
+                const it = document.createElement('div');
+                it.className = 'ctx-item' + (danger ? ' danger' : '');
+                it.textContent = label;
+                it.addEventListener('click', (ev) => { ev.stopPropagation(); hideCtxMenu(); fn(); });
+                menu.appendChild(it);
+            };
+            const sep = () => { const s = document.createElement('div'); s.className = 'ctx-sep'; menu.appendChild(s); };
+            add('New Folder', () => startNewFolder());
+            if (entry) {
+                add('Rename', () => startRename(entry, el));
+                sep();
+                add('Delete', () => doDelete(entry), true);
+                sep();
+                add('Reveal in Explorer', () => window.jac.openInFinder(entry.path));
+            }
+            document.body.appendChild(menu);
+            const r = menu.getBoundingClientRect();
+            menu.style.left = Math.min(x, window.innerWidth - r.width - 4) + 'px';
+            menu.style.top = Math.min(y, window.innerHeight - r.height - 4) + 'px';
+        }
+        function startNewFolder() {
+            const tree = document.getElementById('file-tree');
+            const row = document.createElement('div');
+            row.className = 'tree-entry is-dir';
+            const icon = document.createElement('span'); icon.className = 'tree-icon'; icon.innerHTML = getFolderIcon();
+            const input = document.createElement('input'); input.className = 'tree-rename-input'; input.placeholder = 'new-folder';
+            row.appendChild(icon); row.appendChild(input);
+            tree.insertBefore(row, tree.firstChild);
+            input.focus();
+            let done = false;
+            const commit = async () => {
+                if (done) return; done = true;
+                const name = input.value.trim();
+                if (name) { const res = await window.jac.mkdir(currentPath, name); if (res && !res.ok && res.error) console.warn('mkdir:', res.error); }
+                renderTree();
+            };
+            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') commit(); else if (e.key === 'Escape') { done = true; renderTree(); } });
+            input.addEventListener('blur', commit);
+        }
+        function startRename(entry, el) {
+            const nameSpan = el && el.querySelector('.tree-name');
+            if (!nameSpan) return;
+            const input = document.createElement('input'); input.className = 'tree-rename-input'; input.value = entry.name;
+            nameSpan.replaceWith(input); input.focus(); input.select();
+            let done = false;
+            const commit = async () => {
+                if (done) return; done = true;
+                const nn = input.value.trim();
+                if (nn && nn !== entry.name) { const res = await window.jac.renamePath(entry.path, nn); if (res && !res.ok && res.error) console.warn('rename:', res.error); }
+                renderTree();
+            };
+            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') commit(); else if (e.key === 'Escape') { done = true; renderTree(); } });
+            input.addEventListener('blur', commit);
+        }
+        async function doDelete(entry) {
+            const res = await window.jac.trash(entry.path);
+            if (res && res.ok) { if (selectedPath === entry.path) selectedPath = currentPath; renderTree(); }
+        }
+        document.addEventListener('click', hideCtxMenu);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideCtxMenu(); });
+        (function () {
+            const ft = document.getElementById('file-tree');
+            if (ft) ft.addEventListener('contextmenu', (e) => { e.preventDefault(); showCtxMenu(e.clientX, e.clientY, null, null); });
+        })();
 
         // ── Seti file icons (MIT, from VS Code's bundled theme-seti) ──────────
         // Glyph codes stored as hex strings, decoded at runtime to avoid encoding issues
@@ -544,9 +655,12 @@
             var workflowFrame = document.getElementById('workflow-frame');
             var modelsFrame = document.getElementById('models-frame');
             var musicFrame = document.getElementById('music-frame');
+            var mcpFrame = document.getElementById('mcp-frame');
+            var pcbFrame = document.getElementById('pcb-frame');
+            var cadFrame = document.getElementById('cad-frame');
             var savedWidth = 240;
             var activePanel = 'sidebar';
-            var FULL_PANELS = ['workflow', 'models', 'music'];
+            var FULL_PANELS = ['workflow', 'models', 'music', 'mcp', 'pcb', 'cad'];
 
             function syncActivityHeight() {
                 var header = document.getElementById('header');
@@ -575,10 +689,16 @@
                     workflowFrame.style.display = panel === 'workflow' ? 'flex' : 'none';
                     modelsFrame.style.display   = panel === 'models'   ? 'flex' : 'none';
                     musicFrame.style.display    = panel === 'music'    ? 'flex' : 'none';
+                    mcpFrame.style.display      = panel === 'mcp'      ? 'flex' : 'none';
+                    pcbFrame.style.display      = panel === 'pcb'      ? 'flex' : 'none';
+                    cadFrame.style.display      = panel === 'cad'      ? 'flex' : 'none';
                 } else {
                     workflowFrame.style.display = 'none';
                     modelsFrame.style.display   = 'none';
                     musicFrame.style.display    = 'none';
+                    mcpFrame.style.display      = 'none';
+                    pcbFrame.style.display      = 'none';
+                    cadFrame.style.display      = 'none';
                     chatArea.style.display = '';
                     if (panel === 'sidebar') {
                         sidebar.style.display = '';

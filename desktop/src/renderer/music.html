@@ -295,8 +295,7 @@ document.getElementById('btn-repeat').addEventListener('click',function(){var m=
 document.getElementById('viz-select').addEventListener('change',function(){vm=this.value;save();});
 document.getElementById('btn-folder').addEventListener('click',function(){
   window.parent.jac.openFolderDialog().then(function(f){
-    if(!f)return;fPath=f;document.getElementById('folder-label').textContent=f.replace(/.*\//,'')||f;
-    window.parent.jac.scanMusic(f).then(function(ts){lib=ts.sort(function(a,b){return a.name.localeCompare(b.name);});rebuildQ();renderLib();save();});
+    if(!f)return;setFolder(f);
   });
 });
 function rebuildQ(){if(aPl&&pls[aPl]){var p=new Set(pls[aPl]);queue=lib.filter(function(t){return p.has(t.path);});}else queue=lib.slice();if(shuf)queue=queue.sort(function(){return Math.random()-0.5;});qi=-1;}
@@ -315,7 +314,8 @@ document.getElementById('btn-new-pl').addEventListener('click',function(){var n=
 document.getElementById('btn-add-to-pl').addEventListener('click',function(){var c=queue[qi];if(!c||!aPl){alert(!c?'Nothing playing':'Select a playlist first');return;}if(!pls[aPl].includes(c.path)){pls[aPl].push(c.path);renderPls();save();}});
 document.querySelectorAll('.stab').forEach(function(tab){tab.addEventListener('click',function(){document.querySelectorAll('.stab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');var w=this.dataset.tab;document.getElementById('tab-library').style.display=w==='library'?'':'none';document.getElementById('tab-playlists').style.display=w==='playlists'?'':'none';if(w==='playlists')renderPls();});});
 function save(){window.parent.jac.saveMusicState({folderPath:fPath,playlists:pls,vizMode:vm,volume:aud.volume});}
-function load(){window.parent.jac.loadMusicState().then(function(st){if(!st)return;if(st.vizMode){vm=st.vizMode;document.getElementById('viz-select').value=vm;}if(st.volume!=null){aud.volume=st.volume;document.getElementById('vol-slider').value=Math.round(st.volume*100);}if(st.playlists)pls=st.playlists;if(st.folderPath){fPath=st.folderPath;document.getElementById('folder-label').textContent=fPath.replace(/.*\//,'')||fPath;window.parent.jac.scanMusic(fPath).then(function(ts){lib=ts.sort(function(a,b){return a.name.localeCompare(b.name);});rebuildQ();renderLib();renderPls();});}});}
+function setFolder(f){fPath=f;document.getElementById('folder-label').textContent=f.replace(/.*[\\/]/,'')||f;window.parent.jac.scanMusic(f).then(function(ts){lib=ts.sort(function(a,b){return a.name.localeCompare(b.name);});rebuildQ();renderLib();renderPls();save();});}
+function load(){window.parent.jac.loadMusicState().then(function(st){st=st||{};if(st.vizMode){vm=st.vizMode;document.getElementById('viz-select').value=vm;}if(st.volume!=null){aud.volume=st.volume;document.getElementById('vol-slider').value=Math.round(st.volume*100);}if(st.playlists)pls=st.playlists;if(st.folderPath){setFolder(st.folderPath);}else{/* first run: default to the OS Music folder, e.g. C:\\Users\\<you>\\Music */window.parent.jac.getHome().then(function(h){var sep=h.indexOf('\\')>=0?'\\':'/';setFolder(h+sep+'Music');});}});}
 load();
 })();
 </script>

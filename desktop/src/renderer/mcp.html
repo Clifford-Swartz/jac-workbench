@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  :root { --bg:#1e1e1e; --panel:#252526; --border:#333; --fg:#d4d4d4; --dim:#8a8a8a; --accent:#4daafc; --accent2:#d97757; --ok:#4ec9b0; --err:#f14c4c; --warn:#dcaa55; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:13px/1.5 -apple-system,Segoe UI,sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { padding:16px 20px 10px; -webkit-app-region:drag; }
+  header h1 { margin:0; font-size:16px; font-weight:600; }
+  header p { margin:4px 0 0; color:var(--dim); font-size:12px; }
+  .bar { display:flex; gap:8px; padding:0 20px 12px; -webkit-app-region:no-drag; }
+  button { -webkit-app-region:no-drag; background:#333; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; }
+  button:hover { background:#3a3a3a; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#04263f; font-weight:600; }
+  button.primary:hover { filter:brightness(1.08); }
+  button.danger { color:var(--err); }
+  .content { flex:1; overflow:auto; padding:0 20px 24px; }
+  .server { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+  .server-head { display:flex; align-items:center; gap:10px; }
+  .server-name { font-weight:600; font-size:13px; }
+  .badge { font-size:10px; padding:2px 7px; border-radius:10px; text-transform:uppercase; letter-spacing:.4px; }
+  .badge.ready { background:rgba(78,201,176,.15); color:var(--ok); }
+  .badge.connecting { background:rgba(220,170,85,.15); color:var(--warn); }
+  .badge.error, .badge.stopped { background:rgba(241,76,76,.15); color:var(--err); }
+  .badge.disabled { background:#333; color:var(--dim); }
+  .server-cmd { color:var(--dim); font-family:ui-monospace,Consolas,monospace; font-size:11px; margin-top:4px; word-break:break-all; }
+  .server-err { color:var(--err); font-size:11px; margin-top:4px; }
+  .spacer { flex:1; }
+  .tools { margin-top:8px; border-top:1px solid var(--border); padding-top:8px; display:none; }
+  .tools.open { display:block; }
+  .tool { font-size:11px; padding:3px 0; color:var(--fg); }
+  .tool code { color:var(--accent); font-family:ui-monospace,Consolas,monospace; }
+  .tool .desc { color:var(--dim); }
+  .link { color:var(--accent); cursor:pointer; font-size:11px; background:none; border:none; padding:0; }
+  .empty { color:var(--dim); text-align:center; padding:30px; font-size:12px; }
+  .form { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:14px; display:none; }
+  .form.open { display:block; }
+  .form label { display:block; font-size:11px; color:var(--dim); margin:8px 0 3px; text-transform:uppercase; letter-spacing:.4px; }
+  .form input, .form textarea { width:100%; background:#1a1a1a; border:1px solid var(--border); border-radius:5px; color:var(--fg); padding:7px 9px; font:12px ui-monospace,Consolas,monospace; }
+  .form textarea { resize:vertical; min-height:54px; }
+  .form .hint { color:var(--dim); font-size:10px; margin-top:3px; }
+  .form-actions { margin-top:12px; display:flex; gap:8px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>MCP Servers</h1>
+    <p>Model Context Protocol tool servers. Available to tool-capable models (OpenRouter) in chat.</p>
+  </header>
+  <div class="bar">
+    <button class="primary" id="add-btn">+ Add server</button>
+    <button id="reload-btn">↻ Reconnect all</button>
+  </div>
+
+  <div class="content">
+    <div class="form" id="form">
+      <label>Name</label>
+      <input id="f-name" placeholder="filesystem" autocomplete="off" />
+      <label>Command</label>
+      <input id="f-cmd" placeholder="npx" autocomplete="off" />
+      <label>Arguments — one per line</label>
+      <textarea id="f-args" placeholder="-y&#10;@modelcontextprotocol/server-filesystem&#10;C:\Users\You\Documents"></textarea>
+      <div class="hint">Paths with spaces are fine — each line is a separate argument, no quoting needed.</div>
+      <div class="form-actions">
+        <button class="primary" id="save-btn">Add</button>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+    </div>
+
+    <div id="list"><div class="empty">Loading…</div></div>
+  </div>
+
+<script>
+(function () {
+  var jac = window.parent.jac;
+  var listEl = document.getElementById('list');
+  var formEl = document.getElementById('form');
+  var editing = null; // name being edited, or null for new
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+  async function refresh() {
+    if (!jac) { listEl.innerHTML = '<div class="empty">Bridge unavailable.</div>'; return; }
+    var cfg = await jac.getConfig();
+    var servers = cfg.mcpServers || {};
+    var status = {};
+    (await jac.mcpStatus()).forEach(function(s){ status[s.name] = s; });
+    var toolsByServer = {};
+    (await jac.mcpTools()).forEach(function(t){ (toolsByServer[t.server] = toolsByServer[t.server] || []).push(t); });
+
+    var names = Object.keys(servers);
+    if (names.length === 0) { listEl.innerHTML = '<div class="empty">No servers yet. Click “Add server”.</div>'; return; }
+
+    listEl.innerHTML = names.map(function(name){
+      var cfgS = servers[name] || {};
+      var st = status[name] || { status: cfgS.disabled ? 'disabled' : 'connecting', error:'', toolCount:0 };
+      var stClass = cfgS.disabled ? 'disabled' : st.status;
+      var cmd = (cfgS.command || cfgS.url || '') + ' ' + ((cfgS.args||[]).join(' '));
+      var tools = toolsByServer[name] || [];
+      return '<div class="server" data-name="'+esc(name)+'">'
+        + '<div class="server-head">'
+          + '<span class="server-name">'+esc(name)+'</span>'
+          + '<span class="badge '+stClass+'">'+esc(cfgS.disabled ? 'disabled' : st.status)+'</span>'
+          + (st.toolCount ? '<span style="color:var(--dim);font-size:11px">'+st.toolCount+' tools</span>' : '')
+          + '<span class="spacer"></span>'
+          + '<button class="link" data-act="toggle">'+(cfgS.disabled ? 'Enable' : 'Disable')+'</button>'
+          + '<button class="link" data-act="edit">Edit</button>'
+          + '<button class="link danger" data-act="remove" style="color:var(--err)">Remove</button>'
+        + '</div>'
+        + '<div class="server-cmd">'+esc(cmd)+'</div>'
+        + (st.error ? '<div class="server-err">'+esc(st.error)+'</div>' : '')
+        + (tools.length ? '<button class="link" data-act="tools" style="margin-top:6px">▸ '+tools.length+' tools</button>'
+            + '<div class="tools">'+tools.map(function(t){ return '<div class="tool"><code>'+esc(t.name)+'</code> <span class="desc">'+esc((t.description||'').slice(0,90))+'</span></div>'; }).join('')+'</div>' : '')
+      + '</div>';
+    }).join('');
+  }
+
+  function openForm(name) {
+    editing = name || null;
+    document.getElementById('f-name').value = name || '';
+    if (name) {
+      jac.getConfig().then(function(cfg){
+        var s = (cfg.mcpServers||{})[name] || {};
+        document.getElementById('f-cmd').value = s.command || '';
+        document.getElementById('f-args').value = (s.args||[]).join('\n');
+      });
+    } else {
+      document.getElementById('f-cmd').value = '';
+      document.getElementById('f-args').value = '';
+    }
+    document.getElementById('save-btn').textContent = name ? 'Save' : 'Add';
+    formEl.classList.add('open');
+  }
+  function closeForm(){ formEl.classList.remove('open'); editing = null; }
+
+  async function save() {
+    var name = document.getElementById('f-name').value.trim();
+    var command = document.getElementById('f-cmd').value.trim();
+    var args = document.getElementById('f-args').value.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    if (!name || !command) { alert('Name and command are required.'); return; }
+    var cfg = await jac.getConfig();
+    var servers = Object.assign({}, cfg.mcpServers || {});
+    if (editing && editing !== name) delete servers[editing];
+    var prev = servers[name] || {};
+    servers[name] = Object.assign({}, prev, { command: command, args: args });
+    await jac.saveConfig({ mcpServers: servers });   // main reloads connections on change
+    closeForm();
+    setTimeout(refresh, 600);
+  }
+
+  async function mutate(name, fn) {
+    var cfg = await jac.getConfig();
+    var servers = Object.assign({}, cfg.mcpServers || {});
+    fn(servers);
+    await jac.saveConfig({ mcpServers: servers });
+    setTimeout(refresh, 600);
+  }
+
+  document.getElementById('add-btn').onclick = function(){ openForm(null); };
+  document.getElementById('cancel-btn').onclick = closeForm;
+  document.getElementById('save-btn').onclick = save;
+  document.getElementById('reload-btn').onclick = function(){ jac.mcpReload().then(function(){ setTimeout(refresh, 500); }); };
+
+  listEl.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]'); if (!btn) return;
+    var name = e.target.closest('.server').dataset.name;
+    var act = btn.dataset.act;
+    if (act === 'tools') { var t = btn.nextElementSibling; t.classList.toggle('open'); btn.textContent = (t.classList.contains('open')?'▾ ':'▸ ') + btn.textContent.slice(2); }
+    else if (act === 'remove') { if (confirm('Remove MCP server "'+name+'"?')) mutate(name, function(s){ delete s[name]; }); }
+    else if (act === 'edit') { openForm(name); }
+    else if (act === 'toggle') { mutate(name, function(s){ s[name].disabled = !s[name].disabled; }); }
+  });
+
+  refresh();
+  setInterval(function(){ if (document.visibilityState !== 'hidden') refresh(); }, 2500);
+})();
+</script>
+</body>
+</html>

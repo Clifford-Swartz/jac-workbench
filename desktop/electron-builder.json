@@ -1,13 +1,19 @@
 {
   "appId": "com.clifford.jac",
   "productName": "JAC",
-  "icon": "assets/icon",
+  "icon": "assets/icon.png",
+  "directories": { "output": "release" },
+  "publish": [
+    { "provider": "github", "owner": "Clifford-Swartz", "repo": "jac-desktop-releases" }
+  ],
   "files": [
     "dist/main/**/*",
     "dist/preload/**/*",
-    "dist/preload/package.json",
     "dist/renderer/**/*",
     "assets/**/*"
+  ],
+  "extraResources": [
+    { "from": "resources/llama-server", "to": "llama-server" }
   ],
   "afterPack": "scripts/fix-asar-hash.js",
   "mac": {
@@ -18,6 +24,14 @@
   },
   "win": {
     "target": [{ "target": "nsis", "arch": ["x64"] }]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "perMachine": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "JAC"
   },
   "linux": {
     "target": [{ "target": "AppImage", "arch": ["x64"] }],

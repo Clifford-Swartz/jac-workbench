@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body { background:#1a1a2e; color:#e0e0e0; font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
+  #top-bar { padding:6px 10px; background:#16213e; display:flex; gap:6px; align-items:center; border-bottom:1px solid #333; font-size:12px; }
+  #top-bar h1 { font-size:13px; font-weight:600; margin-right:4px; }
+  #top-bar button { background:#0f3460; color:#e0e0e0; border:1px solid #444; border-radius:3px; padding:3px 9px; cursor:pointer; font-size:11px; }
+  #top-bar button:hover { background:#1a5276; }
+  #top-bar .status { margin-left:auto; opacity:0.55; }
+  #main { flex:1; display:flex; overflow:hidden; }
+  #tool-sidebar { width:42px; background:#0d1b2e; border-right:1px solid #333; display:flex; flex-direction:column; padding:4px; gap:2px; z-index:10; }
+  .tool-btn { width:34px; height:34px; background:#16213e; border:1px solid #333; border-radius:4px; color:#ccc; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; position:relative; }
+  .tool-btn:hover { background:#1a3a5c; border-color:#4daafc; }
+  .tool-btn.active { background:#4daafc; color:#000; border-color:#4daafc; }
+  .tool-btn::after { content:attr(data-tip); position:absolute; left:42px; top:50%; transform:translateY(-50%); background:#222; color:#ddd; padding:3px 8px; border-radius:4px; font-size:11px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; border:1px solid #444; }
+  .tool-btn:hover::after { opacity:1; }
+  .tool-sep { height:1px; background:#333; margin:4px 2px; }
+  #viewer-wrap { flex:1; position:relative; }
+  #viewer { width:100%; height:100%; }
+  #parts-panel { position:absolute; right:8px; top:8px; width:210px; background:rgba(22,33,62,0.92); border:1px solid #333; border-radius:6px; padding:8px; font-size:11px; max-height:50%; overflow-y:auto; backdrop-filter:blur(8px); }
+  #parts-panel h3 { font-size:11px; margin-bottom:4px; color:#4daafc; }
+  .part-item { padding:3px 5px; border-radius:3px; cursor:pointer; }
+  .part-item:hover { background:#1a3a5c; }
+  .part-dims { opacity:0.5; font-size:9px; }
+  .hint { position:absolute; left:8px; bottom:8px; font-size:10px; opacity:0.4; pointer-events:none; }
+</style>
+</head>
+<body>
+  <div id="top-bar">
+    <h1>CAD</h1>
+    <button id="btn-step" title="Open a GLB/OBJ model">Open</button>
+    <button id="btn-stl" title="Export selected part to STL">Save STL</button>
+    <button id="btn-reset" title="Clear all geometry">Reset</button>
+    <span class="status" id="status">Connecting…</span>
+  </div>
+  <div id="main">
+    <div id="tool-sidebar">
+      <button class="tool-btn active" id="btn-select" data-tip="Select (Esc)">&#x2B9E;</button>
+      <button class="tool-btn" id="btn-move" data-tip="Move (G)">&#x2725;</button>
+      <button class="tool-btn" id="btn-rotate" data-tip="Rotate (R)">&#x21BB;</button>
+      <button class="tool-btn" id="btn-scale" data-tip="Scale (S)">&#x2922;</button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" id="btn-box" data-tip="Box">&#x25A1;</button>
+      <button class="tool-btn" id="btn-cyl" data-tip="Cylinder">&#x25CB;</button>
+      <button class="tool-btn" id="btn-sphere" data-tip="Sphere">&#x25CF;</button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" id="btn-dup" data-tip="Duplicate (Shift+D)">&#x2750;</button>
+      <button class="tool-btn" id="btn-mirror" data-tip="Mirror">&#x2194;</button>
+      <button class="tool-btn" id="btn-del" data-tip="Delete (X)">&#x2715;</button>
+    </div>
+    <div id="viewer-wrap">
+      <div id="viewer"></div>
+      <div id="parts-panel"><h3>Parts</h3><div id="parts-list">No geometry</div></div>
+      <div class="hint">click to select · G/R/S move/rotate/scale · X delete · ask the chat to design something</div>
+    </div>
+  </div>
+
+  <script src="three.min.js"></script>
+  <script src="OrbitControls.js"></script>
+  <script src="TransformControls.js"></script>
+  <script src="GLTFLoader.js"></script>
+  <script>
+  (function () {
+    const CAD_API = 'http://127.0.0.1:5050';
+    const statusEl = document.getElementById('status');
+
+    // Bridge that mirrors the old extension host: cad_tool -> POST :5050 -> 'tool_result' event.
+    function dispatchMsg(data) { window.dispatchEvent(new MessageEvent('message', { data })); }
+    const vscode = {
+      postMessage: async function (msg) {
+        try {
+          if (msg.type === 'cad_tool') {
+            const r = await fetch(CAD_API + '/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ tool: msg.tool, args: msg.args || {} }) });
+            dispatchMsg({ type:'tool_result', result: await r.json() });
+          } else if (msg.type === 'save_stl') {
+            const dir = await window.parent.jac.openFolderDialog();
+            if (!dir) return;
+            const filename = dir + '\\part_' + (msg.target || 0) + '.stl';
+            const r = await fetch(CAD_API + '/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ tool:'export_stl', args:{ target: msg.target || 0, filename } }) });
+            const res = await r.json();
+            dispatchMsg({ type:'status', text: res.ok ? ('Saved → ' + filename) : ('Save failed: ' + res.error) });
+          } else if (msg.type === 'load_glb_file') {
+            dispatchMsg({ type:'status', text:'Open GLB from disk: coming soon' });
+          }
+        } catch (e) { dispatchMsg({ type:'status', text:'CAD backend offline — is Python + build123d installed?' }); }
+      },
+    };
+
+    let scene, camera, renderer, orbitControls, transformControls;
+    let meshes = [];
+    let selectedIndex = -1;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const COLORS = [0x4daafc, 0x4ec990, 0xf0a030, 0xe06060, 0xa070d0, 0x60c0c0, 0xd0d060, 0xf080b0];
+
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1a1a2e);
+      camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
+      camera.position.set(100, 80, 100);
+
+      const viewerEl = document.getElementById('viewer');
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(viewerEl.clientWidth, viewerEl.clientHeight);
+      viewerEl.appendChild(renderer.domElement);
+
+      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+
+      transformControls = new THREE.TransformControls(camera, renderer.domElement);
+      transformControls.addEventListener('dragging-changed', (e) => { orbitControls.enabled = !e.value; });
+      transformControls.addEventListener('mouseUp', () => {
+        if (selectedIndex >= 0 && meshes[selectedIndex]) {
+          const m = meshes[selectedIndex];
+          const mode = transformControls.getMode();
+          if (mode === 'translate') {
+            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'translate', vector:[m.position.x, m.position.z, m.position.y] } });
+          } else if (mode === 'rotate') {
+            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'rotate', axis:'Z', angle: THREE.MathUtils.radToDeg(m.rotation.z) } });
+          } else if (mode === 'scale') {
+            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'scale', factor: m.scale.x } });
+          }
+        }
+      });
+      scene.add(transformControls);
+
+      scene.add(new THREE.AmbientLight(0x606060, 2));
+      const dl = new THREE.DirectionalLight(0xffffff, 1.5); dl.position.set(50, 100, 50); scene.add(dl);
+      const dl2 = new THREE.DirectionalLight(0xffffff, 0.5); dl2.position.set(-50, -20, -50); scene.add(dl2);
+      scene.add(new THREE.GridHelper(200, 20, 0x333355, 0x222244));
+
+      renderer.domElement.addEventListener('click', onViewerClick);
+      const onResize = () => {
+        const w = viewerEl.clientWidth, h = viewerEl.clientHeight;
+        camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+      };
+      window.addEventListener('resize', onResize);
+      new ResizeObserver(onResize).observe(viewerEl);
+      onResize();
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target !== document.body) return;
+        if (e.key === 'g' || e.key === 'G') setTransformMode('translate');
+        else if (e.key === 'r' && !e.metaKey) setTransformMode('rotate');
+        else if (e.key === 's' && !e.metaKey) setTransformMode('scale');
+        else if (e.key === 'x' || e.key === 'Delete' || e.key === 'Backspace') deleteSelected();
+        else if (e.key === 'd' && e.shiftKey) duplicateSelected();
+        else if (e.key === 'Escape') deselectAll();
+      });
+      animate();
+    }
+
+    function animate() { requestAnimationFrame(animate); orbitControls.update(); renderer.render(scene, camera); }
+
+    function onViewerClick(event) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(meshes);
+      if (hits.length > 0) selectPart(meshes.indexOf(hits[0].object)); else deselectAll();
+    }
+
+    function selectPart(idx) {
+      deselectAll();
+      if (idx < 0 || idx >= meshes.length) return;
+      selectedIndex = idx;
+      meshes[idx].material.emissive = new THREE.Color(0x444444);
+      transformControls.attach(meshes[idx]);
+      statusEl.textContent = 'Selected part ' + idx;
+      document.querySelectorAll('.part-item').forEach((el, i) => { el.style.background = i === idx ? '#1a3a5c' : ''; });
+    }
+    function deselectAll() {
+      if (selectedIndex >= 0 && meshes[selectedIndex]) meshes[selectedIndex].material.emissive = new THREE.Color(0x000000);
+      selectedIndex = -1;
+      transformControls.detach();
+      statusEl.textContent = 'Ready — ' + meshes.length + ' parts';
+      document.querySelectorAll('.part-item').forEach(el => { el.style.background = ''; });
+    }
+
+    function setActiveTool(tool) {
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('btn-' + tool); if (btn) btn.classList.add('active');
+    }
+    function setTransformMode(mode) {
+      transformControls.setMode(mode);
+      setActiveTool({ translate:'move', rotate:'rotate', scale:'scale' }[mode] || mode);
+    }
+    function deleteSelected() {
+      if (selectedIndex < 0) return;
+      vscode.postMessage({ type:'cad_tool', tool:'delete_parts', args:{ targets:[selectedIndex] } });
+      deselectAll();
+    }
+    function duplicateSelected() {
+      if (selectedIndex < 0) return;
+      vscode.postMessage({ type:'cad_tool', tool:'duplicate_part', args:{ target: selectedIndex, offset:[20,0,0] } });
+    }
+
+    function updateViewer(parts) {
+      meshes.forEach(m => { scene.remove(m); m.geometry.dispose(); });
+      meshes = [];
+      parts.forEach((p, i) => {
+        let geo;
+        if (p.mesh && p.mesh.positions && p.mesh.indices) {
+          geo = new THREE.BufferGeometry();
+          const pos = new Float32Array(p.mesh.positions);
+          for (let j = 0; j < pos.length; j += 3) { const t = pos[j+1]; pos[j+1] = pos[j+2]; pos[j+2] = t; }
+          geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+          geo.setIndex(p.mesh.indices);
+          geo.computeVertexNormals();
+        } else {
+          const [w, h, d] = p.dims || [10,10,10];
+          geo = new THREE.BoxGeometry(w, d, h);
+        }
+        const mat = new THREE.MeshPhongMaterial({ color: COLORS[i % COLORS.length], transparent:true, opacity:0.85, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(geo, mat);
+        if (!p.mesh && p.center) mesh.position.set(p.center[0], p.center[2], p.center[1]);
+        scene.add(mesh); meshes.push(mesh);
+      });
+      statusEl.textContent = 'Ready — ' + parts.length + ' parts';
+      updatePartsList(parts);
+    }
+
+    function updatePartsList(parts) {
+      const el = document.getElementById('parts-list');
+      if (!parts.length) { el.innerHTML = 'No geometry'; return; }
+      el.innerHTML = parts.map((p, i) =>
+        '<div class="part-item" data-i="' + i + '"><span style="color:#' + COLORS[i % COLORS.length].toString(16).padStart(6,'0') + '">■</span> Part ' + i +
+        '<div class="part-dims">' + (p.dims ? p.dims.join(' × ') + ' mm' : '') + (p.volume ? ' — ' + p.volume + ' mm³' : '') + '</div></div>'
+      ).join('');
+      el.querySelectorAll('.part-item').forEach(it => it.addEventListener('click', () => selectPart(parseInt(it.dataset.i, 10))));
+    }
+
+    // GLB loader
+    const gltfLoader = new THREE.GLTFLoader();
+    let glbMeshes = [];
+    function loadGLB(arrayBuffer, name) {
+      glbMeshes.forEach(m => scene.remove(m)); glbMeshes = [];
+      gltfLoader.parse(arrayBuffer, '', (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const scl = 100 / Math.max(size.x, size.y, size.z);
+        model.position.sub(center); model.scale.setScalar(scl);
+        model.traverse((c) => { if (c.isMesh) { c.material.side = THREE.DoubleSide; glbMeshes.push(c); } });
+        scene.add(model);
+        statusEl.textContent = (name || 'Model') + ' — ' + glbMeshes.length + ' meshes';
+      }, () => { statusEl.textContent = 'GLB load error'; });
+    }
+    function loadGLBFromBase64(b64, name) {
+      const bin = atob(b64), buf = new ArrayBuffer(bin.length), v = new Uint8Array(buf);
+      for (let i = 0; i < bin.length; i++) v[i] = bin.charCodeAt(i);
+      loadGLB(buf, name);
+    }
+
+    window.addEventListener('message', (event) => {
+      const msg = event.data;
+      if (msg.type === 'tool_result') {
+        const r = msg.result;
+        if (r && r.parts) updateViewer(r.parts);
+        statusEl.textContent = r && r.ok ? ('Ready — ' + (r.n_parts || 0) + ' parts') : ('Error: ' + ((r && r.error) || 'unknown').substring(0, 120));
+      } else if (msg.type === 'status') {
+        statusEl.textContent = msg.text;
+      } else if (msg.type === 'load_glb_base64') {
+        loadGLBFromBase64(msg.data, msg.name);
+      }
+    });
+
+    // Toolbar wiring
+    document.getElementById('btn-box').addEventListener('click', () => vscode.postMessage({ type:'cad_tool', tool:'cad_execute', args:{ code:'RESULT = Box(50, 30, 20)' } }));
+    document.getElementById('btn-cyl').addEventListener('click', () => vscode.postMessage({ type:'cad_tool', tool:'cad_execute', args:{ code:'RESULT = Cylinder(15, 40)' } }));
+    document.getElementById('btn-sphere').addEventListener('click', () => vscode.postMessage({ type:'cad_tool', tool:'cad_execute', args:{ code:'RESULT = Sphere(25)' } }));
+    document.getElementById('btn-reset').addEventListener('click', () => { vscode.postMessage({ type:'cad_tool', tool:'reset' }); updateViewer([]); });
+    document.getElementById('btn-stl').addEventListener('click', () => vscode.postMessage({ type:'save_stl', target: selectedIndex >= 0 ? selectedIndex : 0 }));
+    document.getElementById('btn-step').addEventListener('click', () => vscode.postMessage({ type:'load_glb_file' }));
+    document.getElementById('btn-select').addEventListener('click', () => { setActiveTool('select'); transformControls.detach(); });
+    document.getElementById('btn-move').addEventListener('click', () => setTransformMode('translate'));
+    document.getElementById('btn-rotate').addEventListener('click', () => setTransformMode('rotate'));
+    document.getElementById('btn-scale').addEventListener('click', () => setTransformMode('scale'));
+    document.getElementById('btn-del').addEventListener('click', deleteSelected);
+    document.getElementById('btn-dup').addEventListener('click', duplicateSelected);
+    document.getElementById('btn-mirror').addEventListener('click', () => { if (selectedIndex >= 0) vscode.postMessage({ type:'cad_tool', tool:'mirror_part', args:{ target: selectedIndex } }); });
+
+    init();
+    vscode.postMessage({ type:'cad_tool', tool:'list_parts' });
+  })();
+  </script>
+</body>
+</html>

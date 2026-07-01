@@ -1,5 +1,11 @@
 # Node
 extension/node_modules/
+desktop/node_modules/
+desktop/dist/
+# Desktop build artifacts (large binaries / installer output — not source)
+desktop/release/
+desktop/resources/
+*.done
 extension/dist/webview/three.min.js
 extension/dist/webview/OrbitControls.js
 extension/dist/webview/TransformControls.js

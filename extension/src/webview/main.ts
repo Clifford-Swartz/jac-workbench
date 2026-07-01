@@ -722,6 +722,10 @@ const SLASH_COMMANDS: SlashCommand[] = [
     }},
     { name: '/init', description: 'Initialize project with CLAUDE.md' },
     { name: '/model', description: 'Change AI model', local: showModelPicker },
+    { name: '/mcp', description: 'Manage MCP tool servers', local: () => {
+        const btn = document.getElementById('act-mcp');
+        if (btn) { (btn as HTMLElement).click(); }
+    }},
     { name: '/plan', description: 'Enter plan mode' },
     { name: '/chain', description: 'Chain skills in sequence (e.g. /chain review ship)' },
     { name: '/plan-ceo-review', description: 'Founder-mode architectural review (gstack)' },

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body { background:#1a1a2e; color:#e0e0e0; font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
+  #top-bar { padding:8px 12px; background:#16213e; display:flex; gap:8px; align-items:center; border-bottom:1px solid #333; font-size:12px; }
+  #top-bar h1 { font-size:14px; font-weight:600; }
+  #top-bar button { background:#0f3460; color:#e0e0e0; border:1px solid #444; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:11px; }
+  #top-bar button:hover { background:#1a5276; }
+  #top-bar .status { margin-left:auto; opacity:0.6; font-size:11px; }
+  #main { flex:1; position:relative; overflow:hidden; }
+  #sch-canvas { width:100%; height:100%; background:#1a1a2e; display:block; }
+  #sch-palette { position:absolute; right:10px; top:10px; width:190px; background:rgba(22,33,62,0.94); border:1px solid #333; border-radius:8px; padding:8px; font-size:11px; max-height:80%; overflow-y:auto; backdrop-filter:blur(8px); }
+  #sch-palette h3 { font-size:11px; margin-bottom:6px; color:#4daafc; }
+  .lib-item { padding:4px 6px; cursor:pointer; border-radius:3px; display:flex; justify-content:space-between; }
+  .lib-item:hover { background:#1a3a5c; }
+  .lib-item .fp { opacity:0.45; font-size:9px; }
+  .hint { position:absolute; left:10px; bottom:10px; font-size:10px; opacity:0.4; pointer-events:none; }
+</style>
+</head>
+<body>
+  <div id="top-bar">
+    <h1>PCB / Schematic</h1>
+    <button id="btn-clear">Clear</button>
+    <button id="btn-kicad">Export KiCad</button>
+    <span class="status" id="status">Connecting…</span>
+  </div>
+  <div id="main">
+    <svg id="sch-canvas">
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#222244" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)"/>
+      <g id="sch-components"></g>
+      <g id="sch-wires"></g>
+    </svg>
+    <div id="sch-palette"><h3>Components</h3><div id="sch-lib-list"></div></div>
+    <div class="hint">click a part to place · drag to move · Del removes · scroll to zoom · middle/empty-drag to pan</div>
+  </div>
+
+<script>
+(function () {
+  const PCB_API = 'http://127.0.0.1:5051';
+  const statusEl = document.getElementById('status');
+  const svg = document.getElementById('sch-canvas');
+  const compsEl = document.getElementById('sch-components');
+  const wiresEl = document.getElementById('sch-wires');
+  const SCH_COLORS = ['#4daafc','#4ec990','#f0a030','#e06060','#a070d0','#60c0c0'];
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  let library = {};           // full component library (with svg symbols)
+  let compData = [];          // current components
+  let selectedIdx = -1;
+  let panX = 0, panY = 0, zoom = 1;
+  let isPanning = false, panStartX = 0, panStartY = 0;
+  let dragging = false, dragX = 0, dragY = 0;
+
+  async function post(tool, args) {
+    try {
+      const r = await fetch(PCB_API + '/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ tool, args: args || {} }) });
+      return await r.json();
+    } catch (e) { statusEl.textContent = 'Backend offline — start the PCB server'; return { ok:false, error:String(e) }; }
+  }
+  async function getJSON(path) {
+    try { const r = await fetch(PCB_API + path); return await r.json(); }
+    catch (e) { statusEl.textContent = 'Backend offline'; return null; }
+  }
+
+  function applyTransform() {
+    const t = 'translate(' + panX + ',' + panY + ') scale(' + zoom + ')';
+    compsEl.setAttribute('transform', t);
+    wiresEl.setAttribute('transform', t);
+  }
+
+  function renderSchematic(data) {
+    compsEl.innerHTML = ''; wiresEl.innerHTML = '';
+    compData = data.components || [];
+    if (selectedIdx >= compData.length) selectedIdx = -1;
+
+    (data.wires || []).forEach(function (w) {
+      if (!w.points || w.points.length < 2) return;
+      const d = 'M ' + w.points.map(function (p) { return p[0] + ' ' + p[1]; }).join(' L ');
+      const path = document.createElementNS(SVGNS, 'path');
+      path.setAttribute('d', d); path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#4ec990'); path.setAttribute('stroke-width', '2');
+      wiresEl.appendChild(path);
+      (w.junctions || []).forEach(function (j) {
+        const dot = document.createElementNS(SVGNS, 'circle');
+        dot.setAttribute('cx', j[0]); dot.setAttribute('cy', j[1]); dot.setAttribute('r', '4'); dot.setAttribute('fill', '#4ec990');
+        wiresEl.appendChild(dot);
+      });
+    });
+
+    compData.forEach(function (comp, idx) {
+      const lib = library[comp.type] || {};
+      const g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('transform', 'translate(' + comp.x + ',' + comp.y + ') rotate(' + (comp.rotation || 0) + ')');
+      g.style.color = SCH_COLORS[idx % SCH_COLORS.length];
+      g.style.cursor = 'pointer';
+
+      if (lib.svg) { const s = document.createElementNS(SVGNS, 'g'); s.innerHTML = lib.svg; g.appendChild(s); }
+      else {
+        const rect = document.createElementNS(SVGNS, 'rect');
+        rect.setAttribute('x','-20'); rect.setAttribute('y','-15'); rect.setAttribute('width','40'); rect.setAttribute('height','30');
+        rect.setAttribute('fill','none'); rect.setAttribute('stroke','currentColor'); rect.setAttribute('stroke-width','1.5');
+        g.appendChild(rect);
+      }
+      Object.values(lib.pins || {}).forEach(function (pin) {
+        const dot = document.createElementNS(SVGNS, 'circle');
+        dot.setAttribute('cx', pin.x); dot.setAttribute('cy', pin.y); dot.setAttribute('r','3'); dot.setAttribute('fill','#4daafc');
+        g.appendChild(dot);
+      });
+      const ref = document.createElementNS(SVGNS, 'text');
+      ref.setAttribute('x','0'); ref.setAttribute('y','-20'); ref.setAttribute('text-anchor','middle'); ref.setAttribute('font-size','10'); ref.setAttribute('fill','#aaa');
+      ref.textContent = comp.ref || ''; g.appendChild(ref);
+      const val = document.createElementNS(SVGNS, 'text');
+      val.setAttribute('x','0'); val.setAttribute('y','25'); val.setAttribute('text-anchor','middle'); val.setAttribute('font-size','9'); val.setAttribute('fill','#888');
+      val.textContent = (comp.properties || {}).value || ''; g.appendChild(val);
+
+      if (idx === selectedIdx) {
+        const hw = (lib.w || 40)/2 + 6, hh = (lib.h || 30)/2 + 6;
+        const sel = document.createElementNS(SVGNS, 'rect');
+        sel.setAttribute('x', String(-hw)); sel.setAttribute('y', String(-hh)); sel.setAttribute('width', String(hw*2)); sel.setAttribute('height', String(hh*2));
+        sel.setAttribute('fill','none'); sel.setAttribute('stroke','#4daafc'); sel.setAttribute('stroke-width','2'); sel.setAttribute('stroke-dasharray','4,2'); sel.setAttribute('rx','3');
+        g.insertBefore(sel, g.firstChild);
+      }
+
+      g.addEventListener('mousedown', (function (capturedIdx) { return function (e) {
+        e.stopPropagation();
+        selectedIdx = capturedIdx; dragging = true; isPanning = false;
+        const rect = svg.getBoundingClientRect();
+        dragX = (e.clientX - rect.left - panX) / zoom;
+        dragY = (e.clientY - rect.top - panY) / zoom;
+        renderSchematic({ components: compData, wires: data.wires });
+      }; })(idx));
+
+      compsEl.appendChild(g);
+    });
+
+    statusEl.textContent = (data.n_components || compData.length) + ' components, ' + (data.n_wires || 0) + ' wires';
+  }
+
+  function renderLibrary(lib) {
+    library = lib;
+    const el = document.getElementById('sch-lib-list');
+    el.innerHTML = '';
+    Object.keys(lib).forEach(function (key) {
+      const comp = lib[key];
+      const item = document.createElement('div');
+      item.className = 'lib-item';
+      item.innerHTML = '<span>' + (comp.name || key) + '</span><span class="fp">' + ((comp.properties && comp.properties.footprint) || '') + '</span>';
+      item.addEventListener('click', function () {
+        post('add_component', { type: key, x: Math.round((300 - panX) / zoom), y: Math.round((250 - panY) / zoom) }).then(function (r) {
+          if (r && r.components) renderSchematic(r); else refresh();
+        });
+      });
+      el.appendChild(item);
+    });
+  }
+
+  async function refresh() { const r = await getJSON('/schematic'); if (r) renderSchematic(r); }
+  async function refreshLibrary() { const r = await getJSON('/library'); if (r && r.library) renderLibrary(r.library); }
+
+  // pan
+  svg.addEventListener('mousedown', function (e) {
+    if (dragging) return;
+    isPanning = true; panStartX = e.clientX - panX; panStartY = e.clientY - panY; svg.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (dragging && selectedIdx >= 0) {
+      const rect = svg.getBoundingClientRect();
+      dragX = (e.clientX - rect.left - panX) / zoom;
+      dragY = (e.clientY - rect.top - panY) / zoom;
+      const g = compsEl.children[selectedIdx];
+      if (g) { const c = compData[selectedIdx]; g.setAttribute('transform', 'translate(' + dragX + ',' + dragY + ') rotate(' + ((c && c.rotation) || 0) + ')'); }
+      return;
+    }
+    if (!isPanning) return;
+    panX = e.clientX - panStartX; panY = e.clientY - panStartY; applyTransform();
+  });
+  window.addEventListener('mouseup', function () {
+    if (dragging && selectedIdx >= 0) {
+      const c = compData[selectedIdx];
+      if (c) post('move_component', { id: c.id, x: Math.round(dragX), y: Math.round(dragY) }).then(function (r) { if (r && r.components) renderSchematic(r); });
+      dragging = false;
+    }
+    isPanning = false; svg.style.cursor = 'default';
+  });
+  svg.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top, old = zoom;
+    zoom *= e.deltaY < 0 ? 1.1 : 0.9; zoom = Math.max(0.2, Math.min(5, zoom));
+    panX = mx - (mx - panX) * (zoom / old); panY = my - (my - panY) * (zoom / old);
+    applyTransform();
+  }, { passive: false });
+
+  window.addEventListener('keydown', function (e) {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIdx >= 0) {
+      const c = compData[selectedIdx];
+      if (c) { selectedIdx = -1; post('remove_component', { id: c.id }).then(function (r) { if (r && r.components) renderSchematic(r); else refresh(); }); }
+    }
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', function () {
+    post('reset', {}).then(function () { selectedIdx = -1; refresh(); });
+  });
+  document.getElementById('btn-kicad').addEventListener('click', async function () {
+    const dir = await window.parent.jac.openFolderDialog();
+    if (!dir) return;
+    const path = dir + '\\jac_schematic.kicad_sch';
+    const r = await post('export_kicad', { path: path });
+    statusEl.textContent = (r && r.ok) ? ('Exported → ' + path) : ('Export failed: ' + (r && r.error || '?'));
+  });
+
+  applyTransform();
+  refreshLibrary();
+  refresh();
+  // poll health so the status reflects the backend coming up
+  setInterval(function () { getJSON('/health').then(function (h) { if (h && !dragging && !isPanning) { /* keep status from render */ } }); }, 4000);
+})();
+</script>
+</body>
+</html>

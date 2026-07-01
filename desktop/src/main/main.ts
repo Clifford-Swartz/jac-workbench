@@ -5,20 +5,30 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as os from 'os';
 import { spawn } from 'child_process';
+import { autoUpdater } from 'electron-updater';
 import { WSClient } from './wsClient';
 import { AgentScheduler } from './agentScheduler';
 import { fetchORModels, queryOR, ORModel } from './orClient';
+import { McpManager, McpServerConfig, McpTool } from './mcp/manager';
+import { runAgenticQuery } from './agent/loop';
 
 const CONFIG_PATH = path.join(os.homedir(), '.jac', 'config.json');
 const DEFAULT_CONFIG = {
     relayUrl: 'wss://mellow-backend.onrender.com',
-    authToken: '',
-    preferredMachineId: 'Mac.attlocal.net',
+    authToken: '',            // relay disabled — no shared secret shipped
+    useRelay: false,          // local + OpenRouter only; no relay / Claude-bridge dependency
+    preferredMachineId: '',
     openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
     openAtLogin: false,
     windowBounds: { width: 1000, height: 700 },
     favoriteModels: [] as string[],
     defaultModel: '',
+    lastModel: '',   // last-selected model, restored on restart so OR/local routing survives
+    localModelPath: '',  // GGUF the bundled jac-llm-server auto-serves (empty = none/auto-detect)
+    // MCP: external tool servers, same shape as Claude Desktop. stdio: {command,args,env}; sse: {url}
+    mcpServers: {} as Record<string, McpServerConfig>,
+    // per-tool permission: 'mcp__<server>__<tool>' -> 'allow' | 'ask' | 'deny' (missing = 'ask')
+    mcpToolPermissions: {} as Record<string, 'allow' | 'ask' | 'deny'>,
 };
 
 function loadConfig(): typeof DEFAULT_CONFIG {
@@ -38,10 +48,100 @@ let tray: TrayType | null = null;
 let wsClient: WSClient | null = null;
 let scheduler: AgentScheduler | null = null;
 let config = loadConfig();
+const mcpManager = new McpManager((m) => console.log(m));
+
+// Pending MCP tool-permission prompts, keyed by request_id (resolved by 'permission_response').
+let permSeq = 0;
+const pendingPermissions = new Map<string, (r: { allow: boolean; remember: boolean }) => void>();
+
+// Decide whether a tool may run: saved allow/deny short-circuits; otherwise prompt the UI and wait.
+function decidePermission(name: string, args: Record<string, unknown>): Promise<'allow' | 'deny'> {
+    const saved = config.mcpToolPermissions[name];
+    if (saved === 'allow' || saved === 'deny') return Promise.resolve(saved);
+    return new Promise((resolve) => {
+        const request_id = `perm_${++permSeq}`;
+        pendingPermissions.set(request_id, ({ allow, remember }) => {
+            if (remember) { config.mcpToolPermissions[name] = allow ? 'allow' : 'deny'; saveConfig(config); }
+            resolve(allow ? 'allow' : 'deny');
+        });
+        mainWindow?.webContents.send('relay-message', {
+            type: 'permission_request',
+            request_id,
+            tool_name: name,
+            tool_input: args,
+            allowlist_suggestion: { scope: 'tool', match: name },
+        });
+    });
+}
+
+// JAC-native "meta" tools — always available to the agent alongside MCP tools, so the model can
+// manage MCP servers conversationally. Namespaced jac__* and dispatched by callBuiltin (not the MCP manager).
+const MCP_BUILTINS: McpTool[] = [
+    {
+        server: 'jac', name: 'add_mcp_server', qualifiedName: 'jac__add_mcp_server',
+        description: 'Add (or update) and connect an MCP tool server in JAC. Runs the given command via stdio. Use for requests like "add the playwright MCP server".',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                name: { type: 'string', description: 'Short unique id, e.g. "playwright"' },
+                command: { type: 'string', description: 'Executable to run, e.g. "npx"' },
+                args: { type: 'array', items: { type: 'string' }, description: 'Arguments, e.g. ["-y","@playwright/mcp@latest"]' },
+                env: { type: 'object', description: 'Optional environment variables', additionalProperties: { type: 'string' } },
+            },
+            required: ['name', 'command'],
+        },
+    },
+    {
+        server: 'jac', name: 'list_mcp_servers', qualifiedName: 'jac__list_mcp_servers',
+        description: 'List configured MCP servers with their connection status and tool counts.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'remove_mcp_server', qualifiedName: 'jac__remove_mcp_server',
+        description: 'Remove a configured MCP server from JAC by its name.',
+        inputSchema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
+    },
+];
+
+async function callBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    try {
+        if (qualifiedName === 'jac__add_mcp_server') {
+            const name = String(args.name ?? '').trim();
+            const command = String(args.command ?? '').trim();
+            if (!name || !command) return { text: 'Both "name" and "command" are required.', isError: true };
+            const serverArgs = Array.isArray(args.args) ? args.args.map(String) : [];
+            const env = (args.env && typeof args.env === 'object') ? args.env as Record<string, string> : undefined;
+            config.mcpServers = { ...config.mcpServers, [name]: { command, args: serverArgs, ...(env ? { env } : {}) } };
+            saveConfig(config);
+            await mcpManager.reload(config.mcpServers);
+            await new Promise(r => setTimeout(r, 1800));   // give it a moment to hand-shake
+            const st = mcpManager.status().find(s => s.name === name);
+            const ok = st?.status === 'ready';
+            return {
+                text: `Server "${name}" saved. Status: ${st?.status ?? 'unknown'}${st?.error ? ` (${st.error})` : ''}, ${st?.toolCount ?? 0} tools.`,
+                isError: !ok,
+            };
+        }
+        if (qualifiedName === 'jac__list_mcp_servers') {
+            return { text: JSON.stringify(mcpManager.status()), isError: false };
+        }
+        if (qualifiedName === 'jac__remove_mcp_server') {
+            const name = String(args.name ?? '').trim();
+            if (!(name in config.mcpServers)) return { text: `No configured server named "${name}".`, isError: true };
+            const next = { ...config.mcpServers }; delete next[name];
+            config.mcpServers = next; saveConfig(config);
+            await mcpManager.reload(config.mcpServers);
+            return { text: `Removed server "${name}".`, isError: false };
+        }
+        return { text: `Unknown built-in tool: ${qualifiedName}`, isError: true };
+    } catch (e) {
+        return { text: `Built-in error: ${String((e as Error).message ?? e)}`, isError: true };
+    }
+}
 
 // OR state
 let orModels: ORModel[] = [];
-let currentModel = '';          // tracks selected model across set_model messages
+let currentModel = config.lastModel || config.defaultModel || '';   // restored across restarts
 let orAbort: AbortController | null = null;
 const CLAUDE_FALLBACK_IDS = new Set(['sonnet', 'opus', 'haiku']);
 
@@ -54,6 +154,130 @@ let ollamaPollTimer: ReturnType<typeof setTimeout> | null = null;
 let lastOllamaLocalList: unknown[] = [];
 
 function isOllamaModel(id: string): boolean { return id.startsWith('ollama:'); }
+
+// Local jac-llm-server (OpenAI-compatible, :8787) state
+const LOCAL_SERVER_URL = 'http://localhost:8787';
+let lastLocalServerList: unknown[] = [];
+let localSrvAbort: AbortController | null = null;
+let localSrvPollTimer: ReturnType<typeof setTimeout> | null = null;
+function isLocalServerModel(id: string): boolean { return id.startsWith('local:'); }
+
+// Bundled jac-llm-server process management — auto-start so local models "just work".
+let localServerChild: ReturnType<typeof spawn> | null = null;
+function localServerDir(): string {
+    return app.isPackaged
+        ? path.join(process.resourcesPath, 'llama-server')
+        : path.join(__dirname, '../../resources/llama-server');
+}
+function resolveLocalModel(): string {
+    if (config.localModelPath && fs.existsSync(config.localModelPath)) return config.localModelPath;
+    const dirs = [
+        path.join(app.getPath('userData'), 'models'),                    // downloaded (first run)
+        app.isPackaged ? path.join(process.resourcesPath, 'models')
+                       : path.join(__dirname, '../../resources/models'),  // bundled (if any)
+    ];
+    for (const dir of dirs) {
+        try {
+            const g = fs.readdirSync(dir).find(f => f.toLowerCase().endsWith('.gguf'));
+            if (g) return path.join(dir, g);
+        } catch { /* dir missing */ }
+    }
+    return '';
+}
+async function startLocalServer(): Promise<void> {
+    // Already serving (e.g. a manually-started instance)? Reuse it.
+    try {
+        const r = await fetch(`${LOCAL_SERVER_URL}/v1/models`, { signal: AbortSignal.timeout(1500) });
+        if (r.ok) return;
+    } catch { /* not up — start it */ }
+    const exe = path.join(localServerDir(), process.platform === 'win32' ? 'llama-server.exe' : 'llama-server');
+    const model = resolveLocalModel();
+    if (!fs.existsSync(exe) || !model) return; // no binary or no model → nothing to start yet
+    try {
+        localServerChild = spawn(exe,
+            ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', '999', '-c', '4096'],
+            { cwd: localServerDir(), windowsHide: true, stdio: 'ignore' });
+        localServerChild.on('exit', () => { localServerChild = null; });
+    } catch { /* spawn failed */ }
+}
+function stopLocalServer(): void {
+    if (localServerChild) { try { localServerChild.kill(); } catch { /* ignore */ } localServerChild = null; }
+}
+
+// Auto-update via electron-updater (GitHub Releases feed). Packaged builds only.
+let updateReady = false;
+function setupAutoUpdate(): void {
+    if (!app.isPackaged) return;
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.on('update-downloaded', (info) => {
+        updateReady = true;
+        try { new Notification({ title: 'JAC update ready', body: `Version ${info.version} downloaded — installs next time you quit JAC.` }).show(); } catch { /* ignore */ }
+        mainWindow?.webContents.send('relay-message', { type: 'update_downloaded', version: info.version });
+    });
+    autoUpdater.on('error', () => { /* offline or no release yet — ignore */ });
+    autoUpdater.checkForUpdates().catch(() => {});
+    setInterval(() => { autoUpdater.checkForUpdates().catch(() => {}); }, 6 * 60 * 60 * 1000); // re-check every 6h
+}
+function checkForUpdatesNow(): void {
+    if (!app.isPackaged) { try { new Notification({ title: 'JAC', body: 'Updates only work in the installed app.' }).show(); } catch { /* ignore */ } return; }
+    if (updateReady) { autoUpdater.quitAndInstall(); return; }
+    autoUpdater.checkForUpdates().catch(() => {});
+    try { new Notification({ title: 'JAC', body: 'Checking for updates…' }).show(); } catch { /* ignore */ }
+}
+function restartLocalServer(): void {
+    stopLocalServer();
+    setTimeout(() => { startLocalServer(); }, 600); // let :8787 free up
+}
+
+// First-run model acquisition (app ships without a model).
+const CURATED_MODEL = {
+    url: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
+    filename: 'Llama-3.2-3B-Instruct-Q4_K_M.gguf',
+    label: 'Llama 3.2 3B Instruct (Q4)',
+    sizeGB: 2.0,
+};
+function modelsDownloadDir(): string {
+    const dir = path.join(app.getPath('userData'), 'models');
+    try { fs.mkdirSync(dir, { recursive: true }); } catch { /* exists */ }
+    return dir;
+}
+let modelDownloadAbort: AbortController | null = null;
+async function downloadCuratedModel(): Promise<{ ok: boolean; path?: string; error?: string }> {
+    modelDownloadAbort?.abort();
+    modelDownloadAbort = new AbortController();
+    const dest = path.join(modelsDownloadDir(), CURATED_MODEL.filename);
+    const tmp = dest + '.part';
+    const send = (p: Record<string, unknown>) => mainWindow?.webContents.send('model-download-progress', p);
+    try {
+        const res = await fetch(CURATED_MODEL.url, { signal: modelDownloadAbort.signal });
+        if (!res.ok || !res.body) return { ok: false, error: `HTTP ${res.status}` };
+        const total = Number(res.headers.get('content-length')) || 0;
+        const out = fs.createWriteStream(tmp);
+        const reader = res.body.getReader();
+        let received = 0, lastPct = -1;
+        send({ status: 'start', total, label: CURATED_MODEL.label });
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            out.write(Buffer.from(value));
+            received += value.length;
+            const pct = total ? Math.floor((received / total) * 100) : 0;
+            if (pct !== lastPct) { lastPct = pct; send({ status: 'progress', pct, received, total }); }
+        }
+        await new Promise<void>(r => out.end(() => r()));
+        fs.renameSync(tmp, dest);
+        config.localModelPath = dest; saveConfig(config);
+        restartLocalServer();
+        send({ status: 'done', path: dest });
+        return { ok: true, path: dest };
+    } catch (err: any) {
+        try { if (fs.existsSync(tmp)) fs.unlinkSync(tmp); } catch { /* ignore */ }
+        if (err.name === 'AbortError') { send({ status: 'canceled' }); return { ok: false, error: 'canceled' }; }
+        send({ status: 'error', error: String(err.message) });
+        return { ok: false, error: String(err.message) };
+    } finally { modelDownloadAbort = null; }
+}
 
 function fmtBytes(b: number): string {
     if (b >= 1e9) return (b / 1e9).toFixed(1) + ' GB';
@@ -84,8 +308,7 @@ async function pollOllamaModels(): Promise<void> {
                 est_tok_s: hotNames.has(m.name) ? 40 : undefined,
             }));
 
-            // Send to LOCAL tab (merging happens at relay intercept too, but send here for immediate display)
-            mainWindow?.webContents.send('relay-message', { type: 'local_models_list', models: lastOllamaLocalList });
+            pushLocalModels();
         }
     } catch { /* Ollama not running */ }
     ollamaPollTimer = setTimeout(pollOllamaModels, 10000);
@@ -138,6 +361,78 @@ async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string
     ollamaAbort = null;
 }
 
+// Combined local-tab list = Ollama models + local jac-llm-server models.
+function pushLocalModels(): void {
+    const models = [...(lastOllamaLocalList as unknown[]), ...(lastLocalServerList as unknown[])];
+    mainWindow?.webContents.send('relay-message', { type: 'local_models_list', models });
+}
+
+async function pollLocalServerModels(): Promise<void> {
+    if (localSrvPollTimer) clearTimeout(localSrvPollTimer);
+    try {
+        const res = await fetch(`${LOCAL_SERVER_URL}/v1/models`, { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+            const data = await res.json() as { data?: Array<{ id: string }> };
+            lastLocalServerList = (data.data || []).map(m => ({
+                id: `local:${m.id}`,
+                label: `${String(m.id).replace(/.*[\\/]/, '').replace(/\.gguf$/i, '')} (local)`,
+                size: '',
+                status: 'ready',
+                provider_id: 'local-srv',
+            }));
+            pushLocalModels();
+        }
+    } catch { lastLocalServerList = []; }
+    localSrvPollTimer = setTimeout(pollLocalServerModels, 10000);
+}
+
+async function handleLocalServerQuery(msg: Record<string, unknown>, modelId: string): Promise<void> {
+    localSrvAbort?.abort();
+    localSrvAbort = new AbortController();
+    const prompt = msg.prompt as string;
+    const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
+    const messages = [
+        ...rawHistory.map(h => ({ role: h.role, content: h.text })),
+        { role: 'user', content: prompt },
+    ];
+    const send = (delta: Record<string, unknown>) => mainWindow?.webContents.send('relay-message', delta);
+    try {
+        const res = await fetch(`${LOCAL_SERVER_URL}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: modelId, messages, stream: true }),
+            signal: localSrvAbort.signal,
+        });
+        if (!res.ok) { send({ type: 'error', message: `Local server ${res.status}: ${await res.text()}` }); localSrvAbort = null; return; }
+        const reader = res.body!.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        send({ type: 'stream_start' });
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const lines = buf.split('\n');
+            buf = lines.pop() ?? '';
+            for (const line of lines) {
+                const t = line.trim();
+                if (!t.startsWith('data:')) continue;
+                const payload = t.slice(5).trim();
+                if (payload === '[DONE]') { send({ type: 'stream_end' }); continue; }
+                try {
+                    const obj = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+                    const txt = obj.choices?.[0]?.delta?.content;
+                    if (txt) send({ type: 'stream_chunk', text: txt });
+                } catch { /* skip malformed SSE */ }
+            }
+        }
+        send({ type: 'stream_end' });
+    } catch (err: any) {
+        if (err.name !== 'AbortError') send({ type: 'error', message: String(err.message) });
+    }
+    localSrvAbort = null;
+}
+
 function mergeModelsForUI(relayModels: ORModel[]): { models: ORModel[]; current_model: string } {
     // Only filter Claude fallbacks once OR models are actually loaded
     const shouldFilter = config.openrouterApiKey && orModels.length > 0;
@@ -174,11 +469,30 @@ async function handleORQuery(msg: Record<string, unknown>, modelId: string): Pro
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
+    const send = (delta: Record<string, unknown>) => mainWindow?.webContents.send('relay-message', delta);
 
-    await queryOR(config.openrouterApiKey, modelId, messages,
-        (delta) => mainWindow?.webContents.send('relay-message', delta),
-        orAbort.signal,
-    );
+    // Tools = live MCP tools + JAC-native meta-tools (always present). Route tool-capable models
+    // through the agentic loop; plain chat otherwise.
+    const tools = [...mcpManager.getTools(), ...MCP_BUILTINS];
+    const model = orModels.find(m => m.id === modelId);
+    if (model?.supportsTools) {
+        await runAgenticQuery({
+            url: 'https://openrouter.ai/api/v1/chat/completions',
+            headers: {
+                'Authorization': `Bearer ${config.openrouterApiKey}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://jac.app',
+                'X-Title': 'JAC',
+            },
+            model: modelId.replace(/^or:/, ''),
+            messages, tools,
+            callTool: (n, a) => (n.startsWith('jac__') ? callBuiltin(n, a) : mcpManager.callTool(n, a)),
+            send, signal: orAbort.signal,
+            permit: (name, a) => decidePermission(name, a),
+        });
+    } else {
+        await queryOR(config.openrouterApiKey, modelId, messages, send, orAbort.signal);
+    }
     orAbort = null;
 }
 
@@ -189,8 +503,10 @@ function createWindow(): BrowserWindowType {
         minWidth: 480,
         minHeight: 400,
         title: 'JAC',
+        icon: path.join(__dirname, '../../assets/icon.png'),
         backgroundColor: '#1e1e1e',
-        titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+        titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
+        titleBarOverlay: { color: '#191919', symbolColor: '#cccccc', height: 32 },
         webPreferences: {
             preload: path.join(__dirname, '../preload/preload.js'),
             contextIsolation: true,
@@ -199,6 +515,11 @@ function createWindow(): BrowserWindowType {
     });
 
     win.loadFile(path.join(__dirname, '../renderer/index.html'));
+
+    // TEMP DIAG: forward renderer console to the main log so we can see explorer errors
+    win.webContents.on('console-message', (_e, level, message, line, sourceId) => {
+        console.log(`[rndr:${level}] ${message} @ ${sourceId}:${line}`);
+    });
 
     win.on('resize', () => {
         const [width, height] = win.getSize();
@@ -252,6 +573,11 @@ function createTray(): void {
             },
             { type: 'separator' },
             {
+                label: 'Check for Updates…',
+                click: () => { checkForUpdatesNow(); },
+            },
+            { type: 'separator' },
+            {
                 label: 'Quit JAC',
                 click: () => { app.quit(); },
             },
@@ -294,8 +620,18 @@ function toolResultText(content: unknown): string {
 
 function loadClaudeCodeHistory(cwd: string): void {
     try {
-        const encoded = cwd.replace(/[\/ ]/g, '-');
-        const projectDir = path.join(os.homedir(), '.claude', 'projects', encoded);
+        // Encode cwd the way Claude Code names its project dirs: every path separator
+        // (/, \, :) and space → '-'. Works on Windows (C:\a b\c) and Unix (/a/b).
+        const encoded = cwd.replace(/[\\/: ]/g, '-');
+        const projectsRoot = path.join(os.homedir(), '.claude', 'projects');
+        let projectDir = path.join(projectsRoot, encoded);
+        if (!fs.existsSync(projectDir)) {
+            // drive-letter case differs between sessions (C:\ vs c:\) — match case-insensitively
+            try {
+                const match = fs.readdirSync(projectsRoot).find(dir => dir.toLowerCase() === encoded.toLowerCase());
+                if (match) projectDir = path.join(projectsRoot, match);
+            } catch { /* projects dir missing */ }
+        }
         if (!fs.existsSync(projectDir)) return;
 
         const files = fs.readdirSync(projectDir)
@@ -398,6 +734,13 @@ function setupRelay(): void {
                 const merged = [...ollamaList, ...bridgeModels];
                 mainWindow?.webContents.send('relay-message', { ...m, models: merged });
             } else {
+                // The relay emits "No provider connected" whenever there's no bridge online.
+                // On a local/OR model nothing is ever routed to a provider, so that error is
+                // pure noise — swallow it. Keep it for Claude models, where it's legitimate.
+                if (m.type === 'error' && m.message === 'No provider connected'
+                    && (isORModel(currentModel) || isOllamaModel(currentModel))) {
+                    return;
+                }
                 mainWindow?.webContents.send('relay-message', msg);
             }
         },
@@ -408,7 +751,75 @@ function setupRelay(): void {
     wsClient.connect();
 }
 
+// ── PCB / CAD Python backends (spawned like the bundled llama server) ─────────
+let pcbServerChild: ReturnType<typeof spawn> | null = null;
+const PCB_SERVER_URL = 'http://127.0.0.1:5051';
+
+/** Resolve a real Python interpreter (the PATH `python` is often the MS Store stub). */
+function pythonExe(): string {
+    const home = os.homedir();
+    const bundled = path.join(process.resourcesPath, 'python', 'python.exe');   // packaged
+    const candidates = [
+        bundled,
+        path.join(home, 'AppData', 'Local', 'Programs', 'Python', 'Python312', 'python.exe'),
+        path.join(home, 'AppData', 'Local', 'Programs', 'Python', 'Python313', 'python.exe'),
+        path.join(home, 'AppData', 'Local', 'Programs', 'Python', 'Python311', 'python.exe'),
+    ];
+    for (const c of candidates) { try { if (fs.existsSync(c)) return c; } catch { /* */ } }
+    return 'python';
+}
+
+/** Directory holding the Python tool servers (dev: jac/server, packaged: resources/server). */
+function serverDir(): string {
+    return app.isPackaged
+        ? path.join(process.resourcesPath, 'server')
+        : path.join(__dirname, '..', '..', '..', 'server');
+}
+
+async function startPcbServer(): Promise<void> {
+    try {
+        const r = await fetch(`${PCB_SERVER_URL}/health`, { signal: AbortSignal.timeout(1000) });
+        if (r.ok) return;   // already running (reuse)
+    } catch { /* not up yet */ }
+    const script = path.join(serverDir(), 'pcb_tools.py');
+    if (!fs.existsSync(script)) { console.log(`[pcb] server script not found: ${script}`); return; }
+    try {
+        pcbServerChild = spawn(pythonExe(), [script, '5051'], { stdio: 'ignore' });
+        pcbServerChild.on('exit', () => { pcbServerChild = null; });
+        console.log('[pcb] server starting on :5051');
+    } catch (e) { console.log(`[pcb] spawn failed: ${e}`); }
+}
+
+function stopPcbServer(): void {
+    try { pcbServerChild?.kill(); } catch { /* */ }
+    pcbServerChild = null;
+}
+
+let cadServerChild: ReturnType<typeof spawn> | null = null;
+const CAD_SERVER_URL = 'http://127.0.0.1:5050';
+
+async function startCadServer(): Promise<void> {
+    try {
+        const r = await fetch(`${CAD_SERVER_URL}/health`, { signal: AbortSignal.timeout(1000) });
+        if (r.ok) return;
+    } catch { /* not up yet */ }
+    const script = path.join(serverDir(), 'cad_tools.py');
+    if (!fs.existsSync(script)) { console.log(`[cad] server script not found: ${script}`); return; }
+    try {
+        cadServerChild = spawn(pythonExe(), [script, '5050'], { stdio: 'ignore' });
+        cadServerChild.on('exit', () => { cadServerChild = null; });
+        console.log('[cad] server starting on :5050 (build123d)');
+    } catch (e) { console.log(`[cad] spawn failed: ${e}`); }
+}
+
+function stopCadServer(): void {
+    try { cadServerChild?.kill(); } catch { /* */ }
+    cadServerChild = null;
+}
+
 app.whenReady().then(() => {
+    Menu.setApplicationMenu(null);   // drop the default File/Edit/View/Window/Help bar
+    if (process.platform === 'win32') app.setAppUserModelId('com.clifford.jac'); // match electron-builder appId
     // IPC handlers — must be registered after app is ready
     ipcMain.handle('history-load-more', (_e, cwd: string, offset: number) => {
         const all = historyStore.get(cwd);
@@ -419,10 +830,19 @@ app.whenReady().then(() => {
     });
     ipcMain.handle('get-config', () => config);
     ipcMain.handle('save-config', (_e, updates: Partial<typeof DEFAULT_CONFIG>) => {
+        const mcpChanged = 'mcpServers' in updates
+            && JSON.stringify(updates.mcpServers) !== JSON.stringify(config.mcpServers);
         config = { ...config, ...updates };
         saveConfig(config);
+        if (mcpChanged) mcpManager.reload(config.mcpServers);
         return config;
     });
+    // MCP: server connection status + flattened tool list (for the settings panel)
+    ipcMain.handle('mcp-status', () => mcpManager.status());
+    ipcMain.handle('mcp-tools', () => mcpManager.getTools().map(t => ({
+        server: t.server, name: t.name, qualifiedName: t.qualifiedName, description: t.description,
+    })));
+    ipcMain.handle('mcp-reload', () => { mcpManager.reload(config.mcpServers); return mcpManager.status(); });
     ipcMain.handle('get-platform', () => process.platform);
     ipcMain.handle('get-home', () => os.homedir());
     ipcMain.handle('open-external', (_e, url: string) => shell.openExternal(url));
@@ -434,13 +854,23 @@ app.whenReady().then(() => {
         const msg = rawMsg as Record<string, unknown>;
         const type = msg.type as string;
 
+        // MCP tool-permission prompt reply — resolve the waiting decidePermission() promise.
+        if (type === 'permission_response') {
+            const rid = msg.request_id as string;
+            const resolver = pendingPermissions.get(rid);
+            if (resolver) { pendingPermissions.delete(rid); resolver({ allow: Boolean(msg.allow), remember: Boolean(msg.remember) }); }
+            return;
+        }
+
         if (type === 'set_model') {
             currentModel = (msg.model as string) || '';
-            if (isORModel(currentModel) || isOllamaModel(currentModel)) return;
+            config.lastModel = currentModel; saveConfig(config);   // persist so it survives restart
+            if (isORModel(currentModel) || isOllamaModel(currentModel) || isLocalServerModel(currentModel)) return;
         }
 
         if (type === 'get_local_models') {
             pollOllamaModels();
+            pollLocalServerModels();
             return;
         }
 
@@ -478,6 +908,19 @@ app.whenReady().then(() => {
         if (type === 'query' && isOllamaModel(currentModel)) {
             const modelName = currentModel.slice('ollama:'.length);
             handleOllamaQuery(msg, modelName).catch(err =>
+                mainWindow?.webContents.send('relay-message', { type: 'error', message: String(err) })
+            );
+            return;
+        }
+
+        if (type === 'abort_query' && isLocalServerModel(currentModel)) {
+            localSrvAbort?.abort();
+            localSrvAbort = null;
+            return;
+        }
+
+        if (type === 'query' && isLocalServerModel(currentModel)) {
+            handleLocalServerQuery(msg, currentModel.slice('local:'.length)).catch(err =>
                 mainWindow?.webContents.send('relay-message', { type: 'error', message: String(err) })
             );
             return;
@@ -566,6 +1009,66 @@ app.whenReady().then(() => {
         return result.canceled ? null : result.filePaths[0];
     });
 
+    ipcMain.handle('fs-mkdir', (_e, dir: string, name: string) => {
+        try {
+            const clean = String(name).trim().replace(/[\\/:*?"<>|]/g, '');
+            if (!clean) return { ok: false, error: 'Invalid name' };
+            const target = path.join(dir, clean);
+            if (fs.existsSync(target)) return { ok: false, error: 'Already exists' };
+            fs.mkdirSync(target);
+            return { ok: true, path: target };
+        } catch (err) { return { ok: false, error: String(err) }; }
+    });
+
+    ipcMain.handle('fs-rename', (_e, oldPath: string, newName: string) => {
+        try {
+            const clean = String(newName).trim().replace(/[\\/:*?"<>|]/g, '');
+            if (!clean) return { ok: false, error: 'Invalid name' };
+            const target = path.join(path.dirname(oldPath), clean);
+            if (fs.existsSync(target)) return { ok: false, error: 'Already exists' };
+            fs.renameSync(oldPath, target);
+            return { ok: true, path: target };
+        } catch (err) { return { ok: false, error: String(err) }; }
+    });
+
+    ipcMain.handle('fs-trash', async (_e, target: string) => {
+        try {
+            const { dialog } = require('electron');
+            const home = os.homedir();
+            const resolved = path.resolve(target);
+            // Safety: only trash things inside the user's home, and never home itself.
+            if (resolved === home || !resolved.toLowerCase().startsWith(home.toLowerCase() + path.sep)) {
+                return { ok: false, error: 'Refused: outside home directory' };
+            }
+            const choice = await dialog.showMessageBox(mainWindow!, {
+                type: 'warning',
+                buttons: ['Move to Recycle Bin', 'Cancel'],
+                defaultId: 1, cancelId: 1,
+                message: `Move "${path.basename(resolved)}" to the Recycle Bin?`,
+                detail: resolved,
+            });
+            if (choice.response !== 0) return { ok: false, canceled: true };
+            await shell.trashItem(resolved);
+            return { ok: true };
+        } catch (err) { return { ok: false, error: String(err) }; }
+    });
+
+    // ── Local model acquisition (download recommended / pick a GGUF) ──
+    ipcMain.handle('get-recommended-model', () => CURATED_MODEL);
+    ipcMain.handle('model-download', () => downloadCuratedModel());
+    ipcMain.handle('model-download-cancel', () => { modelDownloadAbort?.abort(); });
+    ipcMain.handle('model-pick', async () => {
+        const { dialog } = require('electron');
+        const r = await dialog.showOpenDialog(mainWindow!, {
+            properties: ['openFile'],
+            filters: [{ name: 'GGUF models', extensions: ['gguf'] }],
+        });
+        if (r.canceled || !r.filePaths[0]) return { ok: false };
+        config.localModelPath = r.filePaths[0]; saveConfig(config);
+        restartLocalServer();
+        return { ok: true, path: r.filePaths[0] };
+    });
+
     const AUDIO_EXTS = new Set(['.mp3', '.flac', '.wav', '.ogg', '.m4a', '.aac', '.opus', '.wma']);
     const MUSIC_STATE_PATH = path.join(os.homedir(), '.jac', 'music-state.json');
 
@@ -602,8 +1105,20 @@ app.whenReady().then(() => {
 
     mainWindow = createWindow();
 
-    // Start Ollama model polling (no-op if Ollama isn't running)
+    // Auto-start the bundled jac-llm-server (serves the configured model), then poll for it.
+    startLocalServer();
+    app.on('before-quit', stopLocalServer);
+    setupAutoUpdate();
+    // Connect any configured MCP servers; tear them down on quit.
+    mcpManager.reload(config.mcpServers);
+    app.on('before-quit', () => mcpManager.stopAll());
+    // Start the PCB/schematic tool server (Python stdlib, :5051) + CAD server (build123d, :5050).
+    startPcbServer();
+    startCadServer();
+    app.on('before-quit', stopPcbServer);
+    app.on('before-quit', stopCadServer);
     pollOllamaModels();
+    pollLocalServerModels();
 
     // Fetch OR models; push to webview once both fetch and page load are done
     if (config.openrouterApiKey) {
@@ -718,7 +1233,8 @@ app.whenReady().then(() => {
     scheduler.start();
 
     createTray();
-    setupRelay();
+    if (config.useRelay && config.authToken) setupRelay();
+    else mainWindow?.webContents.send('connection-status', 'local'); // local-only mode
 
     app.on('activate', () => {
         mainWindow?.show();

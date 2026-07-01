@@ -310,6 +310,22 @@
         <div id="empty-text">Select a model</div>
       </div>
 
+      <!-- Shown when there are no local models (first run / handoff) -->
+      <div id="get-model" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center;">
+        <div style="font-size:34px; opacity:0.5;">⬡</div>
+        <div style="font-size:15px; color:#d4d4d4; font-weight:600;">No local model yet</div>
+        <div style="font-size:12px; color:#888; max-width:360px; line-height:1.5;">Download a recommended model to run AI fully on this machine — no account, no cloud. Or open a GGUF you already have.</div>
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button class="tb-btn primary" id="dl-model-btn">⬇&nbsp; Download Llama 3.2 3B (~2 GB)</button>
+          <button class="tb-btn" id="open-gguf-btn">📂&nbsp; Open a GGUF…</button>
+        </div>
+        <div id="dl-progress" style="display:none; flex-direction:column; gap:6px; width:340px; margin-top:8px;">
+          <div id="dl-status" style="font-size:11px; color:#888;"></div>
+          <div style="height:6px; background:#2b2b2b; border-radius:3px; overflow:hidden;"><div id="dl-fill" style="height:100%; width:0%; background:#d97757; transition:width 0.2s;"></div></div>
+          <button class="tb-btn danger" id="dl-cancel-btn" style="align-self:center; margin-top:4px;">Cancel</button>
+        </div>
+      </div>
+
       <div id="model-detail">
         <div id="detail-header">
           <div id="detail-name"></div>
@@ -410,33 +426,45 @@
 
   // ── Status ───────────────────────────────────────────────────────────────
 
-  function setStatus(ok) {
+  function setStatus(ollamaUp, serverCount) {
     var dot   = document.getElementById('status-dot');
     var text  = document.getElementById('status-text');
     var startBtn = document.getElementById('start-ollama-btn');
-    dot.className    = ok ? 'connected' : 'error';
-    text.textContent = ok ? 'Ollama connected' : 'Ollama not running';
-    startBtn.style.display = ok ? 'none' : '';
+    var up = ollamaUp || serverCount > 0;
+    dot.className    = up ? 'connected' : 'error';
+    text.textContent = ollamaUp
+      ? ('Ollama connected' + (serverCount ? ' + jac-llm-server' : ''))
+      : (serverCount ? 'jac-llm-server connected' : 'No local models running');
+    startBtn.style.display = ollamaUp ? 'none' : '';
   }
 
   // ── Poll ─────────────────────────────────────────────────────────────────
 
   async function refresh() {
     clearTimeout(pollTimer);
+    running = {};
+    // Ollama (may be down)
+    var ollamaUp = false, ollamaList = [];
     try {
       var [tags, ps] = await Promise.all([
         fetch(BASE + '/api/tags', { signal: AbortSignal.timeout(3000) }).then(r => r.json()),
         fetch(BASE + '/api/ps',   { signal: AbortSignal.timeout(3000) }).then(r => r.json())
       ]);
-      models  = (tags.models || []).sort((a, b) => b.size - a.size);
-      running = {};
+      ollamaList = (tags.models || []);
       for (var m of (ps.models || [])) running[m.name] = m;
-      setStatus(true);
-      renderList();
-      if (selected) renderDetail();
-    } catch(e) {
-      setStatus(false);
-    }
+      ollamaUp = true;
+    } catch(e) { /* Ollama down */ }
+    // jac-llm-server (OpenAI-compatible on :8787; may be down)
+    var serverList = [];
+    try {
+      var sm = await fetch('http://localhost:8787/v1/models', { signal: AbortSignal.timeout(3000) }).then(r => r.json());
+      serverList = (sm.data || []).map(function(x) { return { name: x.id, size: 0, _server: true }; });
+      serverList.forEach(function(s) { running[s.name] = { name: s.name }; }); // served = loaded
+    } catch(e) { /* server down */ }
+    models = ollamaList.concat(serverList).sort(function(a, b) { return (b.size || 0) - (a.size || 0); });
+    setStatus(ollamaUp, serverList.length);
+    renderList();
+    if (selected) renderDetail();
     pollTimer = setTimeout(refresh, 5000);
   }
 
@@ -451,6 +479,16 @@
     var list = document.getElementById('model-list');
     var noMsg = document.getElementById('no-models-msg');
     noMsg.style.display = filtered.length ? 'none' : 'block';
+
+    // First run / handoff: no local models at all → show the "get a model" CTA.
+    var hasModels = models.length > 0;
+    document.getElementById('get-model').style.display = hasModels ? 'none' : 'flex';
+    if (!hasModels) {
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('model-detail').classList.remove('visible');
+    } else if (!selected) {
+      document.getElementById('empty-state').style.display = '';
+    }
 
     // Reconcile DOM items
     var existing = {};
@@ -475,10 +513,14 @@
       }
       el.querySelector('.mdot').className = 'mdot' + (hot ? ' hot' : '');
       el.querySelector('.mname').textContent = m.name;
-      var parts = [];
-      if (m.details && m.details.parameter_size) parts.push(m.details.parameter_size);
-      parts.push(fmtBytes(m.size));
-      el.querySelector('.mmeta').textContent = parts.join('  ·  ');
+      if (m._server) {
+        el.querySelector('.mmeta').textContent = 'jac-llm-server  ·  served';
+      } else {
+        var parts = [];
+        if (m.details && m.details.parameter_size) parts.push(m.details.parameter_size);
+        parts.push(fmtBytes(m.size));
+        el.querySelector('.mmeta').textContent = parts.join('  ·  ');
+      }
       el.classList.toggle('selected', m.name === selected);
     });
   }
@@ -510,14 +552,18 @@
       if (m.details.parameter_size)     tags.push(m.details.parameter_size);
       if (m.details.quantization_level) tags.push(m.details.quantization_level);
     }
-    tags.push(fmtBytes(m.size));
+    tags.push(m._server ? 'jac-llm-server :8787' : fmtBytes(m.size));
     document.getElementById('detail-tags').innerHTML = tags.map(function(t) {
       return '<span class="dtag">' + t + '</span>';
     }).join('');
 
-    // Buttons
+    // Buttons — Ollama load/unload/delete don't apply to served (jac-llm-server) models
+    var srv = !!m._server;
+    document.getElementById('load-btn').style.display   = srv ? 'none' : '';
+    document.getElementById('unload-btn').style.display = srv ? 'none' : '';
+    var delBtn = document.getElementById('delete-btn'); if (delBtn) delBtn.style.display = srv ? 'none' : '';
     document.getElementById('load-btn').disabled   = hot;
-    document.getElementById('load-btn').textContent = hot ? 'Loaded ✓' : 'Load';
+    document.getElementById('load-btn').textContent = srv ? 'Served ✓' : (hot ? 'Loaded ✓' : 'Load');
     document.getElementById('unload-btn').disabled = !hot;
 
     // Expires
@@ -682,7 +728,43 @@
     var t0 = Date.now();
     var text = '';
 
+    var isSrv = (models.find(function(x){ return x.name === selected; }) || {})._server;
     try {
+      if (isSrv) {
+        // jac-llm-server — OpenAI-compatible SSE
+        var res = await fetch('http://localhost:8787/v1/chat/completions', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: selected, messages: [{ role: 'user', content: prompt }], stream: true }),
+          signal: genAbort.signal
+        });
+        var reader = res.body.getReader(), decoder = new TextDecoder(), buf = '', ntok = 0;
+        while (true) {
+          var chunk = await reader.read();
+          if (chunk.done) break;
+          buf += decoder.decode(chunk.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop();
+          for (var line of lines) {
+            var t = line.trim();
+            if (t.slice(0, 5) !== 'data:') continue;
+            var payload = t.slice(5).trim();
+            if (payload === '[DONE]') continue;
+            try {
+              var o = JSON.parse(payload);
+              var dlt = o.choices && o.choices[0] && o.choices[0].delta && o.choices[0].delta.content;
+              if (dlt) { text += dlt; ntok++; out.textContent = text; out.scrollTop = out.scrollHeight; }
+            } catch(e) {}
+          }
+        }
+        var sdur = (Date.now() - t0) / 1000;
+        document.getElementById('stat-tps').textContent    = (ntok / sdur).toFixed(1);
+        document.getElementById('stat-tokens').textContent = ntok;
+        document.getElementById('stat-time').textContent   = sdur.toFixed(1);
+        statsRow.classList.add('visible');
+        footer.textContent = (ntok / sdur).toFixed(1) + ' tok/s  ·  ~' + ntok + ' tokens  ·  ' + sdur.toFixed(1) + 's';
+        genAbort = null; runBtn.style.display = ''; stopBtn.style.display = 'none';
+        return;
+      }
       var res = await fetch(BASE + '/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -741,6 +823,29 @@
   document.getElementById('pull-go-btn').addEventListener('click', doPull);
   document.getElementById('pull-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') doPull(); });
   document.getElementById('refresh-btn').addEventListener('click', refresh);
+
+  // ── Model acquisition: download recommended / open a GGUF ──
+  document.getElementById('dl-model-btn').addEventListener('click', function() {
+    document.getElementById('dl-progress').style.display = 'flex';
+    document.getElementById('dl-model-btn').disabled = true;
+    document.getElementById('open-gguf-btn').disabled = true;
+    document.getElementById('dl-status').textContent = 'Starting download…';
+    window.parent.jac.downloadModel();
+  });
+  document.getElementById('open-gguf-btn').addEventListener('click', async function() {
+    var r = await window.parent.jac.pickModel();
+    if (r && r.ok) { document.getElementById('dl-status').textContent = 'Loading model…'; setTimeout(refresh, 1000); }
+  });
+  document.getElementById('dl-cancel-btn').addEventListener('click', function() { window.parent.jac.cancelModelDownload(); });
+  window.parent.jac.onModelDownloadProgress(function(p) {
+    var prog = document.getElementById('dl-progress'), st = document.getElementById('dl-status'), fill = document.getElementById('dl-fill');
+    var dlBtn = document.getElementById('dl-model-btn'), opBtn = document.getElementById('open-gguf-btn');
+    if (p.status === 'start') { prog.style.display = 'flex'; st.textContent = 'Starting…'; fill.style.width = '0%'; }
+    else if (p.status === 'progress') { st.textContent = p.pct + '%  ·  ' + fmtBytes(p.received) + ' / ' + fmtBytes(p.total); fill.style.width = p.pct + '%'; }
+    else if (p.status === 'done') { st.textContent = 'Done — starting model…'; fill.style.width = '100%'; setTimeout(function(){ prog.style.display = 'none'; dlBtn.disabled = false; opBtn.disabled = false; refresh(); }, 1500); }
+    else if (p.status === 'error') { st.textContent = 'Error: ' + (p.error || ''); dlBtn.disabled = false; opBtn.disabled = false; }
+    else if (p.status === 'canceled') { prog.style.display = 'none'; dlBtn.disabled = false; opBtn.disabled = false; }
+  });
   document.getElementById('search-input').addEventListener('input', renderList);
 
   document.getElementById('load-btn').addEventListener('click', function() { if (selected) loadModel(selected); });

@@ -2,6 +2,7 @@ export interface ORModel {
     id: string;
     label: string;
     provider_id: 'local-or';
+    supportsTools?: boolean;   // model advertises OpenAI tool-calling (for MCP routing)
 }
 
 type SendFn = (msg: Record<string, unknown>) => void;
@@ -17,6 +18,7 @@ export async function fetchORModels(apiKey: string): Promise<ORModel[]> {
             id: `or:${m.id}`,
             label: `${m.name} (OR)`,
             provider_id: 'local-or' as const,
+            supportsTools: (m.supported_parameters ?? []).includes('tools'),
         }));
     } catch {
         return [];

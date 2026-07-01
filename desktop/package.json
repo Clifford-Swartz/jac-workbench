@@ -4,7 +4,29 @@
   "version": "0.1.0",
   "description": "JAC AI Workbench — Desktop",
   "main": "dist/main/main.js",
+  "scripts": {
+    "build:main": "webpack --config webpack.main.js --mode production",
+    "build:preload": "webpack --config webpack.preload.js --mode production",
+    "build:renderer": "webpack --config webpack.renderer.js --mode production",
+    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
   "dependencies": {
+    "dockview-core": "^7.0.2",
+    "electron-updater": "^6.8.9",
+    "three": "^0.128.0",
     "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "@types/ws": "8.18.1",
+    "copy-webpack-plugin": "12.0.2",
+    "electron": "32.3.3",
+    "electron-builder": "24.13.3",
+    "ts-loader": "9.6.2",
+    "typescript": "5.9.3",
+    "webpack": "5.108.1",
+    "webpack-cli": "5.1.4"
   }
 }

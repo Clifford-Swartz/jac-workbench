@@ -14,5 +14,5 @@ module.exports = {
   module: {
     rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }],
   },
-  externals: { electron: 'commonjs electron' },
+  externals: { electron: 'commonjs electron', ws: 'commonjs ws', 'electron-updater': 'commonjs electron-updater' },
 };
