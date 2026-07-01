@@ -1001,6 +1001,28 @@ app.whenReady().then(() => {
         } catch { return []; }
     });
     ipcMain.handle('fs-open-in-finder', (_e, dirPath: string) => shell.openPath(dirPath));
+    // Read a file for the editor tab: text content, image data URL, or binary metadata.
+    ipcMain.handle('fs-read-file', (_e, filePath: string) => {
+        try {
+            const stat = fs.statSync(filePath);
+            if (stat.isDirectory()) return { ok: false, error: 'Path is a directory' };
+            const ext = path.extname(filePath).toLowerCase();
+            const IMG: Record<string, string> = {
+                '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+                '.webp': 'image/webp', '.bmp': 'image/bmp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+            };
+            if (IMG[ext]) {
+                if (stat.size > 25 * 1024 * 1024) return { ok: false, error: 'Image too large to preview' };
+                const b64 = fs.readFileSync(filePath).toString('base64');
+                return { ok: true, kind: 'image', dataUrl: `data:${IMG[ext]};base64,${b64}`, size: stat.size };
+            }
+            if (stat.size > 5 * 1024 * 1024) return { ok: true, kind: 'binary', size: stat.size };
+            const buf = fs.readFileSync(filePath);
+            if (buf.subarray(0, 8192).includes(0)) return { ok: true, kind: 'binary', size: stat.size };  // NUL byte => binary
+            return { ok: true, kind: 'text', content: buf.toString('utf-8'), ext, size: stat.size };
+        } catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
+    });
+    ipcMain.handle('fs-open-external-file', (_e, filePath: string) => shell.openPath(filePath));
     ipcMain.handle('dialog-open-folder', async () => {
         const { dialog } = require('electron');
         const result = await dialog.showOpenDialog(mainWindow!, {

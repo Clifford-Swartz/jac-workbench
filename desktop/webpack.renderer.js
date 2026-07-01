@@ -24,6 +24,8 @@ module.exports = {
         { from: 'src/renderer/mcp.html', to: 'mcp.html' },
         { from: 'src/renderer/pcb.html', to: 'pcb.html' },
         { from: 'src/renderer/cad.html', to: 'cad.html' },
+        { from: 'node_modules/dockview-core/dist/dockview-core.min.noStyle.js', to: 'dockview-core.js' },
+        { from: 'node_modules/dockview-core/dist/styles/dockview.css', to: 'dockview.css' },
         { from: 'assets/seti.woff', to: 'seti.woff' },
         { from: '../extension/src/webview/styles.css', to: 'styles.css' },
         { from: '../extension/dist/webview/main.js', to: 'main.js', noErrorOnMissing: true },

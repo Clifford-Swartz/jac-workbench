@@ -278,7 +278,35 @@
             min-width: 0;
             height: 100%;
         }
+
+        /* dockview editor area */
+        #dockview { flex: 1; min-width: 0; height: 100%; position: relative; }
+        #view-stash { display: none; }
+        /* views hosted inside dockview panels fill the panel */
+        #dockview #chat-area, #dockview iframe { width: 100%; height: 100%; display: flex; }
+        /* Recolor dockview to JAC's neutral dark palette (abyss theme is too navy) */
+        .dockview-theme-abyss {
+            --dv-group-view-background-color: #1e1e1e !important;
+            --dv-tabs-and-actions-container-background-color: #191919 !important;
+            --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e !important;
+            --dv-activegroup-hiddenpanel-tab-background-color: #191919 !important;
+            --dv-inactivegroup-visiblepanel-tab-background-color: #202020 !important;
+            --dv-inactivegroup-hiddenpanel-tab-background-color: #191919 !important;
+            --dv-separator-border: #2a2a2a !important;
+            --dv-tab-divider-color: #191919 !important;
+            --dv-activegroup-visiblepanel-tab-color: #e0e0e0 !important;
+            --dv-inactivegroup-visiblepanel-tab-color: #9a9a9a !important;
+        }
+        /* File viewer tabs (opened from the explorer) */
+        .file-viewer { width: 100%; height: 100%; overflow: auto; background: #1e1e1e; }
+        .fv-text { margin: 0; padding: 12px 16px; font: 12px/1.55 ui-monospace, Consolas, monospace; color: #d4d4d4; white-space: pre; tab-size: 4; }
+        .fv-msg { padding: 28px; color: #9a9a9a; font-size: 13px; text-align: center; }
+        .fv-open-btn { margin-top: 10px; background: #0f3460; color: #e0e0e0; border: 1px solid #444; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
+        .fv-imgwrap { display: flex; align-items: center; justify-content: center; min-height: 100%; padding: 16px; box-sizing: border-box; }
+        .fv-img { max-width: 100%; max-height: 100%; object-fit: contain; }
     </style>
+    <link rel="stylesheet" href="dockview.css">
+    <script src="dockview-core.js"></script>
 </head>
 <body>
     <div id="titlebar"></div>
@@ -286,6 +314,11 @@
     <div id="main-layout">
         <!-- Activity Bar -->
         <div id="activity-bar">
+            <button class="activity-btn active" id="act-chat" title="Chat" data-panel="chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </button>
             <button class="activity-btn active" id="act-explorer" title="Explorer" data-panel="sidebar">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
@@ -361,6 +394,11 @@
 
         <!-- Drag to resize -->
         <div id="resizer"></div>
+
+        <!-- Editor area: dockview hosts chat + tool views as draggable/splittable tabs -->
+        <div id="dockview" class="dockview-theme-abyss"></div>
+        <!-- View elements live here until dockview adopts them into panels -->
+        <div id="view-stash"></div>
 
         <!-- Workflow panel -->
         <iframe id="workflow-frame" src="workflow.html"></iframe>
@@ -477,6 +515,7 @@
                         selectedPath = entry.path;
                         document.querySelectorAll('.tree-entry.selected').forEach(e => e.classList.remove('selected'));
                         el.classList.add('selected');
+                        if (window.jacOpenFile) window.jacOpenFile(entry.path);   // open in an editor tab
                     });
                 }
 
@@ -675,59 +714,106 @@
             syncActivityHeight();
             window.addEventListener('load', syncActivityHeight);
 
-            function showPanel(panel) {
-                document.querySelectorAll('.activity-btn').forEach(function(b) { b.classList.remove('active'); });
-                var btn = document.querySelector('[data-panel="' + panel + '"]');
-                if (btn) btn.classList.add('active');
+            // ── dockview editor area: chat + tool views as draggable/splittable tabs ──
+            var VIEWS = {
+                chat:     { el: 'chat-area',      title: 'Chat' },
+                workflow: { el: 'workflow-frame', title: 'Workflow' },
+                models:   { el: 'models-frame',   title: 'Local Models' },
+                music:    { el: 'music-frame',    title: 'Music' },
+                mcp:      { el: 'mcp-frame',       title: 'MCP Servers' },
+                pcb:      { el: 'pcb-frame',       title: 'PCB' },
+                cad:      { el: 'cad-frame',       title: 'CAD' }
+            };
+            var stash = document.getElementById('view-stash');
+            // park every view in the stash; dockview pulls them into panels on demand
+            Object.keys(VIEWS).forEach(function(name) {
+                var el = document.getElementById(VIEWS[name].el);
+                if (el) { el.style.display = 'none'; stash.appendChild(el); }
+            });
 
-                var isFull = FULL_PANELS.indexOf(panel) !== -1;
-                if (isFull) {
-                    savedWidth = sidebar.offsetWidth || savedWidth;
-                    sidebar.style.display = 'none';
-                    resizer.style.display = 'none';
-                    chatArea.style.display = 'none';
-                    workflowFrame.style.display = panel === 'workflow' ? 'flex' : 'none';
-                    modelsFrame.style.display   = panel === 'models'   ? 'flex' : 'none';
-                    musicFrame.style.display    = panel === 'music'    ? 'flex' : 'none';
-                    mcpFrame.style.display      = panel === 'mcp'      ? 'flex' : 'none';
-                    pcbFrame.style.display      = panel === 'pcb'      ? 'flex' : 'none';
-                    cadFrame.style.display      = panel === 'cad'      ? 'flex' : 'none';
-                } else {
-                    workflowFrame.style.display = 'none';
-                    modelsFrame.style.display   = 'none';
-                    musicFrame.style.display    = 'none';
-                    mcpFrame.style.display      = 'none';
-                    pcbFrame.style.display      = 'none';
-                    cadFrame.style.display      = 'none';
-                    chatArea.style.display = '';
-                    if (panel === 'sidebar') {
-                        sidebar.style.display = '';
-                        sidebar.style.width = savedWidth + 'px';
-                        resizer.style.display = '';
-                    } else {
-                        sidebar.style.display = 'none';
-                        resizer.style.display = 'none';
+            var DV = window['dockview-core'];
+            var dvApi = DV.createDockview(document.getElementById('dockview'), {
+                className: 'dockview-theme-abyss',
+                createComponent: function(options) {
+                    if (options.name === 'file') {
+                        var fv = document.createElement('div');
+                        fv.className = 'file-viewer';
+                        return {
+                            element: fv,
+                            init: function(parameters) { loadFileInto(fv, parameters.params && parameters.params.path); },
+                            dispose: function() {}
+                        };
                     }
+                    var el = document.getElementById(VIEWS[options.name].el);
+                    return {
+                        element: el,
+                        init: function() { el.style.display = 'flex'; el.style.width = '100%'; el.style.height = '100%'; },
+                        dispose: function() { el.style.display = 'none'; stash.appendChild(el); }
+                    };
                 }
-                activePanel = panel;
+            });
+
+            function setActiveBtn(name) {
+                document.querySelectorAll('.activity-btn').forEach(function(b) {
+                    if (b.dataset.panel && b.dataset.panel !== 'sidebar') b.classList.toggle('active', b.dataset.panel === name);
+                });
             }
+            function openView(name) {
+                var existing = dvApi.getPanel(name);
+                if (existing) { existing.api.setActive(); }
+                else { dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title }); }
+                setActiveBtn(name);
+            }
+            // Open a file from the explorer in its own editor tab.
+            function fvEsc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+            async function loadFileInto(el, pathStr) {
+                if (!pathStr) { el.innerHTML = '<div class="fv-msg">No file.</div>'; return; }
+                el.innerHTML = '<div class="fv-msg">Loading...</div>';
+                var res = await window.jac.readFile(pathStr);
+                if (!res || !res.ok) { el.innerHTML = '<div class="fv-msg">Could not open file' + (res && res.error ? ': ' + fvEsc(res.error) : '') + '</div>'; return; }
+                if (res.kind === 'text') {
+                    var pre = document.createElement('pre'); pre.className = 'fv-text'; pre.textContent = res.content;
+                    el.innerHTML = ''; el.appendChild(pre);
+                } else if (res.kind === 'image') {
+                    el.innerHTML = '<div class="fv-imgwrap"><img class="fv-img"></div>';
+                    el.querySelector('.fv-img').src = res.dataUrl;
+                } else {
+                    var kb = Math.round((res.size || 0) / 1024);
+                    el.innerHTML = '<div class="fv-msg">Binary file (' + kb + ' KB) - no preview.<br><button class="fv-open-btn">Open externally</button></div>';
+                    var b = el.querySelector('.fv-open-btn');
+                    if (b) b.addEventListener('click', function(){ window.jac.openExternalFile(pathStr); });
+                }
+            }
+            function openFile(pathStr) {
+                var id = 'file:' + pathStr;
+                var existing = dvApi.getPanel(id);
+                if (existing) { existing.api.setActive(); return; }
+                var base = pathStr.split(/[\\/]/).pop();
+                dvApi.addPanel({ id: id, component: 'file', title: base, params: { path: pathStr } });
+            }
+            window.jacOpenFile = openFile;
+            window.jacOpenView = openView;
+            // keep the activity-bar highlight in sync when tabs are clicked directly
+            try { dvApi.onDidActivePanelChange(function(p) { if (p) setActiveBtn(p.id); }); } catch (e) {}
 
             document.querySelectorAll('.activity-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var panel = btn.dataset.panel;
                     if (!panel) return;
-                    if (activePanel === panel && panel !== 'workflow') {
-                        // Collapse sidebar toggle
-                        savedWidth = sidebar.offsetWidth || savedWidth;
-                        sidebar.style.display = 'none';
-                        resizer.style.display = 'none';
-                        btn.classList.remove('active');
-                        activePanel = null;
+                    if (panel === 'sidebar') {
+                        var open = sidebar.style.display !== 'none';
+                        if (open) { savedWidth = sidebar.offsetWidth || savedWidth; }
+                        sidebar.style.display = open ? 'none' : '';
+                        resizer.style.display = open ? 'none' : '';
+                        if (!open) sidebar.style.width = savedWidth + 'px';
+                        btn.classList.toggle('active', !open);
                     } else {
-                        showPanel(panel);
+                        openView(panel);
                     }
                 });
             });
+
+            openView('chat');   // chat open by default
         })();
 
         // Bootstrap

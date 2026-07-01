@@ -65,6 +65,8 @@ contextBridge.exposeInMainWorld('jac', {
 
     // Filesystem
     listDir: (dirPath: string) => ipcRenderer.invoke('fs-list-dir', dirPath),
+    readFile: (filePath: string) => ipcRenderer.invoke('fs-read-file', filePath),
+    openExternalFile: (filePath: string) => ipcRenderer.invoke('fs-open-external-file', filePath),
     openInFinder: (dirPath: string) => ipcRenderer.invoke('fs-open-in-finder', dirPath),
     openFolderDialog: () => ipcRenderer.invoke('dialog-open-folder'),
     mkdir: (dir: string, name: string) => ipcRenderer.invoke('fs-mkdir', dir, name),
