@@ -1,0 +1,619 @@
+/* ── Music Panel ──────────────────────────────────────────────────────────── */
+
+:root {
+    --bg: var(--vscode-panel-background, #1a1a2e);
+    --surface: var(--vscode-editor-background, #16213e);
+    --text: var(--vscode-foreground, #e0e0e0);
+    --text-dim: var(--vscode-descriptionForeground, #8888aa);
+    --accent: #1db954;
+    --accent-dim: #1a8a42;
+    --progress-bg: var(--vscode-input-background, #333355);
+    --border: var(--vscode-panel-border, #333);
+    --hover: var(--vscode-list-hoverBackground, rgba(255,255,255,0.06));
+    --input-bg: var(--vscode-input-background, #2a2a40);
+    --danger: #e53935;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+}
+
+#music-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* ── Tab Bar ─────────────────────────────────────────────────────────────── */
+
+#tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.tab {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tab:hover { color: var(--text); background: var(--hover); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tab-content.active { display: block; }
+
+/* ── Now Playing Tab ─────────────────────────────────────────────────────── */
+
+#tab-playing {
+    padding: 12px 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Visualizer canvases — back layer behind controls, front layer above */
+#visualizer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#visualizer-front {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Viz controls — opacity slider + cycle button, top-right of glass card */
+#viz-controls {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+#now-playing:hover #viz-controls { opacity: 0.7; }
+#viz-controls:hover { opacity: 1 !important; }
+
+#viz-opacity {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 48px;
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+#viz-opacity::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+}
+#viz-opacity::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    border: none;
+}
+
+#viz-cycle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.08);
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 0;
+    line-height: 1;
+}
+
+#viz-cycle:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.25); transform: rotate(90deg); }
+
+/* Ensure all content floats above both canvases */
+#tab-playing > *:not(#visualizer):not(#visualizer-front) {
+    position: relative;
+    z-index: 4;
+}
+
+#status-msg {
+    color: var(--text-dim);
+    font-size: 11px;
+    min-height: 14px;
+}
+
+#no-music {
+    padding: 24px 12px;
+    color: var(--text-dim);
+    text-align: center;
+    background: rgba(20, 20, 35, 0.3);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.no-music-icon { font-size: 32px; opacity: 0.3; margin-bottom: 8px; }
+.hint { font-size: 11px; margin-top: 4px; opacity: 0.5; color: var(--text-dim); }
+
+/* Frosted glass card around player controls */
+#now-playing {
+    position: relative;
+    background: rgba(20, 20, 35, 0.35);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Now playing layout */
+#np-main { display: flex; align-items: center; gap: 14px; }
+
+#album-art-wrap {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: visible;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+#album-art { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+#album-art-placeholder { font-size: 24px; opacity: 0.15; }
+
+/* Favorite heart button on album art */
+.fav-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6);
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    line-height: 1;
+    padding: 0;
+}
+
+.fav-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.15); }
+.fav-btn.fav-active { color: var(--danger); }
+
+#np-details { flex: 1; min-width: 0; overflow: hidden; }
+
+/* Track info */
+#track-info { margin-bottom: 6px; }
+
+#track-name {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+#track-name.track-change { animation: fadeSlide 0.4s ease; }
+
+@keyframes fadeSlide {
+    0% { opacity: 0; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+#artist-name {
+    font-size: 11px; color: var(--accent);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;
+}
+
+#album-name {
+    font-size: 10px; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;
+}
+
+/* Progress */
+#progress-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+
+#time-current, #time-total {
+    font-size: 9px; color: var(--text-dim); min-width: 28px; font-variant-numeric: tabular-nums;
+}
+#time-current { text-align: right; }
+#time-total { text-align: left; }
+
+#progress-track {
+    flex: 1; height: 3px; background: var(--progress-bg);
+    border-radius: 2px; cursor: pointer; position: relative; overflow: hidden;
+}
+#progress-track:hover { height: 5px; }
+
+#progress-fill {
+    height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s linear;
+}
+
+/* Controls */
+#controls-row { display: flex; align-items: center; gap: 12px; }
+#controls { display: flex; align-items: center; gap: 2px; }
+
+#controls button {
+    background: none; border: none; color: var(--text); cursor: pointer;
+    font-size: 14px; width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;
+}
+#controls button:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+
+#btn-play {
+    font-size: 18px; width: 34px; height: 34px;
+    background: var(--accent) !important; color: #fff !important;
+}
+#btn-play:hover { background: var(--accent-dim) !important; transform: scale(1.12); }
+
+/* Volume */
+#volume-row { display: flex; align-items: center; gap: 4px; }
+.vol-icon { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: -3px; }
+.vol-hi { letter-spacing: -2px; }
+
+#volume-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 60px; height: 3px; background: var(--progress-bg); border-radius: 2px; outline: none;
+}
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+#volume-slider::-moz-range-thumb {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none;
+}
+
+#app-badge {
+    font-size: 9px; color: var(--text-dim); opacity: 0.5;
+    text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; text-align: right;
+}
+
+/* ── Search Tab ──────────────────────────────────────────────────────────── */
+
+#tab-search { padding: 12px; }
+
+#search-box { display: flex; gap: 6px; margin-bottom: 10px; }
+
+#search-input {
+    flex: 1; padding: 7px 10px; font-size: 12px;
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); outline: none; font-family: inherit;
+}
+#search-input:focus { border-color: var(--accent); }
+#search-input::placeholder { color: var(--text-dim); opacity: 0.6; }
+
+#search-btn {
+    padding: 6px 12px; background: var(--accent); border: none; border-radius: 6px;
+    color: #fff; cursor: pointer; font-size: 12px; transition: background 0.15s;
+}
+#search-btn:hover { background: var(--accent-dim); }
+
+#search-status { font-size: 11px; color: var(--accent); min-height: 16px; margin-bottom: 6px; }
+.search-playing { animation: pulse 1s ease infinite; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.section-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--text-dim); opacity: 0.7; padding: 8px 0 4px;
+}
+
+/* Search suggestions */
+.search-suggestion {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 4px; cursor: pointer; transition: background 0.1s; border-radius: 6px;
+}
+.search-suggestion:hover { background: var(--hover); }
+.search-suggestion .item-art-wrap {
+    width: 32px; height: 32px; border-radius: 4px; overflow: hidden;
+    background: var(--surface); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.search-suggestion .item-art { width: 100%; height: 100%; object-fit: cover; }
+.search-suggestion .item-icon { font-size: 11px; opacity: 0.4; flex-shrink: 0; width: 32px; text-align: center; }
+.search-suggestion .item-info { flex: 1; min-width: 0; overflow: hidden; }
+.search-suggestion .item-title {
+    font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-suggestion .item-title b { color: var(--accent); font-weight: 600; }
+.search-suggestion .item-subtitle {
+    font-size: 10px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-suggestion .item-subtitle b { color: var(--accent); font-weight: 500; }
+.search-suggestion .item-text {
+    font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-suggestion .item-text b { color: var(--accent); font-weight: 600; }
+
+/* List items (shared for search items) */
+.list-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 4px; cursor: pointer; transition: background 0.1s;
+}
+.list-item:hover { background: var(--hover); }
+.item-icon { font-size: 12px; opacity: 0.4; flex-shrink: 0; width: 16px; text-align: center; }
+.item-text { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+/* ── Library Tab — CarPlay-style ─────────────────────────────────────────── */
+
+#tab-library { padding: 0; overflow-y: auto; }
+
+.lib-section {
+    padding: 0 0 8px;
+}
+
+.lib-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px 6px; font-size: 12px; font-weight: 600; color: var(--text);
+}
+
+.lib-section-header button {
+    background: none; border: 1px solid var(--border); color: var(--accent);
+    font-size: 10px; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+}
+.lib-section-header button:hover { border-color: var(--accent); background: var(--hover); }
+
+/* Add playlist form */
+#add-playlist-form {
+    display: flex; gap: 6px; padding: 4px 14px 8px; align-items: center;
+}
+
+#playlist-input {
+    flex: 1; padding: 6px 10px; font-size: 11px;
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); outline: none; font-family: inherit;
+}
+#playlist-input:focus { border-color: var(--accent); }
+#playlist-input::placeholder { color: var(--text-dim); opacity: 0.6; }
+
+#playlist-save-btn {
+    padding: 6px 12px; background: var(--accent); border: none; border-radius: 8px;
+    color: #fff; cursor: pointer; font-size: 11px; transition: background 0.15s;
+}
+#playlist-save-btn:hover { background: var(--accent-dim); }
+
+#playlist-error {
+    font-size: 10px; color: var(--danger); padding: 0 14px; min-height: 14px;
+}
+
+/* ── Horizontal scroll row (favorites, history) ──────────────────────────── */
+
+.tile-scroll {
+    display: flex;
+    gap: 10px;
+    padding: 4px 14px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.tile-scroll::-webkit-scrollbar { display: none; }
+
+/* Album art tile — square card */
+.tile {
+    flex-shrink: 0;
+    width: 80px;
+    cursor: pointer;
+    transition: transform 0.12s;
+    position: relative;
+}
+.tile:hover { transform: scale(1.05); }
+.tile:active { transform: scale(0.98); }
+
+.tile-art {
+    width: 80px; height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.tile-art img { width: 100%; height: 100%; object-fit: cover; }
+.tile-art-placeholder { font-size: 28px; opacity: 0.15; }
+
+.tile-title {
+    font-size: 10px; font-weight: 500; color: var(--text);
+    margin-top: 4px; text-align: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tile-subtitle {
+    font-size: 9px; color: var(--text-dim);
+    text-align: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.tile-remove {
+    position: absolute; top: -4px; right: -4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(0,0,0,0.7); border: none; color: var(--text-dim);
+    font-size: 10px; cursor: pointer; display: none;
+    align-items: center; justify-content: center; line-height: 1;
+}
+.tile:hover .tile-remove { display: flex; }
+.tile-remove:hover { color: var(--danger); background: rgba(0,0,0,0.9); }
+
+/* ── Playlist cards — wider, with text ───────────────────────────────────── */
+
+.playlist-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 14px 8px;
+}
+
+.playlist-card {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1 1 calc(50% - 4px);
+    min-width: 140px;
+    max-width: 250px;
+}
+.playlist-card:hover { border-color: var(--accent); background: var(--hover); }
+
+.playlist-card-icon {
+    font-size: 16px; opacity: 0.5; flex-shrink: 0;
+}
+.playlist-card-text {
+    font-size: 11px; font-weight: 500; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+}
+.playlist-card-remove {
+    background: none; border: none; color: var(--text-dim); opacity: 0;
+    font-size: 10px; cursor: pointer; transition: opacity 0.15s; flex-shrink: 0;
+}
+.playlist-card:hover .playlist-card-remove { opacity: 0.6; }
+.playlist-card-remove:hover { opacity: 1 !important; color: var(--danger); }
+
+/* ── Quick Picks Grid — bigger pills ─────────────────────────────────────── */
+
+.quick-picks-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 10px;
+}
+
+.quick-pick {
+    padding: 8px 14px; font-size: 11px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.quick-pick:hover { border-color: var(--accent); color: var(--accent); background: var(--hover); }
+
+/* Empty state */
+.lib-empty {
+    font-size: 11px; color: var(--text-dim); opacity: 0.5;
+    padding: 8px 14px; text-align: center;
+}
+
+/* ── Audio Install Prompt ────────────────────────────────────────────────── */
+
+#audio-prompt {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(20, 20, 35, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+    white-space: nowrap;
+    animation: fadeSlide 0.3s ease;
+}
+
+.audio-prompt-text {
+    color: var(--text-dim);
+}
+
+.audio-prompt-btn {
+    padding: 3px 10px;
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.audio-prompt-btn:hover { background: var(--accent-dim); }
+.audio-prompt-btn:disabled { opacity: 0.5; cursor: default; }
+
+.audio-prompt-dismiss {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0 2px;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+}
+.audio-prompt-dismiss:hover { opacity: 1; }
+
+.audio-cmd {
+    padding: 3px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    cursor: pointer;
+    user-select: all;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+.audio-cmd:hover { background: rgba(255, 255, 255, 0.15); border-color: var(--accent); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+    #np-main { flex-direction: column; text-align: center; }
+    #album-art-wrap { width: 96px; height: 96px; }
+    #controls-row { justify-content: center; flex-wrap: wrap; }
+    #volume-row { justify-content: center; }
+}
