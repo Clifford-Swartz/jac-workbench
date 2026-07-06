@@ -8,9 +8,13 @@ import { spawn } from 'child_process';
 import { autoUpdater } from 'electron-updater';
 import { WSClient } from './wsClient';
 import { AgentScheduler } from './agentScheduler';
-import { fetchORModels, queryOR, ORModel } from './orClient';
+import { fetchORModels, fetchORCredits, queryOR, ORModel } from './orClient';
 import { McpManager, McpServerConfig, McpTool } from './mcp/manager';
 import { runAgenticQuery } from './agent/loop';
+import { Schematic } from './kicad/schematic';
+import { findKicad, searchCatalog, resolveLibId, symbolRefPrefix, symbolDefaultValue,
+    symbolDefaultFootprint, symbolPins, symbolGraphics, extractSymbol } from './kicad/symbols';
+import { routeDemo, routeSetup, routeStart, routeMove, routeFinish, routeAB, Obstacle, SegObstacle } from './kicad/router';
 
 const CONFIG_PATH = path.join(os.homedir(), '.jac', 'config.json');
 const DEFAULT_CONFIG = {
@@ -25,10 +29,13 @@ const DEFAULT_CONFIG = {
     defaultModel: '',
     lastModel: '',   // last-selected model, restored on restart so OR/local routing survives
     localModelPath: '',  // GGUF the bundled jac-llm-server auto-serves (empty = none/auto-detect)
+    localDraftModelPath: '',  // small draft GGUF (same tokenizer) for speculative decoding (empty = auto/off)
     // MCP: external tool servers, same shape as Claude Desktop. stdio: {command,args,env}; sse: {url}
     mcpServers: {} as Record<string, McpServerConfig>,
     // per-tool permission: 'mcp__<server>__<tool>' -> 'allow' | 'ask' | 'deny' (missing = 'ask')
     mcpToolPermissions: {} as Record<string, 'allow' | 'ask' | 'deny'>,
+    editorTheme: 'One Dark',   // CodeMirror theme for the file editor
+    lastCwd: '',               // last project folder — restores the history scope across restarts
 };
 
 function loadConfig(): typeof DEFAULT_CONFIG {
@@ -101,9 +108,574 @@ const MCP_BUILTINS: McpTool[] = [
         description: 'Remove a configured MCP server from JAC by its name.',
         inputSchema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
     },
+    // ── CAD control: let the chat drive the build123d CAD kernel (:5050) and its live viewer ──
+    {
+        server: 'jac', name: 'cad_execute', qualifiedName: 'jac__cad_execute',
+        description:
+            'Create or modify precise/parametric 3D CAD geometry by running build123d Python. It renders live in the CAD tab. ' +
+            'Assign the final solid (or list of solids) to a variable named RESULT. build123d is auto-imported. ' +
+            'Builders: Box(l,w,h), Cylinder(radius,height), Sphere(r), Cone(bottom,top,height), Torus(major,minor). ' +
+            'Combine with + (union), - (cut), & (intersect). Edit edges with .fillet(radius) / .chamfer(size). ' +
+            'IMPORTANT: RESULT replaces the WHOLE scene by default. Two variables are pre-bound so you can build on existing geometry: ' +
+            'INPUT_SHAPES (list of all current solids) and TARGET_PART (the solid at target_index, if given). ' +
+            'To ADD a part while keeping the rest: RESULT = INPUT_SHAPES + [Box(10,10,10)]. ' +
+            'Use this for mechanical/precise/printable parts. For organic/artistic shapes, use the (separate) 3D-generation tools instead.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                code: { type: 'string', description: 'build123d Python. Must assign the shape(s) to RESULT.' },
+                target_index: { type: 'number', description: 'Optional: bind TARGET_PART and replace only the part at this index.' },
+            },
+            required: ['code'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_list_parts', qualifiedName: 'jac__cad_list_parts',
+        description: 'List the current CAD parts with their index, dimensions (mm), volume and center. Read-only; use to inspect geometry before editing.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'cad_transform', qualifiedName: 'jac__cad_transform',
+        description: 'Move, rotate, or scale a CAD part by its index.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                target: { type: 'number', description: 'Part index (see cad_list_parts).' },
+                transform: { type: 'string', enum: ['translate', 'rotate', 'scale'] },
+                vector: { type: 'array', items: { type: 'number' }, description: 'For translate: [dx,dy,dz] in mm.' },
+                axis: { type: 'string', enum: ['X', 'Y', 'Z'], description: 'For rotate: axis (default Z).' },
+                angle: { type: 'number', description: 'For rotate: degrees.' },
+                factor: { type: 'number', description: 'For scale: multiplier.' },
+            },
+            required: ['target', 'transform'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_boolean', qualifiedName: 'jac__cad_boolean',
+        description: 'Boolean-combine two CAD parts by index: union (fuse), cut (subtract b from a), or intersect. Both originals are replaced by the result.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                op: { type: 'string', enum: ['union', 'cut', 'intersect'] },
+                target_a: { type: 'number' },
+                target_b: { type: 'number' },
+            },
+            required: ['op', 'target_a', 'target_b'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_delete', qualifiedName: 'jac__cad_delete',
+        description: 'Delete CAD parts by index.',
+        inputSchema: { type: 'object', properties: { targets: { type: 'array', items: { type: 'number' } } }, required: ['targets'] },
+    },
+    {
+        server: 'jac', name: 'cad_export_stl', qualifiedName: 'jac__cad_export_stl',
+        description: 'Export a CAD part to an STL file (for 3D printing). Saves to ~/.jac/cad_out unless an absolute path is given.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                target: { type: 'number', description: 'Part index to export.' },
+                filename: { type: 'string', description: 'File name or absolute path, e.g. "bracket.stl".' },
+            },
+            required: ['target'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_duplicate', qualifiedName: 'jac__cad_duplicate',
+        description: 'Duplicate a CAD part by index, offset by [dx,dy,dz] mm (default [20,0,0]). The copy is added as a new part.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                target: { type: 'number' },
+                offset: { type: 'array', items: { type: 'number' }, description: 'Copy offset [dx,dy,dz] in mm.' },
+            },
+            required: ['target'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_mirror', qualifiedName: 'jac__cad_mirror',
+        description: 'Mirror a CAD part across a plane (YZ, XZ, or XY). By default keeps the original and adds the mirrored copy — set keep_original false to replace in place.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                target: { type: 'number' },
+                plane: { type: 'string', enum: ['YZ', 'XZ', 'XY'] },
+                keep_original: { type: 'boolean' },
+            },
+            required: ['target'],
+        },
+    },
+    {
+        server: 'jac', name: 'cad_reset', qualifiedName: 'jac__cad_reset',
+        description: 'Clear all CAD geometry from the scene. Destructive.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    // ── 3D generation: turn an image (or, later, text) into a mesh via the local gen server (:5052) ──
+    {
+        server: 'jac', name: 'gen3d_from_image', qualifiedName: 'jac__gen3d_from_image',
+        description:
+            'Generate an organic/artistic 3D model (a mesh) from a single input image using the local 3D-gen AI, ' +
+            'and load it into the CAD viewer. Use for figurines, creatures, props, scanned-look objects — anything ' +
+            'sculptural rather than mechanical. For precise/parametric parts (brackets, holes, exact dimensions) use ' +
+            'cad_execute instead. Two quality tiers: "fast" (TripoSR, untextured, ~5s) and "best" (Hunyuan3D 2.1, ' +
+            'clean geometry + real PBR textures, ~10 min on the local GPU). Default fast.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                image_path: { type: 'string', description: 'Path to the input image (PNG/JPG). A single clear subject on a plain background works best.' },
+                quality: { type: 'string', enum: ['fast', 'best'], description: '"fast" = TripoSR (~5s, untextured). "best" = Hunyuan3D 2.1 with PBR textures (~10 min). Default fast; use best when the user wants high quality / textures.' },
+                seed: { type: 'number', description: 'Optional random seed for reproducibility.' },
+                free_gpu_after: { type: 'boolean', description: 'Unload the 3D model from the GPU right after this generation (use when a local LLM needs the VRAM back). Costs a reload (~30s) next time.' },
+            },
+            required: ['image_path'],
+        },
+    },
+    {
+        server: 'jac', name: 'gen3d_release_gpu', qualifiedName: 'jac__gen3d_release_gpu',
+        description: 'Unload the 3D-generation model from the GPU immediately, freeing its VRAM (e.g. so a local LLM has the full card). The model reloads automatically on the next generation.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'gen3d_from_text', qualifiedName: 'jac__gen3d_from_text',
+        description: 'Generate a 3D model from a text prompt. NOTE: text→3D needs the text-to-image stage which is not enabled yet — this currently returns guidance to use an image instead.',
+        inputSchema: { type: 'object', properties: { prompt: { type: 'string' } }, required: ['prompt'] },
+    },
+    {
+        server: 'jac', name: 'cad_import_model', qualifiedName: 'jac__cad_import_model',
+        description: 'Load an existing 3D model file (GLB/GLTF) from disk into the CAD viewer.',
+        inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Absolute path to a .glb/.gltf file.' } }, required: ['path'] },
+    },
+    // ── PCB / schematic capture: let the chat build circuit schematics in the PCB tab (:5051) ──
+    {
+        server: 'jac', name: 'pcb_add_component', qualifiedName: 'jac__pcb_add_component',
+        description:
+            'Place a component on the schematic. It gets an auto reference designator (R1, C1, U1…) and renders live in the PCB tab. ' +
+            'Available types: resistor, capacitor, cap_polar, inductor, led, diode, npn, pnp, ic_generic, 555, esp32, connector_2pin, usb_c, vcc, gnd, 3v3. ' +
+            'Call pcb_library to see each type\'s pin names before wiring. Lay parts out on a grid (e.g. x/y in multiples of ~60) so wires route cleanly.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                type: { type: 'string', description: 'Component type (see list above).' },
+                x: { type: 'number', description: 'X position (schematic units).' },
+                y: { type: 'number', description: 'Y position.' },
+                rotation: { type: 'number', description: 'Rotation in degrees (0/90/180/270).' },
+                properties: { type: 'object', description: 'Optional overrides, e.g. {"value":"4.7k"}.', additionalProperties: true },
+            },
+            required: ['type'],
+        },
+    },
+    {
+        server: 'jac', name: 'pcb_add_wire', qualifiedName: 'jac__pcb_add_wire',
+        description: 'Connect two component pins with an auto-routed wire (A* around other parts). Components are named by ref (R1) or id; pins by name (see pcb_library). Give the net a meaningful name (VCC, GND, SIG) so it groups correctly.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                from: { type: 'string', description: 'Source component ref or id (e.g. "R1").' },
+                from_pin: { type: 'string', description: 'Source pin name (e.g. "1", "A", "GPIO0").' },
+                to: { type: 'string', description: 'Target component ref or id.' },
+                to_pin: { type: 'string', description: 'Target pin name.' },
+                net: { type: 'string', description: 'Optional net name (e.g. "VCC", "GND", "LED_SIG").' },
+            },
+            required: ['from', 'from_pin', 'to', 'to_pin'],
+        },
+    },
+    {
+        server: 'jac', name: 'pcb_move_component', qualifiedName: 'jac__pcb_move_component',
+        description: 'Move a component (by ref or id) to a new position.',
+        inputSchema: { type: 'object', properties: { target: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' } }, required: ['target', 'x', 'y'] },
+    },
+    {
+        server: 'jac', name: 'pcb_remove_component', qualifiedName: 'jac__pcb_remove_component',
+        description: 'Remove a component (by ref or id) and its connections.',
+        inputSchema: { type: 'object', properties: { target: { type: 'string' } }, required: ['target'] },
+    },
+    {
+        server: 'jac', name: 'pcb_list', qualifiedName: 'jac__pcb_list',
+        description: 'List the current schematic: components (ref, type, position, value) and nets. Read-only.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'pcb_library', qualifiedName: 'jac__pcb_library',
+        description: 'List the available component types with their PIN NAMES and default value/footprint. Call this before wiring so you use correct pin names.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'pcb_reset', qualifiedName: 'jac__pcb_reset',
+        description: 'Clear the whole schematic. Destructive.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'pcb_export_kicad', qualifiedName: 'jac__pcb_export_kicad',
+        description: 'Export the schematic to a KiCad .kicad_sch file (so it can be opened in KiCad for PCB layout).',
+        inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Optional output path; defaults to ~/.jac/cad_out/schematic.kicad_sch.' } } },
+    },
+    // ── KiCad-native schematic capture: real symbol libraries, valid .kicad_sch, real ERC ──
+    {
+        server: 'jac', name: 'sch_search_library', qualifiedName: 'jac__sch_search_library',
+        description: 'Search KiCad\'s real symbol libraries (thousands of parts) for a component. Returns lib_ids like "Device:R", "Regulator_Linear:AMS1117-3.3", "MCU_Module:Arduino_UNO_R3". Call this to find the exact lib_id before adding a part.',
+        inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'e.g. "resistor", "555 timer", "esp32", "usb c", "ldo 3.3v".' } }, required: ['query'] },
+    },
+    {
+        server: 'jac', name: 'sch_add_component', qualifiedName: 'jac__sch_add_component',
+        description: 'Place a real KiCad component on the schematic by its lib_id (from sch_search_library). Auto-numbers the reference (R1, C1, U1…). Renders live via KiCad.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                lib_id: { type: 'string', description: 'Exact KiCad lib_id, e.g. "Device:R".' },
+                value: { type: 'string', description: 'Optional value, e.g. "10k", "100nF".' },
+                x: { type: 'number', description: 'Sheet X in mm (optional; auto-placed on a grid otherwise).' },
+                y: { type: 'number', description: 'Sheet Y in mm (optional).' },
+                rotation: { type: 'number', description: 'Rotation degrees (0/90/180/270).' },
+            },
+            required: ['lib_id'],
+        },
+    },
+    {
+        server: 'jac', name: 'sch_add_wire', qualifiedName: 'jac__sch_add_wire',
+        description: 'Connect two component pins by reference + pin number/name (KiCad pin numbers, e.g. "1","2","VCC","GND"). Optionally name the net.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                from: { type: 'string', description: 'Source component ref, e.g. "R1".' },
+                from_pin: { type: 'string', description: 'Source pin number or name.' },
+                to: { type: 'string', description: 'Target component ref.' },
+                to_pin: { type: 'string', description: 'Target pin number or name.' },
+                net: { type: 'string', description: 'Optional net label (VCC/GND/…).' },
+            },
+            required: ['from', 'from_pin', 'to', 'to_pin'],
+        },
+    },
+    {
+        server: 'jac', name: 'sch_move_component', qualifiedName: 'jac__sch_move_component',
+        description: 'Move a component (by ref) to a new sheet position (mm).',
+        inputSchema: { type: 'object', properties: { target: { type: 'string' }, x: { type: 'number' }, y: { type: 'number' } }, required: ['target', 'x', 'y'] },
+    },
+    {
+        server: 'jac', name: 'sch_remove_component', qualifiedName: 'jac__sch_remove_component',
+        description: 'Remove a component (by ref) from the schematic.',
+        inputSchema: { type: 'object', properties: { target: { type: 'string' } }, required: ['target'] },
+    },
+    {
+        server: 'jac', name: 'sch_list', qualifiedName: 'jac__sch_list',
+        description: 'List the current KiCad schematic: components (ref, lib_id, value) and wire/label counts.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'sch_reset', qualifiedName: 'jac__sch_reset',
+        description: 'Clear the schematic. Destructive.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'sch_export', qualifiedName: 'jac__sch_export',
+        description: 'Write the current schematic to a real .kicad_sch file that opens directly in KiCad.',
+        inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Optional output path.' } } },
+    },
+    {
+        server: 'jac', name: 'sch_erc', qualifiedName: 'jac__sch_erc',
+        description: 'Run KiCad\'s real Electrical Rule Check on the current schematic and return the report.',
+        inputSchema: { type: 'object', properties: {} },
+    },
 ];
 
+// CAD kernel bridge (:5050). The chat mutates geometry here; the viewer is told to refresh + focus.
+async function cadPost(tool: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const r = await fetch(`${CAD_SERVER_URL}/`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool, args }), signal: AbortSignal.timeout(30000),
+    });
+    return await r.json() as Record<string, unknown>;
+}
+async function cadContext(): Promise<string> {
+    try {
+        const r = await fetch(`${CAD_SERVER_URL}/context`, { signal: AbortSignal.timeout(5000) });
+        const j = await r.json() as { context?: string };
+        return j.context || '';
+    } catch { return ''; }
+}
+// Tell the renderer to focus the CAD tab and refresh its viewer after an out-of-band mutation.
+function notifyCadActivity(): void {
+    mainWindow?.webContents.send('relay-message', { type: 'cad_activity' });
+}
+
+async function callCadBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    const clip = (s: string, n = 1500) => (s.length > n ? s.slice(-n) : s);
+    try {
+        if (qualifiedName === 'jac__cad_list_parts') {
+            const ctx = await cadContext();
+            return { text: ctx || 'No geometry loaded.', isError: false };
+        }
+        let res: Record<string, unknown>;
+        if (qualifiedName === 'jac__cad_execute') {
+            const code = String(args.code ?? '');
+            if (!code.trim()) return { text: '`code` is required — build123d Python that assigns to RESULT.', isError: true };
+            res = await cadPost('cad_execute', { code, ...(args.target_index != null ? { target_index: args.target_index } : {}) });
+        } else if (qualifiedName === 'jac__cad_transform') {
+            res = await cadPost('transform_part', args);
+        } else if (qualifiedName === 'jac__cad_boolean') {
+            res = await cadPost('boolean_op', args);
+        } else if (qualifiedName === 'jac__cad_delete') {
+            res = await cadPost('delete_parts', { targets: args.targets });
+        } else if (qualifiedName === 'jac__cad_duplicate') {
+            res = await cadPost('duplicate_part', { target: args.target, ...(args.offset != null ? { offset: args.offset } : {}) });
+        } else if (qualifiedName === 'jac__cad_mirror') {
+            res = await cadPost('mirror_part', { target: args.target, plane: args.plane ?? 'YZ', keep_original: args.keep_original ?? true });
+        } else if (qualifiedName === 'jac__cad_export_stl') {
+            res = await cadPost('export_stl', { target: args.target, filename: String(args.filename ?? 'export.stl') });
+            if (res.ok) return { text: `Saved STL → ${res.path} (${res.size_kb} KB)`, isError: false };
+        } else if (qualifiedName === 'jac__cad_reset') {
+            res = await cadPost('reset', {});
+            notifyCadActivity();
+            return { text: 'CAD scene cleared.', isError: false };
+        } else {
+            return { text: `Unknown CAD tool: ${qualifiedName}`, isError: true };
+        }
+        notifyCadActivity();
+        if (!res.ok) return { text: `CAD error:\n${clip(String(res.error ?? 'unknown'))}`, isError: true };
+        const ctx = await cadContext();
+        const n = res.n_parts ?? '';
+        return { text: `OK.${n !== '' ? ` ${n} part(s).` : ''}\n${ctx}`.trim(), isError: false };
+    } catch (e) {
+        return { text: `CAD backend unreachable on :5050 — is Python + build123d installed and the CAD server running? (${String((e as Error).message ?? e)})`, isError: true };
+    }
+}
+
+// 3D-gen bridge (:5052, runs in WSL). Kick a job, poll to completion, load the GLB into the viewer.
+const GEN3D_SERVER_URL = 'http://127.0.0.1:5052';
+async function gen3dPost(path: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const r = await fetch(`${GEN3D_SERVER_URL}${path}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), signal: AbortSignal.timeout(15000),
+    });
+    return await r.json() as Record<string, unknown>;
+}
+// Load a GLB (Windows path or \\wsl.localhost UNC) into the CAD viewer. Ship the PATH, not the bytes —
+// the renderer reads it via the proven openGlb IPC (avoids pushing multi-MB base64 through the relay bus).
+function loadGlbIntoViewer(filePath: string, name: string): boolean {
+    const fwd = filePath.replace(/\\/g, '/');   // forward-slash UNC reads cleanly on Windows Node
+    if (!fs.existsSync(fwd)) return false;
+    mainWindow?.webContents.send('relay-message', { type: 'cad_load_glb', path: fwd, name });
+    return true;
+}
+
+async function callGen3dBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    try {
+        if (qualifiedName === 'jac__gen3d_from_text') {
+            return { text: 'Text→3D is not enabled yet (needs the text-to-image stage). Provide an image and use gen3d_from_image instead.', isError: true };
+        }
+        if (qualifiedName === 'jac__gen3d_release_gpu') {
+            try {
+                const r = await gen3dPost('/unload', {});
+                return { text: r.freed ? 'Released the 3D model from the GPU — VRAM is free.' : 'Nothing was loaded; GPU already free.', isError: false };
+            } catch { return { text: 'The 3D-gen server (:5052) is not running.', isError: true }; }
+        }
+        if (qualifiedName === 'jac__cad_import_model') {
+            const p = String(args.path ?? '');
+            if (!p) return { text: '`path` to a .glb/.gltf is required.', isError: true };
+            const name = p.split(/[\\/]/).pop() || 'model';
+            return loadGlbIntoViewer(p, name)
+                ? { text: `Loaded ${name} into the CAD viewer.`, isError: false }
+                : { text: `Could not read model file: ${p}`, isError: true };
+        }
+        if (qualifiedName === 'jac__gen3d_from_image') {
+            const imagePath = String(args.image_path ?? '');
+            if (!imagePath) return { text: '`image_path` is required.', isError: true };
+            // health check → clearer error than a failed POST if the server/installer isn't up
+            try { await fetch(`${GEN3D_SERVER_URL}/health`, { signal: AbortSignal.timeout(3000) }); }
+            catch { return { text: 'The 3D-gen server (:5052) is not running — it needs to be set up first (P2 installer).', isError: true }; }
+            const quality = String(args.quality ?? 'fast').toLowerCase();
+            const backend = quality === 'best' ? 'hunyuan' : 'triposr';
+            const opts: Record<string, unknown> = {};
+            if (args.seed != null) opts.seed = args.seed;
+            if (args.free_gpu_after) opts.unload_after = true;
+            const started = await gen3dPost('/generate', { mode: 'image', image: imagePath, backend, ...(Object.keys(opts).length ? { opts } : {}) });
+            if (started.error) return { text: `Generation rejected: ${started.error}`, isError: true };
+            const jobId = String(started.job_id ?? '');
+            if (!jobId) return { text: 'No job id returned from the gen server.', isError: true };
+            // "best" (Hunyuan shape+paint) runs ~10 min; give it generous headroom. "fast" ~seconds.
+            const deadline = Date.now() + (backend === 'hunyuan' ? 25 : 10) * 60 * 1000;
+            while (Date.now() < deadline) {
+                await new Promise(r => setTimeout(r, 1500));
+                let job: Record<string, unknown>;
+                try {
+                    const jr = await fetch(`${GEN3D_SERVER_URL}/job/${jobId}`, { signal: AbortSignal.timeout(5000) });
+                    job = await jr.json() as Record<string, unknown>;
+                } catch { continue; }
+                if (job.state === 'error') return { text: `Generation failed: ${String(job.error ?? 'unknown').slice(0, 400)}`, isError: true };
+                if (job.state === 'done') {
+                    const win = String(job.glb_win || job.glb || '');
+                    const name = `gen-${jobId}.glb`;
+                    const ok = loadGlbIntoViewer(win, name);
+                    return ok
+                        ? { text: `Generated a 3D model from ${imagePath.split(/[\\/]/).pop()} and loaded it into the CAD viewer.`, isError: false }
+                        : { text: `Model generated (${win}) but could not be read into the viewer.`, isError: true };
+                }
+            }
+            return { text: 'Generation timed out after 10 minutes.', isError: true };
+        }
+        return { text: `Unknown gen3d tool: ${qualifiedName}`, isError: true };
+    } catch (e) {
+        return { text: `3D-gen error: ${String((e as Error).message ?? e)}`, isError: true };
+    }
+}
+
+// PCB/schematic bridge (:5051). The chat mutates the schematic; the viewer is told to refresh + focus.
+async function pcbPost(tool: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const r = await fetch(`${PCB_SERVER_URL}/`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool, args }), signal: AbortSignal.timeout(15000),
+    });
+    return await r.json() as Record<string, unknown>;
+}
+async function pcbContext(): Promise<string> {
+    try {
+        const r = await fetch(`${PCB_SERVER_URL}/context`, { signal: AbortSignal.timeout(5000) });
+        const j = await r.json() as { context?: string };
+        return j.context || '';
+    } catch { return ''; }
+}
+function notifyPcbActivity(): void {
+    mainWindow?.webContents.send('relay-message', { type: 'pcb_activity' });
+}
+
+async function callPcbBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    try {
+        if (qualifiedName === 'jac__pcb_list') {
+            const ctx = await pcbContext();
+            return { text: ctx || 'Empty schematic.', isError: false };
+        }
+        if (qualifiedName === 'jac__pcb_library') {
+            const res = await pcbPost('get_library', {});
+            const lib = (res.library ?? {}) as Record<string, { name?: string; pins?: Record<string, unknown>; properties?: { value?: string; footprint?: string } }>;
+            const lines = Object.entries(lib).map(([type, v]) =>
+                `${type} (${v.name ?? type}): pins [${Object.keys(v.pins ?? {}).join(', ')}]${v.properties?.value ? ` default=${v.properties.value}` : ''}`);
+            return { text: lines.join('\n') || 'No components.', isError: false };
+        }
+        let res: Record<string, unknown>;
+        if (qualifiedName === 'jac__pcb_add_component') {
+            const type = String(args.type ?? '');
+            if (!type) return { text: '`type` is required (see pcb_library for types).', isError: true };
+            res = await pcbPost('add_component', { type, x: args.x ?? 0, y: args.y ?? 0, rotation: args.rotation ?? 0, ...(args.properties ? { properties: args.properties } : {}) });
+        } else if (qualifiedName === 'jac__pcb_add_wire') {
+            res = await pcbPost('add_wire', { from_comp: args.from, from_pin: args.from_pin, to_comp: args.to, to_pin: args.to_pin, ...(args.net ? { net: args.net } : {}) });
+        } else if (qualifiedName === 'jac__pcb_move_component') {
+            res = await pcbPost('move_component', { id: args.target, x: args.x, y: args.y });
+        } else if (qualifiedName === 'jac__pcb_remove_component') {
+            res = await pcbPost('remove_component', { id: args.target });
+        } else if (qualifiedName === 'jac__pcb_reset') {
+            res = await pcbPost('reset', {});
+            notifyPcbActivity();
+            return { text: 'Schematic cleared.', isError: false };
+        } else if (qualifiedName === 'jac__pcb_export_kicad') {
+            res = await pcbPost('export_kicad', { ...(args.path ? { path: args.path } : {}) });
+            if (res.ok) return { text: `Exported KiCad schematic → ${res.path}`, isError: false };
+        } else {
+            return { text: `Unknown PCB tool: ${qualifiedName}`, isError: true };
+        }
+        notifyPcbActivity();
+        if (!res.ok) return { text: `PCB error: ${String(res.error ?? 'unknown').slice(0, 300)}`, isError: true };
+        const added = res.component ? `Added ${(res.component as { ref?: string }).ref}. ` : '';
+        const ctx = await pcbContext();
+        return { text: `${added}${ctx}`.trim(), isError: false };
+    } catch (e) {
+        return { text: `PCB backend unreachable on :5051 — is the PCB server running? (${String((e as Error).message ?? e)})`, isError: true };
+    }
+}
+
+// ── KiCad schematic (native): real symbol libs + valid .kicad_sch, rendered by bundled kicad-cli ──
+const schematic = new Schematic();
+let kicadPaths = findKicad();
+async function renderSchematicSvg(): Promise<void> {
+    if (!kicadPaths?.cli) { mainWindow?.webContents.send('relay-message', { type: 'sch_activity', error: 'KiCad not installed' }); return; }
+    try {
+        const dir = path.join(os.tmpdir(), 'jac-sch'); fs.mkdirSync(dir, { recursive: true });
+        const schPath = path.join(dir, 'schematic.kicad_sch');
+        fs.writeFileSync(schPath, schematic.emit());
+        await new Promise<void>((resolve) => {
+            const p = spawn(kicadPaths!.cli, ['sch', 'export', 'svg', '--output', dir, '--exclude-drawing-sheet', schPath], { windowsHide: true, stdio: 'ignore' });
+            p.on('exit', () => resolve()); p.on('error', () => resolve());
+        });
+        let svg = ''; try { svg = fs.readFileSync(path.join(dir, 'schematic.svg'), 'utf8'); } catch { /* no svg */ }
+        mainWindow?.webContents.send('relay-message', { type: 'sch_kicad_svg', svg });
+    } catch (e) { mainWindow?.webContents.send('relay-message', { type: 'sch_activity', error: String((e as Error).message ?? e) }); }
+}
+/** Push the native render-data (symbol graphics + wires) to the schematic editor canvas. */
+function pushSchematic(): void {
+    try { mainWindow?.webContents.send('relay-message', { type: 'sch_activity', data: schematic.renderData() }); }
+    catch (e) { mainWindow?.webContents.send('relay-message', { type: 'sch_activity', error: String((e as Error).message ?? e) }); }
+}
+
+async function callSchBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    if (!kicadPaths) kicadPaths = findKicad();
+    if (!kicadPaths?.symbolsDir) return { text: 'KiCad not found — it needs to be installed for the schematic tools.', isError: true };
+    const sdir = kicadPaths.symbolsDir;
+    try {
+        if (qualifiedName === 'jac__sch_search_library') {
+            const res = searchCatalog(sdir, String(args.query ?? ''));
+            return { text: res.length ? res.map((e) => `${e.libId}${e.desc ? ' — ' + e.desc : ''}`).join('\n') : 'No matching parts.', isError: false };
+        }
+        if (qualifiedName === 'jac__sch_list') return { text: schematic.context(), isError: false };
+        if (qualifiedName === 'jac__sch_reset') { schematic.reset(); pushSchematic(); return { text: 'Schematic cleared.', isError: false }; }
+        if (qualifiedName === 'jac__sch_add_component') {
+            const libId = String(args.lib_id ?? '');
+            const e = resolveLibId(sdir, libId);
+            if (!e) return { text: `Unknown lib_id '${libId}'. Use sch_search_library first.`, isError: true };
+            const prefix = symbolRefPrefix(e.lib, e.name);
+            const value = String(args.value ?? '') || symbolDefaultValue(e.lib, e.name) || e.name;
+            const n = schematic.components.length;
+            const x = args.x != null ? Number(args.x) : 60 + (n % 6) * 25.4;
+            const y = args.y != null ? Number(args.y) : 60 + Math.floor(n / 6) * 25.4;
+            const c = schematic.add(libId, e.lib, e.name, value, x, y, Number(args.rotation ?? 0), prefix);
+            pushSchematic();
+            return { text: `Added ${c.ref} (${libId}) = ${value}.\n${schematic.context()}`, isError: false };
+        }
+        if (qualifiedName === 'jac__sch_add_wire') {
+            const a = schematic.pinWorld(String(args.from), String(args.from_pin));
+            const b = schematic.pinWorld(String(args.to), String(args.to_pin));
+            if (!a) return { text: `Could not resolve pin ${args.from}.${args.from_pin}.`, isError: true };
+            if (!b) return { text: `Could not resolve pin ${args.to}.${args.to_pin}.`, isError: true };
+            schematic.addWire(a.x, a.y, b.x, b.y);
+            if (args.net) schematic.addLabel(String(args.net), a.x, a.y);
+            pushSchematic();
+            return { text: `Wired ${args.from}.${args.from_pin} → ${args.to}.${args.to_pin}${args.net ? ' (' + args.net + ')' : ''}.`, isError: false };
+        }
+        if (qualifiedName === 'jac__sch_move_component') {
+            const c = schematic.find(String(args.target));
+            if (!c) return { text: `No component ${args.target}.`, isError: true };
+            c.x = Number(args.x); c.y = Number(args.y); pushSchematic();
+            return { text: `Moved ${c.ref} to (${c.x},${c.y}).`, isError: false };
+        }
+        if (qualifiedName === 'jac__sch_remove_component') {
+            const ok = schematic.remove(String(args.target)); pushSchematic();
+            return { text: ok ? `Removed ${args.target}.` : `No component ${args.target}.`, isError: !ok };
+        }
+        if (qualifiedName === 'jac__sch_export') {
+            const outDir = path.join(os.homedir(), '.jac', 'cad_out'); fs.mkdirSync(outDir, { recursive: true });
+            const p = String(args.path ?? path.join(outDir, 'schematic.kicad_sch'));
+            fs.writeFileSync(p, schematic.emit());
+            return { text: `Exported valid KiCad schematic → ${p} (opens in KiCad).`, isError: false };
+        }
+        if (qualifiedName === 'jac__sch_erc') {
+            const dir = path.join(os.tmpdir(), 'jac-sch'); fs.mkdirSync(dir, { recursive: true });
+            const schPath = path.join(dir, 'erc.kicad_sch'); fs.writeFileSync(schPath, schematic.emit());
+            const rpt = path.join(dir, 'erc.rpt');
+            await new Promise<void>((resolve) => {
+                const pr = spawn(kicadPaths!.cli, ['sch', 'erc', '--output', rpt, schPath], { windowsHide: true, stdio: 'ignore' });
+                pr.on('exit', () => resolve()); pr.on('error', () => resolve());
+            });
+            let report = ''; try { report = fs.readFileSync(rpt, 'utf8'); } catch { /* */ }
+            return { text: report ? report.slice(0, 2000) : 'ERC ran (no issues reported).', isError: false };
+        }
+        return { text: `Unknown schematic tool: ${qualifiedName}`, isError: true };
+    } catch (e) {
+        return { text: `Schematic error: ${String((e as Error).message ?? e)}`, isError: true };
+    }
+}
+
 async function callBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
+    if (qualifiedName.startsWith('jac__sch_')) return callSchBuiltin(qualifiedName, args);
+    if (qualifiedName.startsWith('jac__pcb_')) return callPcbBuiltin(qualifiedName, args);
+    if (qualifiedName.startsWith('jac__cad_import_model') || qualifiedName.startsWith('jac__gen3d_')) return callGen3dBuiltin(qualifiedName, args);
+    if (qualifiedName.startsWith('jac__cad_')) return callCadBuiltin(qualifiedName, args);
     try {
         if (qualifiedName === 'jac__add_mcp_server') {
             const name = String(args.name ?? '').trim();
@@ -141,6 +713,12 @@ async function callBuiltin(qualifiedName: string, args: Record<string, unknown>)
 
 // OR state
 let orModels: ORModel[] = [];
+// The folder the current chat is anchored to (from the renderer's set_cwd). Injected into
+// every model query so tool-capable models know where to look instead of scanning whole drives.
+let activeCwd = '';
+// The current PROJECT the history dropdown is scoped to (persisted across restarts). Updated as the
+// user browses into a project or starts a conversation in one; stays put over non-project browsing.
+let lastProject = config.lastCwd || '';
 let currentModel = config.lastModel || config.defaultModel || '';   // restored across restarts
 let orAbort: AbortController | null = null;
 const CLAUDE_FALLBACK_IDS = new Set(['sonnet', 'opus', 'haiku']);
@@ -184,6 +762,27 @@ function resolveLocalModel(): string {
     }
     return '';
 }
+// Small draft model for speculative decoding — must share the main model's tokenizer. Explicit config
+// wins; otherwise auto-detect a small GGUF (name-hinted) sitting next to the models.
+function resolveDraftModel(): string {
+    if (config.localDraftModelPath && fs.existsSync(config.localDraftModelPath)) return config.localDraftModelPath;
+    const main = resolveLocalModel();
+    const dirs = [
+        path.join(app.getPath('userData'), 'models'),
+        main ? path.dirname(main) : '',
+        app.isPackaged ? path.join(process.resourcesPath, 'models') : path.join(__dirname, '../../resources/models'),
+    ].filter(Boolean);
+    for (const dir of dirs) {
+        try {
+            const cand = fs.readdirSync(dir).find(f =>
+                f.toLowerCase().endsWith('.gguf') &&
+                path.join(dir, f) !== main &&
+                /draft|1b|0\.5b|-3\.2-1|1\.5b/i.test(f));
+            if (cand) return path.join(dir, cand);
+        } catch { /* dir missing */ }
+    }
+    return '';
+}
 async function startLocalServer(): Promise<void> {
     // Already serving (e.g. a manually-started instance)? Reuse it.
     try {
@@ -194,9 +793,21 @@ async function startLocalServer(): Promise<void> {
     const model = resolveLocalModel();
     if (!fs.existsSync(exe) || !model) return; // no binary or no model → nothing to start yet
     try {
-        localServerChild = spawn(exe,
-            ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', '999', '-c', '4096'],
-            { cwd: localServerDir(), windowsHide: true, stdio: 'ignore' });
+        const args = ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', '999', '-c', '4096'];
+        // Speculative decoding only pays off when the main is slow-per-token, i.e. big enough to PAGE off
+        // NVMe (measured ~2× there). On a model that FITS VRAM it's a wash — the draft's own passes cancel
+        // the gain — so don't add the overhead. Honor an explicit draft always; auto-detect only for paged mains.
+        let mainGB = 0; try { mainGB = fs.statSync(model).size / 1073741824; } catch { /* stat failed */ }
+        const draft = (config.localDraftModelPath && fs.existsSync(config.localDraftModelPath))
+            ? config.localDraftModelPath
+            : (mainGB > 22 ? resolveDraftModel() : '');
+        if (draft) {
+            // Draft proposes up to 16 tokens; the paged main verifies a block per (expensive) forward pass.
+            // -ngld 999 = draft fully on GPU; --draft-p-min is a probability accept-gate (lightweight stand-in
+            // for DSpark's trained confidence head).
+            args.push('-md', draft, '-ngld', '999', '--draft-max', '16', '--draft-min', '1', '--draft-p-min', '0.75');
+        }
+        localServerChild = spawn(exe, args, { cwd: localServerDir(), windowsHide: true, stdio: 'ignore' });
         localServerChild.on('exit', () => { localServerChild = null; });
     } catch { /* spawn failed */ }
 }
@@ -320,7 +931,9 @@ async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string
 
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
+    const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
+        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -391,7 +1004,9 @@ async function handleLocalServerQuery(msg: Record<string, unknown>, modelId: str
     localSrvAbort = new AbortController();
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
+    const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
+        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -465,7 +1080,9 @@ async function handleORQuery(msg: Record<string, unknown>, modelId: string): Pro
 
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
+    const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
+        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -618,102 +1235,155 @@ function toolResultText(content: unknown): string {
     return String(content ?? '');
 }
 
-function loadClaudeCodeHistory(cwd: string): void {
+// Locate Claude Code's project dir for a cwd. It encodes every path separator (/, \, :) and space → '-'.
+function resolveClaudeProjectDir(cwd: string): string | null {
+    if (!cwd) return null;
+    const encoded = cwd.replace(/[\\/: ]/g, '-');
+    const projectsRoot = path.join(os.homedir(), '.claude', 'projects');
+    let projectDir = path.join(projectsRoot, encoded);
+    if (!fs.existsSync(projectDir)) {
+        // drive-letter case differs between sessions (C:\ vs c:\) — match case-insensitively
+        try {
+            const match = fs.readdirSync(projectsRoot).find(dir => dir.toLowerCase() === encoded.toLowerCase());
+            if (match) projectDir = path.join(projectsRoot, match);
+        } catch { return null; }
+    }
+    return fs.existsSync(projectDir) ? projectDir : null;
+}
+
+// Parse one Claude Code .jsonl transcript into JAC's SerializedMsg[] (text + tool calls/results).
+function parseClaudeJsonl(jsonlPath: string): SerializedMsg[] {
+    const lines = fs.readFileSync(jsonlPath, 'utf8').split('\n').filter(Boolean);
+    const messages: SerializedMsg[] = [];
+    const pendingTools = new Map<string, SerializedMsg>();   // tool_use_id → owning assistant msg
+    for (const line of lines) {
+        try {
+            const obj = JSON.parse(line) as Record<string, unknown>;
+            if (obj.type !== 'user' && obj.type !== 'assistant') continue;
+            const msg = obj.message as Record<string, unknown> | undefined;
+            if (!msg) continue;
+            const role = msg.role as 'user' | 'assistant';
+            const content = msg.content;
+            const ts = new Date(obj.timestamp as string).getTime() || Date.now();
+            const blocks = typeof content === 'string'
+                ? [{ type: 'text', text: content }]
+                : (Array.isArray(content) ? content as Array<Record<string, unknown>> : []);
+            const textParts: string[] = [];
+            const toolUses: Array<{ name: string; id: string; args: Record<string, unknown> }> = [];
+            const toolResults: Array<{ tool_use_id: string; content: unknown; is_error?: boolean }> = [];
+            for (const block of blocks) {
+                if (block.type === 'text') textParts.push(String(block.text ?? ''));
+                else if (block.type === 'tool_use') toolUses.push({ name: String(block.name), id: String(block.id), args: (block.input as Record<string, unknown>) ?? {} });
+                else if (block.type === 'tool_result') toolResults.push({ tool_use_id: String(block.tool_use_id), content: block.content, is_error: Boolean(block.is_error) });
+            }
+            for (const tr of toolResults) {
+                const ownerMsg = pendingTools.get(tr.tool_use_id);
+                if (ownerMsg?.tools) {
+                    const tool = ownerMsg.tools.find(t => t.id === tr.tool_use_id);
+                    if (tool) { tool.result = toolResultText(tr.content); tool.isError = tr.is_error; }
+                }
+                pendingTools.delete(tr.tool_use_id);
+            }
+            const text = textParts.join('\n').trim();
+            if (!text && !toolUses.length) continue;
+            const serialized: SerializedMsg = { role, text, timestamp: ts };
+            if (toolUses.length) {
+                serialized.tools = toolUses.map(tu => ({ name: tu.name, id: tu.id, args: tu.args }));
+                for (const tu of toolUses) pendingTools.set(tu.id, serialized);
+            }
+            messages.push(serialized);
+        } catch { /* skip malformed lines */ }
+    }
+    return messages;
+}
+
+// Cheap title + folder from a session file — reads only the first 64KB (sessions can be 100MB+),
+// finding the first real user message (skips IDE-injected <ide_opened_file> openers) and the cwd.
+function claudeSessionInfo(jsonlPath: string): { title: string; folder: string } {
+    let fd: number | undefined;
+    let title = '', folder = '';
     try {
-        // Encode cwd the way Claude Code names its project dirs: every path separator
-        // (/, \, :) and space → '-'. Works on Windows (C:\a b\c) and Unix (/a/b).
-        const encoded = cwd.replace(/[\\/: ]/g, '-');
-        const projectsRoot = path.join(os.homedir(), '.claude', 'projects');
-        let projectDir = path.join(projectsRoot, encoded);
-        if (!fs.existsSync(projectDir)) {
-            // drive-letter case differs between sessions (C:\ vs c:\) — match case-insensitively
-            try {
-                const match = fs.readdirSync(projectsRoot).find(dir => dir.toLowerCase() === encoded.toLowerCase());
-                if (match) projectDir = path.join(projectsRoot, match);
-            } catch { /* projects dir missing */ }
+        fd = fs.openSync(jsonlPath, 'r');
+        const buf = Buffer.alloc(65536);
+        const bytes = fs.readSync(fd, buf, 0, buf.length, 0);
+        for (const line of buf.toString('utf8', 0, bytes).split('\n')) {
+            if (!line.trim()) continue;
+            let obj: Record<string, unknown>;
+            try { obj = JSON.parse(line); } catch { continue; }   // last line may be truncated by the 64KB cut
+            if (!folder && typeof obj.cwd === 'string') folder = path.basename(obj.cwd as string);
+            if (!title && obj.type === 'user' && obj.message) {
+                const c = (obj.message as Record<string, unknown>).content;
+                let t = typeof c === 'string' ? c
+                    : Array.isArray(c) ? String((c.find((b: Record<string, unknown>) => b.type === 'text') as Record<string, unknown> | undefined)?.text ?? '') : '';
+                t = t.trim();
+                if (t && !t.startsWith('<')) title = t.replace(/\s+/g, ' ').slice(0, 48);
+            }
+            if (title && folder) break;
         }
-        if (!fs.existsSync(projectDir)) return;
+    } catch { /* unreadable */ }
+    finally { if (fd !== undefined) { try { fs.closeSync(fd); } catch { /* */ } } }
+    return { title: title || 'Claude Code session', folder };
+}
 
-        const files = fs.readdirSync(projectDir)
+// Walk up from a browsed folder to the nearest ancestor that actually has Claude Code sessions — that's
+// the "project." Returns '' if the area isn't a project (home, Desktop) so history can stay on the last one.
+function resolveProjectDir(cwd: string): string {
+    let p = cwd;
+    for (let i = 0; i < 12 && p; i++) {
+        const dir = resolveClaudeProjectDir(p);
+        if (dir) { try { if (fs.readdirSync(dir).some(f => f.endsWith('.jsonl'))) return p; } catch { /* */ } }
+        const parent = path.dirname(p);
+        if (!parent || parent === p) break;
+        p = parent;
+    }
+    return '';
+}
+
+// This PROJECT's Claude Code sessions, most-recent first — scoped so switching projects switches history.
+// Browsing subfolders resolves UP to the project; browsing a non-project area keeps the last project.
+// Only stats the project's files (cheap) + reads a 64KB title for each; a ⟢ glyph marks origin.
+function listClaudeSessions(cwd: string): Array<{ id: string; title: string; timestamp: number; source: string }> {
+    try {
+        const resolved = resolveProjectDir(cwd || '');
+        if (resolved && resolved !== lastProject) {   // switched into a different project → remember + persist
+            lastProject = resolved;
+            config.lastCwd = resolved;
+            saveConfig(config);
+        }
+        const project = lastProject || resolved || cwd;
+        const dir = resolveClaudeProjectDir(project);
+        if (!dir) return [];
+        return fs.readdirSync(dir)
             .filter(f => f.endsWith('.jsonl'))
-            .map(f => ({ f, mtime: fs.statSync(path.join(projectDir, f)).mtimeMs }))
-            .sort((a, b) => b.mtime - a.mtime);
-        if (!files.length) return;
+            .map(f => {
+                const full = path.join(dir, f);
+                let mtime = 0; try { mtime = fs.statSync(full).mtimeMs; } catch { /* */ }
+                return { file: f, full, mtime };
+            })
+            .sort((a, b) => b.mtime - a.mtime)
+            .slice(0, 30)
+            .map(f => ({ id: 'cc:' + f.file, title: `⟢ ${claudeSessionInfo(f.full).title}`, timestamp: f.mtime, source: 'claude' }));
+    } catch { return []; }
+}
 
-        const jsonlPath = path.join(projectDir, files[0].f);
-        const lines = fs.readFileSync(jsonlPath, 'utf8').split('\n').filter(Boolean);
-
-        const messages: SerializedMsg[] = [];
-        // Maps tool_use_id → the assistant SerializedMsg that owns it
-        const pendingTools = new Map<string, SerializedMsg>();
-
-        for (const line of lines) {
-            try {
-                const obj = JSON.parse(line) as Record<string, unknown>;
-                if (obj.type !== 'user' && obj.type !== 'assistant') continue;
-                const msg = obj.message as Record<string, unknown> | undefined;
-                if (!msg) continue;
-
-                const role = msg.role as 'user' | 'assistant';
-                const content = msg.content;
-                const ts = new Date(obj.timestamp as string).getTime() || Date.now();
-                const blocks = typeof content === 'string'
-                    ? [{ type: 'text', text: content }]
-                    : (Array.isArray(content) ? content as Array<Record<string, unknown>> : []);
-
-                const textParts: string[] = [];
-                const toolUses: Array<{ name: string; id: string; args: Record<string, unknown> }> = [];
-                const toolResults: Array<{ tool_use_id: string; content: unknown; is_error?: boolean }> = [];
-
-                for (const block of blocks) {
-                    if (block.type === 'text') textParts.push(String(block.text ?? ''));
-                    else if (block.type === 'tool_use') {
-                        toolUses.push({ name: String(block.name), id: String(block.id), args: (block.input as Record<string, unknown>) ?? {} });
-                    } else if (block.type === 'tool_result') {
-                        toolResults.push({ tool_use_id: String(block.tool_use_id), content: block.content, is_error: Boolean(block.is_error) });
-                    }
-                    // skip thinking blocks
-                }
-
-                // Attach tool results to their owning assistant messages
-                for (const tr of toolResults) {
-                    const ownerMsg = pendingTools.get(tr.tool_use_id);
-                    if (ownerMsg?.tools) {
-                        const tool = ownerMsg.tools.find(t => t.id === tr.tool_use_id);
-                        if (tool) {
-                            tool.result = toolResultText(tr.content);
-                            tool.isError = tr.is_error;
-                        }
-                    }
-                    pendingTools.delete(tr.tool_use_id);
-                }
-
-                const text = textParts.join('\n').trim();
-
-                // Only emit a message if there's text or tool_use blocks
-                if (!text && !toolUses.length) continue;
-
-                const serialized: SerializedMsg = { role, text, timestamp: ts };
-                if (toolUses.length) {
-                    serialized.tools = toolUses.map(tu => ({ name: tu.name, id: tu.id, args: tu.args }));
-                    for (const tu of toolUses) pendingTools.set(tu.id, serialized);
-                }
-                messages.push(serialized);
-            } catch { /* skip malformed lines */ }
+// Load a Claude Code session by id ('cc:<file>') for read-only viewing. The uuid filename is globally
+// unique, so search all project dirs (cwd-preferred) — restore works regardless of the current workspace.
+function loadClaudeSession(cwd: string, id: string): SerializedMsg[] | null {
+    try {
+        const file = id.replace(/^cc:/, '');
+        if (!/^[\w.\-]+\.jsonl$/.test(file)) return null;   // plain filename only — no path traversal
+        const projectsRoot = path.join(os.homedir(), '.claude', 'projects');
+        const preferred = resolveClaudeProjectDir(cwd);
+        const all = fs.existsSync(projectsRoot)
+            ? fs.readdirSync(projectsRoot).map(d => path.join(projectsRoot, d))
+            : [];
+        const ordered = preferred ? [preferred, ...all.filter(d => d !== preferred)] : all;
+        for (const d of ordered) {
+            const full = path.join(d, file);
+            if (fs.existsSync(full)) return parseClaudeJsonl(full);
         }
-
-        if (!messages.length) return;
-        historyStore.set(cwd, messages);
-        const PAGE = 50;
-        const page = messages.slice(-PAGE);
-        mainWindow?.webContents.send('relay-message', {
-            type: 'conversation_loaded',
-            messages: page,
-            historyTotal: messages.length,
-            historyOffset: messages.length - page.length,
-            historyCwd: cwd,
-        });
-    } catch { /* silently ignore — feature is best-effort */ }
+        return null;
+    } catch { return null; }
 }
 
 const historyStore = new Map<string, SerializedMsg[]>();
@@ -817,6 +1487,36 @@ function stopCadServer(): void {
     cadServerChild = null;
 }
 
+// ── 3D-gen server (:5052) — runs INSIDE WSL where the ROCm/torch env lives ────
+// (P2a: hardcoded distro + backend; P2b's detection/installer will make these dynamic.)
+let gen3dServerChild: ReturnType<typeof spawn> | null = null;
+const GEN3D_DISTRO = 'Ubuntu-24.04';
+const GEN3D_WSL_PYTHON = '/root/jac3d/bin/python3';   // venv with torch/TripoSR; stub tolerates any python
+const GEN3D_BACKEND: string = 'triposr';               // stub | triposr | trellis
+/** Convert a Windows path (C:\a\b) to the /mnt/c/a/b form WSL can exec. */
+function winToWslPath(p: string): string {
+    const m = /^([A-Za-z]):[\\/](.*)$/.exec(p);
+    if (!m) return p.replace(/\\/g, '/');
+    return `/mnt/${m[1].toLowerCase()}/${m[2].replace(/\\/g, '/')}`;
+}
+async function startGen3dServer(): Promise<void> {
+    try {
+        const r = await fetch(`${GEN3D_SERVER_URL}/health`, { signal: AbortSignal.timeout(1000) });
+        if (r.ok) return;   // already running (reuse)
+    } catch { /* not up */ }
+    const script = winToWslPath(path.join(serverDir(), 'gen3d_server.py'));
+    const py = GEN3D_BACKEND === 'stub' ? 'python3' : GEN3D_WSL_PYTHON;
+    try {
+        gen3dServerChild = spawn('wsl.exe', ['-d', GEN3D_DISTRO, '--', py, script, '5052', GEN3D_BACKEND], { stdio: 'ignore' });
+        gen3dServerChild.on('exit', () => { gen3dServerChild = null; });
+        console.log(`[gen3d] server starting on :5052 in WSL (${GEN3D_DISTRO}, backend=${GEN3D_BACKEND})`);
+    } catch (e) { console.log(`[gen3d] spawn failed: ${e}`); }
+}
+function stopGen3dServer(): void {
+    try { gen3dServerChild?.kill(); } catch { /* */ }
+    gen3dServerChild = null;
+}
+
 app.whenReady().then(() => {
     Menu.setApplicationMenu(null);   // drop the default File/Edit/View/Window/Help bar
     if (process.platform === 'win32') app.setAppUserModelId('com.clifford.jac'); // match electron-builder appId
@@ -829,12 +1529,27 @@ app.whenReady().then(() => {
         return { messages: all.slice(start, offset), newOffset: start, historyTotal: all.length, historyCwd: cwd };
     });
     ipcMain.handle('get-config', () => config);
+    // OpenRouter balance for the chat header readout (null if no key / OR unreachable).
+    ipcMain.handle('get-or-usage', () => fetchORCredits(config.openrouterApiKey));
     ipcMain.handle('save-config', (_e, updates: Partial<typeof DEFAULT_CONFIG>) => {
         const mcpChanged = 'mcpServers' in updates
             && JSON.stringify(updates.mcpServers) !== JSON.stringify(config.mcpServers);
+        const keyChanged = 'openrouterApiKey' in updates
+            && updates.openrouterApiKey !== config.openrouterApiKey;
         config = { ...config, ...updates };
         saveConfig(config);
         if (mcpChanged) mcpManager.reload(config.mcpServers);
+        // A changed OpenRouter key: re-fetch the model list live so the picker updates without a restart.
+        if (keyChanged) {
+            if (config.openrouterApiKey) {
+                fetchORModels(config.openrouterApiKey)
+                    .then((models) => { orModels = models; pushModelsToUI(); })
+                    .catch(() => { /* OR unavailable */ });
+            } else {
+                orModels = [];
+                pushModelsToUI();
+            }
+        }
         return config;
     });
     // MCP: server connection status + flattened tool list (for the settings panel)
@@ -846,6 +1561,172 @@ app.whenReady().then(() => {
     ipcMain.handle('get-platform', () => process.platform);
     ipcMain.handle('get-home', () => os.homedir());
     ipcMain.handle('open-external', (_e, url: string) => shell.openExternal(url));
+
+    // Run KiCad's real push-and-shove router (ported to WASM) and return the routed polyline.
+    ipcMain.handle('kicad-route-demo', async (_e, withObstacle: boolean, mode: string) => {
+        try {
+            const poly = await routeDemo(!!withObstacle, mode === 'shove' ? 'shove' : 'walkaround');
+            return { ok: true, path: poly };
+        } catch (err) {
+            return { ok: false, error: String(err) };
+        }
+    });
+
+    // Interactive routing session driven by the PCB canvas (all coords in nanometres).
+    ipcMain.handle('kicad-route-setup', async (_e, obstacles: Obstacle[], segments: SegObstacle[], mode: string, tw: number, cl: number) => {
+        try { await routeSetup(obstacles || [], segments || [], mode === 'shove' ? 'shove' : 'walkaround', tw, cl); return { ok: true }; }
+        catch (err) { return { ok: false, error: String(err) }; }
+    });
+    ipcMain.handle('kicad-route-start', (_e, x: number, y: number, layer: number) => routeStart(x, y, layer));
+    ipcMain.handle('kicad-route-move', (_e, x: number, y: number) => routeMove(x, y));
+    ipcMain.handle('kicad-route-finish', (_e, x: number, y: number) => routeFinish(x, y));
+    ipcMain.handle('kicad-route-ab', (_e, x1: number, y1: number, x2: number, y2: number, layer: number) => routeAB(x1, y1, x2, y2, layer));
+
+    // Manufacturing: turn a .kicad_pcb into a fab package (Gerbers + drill + pick-and-place, zipped)
+    // — the exact bundle a fab house (JLCPCB / PCBWay) takes to make the board.
+    ipcMain.handle('kicad-fabricate', async (_e, pcbPath: string, bomPath?: string) => {
+        try {
+            if (!kicadPaths?.cli) { kicadPaths = findKicad(); }
+            if (!kicadPaths?.cli) return { ok: false, error: 'KiCad CLI not found (install KiCad).' };
+            if (!fs.existsSync(pcbPath)) return { ok: false, error: 'Board file not found: ' + pcbPath };
+
+            const outDir = path.join(path.dirname(pcbPath), 'fab');
+            fs.rmSync(outDir, { recursive: true, force: true });
+            fs.mkdirSync(outDir, { recursive: true });
+
+            // Assembly BOM (from the :5051 schematic) rounds out the package with the CPL/pos file.
+            if (bomPath && fs.existsSync(bomPath)) {
+                try { fs.copyFileSync(bomPath, path.join(outDir, 'bom.csv')); } catch { /* BOM optional */ }
+            }
+
+            const run = (args: string[]) => new Promise<void>((res, rej) => {
+                const p = spawn(kicadPaths!.cli, args, { windowsHide: true, stdio: 'ignore' });
+                p.on('exit', (code) => code === 0 ? res() : rej(new Error('kicad-cli ' + args[1] + ' exit ' + code)));
+                p.on('error', rej);
+            });
+            // Fill copper zones (ground/power planes) into the board first, so the pour plots to gerbers.
+            try { await run(['pcb', 'drc', pcbPath, '--refill-zones', '--save-board', '-o', path.join(outDir, '_fill.rpt')]); } catch { /* fill best-effort */ }
+            await run(['pcb', 'export', 'gerbers', pcbPath, '-o', outDir + path.sep]);
+            await run(['pcb', 'export', 'drill', pcbPath, '-o', outDir + path.sep]);
+            try { await run(['pcb', 'export', 'pos', pcbPath, '-o', path.join(outDir, 'pos.csv'), '--format', 'csv', '--units', 'mm']); } catch { /* assembly file optional */ }
+
+            const zip = path.join(path.dirname(pcbPath), 'jac_fab.zip');
+            fs.rmSync(zip, { force: true });
+            await new Promise<void>((res, rej) => {
+                const ps = spawn('powershell', ['-NoProfile', '-Command',
+                    `Compress-Archive -Path '${outDir}\\*' -DestinationPath '${zip}' -Force`], { windowsHide: true, stdio: 'ignore' });
+                ps.on('exit', (code) => code === 0 ? res() : rej(new Error('zip failed')));
+                ps.on('error', rej);
+            });
+
+            const files = fs.readdirSync(outDir);
+            const gerbers = files.filter((f) => /\.(gtl|gbl|gto|gbo|gm1|gbr)$/i.test(f)).length;
+            return { ok: true, zip, dir: outDir, files, gerbers, hasDrill: files.some((f) => /\.drl$/i.test(f)),
+                hasBom: files.includes('bom.csv'), hasCpl: files.includes('pos.csv') };
+        } catch (err) {
+            return { ok: false, error: String(err) };
+        }
+    });
+
+    // Design-Rule Check: run KiCad's real DRC engine on the exported board and return
+    // structured violations + unconnected items for the PCB view to list + mark on the canvas.
+    ipcMain.handle('kicad-drc', async (_e, pcbPath: string) => {
+        try {
+            if (!kicadPaths?.cli) { kicadPaths = findKicad(); }
+            if (!kicadPaths?.cli) return { ok: false, error: 'KiCad CLI not found (install KiCad).' };
+            if (!fs.existsSync(pcbPath)) return { ok: false, error: 'Board file not found: ' + pcbPath };
+
+            const report = path.join(path.dirname(pcbPath), 'drc_report.json');
+            fs.rmSync(report, { force: true });
+            // DRC exits 0 even when violations exist (only --exit-code-violations changes that),
+            // so resolve regardless of exit code and read the report file — like the sch-erc path.
+            await new Promise<void>((resolve) => {
+                const p = spawn(kicadPaths!.cli, ['pcb', 'drc', pcbPath, '-o', report,
+                    '--format', 'json', '--units', 'mm', '--severity-all', '--refill-zones'], { windowsHide: true, stdio: 'ignore' });
+                p.on('exit', () => resolve());
+                p.on('error', () => resolve());
+            });
+            if (!fs.existsSync(report)) return { ok: false, error: 'DRC produced no report (kicad-cli pcb drc failed).' };
+            const raw = JSON.parse(fs.readFileSync(report, 'utf8'));
+
+            // Findings live in three arrays; every item is {description, pos:{x,y}, uuid}.
+            // 'lib_footprint_issues' is pure noise from JAC's synthetic 'jac:' footprint lib — collapse it out.
+            const NOISE = 'lib_footprint_issues';
+            const norm = (arr: unknown[], kind: string) => (Array.isArray(arr) ? arr : [])
+                .filter((v: any) => v.type !== NOISE)
+                .map((v: any) => ({
+                    kind, type: v.type, severity: v.severity, description: v.description,
+                    items: (v.items || []).map((it: any) => ({
+                        description: it.description, x: it.pos ? it.pos.x : 0, y: it.pos ? it.pos.y : 0, uuid: it.uuid,
+                    })),
+                }));
+            const findings = [
+                ...norm(raw.violations, 'violation'),
+                ...norm(raw.unconnected_items, 'unconnected'),
+            ];
+            const errors = findings.filter((f) => f.severity === 'error').length;
+            const warnings = findings.filter((f) => f.severity === 'warning').length;
+            const libIssues = (Array.isArray(raw.violations) ? raw.violations : []).filter((v: any) => v.type === NOISE).length;
+            return { ok: true, findings, errors, warnings, libIssues, units: raw.coordinate_units || 'mm' };
+        } catch (err) {
+            return { ok: false, error: String(err) };
+        }
+    });
+
+    // Search KiCad's real 22k-symbol library so JAC's palette isn't limited to the built-ins.
+    ipcMain.handle('kicad-symbol-search', (_e, query: string) => {
+        if (!kicadPaths?.symbolsDir) { kicadPaths = findKicad(); }
+        if (!kicadPaths?.symbolsDir) return { ok: false, error: 'KiCad symbols not found (install KiCad).' };
+        const res = searchCatalog(kicadPaths.symbolsDir, String(query || ''), 24);
+        return { ok: true, results: res.map((e) => ({ libId: e.libId, name: e.name, lib: e.libName, desc: e.desc })) };
+    });
+
+    // Resolve one symbol → a placeable definition: pins + graphics in JAC world units
+    // (KiCad symbol Y is up, so flip), plus the symbol's default footprint / ref prefix / value.
+    ipcMain.handle('kicad-symbol-get', (_e, libId: string) => {
+        try {
+            if (!kicadPaths?.symbolsDir) { kicadPaths = findKicad(); }
+            if (!kicadPaths?.symbolsDir) return { ok: false, error: 'KiCad symbols not found.' };
+            const e = resolveLibId(kicadPaths.symbolsDir, String(libId));
+            if (!e) return { ok: false, error: 'Symbol not found: ' + libId };
+            // Derived symbols (extends "Parent") inherit pins + graphics from the parent — follow the chain.
+            let pinSrc = e.name;
+            let symText = extractSymbol(e.lib, e.name) || '';
+            for (let hop = 0; hop < 4; hop++) {
+                const ext = symText.match(/\(extends "([^"]+)"/);
+                if (!ext) break;
+                const parent = extractSymbol(e.lib, ext[1]);
+                if (!parent) break;
+                pinSrc = ext[1]; symText = parent;
+            }
+            const S = 8;                                        // world units per mm
+            const X = (v: number) => Math.round(v * S), Y = (v: number) => Math.round(-v * S);
+            const pins: Record<string, { x: number; y: number; name: string }> = {};
+            for (const p of symbolPins(symText)) pins[p.number] = { x: X(p.x), y: Y(p.y), name: p.name };
+            const g = symbolGraphics(e.lib, pinSrc);
+            const svg: string[] = [];
+            for (const r of g.rects) svg.push(`<rect x="${Math.min(X(r[0]), X(r[2]))}" y="${Math.min(Y(r[1]), Y(r[3]))}" width="${Math.abs(X(r[2]) - X(r[0]))}" height="${Math.abs(Y(r[3]) - Y(r[1]))}" fill="none" stroke="currentColor" stroke-width="1.5"/>`);
+            for (const pl of g.polylines) { if (pl.length < 2) continue; svg.push(`<polyline points="${pl.map((pt) => `${X(pt[0])},${Y(pt[1])}`).join(' ')}" fill="none" stroke="currentColor" stroke-width="1.5"/>`); }
+            for (const c of g.circles) svg.push(`<circle cx="${X(c.x)}" cy="${Y(c.y)}" r="${Math.round(c.r * S)}" fill="none" stroke="currentColor" stroke-width="1.4"/>`);
+            const xs: number[] = [], ys: number[] = [];
+            Object.keys(pins).forEach((k) => { xs.push(pins[k].x); ys.push(pins[k].y); });
+            g.rects.forEach((r) => { xs.push(X(r[0]), X(r[2])); ys.push(Y(r[1]), Y(r[3])); });
+            const w = xs.length ? Math.max(...xs) - Math.min(...xs) : 40;
+            const h = ys.length ? Math.max(...ys) - Math.min(...ys) : 30;
+            return { ok: true, def: {
+                libId: e.libId, name: e.name,
+                prefix: symbolRefPrefix(e.lib, e.name) || symbolRefPrefix(e.lib, pinSrc),
+                value: symbolDefaultValue(e.lib, e.name) || e.name,
+                footprint: symbolDefaultFootprint(e.lib, e.name) || symbolDefaultFootprint(e.lib, pinSrc),
+                pins, svg: svg.join(''), w: Math.max(w, 20), h: Math.max(h, 16), desc: e.desc } };
+        } catch (err) { return { ok: false, error: String(err) }; }
+    });
+
+    // Recolor the native window controls (min/max/close overlay) to match the app theme.
+    ipcMain.handle('set-titlebar-overlay', (_e, color: string, symbolColor: string) => {
+        try { mainWindow?.setTitleBarOverlay?.({ color, symbolColor, height: 32 }); return { ok: true }; }
+        catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
+    });
     ipcMain.handle('get-pending-findings', () => scheduler?.getPendingFindings() ?? []);
     ipcMain.handle('clear-finding', (_e, id: string) => scheduler?.clearFinding(id));
     ipcMain.handle('run-task-now', (_e, name: string) => scheduler?.runNow(name));
@@ -853,6 +1734,19 @@ app.whenReady().then(() => {
     ipcMain.on('relay-send', (_e, rawMsg: unknown) => {
         const msg = rawMsg as Record<string, unknown>;
         const type = msg.type as string;
+
+        // Schematic tab opened/reloaded — push current state.
+        if (type === 'sch_request') { pushSchematic(); return; }
+        // Native schematic canvas edits (drag/rotate/delete/wire) — mutate the model + re-push.
+        if (type === 'sch_edit') {
+            const a = msg.action as string;
+            if (a === 'move') { const c = schematic.find(String(msg.target)); if (c) { c.x = Number(msg.x); c.y = Number(msg.y); } }
+            else if (a === 'rotate') { const c = schematic.find(String(msg.target)); if (c) c.rot = ((Number(msg.rot) % 360) + 360) % 360; }
+            else if (a === 'remove') { schematic.remove(String(msg.target)); }
+            else if (a === 'add_wire') { schematic.addWire(Number(msg.x1), Number(msg.y1), Number(msg.x2), Number(msg.y2)); }
+            pushSchematic();
+            return;
+        }
 
         // MCP tool-permission prompt reply — resolve the waiting decidePermission() promise.
         if (type === 'permission_response') {
@@ -932,7 +1826,10 @@ app.whenReady().then(() => {
         const m = rawMsg as Record<string, unknown>;
         if (m.type === 'set_cwd') {
             const cwd = m.cwd as string;
-            if (cwd) loadClaudeCodeHistory(cwd);
+            if (cwd) {                       // starting a conversation here makes this the active project
+                activeCwd = cwd;
+                if (cwd !== lastProject) { lastProject = cwd; config.lastCwd = cwd; saveConfig(config); }
+            }
         }
         wsClient?.sendRaw(m as Record<string, unknown>);
     });
@@ -956,23 +1853,46 @@ app.whenReady().then(() => {
         fs.mkdirSync(CONV_DIR, { recursive: true });
         fs.writeFileSync(path.join(CONV_DIR, `${id}.json`), JSON.stringify(messages));
 
+        // Authoritative workspace: stamp the project the app currently has open. The renderer's
+        // `workspace` arg often arrives unset (→ 'global'), which orphans the conv from per-project
+        // history. Main knows the cwd reliably (activeCwd, else the persisted lastProject), so resolve
+        // THAT to its project root — the same value get-project-history filters against.
+        const base = activeCwd || lastProject || '';
+        const ws = resolveProjectDir(base) || base
+            || (workspace && workspace !== 'global' ? workspace : '') || 'global';
+
+        // Title = first user message (the dropdown renders entry.title); fixes blank JAC entries.
+        const firstUser = (messages as Array<{ role?: string; text?: string }>).find(m => m?.role === 'user');
+        const title = (firstUser?.text || 'Conversation').replace(/\s+/g, ' ').trim().slice(0, 56) || 'Conversation';
+
         let idx = convReadIndex() as Array<Record<string, unknown>>;
         idx = idx.filter(c => c.id !== id);
-        idx.unshift({ ...meta, id, workspace, timestamp: Date.now() });
+        idx.unshift({ ...meta, id, workspace: ws, timestamp: Date.now(), title });
 
         // Keep MAX_PER_WORKSPACE per folder, prune old
-        const ws = idx.filter(c => c.workspace === workspace);
-        if (ws.length > MAX_PER_WORKSPACE) {
-            ws.slice(MAX_PER_WORKSPACE).forEach(old => {
+        const sameWs = idx.filter(c => c.workspace === ws);
+        if (sameWs.length > MAX_PER_WORKSPACE) {
+            sameWs.slice(MAX_PER_WORKSPACE).forEach(old => {
                 try { fs.unlinkSync(path.join(CONV_DIR, `${old.id}.json`)); } catch {}
             });
         }
-        idx = idx.filter(c => c.workspace !== workspace || ws.indexOf(c) < MAX_PER_WORKSPACE);
+        idx = idx.filter(c => c.workspace !== ws || sameWs.indexOf(c) < MAX_PER_WORKSPACE);
         convWriteIndex(idx);
         return id;
     });
 
     ipcMain.handle('conv-load-index', () => convReadIndex());
+    // Claude Code sessions for the folder — merged into the history dropdown (read-only viewing).
+    ipcMain.handle('list-claude-sessions', (_e, cwd: string) => listClaudeSessions(cwd || activeCwd));
+    // The full history dropdown, scoped to ONE project: that project's Claude Code sessions + its JAC
+    // conversations only (browsedCwd resolves up to the project; non-project browsing keeps the last).
+    ipcMain.handle('get-project-history', (_e, browsedCwd: string) => {
+        const claude = listClaudeSessions(browsedCwd || '');    // resolves + remembers the project
+        const jac = (convReadIndex() as Array<Record<string, unknown>>)
+            .filter(c => !!c.workspace && c.workspace === lastProject);   // only this project's JAC convs
+        return [...claude, ...jac].sort((a, b) => (b.timestamp as number) - (a.timestamp as number));
+    });
+    ipcMain.handle('load-claude-session', (_e, cwd: string, id: string) => loadClaudeSession(cwd || activeCwd, id));
 
     ipcMain.handle('conv-load', (_e, id: string) => {
         try { return JSON.parse(fs.readFileSync(path.join(CONV_DIR, `${id}.json`), 'utf-8')); } catch { return null; }
@@ -1023,12 +1943,70 @@ app.whenReady().then(() => {
         } catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
     });
     ipcMain.handle('fs-open-external-file', (_e, filePath: string) => shell.openPath(filePath));
+    ipcMain.handle('fs-write-file', (_e, filePath: string, content: string) => {
+        try { fs.writeFileSync(filePath, content, 'utf-8'); return { ok: true }; }
+        catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
+    });
+    // Open a 3D model for the CAD viewer: file dialog (or explicit path) -> base64 GLB.
+    ipcMain.handle('cad-open-glb', async (_e, explicitPath?: string) => {
+        try {
+            let filePath = explicitPath;
+            if (!filePath) {
+                const { dialog } = require('electron');
+                const r = await dialog.showOpenDialog({
+                    title: 'Open 3D model',
+                    filters: [{ name: '3D Models', extensions: ['glb', 'gltf'] }],
+                    properties: ['openFile'],
+                });
+                if (r.canceled || !r.filePaths[0]) return { ok: false, canceled: true };
+                filePath = r.filePaths[0];
+            }
+            const fp: string = filePath as string;
+            const stat = fs.statSync(fp);
+            if (stat.size > 200 * 1024 * 1024) return { ok: false, error: 'Model too large (>200MB)' };
+            return { ok: true, name: path.basename(fp), b64: fs.readFileSync(fp).toString('base64') };
+        } catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
+    });
+    // Save a model exported client-side (STL/GLB) from the CAD viewer: base64 bytes -> save dialog -> disk.
+    ipcMain.handle('cad-save-model', async (_e, b64: string, defaultName: string) => {
+        try {
+            const { dialog } = require('electron');
+            const ext = (path.extname(defaultName || '') || '.stl').replace('.', '').toLowerCase();
+            const r = await dialog.showSaveDialog(mainWindow!, {
+                title: 'Save 3D model',
+                defaultPath: defaultName || 'model.stl',
+                filters: [{ name: ext.toUpperCase() + ' model', extensions: [ext] }, { name: 'All files', extensions: ['*'] }],
+            });
+            if (r.canceled || !r.filePath) return { ok: false, canceled: true };
+            fs.writeFileSync(r.filePath, Buffer.from(b64, 'base64'));
+            return { ok: true, path: r.filePath };
+        } catch (e) { return { ok: false, error: String((e as Error).message ?? e) }; }
+    });
     ipcMain.handle('dialog-open-folder', async () => {
         const { dialog } = require('electron');
         const result = await dialog.showOpenDialog(mainWindow!, {
             properties: ['openDirectory'],
         });
         return result.canceled ? null : result.filePaths[0];
+    });
+    // JAC project (.jac) save/open dialogs — the backend does the actual read/write to the chosen path.
+    ipcMain.handle('project-save-dialog', async () => {
+        const { dialog } = require('electron');
+        const r = await dialog.showSaveDialog(mainWindow!, {
+            title: 'Save JAC project',
+            defaultPath: 'board.jac',
+            filters: [{ name: 'JAC project', extensions: ['jac'] }, { name: 'All files', extensions: ['*'] }],
+        });
+        return r.canceled ? null : r.filePath;
+    });
+    ipcMain.handle('project-open-dialog', async () => {
+        const { dialog } = require('electron');
+        const r = await dialog.showOpenDialog(mainWindow!, {
+            title: 'Open JAC project',
+            filters: [{ name: 'JAC project', extensions: ['jac', 'json'] }, { name: 'All files', extensions: ['*'] }],
+            properties: ['openFile'],
+        });
+        return (r.canceled || !r.filePaths[0]) ? null : r.filePaths[0];
     });
 
     ipcMain.handle('fs-mkdir', (_e, dir: string, name: string) => {
@@ -1137,8 +2115,10 @@ app.whenReady().then(() => {
     // Start the PCB/schematic tool server (Python stdlib, :5051) + CAD server (build123d, :5050).
     startPcbServer();
     startCadServer();
+    startGen3dServer();
     app.on('before-quit', stopPcbServer);
     app.on('before-quit', stopCadServer);
+    app.on('before-quit', stopGen3dServer);
     pollOllamaModels();
     pollLocalServerModels();
 

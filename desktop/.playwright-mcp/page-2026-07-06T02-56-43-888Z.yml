@@ -1,0 +1,860 @@
+- generic [ref=f37e2]:
+  - generic [ref=f37e3]:
+    - link "Skip to content" [ref=f37e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f37e6]:
+      - heading "Navigation Menu" [level=2] [ref=f37e7]
+      - generic [ref=f37e8]:
+        - link "Homepage" [ref=f37e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=f37e11]
+        - generic [ref=f37e13]:
+          - navigation "Global" [ref=f37e16]:
+            - list [ref=f37e17]:
+              - listitem [ref=f37e18]:
+                - button "Platform" [ref=f37e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=f37e21]
+              - listitem [ref=f37e23]:
+                - button "Solutions" [ref=f37e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=f37e26]
+              - listitem [ref=f37e28]:
+                - button "Resources" [ref=f37e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=f37e31]
+              - listitem [ref=f37e33]:
+                - button "Open Source" [ref=f37e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=f37e36]
+              - listitem [ref=f37e38]:
+                - button "Enterprise" [ref=f37e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=f37e41]
+              - listitem [ref=f37e43]:
+                - link "Pricing" [ref=f37e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=f37e45]: Pricing
+          - generic [ref=f37e46]:
+            - button "Search or jump to…" [ref=f37e49] [cursor=pointer]:
+              - img [ref=f37e51]
+              - generic [ref=f37e53]: Search or jump to...
+              - img [ref=f37e55]
+            - link "Sign in" [ref=f37e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce
+            - link "Sign up" [ref=f37e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=x360ce%2Fx360ce
+            - button "Appearance settings" [ref=f37e63] [cursor=pointer]:
+              - img
+  - main [ref=f37e67]:
+    - generic [ref=f37e68]:
+      - generic [ref=f37e69]:
+        - generic [ref=f37e71]:
+          - img [ref=f37e72]
+          - link "x360ce" [ref=f37e75] [cursor=pointer]:
+            - /url: /x360ce
+          - generic [ref=f37e76]: /
+          - strong [ref=f37e77]:
+            - link "x360ce" [ref=f37e78] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+          - generic [ref=f37e79]: Public
+        - generic [ref=f37e80]:
+          - list:
+            - listitem [ref=f37e81]:
+              - link "You must be signed in to change notification settings" [ref=f37e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f37e83]
+                - text: Notifications
+            - listitem [ref=f37e85]:
+              - link "Fork 504" [ref=f37e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f37e87]
+                - text: Fork
+                - generic "504" [ref=f37e89]
+            - listitem [ref=f37e90]:
+              - link "You must be signed in to star a repository" [ref=f37e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f37e93]
+                - text: Star
+                - generic "2866 users starred this repository" [ref=f37e95]: 2.9k
+      - navigation "Repository" [ref=f37e96]:
+        - list [ref=f37e97]:
+          - listitem [ref=f37e98]:
+            - link "Code" [ref=f37e99] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+              - img [ref=f37e100]
+              - generic [ref=f37e102]: Code
+          - listitem [ref=f37e103]:
+            - link "Issues 837" [ref=f37e104] [cursor=pointer]:
+              - /url: /x360ce/x360ce/issues
+              - img [ref=f37e105]
+              - generic [ref=f37e108]: Issues
+              - generic "837" [ref=f37e109]
+          - listitem [ref=f37e110]:
+            - link "Pull requests 7" [ref=f37e111] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulls
+              - img [ref=f37e112]
+              - generic [ref=f37e114]: Pull requests
+              - generic "7" [ref=f37e115]
+          - listitem [ref=f37e116]:
+            - link "Discussions" [ref=f37e117] [cursor=pointer]:
+              - /url: /x360ce/x360ce/discussions
+              - img [ref=f37e118]
+              - generic [ref=f37e120]: Discussions
+          - listitem [ref=f37e121]:
+            - link "Actions" [ref=f37e122] [cursor=pointer]:
+              - /url: /x360ce/x360ce/actions
+              - img [ref=f37e123]
+              - generic [ref=f37e125]: Actions
+          - listitem [ref=f37e126]:
+            - link "Projects" [ref=f37e127] [cursor=pointer]:
+              - /url: /x360ce/x360ce/projects
+              - img [ref=f37e128]
+              - generic [ref=f37e130]: Projects
+          - listitem [ref=f37e131]:
+            - link "Wiki" [ref=f37e132] [cursor=pointer]:
+              - /url: /x360ce/x360ce/wiki
+              - img [ref=f37e133]
+              - generic [ref=f37e135]: Wiki
+          - listitem [ref=f37e136]:
+            - link "Security and quality" [ref=f37e137] [cursor=pointer]:
+              - /url: /x360ce/x360ce/security
+              - img [ref=f37e138]
+              - generic [ref=f37e140]: Security and quality
+          - listitem [ref=f37e141]:
+            - link "Insights" [ref=f37e142] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulse
+              - img [ref=f37e143]
+              - generic [ref=f37e145]: Insights
+    - generic [ref=f37e158]:
+      - heading "x360ce/x360ce" [level=1] [ref=f37e160]
+      - generic [ref=f37e161]:
+        - generic [ref=f37e164]:
+          - generic [ref=f37e165]:
+            - generic [ref=f37e166]:
+              - button "master branch" [ref=f37e168] [cursor=pointer]:
+                - generic [ref=f37e169]:
+                  - generic [ref=f37e171]:
+                    - img [ref=f37e173]
+                    - generic [ref=f37e176]: master
+                  - generic:
+                    - img
+              - generic [ref=f37e177]:
+                - link "7 Branches" [ref=f37e178] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/branches
+                  - generic [ref=f37e179]:
+                    - generic:
+                      - img
+                    - generic [ref=f37e181]:
+                      - strong [ref=f37e182]: "7"
+                      - text: Branches
+                - link "10 Tags" [ref=f37e183] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/tags
+                  - generic [ref=f37e184]:
+                    - generic:
+                      - img
+                    - generic [ref=f37e186]:
+                      - strong [ref=f37e187]: "10"
+                      - text: Tags
+            - generic [ref=f37e188]:
+              - generic [ref=f37e192]:
+                - img [ref=f37e194]
+                - combobox "Go to file" [ref=f37e196]
+              - button "Code" [ref=f37e197] [cursor=pointer]:
+                - generic [ref=f37e198]:
+                  - generic:
+                    - img
+                  - generic [ref=f37e199]: Code
+                  - generic:
+                    - img
+          - generic [ref=f37e200]:
+            - generic [ref=f37e201]:
+              - heading "Folders and files" [level=2] [ref=f37e202]
+              - table "Folders and files" [ref=f37e203]:
+                - rowgroup:
+                  - row "Name Last commit message Last commit date":
+                    - columnheader "Name"
+                    - columnheader "Last commit message":
+                      - generic "Last commit message"
+                    - columnheader "Last commit date":
+                      - generic "Last commit date"
+                - rowgroup [ref=f37e204]:
+                  - row "Latest commit EvoJocys commits by EvoJocys AI Refactoring - Batch 1 (#1555) Commit 073d9d8 · Jun 1, 2025last year History 2,579 Commits" [ref=f37e205]:
+                    - cell "Latest commit EvoJocys commits by EvoJocys AI Refactoring - Batch 1 (#1555) Commit 073d9d8 · Jun 1, 2025last year History 2,579 Commits" [ref=f37e206]:
+                      - generic [ref=f37e207]:
+                        - heading "Latest commit" [level=2] [ref=f37e208]
+                        - generic [ref=f37e209]:
+                          - generic [ref=f37e211]:
+                            - link "EvoJocys" [ref=f37e212] [cursor=pointer]:
+                              - /url: /EvoJocys
+                              - img "EvoJocys" [ref=f37e213]
+                            - link "commits by EvoJocys" [ref=f37e214] [cursor=pointer]:
+                              - /url: /x360ce/x360ce/commits?author=EvoJocys
+                              - text: EvoJocys
+                          - generic [ref=f37e217]:
+                            - link "AI Refactoring - Batch 1 (" [ref=f37e218] [cursor=pointer]:
+                              - /url: /x360ce/x360ce/commit/073d9d805c814cc44876a328d7d9be16f08d0fdd
+                            - link "#1555" [ref=f37e219] [cursor=pointer]:
+                              - /url: https://github.com/x360ce/x360ce/pull/1555
+                            - link ")" [ref=f37e220] [cursor=pointer]:
+                              - /url: /x360ce/x360ce/commit/073d9d805c814cc44876a328d7d9be16f08d0fdd
+                        - generic [ref=f37e221]:
+                          - generic [ref=f37e223]:
+                            - link "Commit 073d9d8" [ref=f37e224] [cursor=pointer]:
+                              - /url: /x360ce/x360ce/commit/073d9d805c814cc44876a328d7d9be16f08d0fdd
+                              - text: 073d9d8
+                            - text: ·
+                            - generic "Jun 1, 2025, 1:21 AM MST" [ref=f37e225]: Jun 1, 2025last year
+                          - generic [ref=f37e226]:
+                            - heading "History" [level=2] [ref=f37e227]
+                            - link "2,579 Commits" [ref=f37e228] [cursor=pointer]:
+                              - /url: /x360ce/x360ce/commits/master/
+                              - generic [ref=f37e229]:
+                                - generic:
+                                  - img
+                                - generic [ref=f37e230]: 2,579 Commits
+                  - row "MinHook, (Submodule)" [ref=f37e231]:
+                    - cell "MinHook, (Submodule)" [ref=f37e232]:
+                      - generic [ref=f37e233]:
+                        - img [ref=f37e234]
+                        - link "MinHook, (Submodule)" [ref=f37e239] [cursor=pointer]:
+                          - /url: /TsudaKageyu/minhook/tree/1f8bd27e5a00bc6ca3b4bb79c043157ffc09475d
+                          - text: MinHook @ 1f8bd27
+                    - cell [ref=f37e240]
+                    - cell [ref=f37e242]
+                  - row "Mobile, (Directory)" [ref=f37e245]:
+                    - cell "Mobile, (Directory)" [ref=f37e246]:
+                      - generic [ref=f37e247]:
+                        - img [ref=f37e248]
+                        - link "Mobile, (Directory)" [ref=f37e253] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/Mobile
+                          - text: Mobile
+                    - cell [ref=f37e254]
+                    - cell [ref=f37e256]
+                  - row "x360ce.App.Beta, (Directory)" [ref=f37e259]:
+                    - cell "x360ce.App.Beta, (Directory)" [ref=f37e260]:
+                      - generic [ref=f37e261]:
+                        - img [ref=f37e262]
+                        - link "x360ce.App.Beta, (Directory)" [ref=f37e267] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.App.Beta
+                          - text: x360ce.App.Beta
+                    - cell [ref=f37e268]
+                    - cell [ref=f37e270]
+                  - row "x360ce.App.WPF, (Directory)" [ref=f37e273]:
+                    - cell "x360ce.App.WPF, (Directory)" [ref=f37e274]:
+                      - generic [ref=f37e275]:
+                        - img [ref=f37e276]
+                        - link "x360ce.App.WPF, (Directory)" [ref=f37e281] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.App.WPF
+                          - text: x360ce.App.WPF
+                    - cell [ref=f37e282]
+                    - cell [ref=f37e284]
+                  - row "x360ce.App, (Directory)" [ref=f37e287]:
+                    - cell "x360ce.App, (Directory)" [ref=f37e288]:
+                      - generic [ref=f37e289]:
+                        - img [ref=f37e290]
+                        - link "x360ce.App, (Directory)" [ref=f37e295] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.App
+                          - text: x360ce.App
+                    - cell [ref=f37e296]
+                    - cell [ref=f37e298]
+                  - row "x360ce.Data, (Directory)" [ref=f37e301]:
+                    - cell "x360ce.Data, (Directory)" [ref=f37e302]:
+                      - generic [ref=f37e303]:
+                        - img [ref=f37e304]
+                        - link "x360ce.Data, (Directory)" [ref=f37e309] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Data
+                          - text: x360ce.Data
+                    - cell [ref=f37e310]
+                    - cell [ref=f37e312]
+                  - row "x360ce.Engine, (Directory)" [ref=f37e315]:
+                    - cell "x360ce.Engine, (Directory)" [ref=f37e316]:
+                      - generic [ref=f37e317]:
+                        - img [ref=f37e318]
+                        - link "x360ce.Engine, (Directory)" [ref=f37e323] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine
+                          - text: x360ce.Engine
+                    - cell [ref=f37e324]
+                    - cell [ref=f37e326]
+                  - row "x360ce.Net48Test, (Directory)" [ref=f37e329]:
+                    - cell "x360ce.Net48Test, (Directory)" [ref=f37e330]:
+                      - generic [ref=f37e331]:
+                        - img [ref=f37e332]
+                        - link "x360ce.Net48Test, (Directory)" [ref=f37e337] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Net48Test
+                          - text: x360ce.Net48Test
+                    - cell [ref=f37e338]
+                    - cell [ref=f37e340]
+                  - row "x360ce.Net60Test, (Directory)" [ref=f37e343]:
+                    - cell "x360ce.Net60Test, (Directory)" [ref=f37e344]:
+                      - generic [ref=f37e345]:
+                        - img [ref=f37e346]
+                        - link "x360ce.Net60Test, (Directory)" [ref=f37e351] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Net60Test
+                          - text: x360ce.Net60Test
+                    - cell [ref=f37e352]
+                    - cell [ref=f37e354]
+                  - row "x360ce.RemoteController, (Directory)" [ref=f37e357]:
+                    - cell "x360ce.RemoteController, (Directory)" [ref=f37e358]:
+                      - generic [ref=f37e359]:
+                        - img [ref=f37e360]
+                        - link "x360ce.RemoteController, (Directory)" [ref=f37e365] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.RemoteController
+                          - text: x360ce.RemoteController
+                    - cell [ref=f37e366]
+                    - cell [ref=f37e368]
+                  - row "x360ce.Web, (Directory)" [ref=f37e371]:
+                    - cell "x360ce.Web, (Directory)" [ref=f37e372]:
+                      - generic [ref=f37e373]:
+                        - img [ref=f37e374]
+                        - link "x360ce.Web, (Directory)" [ref=f37e379] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Web
+                          - text: x360ce.Web
+                    - cell [ref=f37e380]
+                    - cell [ref=f37e382]
+                  - row "x360ce, (Directory)" [ref=f37e385]:
+                    - cell "x360ce, (Directory)" [ref=f37e386]:
+                      - generic [ref=f37e387]:
+                        - img [ref=f37e388]
+                        - link "x360ce, (Directory)" [ref=f37e393] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce
+                          - text: x360ce
+                    - cell [ref=f37e394]
+                    - cell [ref=f37e396]
+                  - row ".editorconfig, (File)" [ref=f37e399]:
+                    - cell ".editorconfig, (File)" [ref=f37e400]:
+                      - generic [ref=f37e401]:
+                        - img [ref=f37e402]
+                        - link ".editorconfig, (File)" [ref=f37e407] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/.editorconfig
+                          - text: .editorconfig
+                    - cell [ref=f37e408]
+                    - cell [ref=f37e410]
+                  - row ".gitattributes, (File)" [ref=f37e413]:
+                    - cell ".gitattributes, (File)" [ref=f37e414]:
+                      - generic [ref=f37e415]:
+                        - img [ref=f37e416]
+                        - link ".gitattributes, (File)" [ref=f37e421] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/.gitattributes
+                          - text: .gitattributes
+                    - cell [ref=f37e422]
+                    - cell [ref=f37e424]
+                  - row ".gitignore, (File)" [ref=f37e427]:
+                    - cell ".gitignore, (File)" [ref=f37e428]:
+                      - generic [ref=f37e429]:
+                        - img [ref=f37e430]
+                        - link ".gitignore, (File)" [ref=f37e435] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/.gitignore
+                          - text: .gitignore
+                    - cell [ref=f37e436]
+                    - cell [ref=f37e438]
+                  - row ".gitmodules, (File)" [ref=f37e441]:
+                    - cell ".gitmodules, (File)" [ref=f37e442]:
+                      - generic [ref=f37e443]:
+                        - img [ref=f37e444]
+                        - link ".gitmodules, (File)" [ref=f37e449] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/.gitmodules
+                          - text: .gitmodules
+                    - cell [ref=f37e450]
+                    - cell [ref=f37e452]
+                  - row ".runsettings, (File)" [ref=f37e455]:
+                    - cell ".runsettings, (File)" [ref=f37e456]:
+                      - generic [ref=f37e457]:
+                        - img [ref=f37e458]
+                        - link ".runsettings, (File)" [ref=f37e463] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/.runsettings
+                          - text: .runsettings
+                    - cell [ref=f37e464]
+                    - cell [ref=f37e466]
+                  - row "Cleanup_Solution.ps1, (File)" [ref=f37e469]:
+                    - cell "Cleanup_Solution.ps1, (File)" [ref=f37e470]:
+                      - generic [ref=f37e471]:
+                        - img [ref=f37e472]
+                        - link "Cleanup_Solution.ps1, (File)" [ref=f37e477] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/Cleanup_Solution.ps1
+                          - text: Cleanup_Solution.ps1
+                    - cell [ref=f37e478]
+                    - cell [ref=f37e480]
+                  - row "MinHook_clone_as_SVN.bat, (File)" [ref=f37e483]:
+                    - cell "MinHook_clone_as_SVN.bat, (File)" [ref=f37e484]:
+                      - generic [ref=f37e485]:
+                        - img [ref=f37e486]
+                        - link "MinHook_clone_as_SVN.bat, (File)" [ref=f37e491] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/MinHook_clone_as_SVN.bat
+                          - text: MinHook_clone_as_SVN.bat
+                    - cell [ref=f37e492]
+                    - cell [ref=f37e494]
+                  - row "README.MD, (File)" [ref=f37e497]:
+                    - cell "README.MD, (File)" [ref=f37e498]:
+                      - generic [ref=f37e499]:
+                        - img [ref=f37e500]
+                        - link "README.MD, (File)" [ref=f37e505] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/README.MD
+                          - text: README.MD
+                    - cell [ref=f37e506]
+                    - cell [ref=f37e508]
+                  - row "SECURITY.md, (File)" [ref=f37e511]:
+                    - cell "SECURITY.md, (File)" [ref=f37e512]:
+                      - generic [ref=f37e513]:
+                        - img [ref=f37e514]
+                        - link "SECURITY.md, (File)" [ref=f37e519] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/SECURITY.md
+                          - text: SECURITY.md
+                    - cell [ref=f37e520]
+                    - cell [ref=f37e522]
+                  - row "TODO.md, (File)" [ref=f37e525]:
+                    - cell "TODO.md, (File)" [ref=f37e526]:
+                      - generic [ref=f37e527]:
+                        - img [ref=f37e528]
+                        - link "TODO.md, (File)" [ref=f37e533] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/TODO.md
+                          - text: TODO.md
+                    - cell [ref=f37e534]
+                    - cell [ref=f37e536]
+                  - row "x360ce.sln, (File)" [ref=f37e539]:
+                    - cell "x360ce.sln, (File)" [ref=f37e540]:
+                      - generic [ref=f37e541]:
+                        - img [ref=f37e542]
+                        - link "x360ce.sln, (File)" [ref=f37e547] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.sln
+                          - text: x360ce.sln
+                    - cell [ref=f37e548]
+                    - cell [ref=f37e550]
+                  - row "x360ce.sln.vsspell, (File)" [ref=f37e553]:
+                    - cell "x360ce.sln.vsspell, (File)" [ref=f37e554]:
+                      - generic [ref=f37e555]:
+                        - img [ref=f37e556]
+                        - link "x360ce.sln.vsspell, (File)" [ref=f37e561] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.sln.vsspell
+                          - text: x360ce.sln.vsspell
+                    - cell [ref=f37e562]
+                    - cell [ref=f37e564]
+                  - row "x360ce_3x.sln, (File)" [ref=f37e567]:
+                    - cell "x360ce_3x.sln, (File)" [ref=f37e568]:
+                      - generic [ref=f37e569]:
+                        - img [ref=f37e570]
+                        - link "x360ce_3x.sln, (File)" [ref=f37e575] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce_3x.sln
+                          - text: x360ce_3x.sln
+                    - cell [ref=f37e576]
+                    - cell [ref=f37e578]
+                  - row "x360ce_dll.sln, (File)" [ref=f37e581]:
+                    - cell "x360ce_dll.sln, (File)" [ref=f37e582]:
+                      - generic [ref=f37e583]:
+                        - img [ref=f37e584]
+                        - link "x360ce_dll.sln, (File)" [ref=f37e589] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce_dll.sln
+                          - text: x360ce_dll.sln
+                    - cell [ref=f37e590]
+                    - cell [ref=f37e592]
+            - generic [ref=f37e596]:
+              - generic [ref=f37e597]:
+                - heading "Repository files navigation" [level=2] [ref=f37e598]
+                - navigation "Repository files" [ref=f37e599]:
+                  - list [ref=f37e600]:
+                    - listitem [ref=f37e601]:
+                      - link "README" [ref=f37e602] [cursor=pointer]:
+                        - /url: "#"
+                        - img [ref=f37e604]
+                        - generic [ref=f37e606]: README
+                    - listitem [ref=f37e607]:
+                      - link "Security" [ref=f37e608] [cursor=pointer]:
+                        - /url: "#"
+                        - img [ref=f37e610]
+                        - generic [ref=f37e612]: Security
+                - button "Outline" [ref=f37e613] [cursor=pointer]:
+                  - img [ref=f37e614]
+              - article [ref=f37e617]:
+                - paragraph [ref=f37e618]: "\"Xbox 360 Controller Emulator\" allows your controller (gamepad, joystick, wheel, etc.) to function as an Xbox 360 controller. For example, it lets you play games such as \"Grand Theft Auto\" (GTA) or \"Mafia II\" using a Logitech Wheel."
+                - generic [ref=f37e619]:
+                  - heading "Download" [level=1] [ref=f37e620]
+                  - 'link "Permalink: Download" [ref=f37e621] [cursor=pointer]':
+                    - /url: "#download"
+                    - img [ref=f37e622]
+                - paragraph [ref=f37e624]:
+                  - text: "IMPORTANT: Please download and run digitally signed files only! If someone asks to disable antivirus or exclude X360CE app from anti-virus - DON'T! Report any suspicion in"
+                  - link "Issues" [ref=f37e625] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/issues
+                  - text: and we will try to resolve any false positive with anti-virus developers.
+                - paragraph [ref=f37e626]: On 2022-07-14 some malicious people updated the "Beta Testing" WIKI page with a link to a file which was not signed by developers of X360CE. The "Beta Testing" WIKI page has been restored and all WIKI pages have been locked for project contributors only, to ensure this does not happen again.
+                - generic [ref=f37e627]:
+                  - heading "Download v4.x" [level=2] [ref=f37e628]
+                  - 'link "Permalink: Download v4.x" [ref=f37e629] [cursor=pointer]':
+                    - /url: "#download-v4x"
+                    - img [ref=f37e630]
+                - paragraph [ref=f37e632]: Digitally Signed Application v4.17.15.0 (2020-11-15) and Virtual Gamepad Emulation Bus 1.16.112.0
+                - paragraph [ref=f37e633]:
+                  - link "Download - x360ce.zip" [ref=f37e634] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/releases/download/4.17.0.0/x360ce.zip
+                  - text: "- for All games"
+                - paragraph [ref=f37e635]:
+                  - text: "Note: version 4.x use Virtual Gamepad Emulation. Instructions can be found here:"
+                  - link "https://github.com/x360ce/x360ce/wiki/Beta-Testing" [ref=f37e636] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/wiki/Beta-Testing
+                - generic [ref=f37e637]:
+                  - heading "Download v3.x" [level=2] [ref=f37e638]
+                  - 'link "Permalink: Download v3.x" [ref=f37e639] [cursor=pointer]':
+                    - /url: "#download-v3x"
+                    - img [ref=f37e640]
+                - paragraph [ref=f37e642]: Digitally Signed Application v3.3.6.0 (2018-07-06) and Libraries 3.4.1.1357 (2015-08-27)
+                - paragraph [ref=f37e643]:
+                  - link "32-bit Download - x360ce_x86.zip" [ref=f37e644] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/releases/download/3.2.9.82/x360ce_x86.zip
+                  - text: "- for 32-bit games"
+                - paragraph [ref=f37e645]:
+                  - link "64-bit Download - x360ce_x64.zip" [ref=f37e646] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/releases/download/3.2.9.82/x360ce_x64.zip
+                  - text: "- for 64-bit games"
+                - paragraph [ref=f37e647]: "DInput.dll Plugin (required for some games):"
+                - paragraph [ref=f37e648]:
+                  - link "32-bit Download - dinput_x86.dll" [ref=f37e649] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/raw/master/x360ce.App/Resources/dinput_x86.dll
+                  - text: "- for 32-bit games"
+                - paragraph [ref=f37e650]:
+                  - link "64-bit Download - dinput_x64.dll" [ref=f37e651] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/raw/master/x360ce.App/Resources/dinput_x64.dll
+                  - text: "- for 64-bit games"
+                - generic [ref=f37e652]:
+                  - heading "Reporting Issues" [level=1] [ref=f37e653]
+                  - 'link "Permalink: Reporting Issues" [ref=f37e654] [cursor=pointer]':
+                    - /url: "#reporting-issues"
+                    - img [ref=f37e655]
+                - paragraph [ref=f37e657]:
+                  - strong [ref=f37e658]: "!!! Denuvo protected games are not supported !!!"
+                - paragraph [ref=f37e659]:
+                  - text: List of denuvo protected games is
+                  - link "here" [ref=f37e660] [cursor=pointer]:
+                    - /url: https://en.wikipedia.org/wiki/Denuvo#List_of_Denuvo_games
+                - paragraph [ref=f37e661]: Report only crashes or other bugs, note that the Issue tracker is not a help desk!
+                - paragraph [ref=f37e662]:
+                  - strong [ref=f37e663]: DO NOT ASK FOR HELP IN INSTALLATION OR CONFIGURATION!!!
+                - paragraph [ref=f37e664]:
+                  - strong [ref=f37e665]:
+                    - text: If you have questions about installation or configuration, please go to our
+                    - link "forum @NGemu" [ref=f37e666] [cursor=pointer]:
+                      - /url: http://ngemu.com/forums/x360ce.140
+                - generic [ref=f37e667]:
+                  - heading "Guides [OUTDATED!]" [level=1] [ref=f37e668]
+                  - 'link "Permalink: Guides [OUTDATED!]" [ref=f37e669] [cursor=pointer]':
+                    - /url: "#guides-outdated"
+                    - img [ref=f37e670]
+                - paragraph [ref=f37e672]:
+                  - link "x360ce Libraries Tutorial" [ref=f37e673] [cursor=pointer]:
+                    - /url: http://ngemu.com/threads/x360ce-libraries-tutorial-by-resolutespider5.155310/
+                - paragraph [ref=f37e674]:
+                  - link "x360ce Application Tutorial" [ref=f37e675] [cursor=pointer]:
+                    - /url: http://ngemu.com/threads/tutorial-by-resolutespider5.155011/
+                - paragraph [ref=f37e676]:
+                  - link "Various x360ce Guides" [ref=f37e677] [cursor=pointer]:
+                    - /url: http://ngemu.com/threads/various-x360ce-guides-by-resolutespider5.156807/
+                - generic [ref=f37e678]:
+                  - heading "Compatibility" [level=1] [ref=f37e679]
+                  - 'link "Permalink: Compatibility" [ref=f37e680] [cursor=pointer]':
+                    - /url: "#compatibility"
+                    - img [ref=f37e681]
+                - paragraph [ref=f37e683]:
+                  - text: Games that work with x360ce can be found on the
+                  - link "Compatibility List" [ref=f37e684] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/wiki/Compatibility-List
+                  - text: . If you would like to add to that list or provide updated information place see
+                  - link "Reporting Compatibility" [ref=f37e685] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/wiki/Reporting-Compatibility
+                  - text: .
+                - generic [ref=f37e686]:
+                  - heading "System Requirements" [level=1] [ref=f37e687]
+                  - 'link "Permalink: System Requirements" [ref=f37e688] [cursor=pointer]':
+                    - /url: "#system-requirements"
+                    - img [ref=f37e689]
+                - list [ref=f37e691]:
+                  - listitem [ref=f37e692]: Windows Vista or newer.
+                  - listitem [ref=f37e693]:
+                    - link ".NET 3.5 (also installs 2.0 and 3.0)" [ref=f37e694] [cursor=pointer]:
+                      - /url: http://www.microsoft.com/en-us/download/details.aspx?id=22
+                    - text: (included in Windows 7)
+                  - listitem [ref=f37e695]:
+                    - link ".NET 4.0 (link to 4.6, also installs 4.0)" [ref=f37e696] [cursor=pointer]:
+                      - /url: http://www.microsoft.com/en-us/download/details.aspx?id=48130
+                    - text: (included in Windows 8 and 10)
+                  - listitem [ref=f37e697]:
+                    - link "DirectX End-User Runtime (June 2010)" [ref=f37e698] [cursor=pointer]:
+                      - /url: http://www.microsoft.com/en-us/download/details.aspx?id=8109
+                    - text: (required regardless of OS)
+                  - listitem [ref=f37e699]:
+                    - link "Visual C++ Redistributable for Visual Studio 2013" [ref=f37e700] [cursor=pointer]:
+                      - /url: http://www.microsoft.com/en-us/download/details.aspx?id=40784
+                    - text: (
+                    - strong [ref=f37e701]: for x64 systems install both x86 and x64 redistributables
+                    - text: )
+                  - listitem [ref=f37e702]: If you upgraded to Windows 10, you must Uninstall and Reinstall the Visual C++ Redistributable
+                - paragraph [ref=f37e703]: "Notes:"
+                - list [ref=f37e704]:
+                  - listitem [ref=f37e705]: Most game's executables are 32-bit and require x86 x360ce and also the x86 redistributable.
+                  - listitem [ref=f37e706]:
+                    - text: Vista users can obtain .NET 3.5 from the above link, and Windows 8 users can enable it in
+                    - link "Programs and Features - Turn Windows Features on and off." [ref=f37e707] [cursor=pointer]:
+                      - /url: http://msdn.microsoft.com/en-us/library/hh506443.aspx
+                  - listitem [ref=f37e708]:
+                    - strong [ref=f37e709]: .NET MUST be installed prior to the DirectX webupdate as it checks that .NET 2.0/3.0/3.5 is installed and skips the Managed DirectX framework if it is not.
+                  - listitem [ref=f37e710]: The full DirectX Redistributable will always install the file, however it's best to have .NET 3.5 installed anyhow as quite a few XInput titles utilize .NET for internal dependencies.
+                - generic [ref=f37e711]:
+                  - heading "Files" [level=1] [ref=f37e712]
+                  - 'link "Permalink: Files" [ref=f37e713] [cursor=pointer]':
+                    - /url: "#files"
+                    - img [ref=f37e714]
+                - paragraph [ref=f37e716]:
+                  - text: xinput1_3.dll (Wrapper Library) - Translates XInput calls to DirectInput calls - supports old, non-XInput compatible GamePads.
+                  - text: x360ce.exe - (Application) - Allows for editing and testing of Library settings.
+                  - text: x360ce.ini - (Configuration) - Contain Library settings (button, axis, slider maps).
+                  - text: x360ce.gdb - (Game Database) Includes required hookmasks for various games).
+                  - text: Dinput8.dll - (DirectInput 8 spoof/wrapping file to improve x360ce compatibility in rare cases).
+                - generic [ref=f37e717]:
+                  - heading "Installation" [level=1] [ref=f37e718]
+                  - 'link "Permalink: Installation" [ref=f37e719] [cursor=pointer]':
+                    - /url: "#installation"
+                    - img [ref=f37e720]
+                - paragraph [ref=f37e722]: "Run this program from the same directory as the game executable. XInput library files exist with several different names and some games require a change in its name. Known names:"
+                - list [ref=f37e723]:
+                  - listitem [ref=f37e724]: xinput1_4.dll (Windows 8 / metro apps only)
+                  - listitem [ref=f37e725]: xinput1_3.dll
+                  - listitem [ref=f37e726]: xinput1_2.dll
+                  - listitem [ref=f37e727]: xinput1_1.dll
+                  - listitem [ref=f37e728]: xinput9_1_0.dll
+                - paragraph [ref=f37e729]: Game Database (GDB) and Configuration (INI) files can be copied to %ALLUSERSPROFILE%\X360CE on NT6 (Vista/7/8) or %ALLUSERSPROFILE%\Application Data\X360CE on NT5.1 (XP), or be left in the same directory as the game's executable (.EXE)
+                - paragraph [ref=f37e730]: "Note:"
+                - list [ref=f37e731]:
+                  - listitem [ref=f37e732]: In most cases games based on the Source engine have the DLL placed inside the /Bin/ sub folder, as it is loaded by inputsystem.dll instead of the game executable.
+                  - listitem [ref=f37e733]: The DLL is not currently fully supported by the App, recent versions incorporate HookMasks and fully remove HookModes, and requires placing Version=1 under [options] in the x360ce.ini to quieten a warning about incorrect version.
+                - generic [ref=f37e734]:
+                  - heading "Uninstallation" [level=1] [ref=f37e735]
+                  - 'link "Permalink: Uninstallation" [ref=f37e736] [cursor=pointer]':
+                    - /url: "#uninstallation"
+                    - img [ref=f37e737]
+                - paragraph [ref=f37e739]: Delete x360ce.exe, x360ce.ini and all XInput DLLs from the game's executable directory.
+                - generic [ref=f37e740]:
+                  - heading "How to remove HID Guardian if access to your Mouse and Keyboard is lost (X360CE v4.x)" [level=3] [ref=f37e741]
+                  - 'link "Permalink: How to remove HID Guardian if access to your Mouse and Keyboard is lost (X360CE v4.x)" [ref=f37e742] [cursor=pointer]':
+                    - /url: "#how-to-remove-hid-guardian-if-access-to-your-mouse-and-keyboard-is-lost-x360ce-v4x"
+                    - img [ref=f37e743]
+                - paragraph [ref=f37e745]:
+                  - text: "Instructions:"
+                  - link "https://github.com/x360ce/x360ce/wiki/HID-Guardian" [ref=f37e746] [cursor=pointer]:
+                    - /url: https://github.com/x360ce/x360ce/wiki/HID-Guardian
+                - generic [ref=f37e747]:
+                  - heading "Troubleshooting" [level=1] [ref=f37e748]
+                  - 'link "Permalink: Troubleshooting" [ref=f37e749] [cursor=pointer]':
+                    - /url: "#troubleshooting"
+                    - img [ref=f37e750]
+                - paragraph [ref=f37e752]: Some games have control issues when Dead Zone is reduced to 0%.
+                - paragraph [ref=f37e753]: You may need to increase the Anti-Dead Zone value if there is gap between the moment when you start to push the axis-related button and the reaction in game.
+                - paragraph [ref=f37e754]:
+                  - strong [ref=f37e755]: Wheel doesn't work in the game, but it works inside x360ce Application.
+                - paragraph [ref=f37e756]: "Some controllers will only operate in game if they are set as \"GamePad\". Try to:"
+                - list [ref=f37e757]:
+                  - listitem [ref=f37e758]: Run x360ce.exe
+                  - listitem [ref=f37e759]: "Select the [Controller #] tab page corresponding to your controller."
+                  - listitem [ref=f37e760]: Open [Advanced] tab page.
+                  - listitem [ref=f37e761]: "Set \"Device Type\" drop down list value to: GamePad."
+                  - listitem [ref=f37e762]: Click [Save] button.
+                  - listitem [ref=f37e763]: Close x360ce.exe.
+                  - listitem [ref=f37e764]: Run the game.
+                - paragraph [ref=f37e765]: "Only one controller, mapped to PAD1, may work correctly in some games. Try to:"
+                - list [ref=f37e766]:
+                  - listitem [ref=f37e767]: Run x360ce.exe
+                  - listitem [ref=f37e768]: "Select the [Controller #] tab page corresponding to your controller."
+                  - listitem [ref=f37e769]: Open the [Direct Input Device] tab page (visible when the controller is connected).
+                  - listitem [ref=f37e770]: "Set \"Map To\" drop down list value to: 1."
+                  - listitem [ref=f37e771]:
+                    - text: Set "Map To" drop down list values
+                    - emphasis [ref=f37e772]: (repeat steps 2. to 4.)
+                    - text: "for other controllers, if you have them, to: 2, 3 or 4."
+                  - listitem [ref=f37e773]: Click [Save] button.
+                  - listitem [ref=f37e774]: Close x360ce.exe.
+                  - listitem [ref=f37e775]: Run the game.
+                - paragraph [ref=f37e776]: "To use more than one controller in game, you may need to combine them. Try to:"
+                - list [ref=f37e777]:
+                  - listitem [ref=f37e778]: Run x360ce.exe
+                  - listitem [ref=f37e779]: "Select the [Controller #] tab page corresponding to your additional controller."
+                  - listitem [ref=f37e780]: Open the [Advanced] tab page.
+                  - listitem [ref=f37e781]: "Set \"Combine Into\" drop down list value to: One."
+                  - listitem [ref=f37e782]: Select [Options] tab page.
+                  - listitem [ref=f37e783]:
+                    - text: Check "Enable Combining" check-box.
+                    - emphasis [ref=f37e784]: "(Note: Uncheck \"Enable Combining\" check-box when you want to configure the controller.)"
+                  - listitem [ref=f37e785]: Click [Save] button.
+                  - listitem [ref=f37e786]: Close x360ce.exe.
+                  - listitem [ref=f37e787]: Run the game.
+                - paragraph [ref=f37e788]:
+                  - strong [ref=f37e789]: Do I need to run x360ce Application during the game?
+                - paragraph [ref=f37e790]: The x360ce.exe application can be closed before launching the game; the game doesn't need it and it uses your computer's resources. The x360ce.exe application is just a GUI for editing x360ce.ini and testing your controller.
+                - paragraph [ref=f37e791]:
+                  - strong [ref=f37e792]: Warning - Configuration file version does not match x360ce version.
+                - paragraph [ref=f37e793]: This occurs because the current version of the application is not completely compatible with the DLL just yet. You can resolve this by adding Version=1 under the [Options] section in x360ce.ini
+                - paragraph [ref=f37e794]:
+                  - strong [ref=f37e795]: Controller tab won't turn green / Red light on Controller 1, 2 etc.
+                - paragraph [ref=f37e796]: "This can occur for a number of reasons:"
+                - list [ref=f37e797]:
+                  - listitem [ref=f37e798]: The configuration utility DOES NOT work with the 64-bit library, it will only work with the 32-bit version, This is the case regardless of whether your Windows is 32-bit or 64-bit.
+                  - listitem [ref=f37e799]: The DInput state of the controller might be incorrect due to an application crashing previously and not unloading the controller or some other reason. Opening up Joy.cpl (Set Up USB Game Controllers) and clicking the Advanced button, and then Okaying out of the window that appears can fix it.
+                  - listitem [ref=f37e800]: The controller profile loaded may match the name of the controller but not actually be for the controller you own - in this case you might see button numbers or axes mapped that do not appear in the Joy.cpl test page.
+                  - listitem [ref=f37e801]: The controller profile might have PassThrough set. A growing number of profiles have been uploaded that do this, I have no idea why as it disables x360ce and just bloats the list of available profiles.
+                  - listitem [ref=f37e802]: There just might not be a profile for your control at all - The light should turn green at least once the 2 sticks, triggers and D-pad are assigned. Sometimes the application needs to be restarted after assigning these for the light to turn green.
+                - generic [ref=f37e803]:
+                  - heading "Screenshots" [level=1] [ref=f37e804]
+                  - 'link "Permalink: Screenshots" [ref=f37e805] [cursor=pointer]':
+                    - /url: "#screenshots"
+                    - img [ref=f37e806]
+                - paragraph [ref=f37e808]:
+                  - link "http://www.jocys.com/projects/x360ce/Images/x360ce_General.png" [ref=f37e809] [cursor=pointer]:
+                    - /url: https://camo.githubusercontent.com/06f34989a360fd6756a5db987a6d52788186c852bbe412c87d19c0a773fdf9ea/687474703a2f2f7777772e6a6f6379732e636f6d2f70726f6a656374732f7833363063652f496d616765732f7833363063655f47656e6572616c2e706e67
+                    - img "http://www.jocys.com/projects/x360ce/Images/x360ce_General.png" [ref=f37e810]
+        - generic [ref=f37e814]:
+          - generic [ref=f37e817]:
+            - heading "About" [level=2] [ref=f37e818]
+            - paragraph [ref=f37e819]: Primary repository for the x360ce library, front-end and tools.
+            - heading "Resources" [level=3] [ref=f37e820]
+            - link "Readme" [ref=f37e822] [cursor=pointer]:
+              - /url: "#readme-ov-file"
+              - img [ref=f37e823]
+              - text: Readme
+            - heading "Security policy" [level=3] [ref=f37e825]
+            - link "Security policy" [ref=f37e827] [cursor=pointer]:
+              - /url: "#security-ov-file"
+              - img [ref=f37e828]
+              - text: Security policy
+            - link "Activity" [ref=f37e831] [cursor=pointer]:
+              - /url: /x360ce/x360ce/activity
+              - img [ref=f37e832]
+              - text: Activity
+            - link "Custom properties" [ref=f37e835] [cursor=pointer]:
+              - /url: /x360ce/x360ce/custom-properties
+              - img [ref=f37e836]
+              - text: Custom properties
+            - heading "Stars" [level=3] [ref=f37e838]
+            - link "2.9k stars" [ref=f37e840] [cursor=pointer]:
+              - /url: /x360ce/x360ce/stargazers
+              - img [ref=f37e841]
+              - strong [ref=f37e843]: 2.9k
+              - text: stars
+            - heading "Watchers" [level=3] [ref=f37e844]
+            - link "103 watching" [ref=f37e846] [cursor=pointer]:
+              - /url: /x360ce/x360ce/watchers
+              - img [ref=f37e847]
+              - strong [ref=f37e849]: "103"
+              - text: watching
+            - heading "Forks" [level=3] [ref=f37e850]
+            - link "504 forks" [ref=f37e852] [cursor=pointer]:
+              - /url: /x360ce/x360ce/forks
+              - img [ref=f37e853]
+              - strong [ref=f37e855]: "504"
+              - text: forks
+            - link "Report repository" [ref=f37e857] [cursor=pointer]:
+              - /url: /contact/report-content?content_url=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce&report=x360ce+%28user%29
+          - generic [ref=f37e859]:
+            - heading "Releases 8" [level=2] [ref=f37e860]:
+              - link "Releases 8" [ref=f37e861] [cursor=pointer]:
+                - /url: /x360ce/x360ce/releases
+                - text: Releases
+                - generic "8" [ref=f37e862]
+            - link "X360CE 3.2.9.82 Latest Jul 7, 2018on Jul 7, 2018" [ref=f37e863] [cursor=pointer]:
+              - /url: /x360ce/x360ce/releases/tag/3.2.9.82
+              - img [ref=f37e864]
+              - generic [ref=f37e866]:
+                - generic [ref=f37e867]:
+                  - generic [ref=f37e868]: X360CE 3.2.9.82
+                  - 'generic "Label: Latest" [ref=f37e869]': Latest
+                - generic [ref=f37e870]: Jul 7, 2018on Jul 7, 2018
+            - link "+ 7 releases" [ref=f37e872] [cursor=pointer]:
+              - /url: /x360ce/x360ce/releases
+          - generic "Loading latest packages" [ref=f37e875]:
+            - heading "Packages" [level=2] [ref=f37e876]:
+              - link "Packages" [ref=f37e877] [cursor=pointer]:
+                - /url: /orgs/x360ce/packages?repo_name=x360ce
+          - generic "Loading contributors" [ref=f37e889]:
+            - generic:
+              - heading "Contributors" [level=2] [ref=f37e890]:
+                - link "Contributors" [ref=f37e891] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/graphs/contributors
+              - list [ref=f37e892]:
+                - listitem [ref=f37e893]
+                - listitem [ref=f37e895]
+                - listitem [ref=f37e897]
+          - generic [ref=f37e900]:
+            - heading "Languages" [level=2] [ref=f37e901]
+            - list [ref=f37e911]:
+              - listitem [ref=f37e912]:
+                - link "C# 78.8%" [ref=f37e913] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=c%23
+                  - img [ref=f37e914]
+                  - generic [ref=f37e916]: C#
+                  - generic [ref=f37e917]: 78.8%
+              - listitem [ref=f37e918]:
+                - link "C++ 5.4%" [ref=f37e919] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=c%2B%2B
+                  - img [ref=f37e920]
+                  - generic [ref=f37e922]: C++
+                  - generic [ref=f37e923]: 5.4%
+              - listitem [ref=f37e924]:
+                - link "TSQL 4.5%" [ref=f37e925] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=tsql
+                  - img [ref=f37e926]
+                  - generic [ref=f37e928]: TSQL
+                  - generic [ref=f37e929]: 4.5%
+              - listitem [ref=f37e930]:
+                - link "Rich Text Format 2.5%" [ref=f37e931] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=rich-text-format
+                  - img [ref=f37e932]
+                  - generic [ref=f37e934]: Rich Text Format
+                  - generic [ref=f37e935]: 2.5%
+              - listitem [ref=f37e936]:
+                - link "PowerShell 2.0%" [ref=f37e937] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=powershell
+                  - img [ref=f37e938]
+                  - generic [ref=f37e940]: PowerShell
+                  - generic [ref=f37e941]: 2.0%
+              - listitem [ref=f37e942]:
+                - link "ASP.NET 1.9%" [ref=f37e943] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/search?l=asp.net
+                  - img [ref=f37e944]
+                  - generic [ref=f37e946]: ASP.NET
+                  - generic [ref=f37e947]: 1.9%
+              - listitem [ref=f37e948]:
+                - generic [ref=f37e949]:
+                  - img [ref=f37e950]
+                  - generic [ref=f37e952]: Other
+                  - generic [ref=f37e953]: 4.9%
+  - contentinfo [ref=f37e955]:
+    - heading "Footer" [level=2] [ref=f37e956]
+    - generic [ref=f37e957]:
+      - generic [ref=f37e958]:
+        - link "GitHub Homepage" [ref=f37e959] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=f37e960]
+        - generic [ref=f37e962]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f37e963]:
+        - heading "Footer navigation" [level=3] [ref=f37e964]
+        - list "Footer navigation" [ref=f37e965]:
+          - listitem [ref=f37e966]:
+            - link "Terms" [ref=f37e967] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f37e968]:
+            - link "Privacy" [ref=f37e969] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f37e970]:
+            - link "Security" [ref=f37e971] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f37e972]:
+            - link "Status" [ref=f37e973] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f37e974]:
+            - link "Community" [ref=f37e975] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f37e976]:
+            - link "Docs" [ref=f37e977] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f37e978]:
+            - link "Contact" [ref=f37e979] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f37e980]:
+            - button "Manage cookies" [ref=f37e982] [cursor=pointer]
+          - listitem [ref=f37e983]:
+            - button "Do not share my personal information" [ref=f37e985] [cursor=pointer]

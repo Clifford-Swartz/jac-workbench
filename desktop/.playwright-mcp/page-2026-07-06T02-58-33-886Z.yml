@@ -1,0 +1,489 @@
+- generic [active] [ref=f40e1]:
+  - generic [ref=f40e2]:
+    - generic [ref=f40e3]:
+      - link "Skip to content" [ref=f40e4] [cursor=pointer]:
+        - /url: "#start-of-content"
+      - banner [ref=f40e6]:
+        - heading "Navigation Menu" [level=2] [ref=f40e7]
+        - generic [ref=f40e8]:
+          - link "Homepage" [ref=f40e10] [cursor=pointer]:
+            - /url: /
+            - img [ref=f40e11]
+          - generic [ref=f40e13]:
+            - navigation "Global" [ref=f40e16]:
+              - list [ref=f40e17]:
+                - listitem [ref=f40e18]:
+                  - button "Platform" [ref=f40e20] [cursor=pointer]:
+                    - text: Platform
+                    - img [ref=f40e21]
+                - listitem [ref=f40e23]:
+                  - button "Solutions" [ref=f40e25] [cursor=pointer]:
+                    - text: Solutions
+                    - img [ref=f40e26]
+                - listitem [ref=f40e28]:
+                  - button "Resources" [ref=f40e30] [cursor=pointer]:
+                    - text: Resources
+                    - img [ref=f40e31]
+                - listitem [ref=f40e33]:
+                  - button "Open Source" [ref=f40e35] [cursor=pointer]:
+                    - text: Open Source
+                    - img [ref=f40e36]
+                - listitem [ref=f40e38]:
+                  - button "Enterprise" [ref=f40e40] [cursor=pointer]:
+                    - text: Enterprise
+                    - img [ref=f40e41]
+                - listitem [ref=f40e43]:
+                  - link "Pricing" [ref=f40e44] [cursor=pointer]:
+                    - /url: https://github.com/pricing
+                    - generic [ref=f40e45]: Pricing
+            - generic [ref=f40e46]:
+              - button "Search or jump to…" [ref=f40e49] [cursor=pointer]:
+                - img [ref=f40e51]
+                - generic [ref=f40e53]: Search or jump to...
+                - img [ref=f40e55]
+              - link "Sign in" [ref=f40e59] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Ftree%2Fmaster%2Fx360ce.Engine
+              - link "Sign up" [ref=f40e60] [cursor=pointer]:
+                - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Ffiles%2Fdisambiguate&source=header-repo&source_repo=x360ce%2Fx360ce
+              - button "Appearance settings" [ref=f40e63] [cursor=pointer]:
+                - img
+    - main [ref=f40e67]:
+      - generic [ref=f40e68]:
+        - generic [ref=f40e69]:
+          - generic [ref=f40e71]:
+            - img [ref=f40e72]
+            - link "x360ce" [ref=f40e75] [cursor=pointer]:
+              - /url: /x360ce
+            - generic [ref=f40e76]: /
+            - strong [ref=f40e77]:
+              - link "x360ce" [ref=f40e78] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+            - generic [ref=f40e79]: Public
+          - generic [ref=f40e80]:
+            - list:
+              - listitem [ref=f40e81]:
+                - link "You must be signed in to change notification settings" [ref=f40e82] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f40e83]
+                  - text: Notifications
+              - listitem [ref=f40e85]:
+                - link "Fork 504" [ref=f40e86] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f40e87]
+                  - text: Fork
+                  - generic "504" [ref=f40e89]
+              - listitem [ref=f40e90]:
+                - link "You must be signed in to star a repository" [ref=f40e92] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f40e93]
+                  - text: Star
+                  - generic "2866 users starred this repository" [ref=f40e95]: 2.9k
+        - navigation "Repository" [ref=f40e96]:
+          - list [ref=f40e97]:
+            - listitem [ref=f40e98]:
+              - link "Code" [ref=f40e99] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+                - img [ref=f40e100]
+                - generic [ref=f40e102]: Code
+            - listitem [ref=f40e103]:
+              - link "Issues 837" [ref=f40e104] [cursor=pointer]:
+                - /url: /x360ce/x360ce/issues
+                - img [ref=f40e105]
+                - generic [ref=f40e108]: Issues
+                - generic "837" [ref=f40e109]
+            - listitem [ref=f40e110]:
+              - link "Pull requests 7" [ref=f40e111] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulls
+                - img [ref=f40e112]
+                - generic [ref=f40e114]: Pull requests
+                - generic "7" [ref=f40e115]
+            - listitem [ref=f40e116]:
+              - link "Discussions" [ref=f40e117] [cursor=pointer]:
+                - /url: /x360ce/x360ce/discussions
+                - img [ref=f40e118]
+                - generic [ref=f40e120]: Discussions
+            - listitem [ref=f40e121]:
+              - link "Actions" [ref=f40e122] [cursor=pointer]:
+                - /url: /x360ce/x360ce/actions
+                - img [ref=f40e123]
+                - generic [ref=f40e125]: Actions
+            - listitem [ref=f40e126]:
+              - link "Projects" [ref=f40e127] [cursor=pointer]:
+                - /url: /x360ce/x360ce/projects
+                - img [ref=f40e128]
+                - generic [ref=f40e130]: Projects
+            - listitem [ref=f40e131]:
+              - link "Wiki" [ref=f40e132] [cursor=pointer]:
+                - /url: /x360ce/x360ce/wiki
+                - img [ref=f40e133]
+                - generic [ref=f40e135]: Wiki
+            - listitem [ref=f40e136]:
+              - link "Security and quality" [ref=f40e137] [cursor=pointer]:
+                - /url: /x360ce/x360ce/security
+                - img [ref=f40e138]
+                - generic [ref=f40e140]: Security and quality
+            - listitem [ref=f40e141]:
+              - link "Insights" [ref=f40e142] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulse
+                - img [ref=f40e143]
+                - generic [ref=f40e145]: Insights
+      - generic [ref=f40e153]:
+        - generic [ref=f40e155]:
+          - generic [ref=f40e158]:
+            - generic [ref=f40e159]:
+              - generic [ref=f40e160]:
+                - heading "Collapse file tree" [level=2] [ref=f40e161]:
+                  - button "Collapse file tree" [expanded] [ref=f40e162] [cursor=pointer]:
+                    - img [ref=f40e163]
+                - heading "Files" [level=2] [ref=f40e166]
+              - generic [ref=f40e167]:
+                - button "master branch" [ref=f40e169] [cursor=pointer]:
+                  - generic [ref=f40e170]:
+                    - generic [ref=f40e172]:
+                      - img [ref=f40e174]
+                      - generic [ref=f40e177]: master
+                    - generic:
+                      - img
+                - button "Search this repository (forward slash)" [ref=f40e179] [cursor=pointer]:
+                  - img [ref=f40e180]
+            - generic [ref=f40e183]:
+              - img [ref=f40e185]
+              - combobox "Go to file" [ref=f40e187]
+            - navigation "File Tree Navigation" [ref=f40e193]:
+              - tree "Files" [ref=f40e195]:
+                - treeitem "MinHook" [level=1] [ref=f40e196]:
+                  - generic [ref=f40e198] [cursor=pointer]:
+                    - img [ref=f40e201]
+                    - generic [ref=f40e203]: MinHook
+                - treeitem "Mobile" [level=1] [ref=f40e204]:
+                  - generic [ref=f40e205] [cursor=pointer]:
+                    - img [ref=f40e207]
+                    - generic [ref=f40e209]:
+                      - img [ref=f40e213]
+                      - generic [ref=f40e215]: Mobile
+                - treeitem "x360ce.App.Beta" [level=1] [ref=f40e216]:
+                  - generic [ref=f40e217] [cursor=pointer]:
+                    - img [ref=f40e219]
+                    - generic [ref=f40e221]:
+                      - img [ref=f40e225]
+                      - generic [ref=f40e227]: x360ce.App.Beta
+                - treeitem "x360ce.App.WPF" [level=1] [ref=f40e228]:
+                  - generic [ref=f40e229] [cursor=pointer]:
+                    - img [ref=f40e231]
+                    - generic [ref=f40e233]:
+                      - img [ref=f40e237]
+                      - generic [ref=f40e239]: x360ce.App.WPF
+                - treeitem "x360ce.App" [level=1] [ref=f40e240]:
+                  - generic [ref=f40e241] [cursor=pointer]:
+                    - img [ref=f40e243]
+                    - generic [ref=f40e245]:
+                      - img [ref=f40e249]
+                      - generic [ref=f40e251]: x360ce.App
+                - treeitem "x360ce.Data" [level=1] [ref=f40e252]:
+                  - generic [ref=f40e253] [cursor=pointer]:
+                    - img [ref=f40e255]
+                    - generic [ref=f40e257]:
+                      - img [ref=f40e261]
+                      - generic [ref=f40e263]: x360ce.Data
+                - treeitem "x360ce.Engine" [expanded] [level=1] [ref=f40e264]:
+                  - generic [ref=f40e265] [cursor=pointer]:
+                    - img [ref=f40e267]
+                    - generic [ref=f40e269]:
+                      - img [ref=f40e273]
+                      - generic [ref=f40e275]: x360ce.Engine
+                  - group "x360ce.Engine" [ref=f40e276]:
+                    - treeitem "Common" [level=2] [ref=f40e277]:
+                      - generic [ref=f40e278] [cursor=pointer]:
+                        - img [ref=f40e283]
+                        - generic [ref=f40e285]:
+                          - img [ref=f40e289]
+                          - generic [ref=f40e291]: Common
+                    - treeitem "Data" [level=2] [ref=f40e292]:
+                      - generic [ref=f40e293] [cursor=pointer]:
+                        - img [ref=f40e298]
+                        - generic [ref=f40e300]:
+                          - img [ref=f40e304]
+                          - generic [ref=f40e306]: Data
+                    - treeitem "JocysCom" [level=2] [ref=f40e307]:
+                      - generic [ref=f40e308] [cursor=pointer]:
+                        - img [ref=f40e313]
+                        - generic [ref=f40e315]:
+                          - img [ref=f40e319]
+                          - generic [ref=f40e321]: JocysCom
+                    - treeitem "Maps" [level=2] [ref=f40e322]:
+                      - generic [ref=f40e323] [cursor=pointer]:
+                        - img [ref=f40e328]
+                        - generic [ref=f40e330]:
+                          - img [ref=f40e334]
+                          - generic [ref=f40e336]: Maps
+                    - treeitem "Properties" [level=2] [ref=f40e337]:
+                      - generic [ref=f40e338] [cursor=pointer]:
+                        - img [ref=f40e343]
+                        - generic [ref=f40e345]:
+                          - img [ref=f40e349]
+                          - generic [ref=f40e351]: Properties
+                    - treeitem "Resources" [level=2] [ref=f40e352]:
+                      - generic [ref=f40e353] [cursor=pointer]:
+                        - img [ref=f40e358]
+                        - generic [ref=f40e360]:
+                          - img [ref=f40e364]
+                          - generic [ref=f40e366]: Resources
+                    - treeitem "SharpDX.XInput" [level=2] [ref=f40e367]:
+                      - generic [ref=f40e368] [cursor=pointer]:
+                        - img [ref=f40e373]
+                        - generic [ref=f40e375]:
+                          - img [ref=f40e379]
+                          - generic [ref=f40e381]: SharpDX.XInput
+                    - treeitem "App.Config" [level=2] [ref=f40e382]:
+                      - generic [ref=f40e387] [cursor=pointer]:
+                        - img [ref=f40e390]
+                        - generic [ref=f40e392]: App.Config
+                    - treeitem "GlobalSuppressions.cs" [level=2] [ref=f40e393]:
+                      - generic [ref=f40e398] [cursor=pointer]:
+                        - img [ref=f40e401]
+                        - generic [ref=f40e403]: GlobalSuppressions.cs
+                    - treeitem "packages.config" [level=2] [ref=f40e404]:
+                      - generic [ref=f40e409] [cursor=pointer]:
+                        - img [ref=f40e412]
+                        - generic [ref=f40e414]: packages.config
+                    - treeitem "x360ce.Engine.csproj" [level=2] [ref=f40e415]:
+                      - generic [ref=f40e420] [cursor=pointer]:
+                        - img [ref=f40e423]
+                        - generic [ref=f40e425]: x360ce.Engine.csproj
+                - treeitem "x360ce.Net48Test" [level=1] [ref=f40e426]:
+                  - generic [ref=f40e427] [cursor=pointer]:
+                    - img [ref=f40e429]
+                    - generic [ref=f40e431]:
+                      - img [ref=f40e435]
+                      - generic [ref=f40e437]: x360ce.Net48Test
+                - treeitem "x360ce.Net60Test" [level=1] [ref=f40e438]:
+                  - generic [ref=f40e439] [cursor=pointer]:
+                    - img [ref=f40e441]
+                    - generic [ref=f40e443]:
+                      - img [ref=f40e447]
+                      - generic [ref=f40e449]: x360ce.Net60Test
+                - treeitem "x360ce.RemoteController" [level=1] [ref=f40e450]:
+                  - generic [ref=f40e451] [cursor=pointer]:
+                    - img [ref=f40e453]
+                    - generic [ref=f40e455]:
+                      - img [ref=f40e459]
+                      - generic [ref=f40e461]: x360ce.RemoteController
+                - treeitem "x360ce.Web" [level=1] [ref=f40e462]:
+                  - generic [ref=f40e463] [cursor=pointer]:
+                    - img [ref=f40e465]
+                    - generic [ref=f40e467]:
+                      - img [ref=f40e471]
+                      - generic [ref=f40e473]: x360ce.Web
+                - treeitem "x360ce" [level=1] [ref=f40e474]:
+                  - generic [ref=f40e475] [cursor=pointer]:
+                    - img [ref=f40e477]
+                    - generic [ref=f40e479]:
+                      - img [ref=f40e483]
+                      - generic [ref=f40e485]: x360ce
+                - treeitem ".editorconfig" [level=1] [ref=f40e486]:
+                  - generic [ref=f40e488] [cursor=pointer]:
+                    - img [ref=f40e491]
+                    - generic [ref=f40e493]: .editorconfig
+                - treeitem ".gitattributes" [level=1] [ref=f40e494]:
+                  - generic [ref=f40e496] [cursor=pointer]:
+                    - img [ref=f40e499]
+                    - generic [ref=f40e501]: .gitattributes
+                - treeitem ".gitignore" [level=1] [ref=f40e502]:
+                  - generic [ref=f40e504] [cursor=pointer]:
+                    - img [ref=f40e507]
+                    - generic [ref=f40e509]: .gitignore
+                - treeitem ".gitmodules" [level=1] [ref=f40e510]:
+                  - generic [ref=f40e512] [cursor=pointer]:
+                    - img [ref=f40e515]
+                    - generic [ref=f40e517]: .gitmodules
+                - treeitem ".runsettings" [level=1] [ref=f40e518]:
+                  - generic [ref=f40e520] [cursor=pointer]:
+                    - img [ref=f40e523]
+                    - generic [ref=f40e525]: .runsettings
+                - treeitem "Cleanup_Solution.ps1" [level=1] [ref=f40e526]:
+                  - generic [ref=f40e528] [cursor=pointer]:
+                    - img [ref=f40e531]
+                    - generic [ref=f40e533]: Cleanup_Solution.ps1
+                - treeitem "MinHook_clone_as_SVN.bat" [level=1] [ref=f40e534]:
+                  - generic [ref=f40e536] [cursor=pointer]:
+                    - img [ref=f40e539]
+                    - generic [ref=f40e541]: MinHook_clone_as_SVN.bat
+                - treeitem "README.MD" [level=1] [ref=f40e542]:
+                  - generic [ref=f40e544] [cursor=pointer]:
+                    - img [ref=f40e547]
+                    - generic [ref=f40e549]: README.MD
+                - treeitem "SECURITY.md" [level=1] [ref=f40e550]:
+                  - generic [ref=f40e552] [cursor=pointer]:
+                    - img [ref=f40e555]
+                    - generic [ref=f40e557]: SECURITY.md
+                - treeitem "TODO.md" [level=1] [ref=f40e558]:
+                  - generic [ref=f40e560] [cursor=pointer]:
+                    - img [ref=f40e563]
+                    - generic [ref=f40e565]: TODO.md
+                - treeitem "x360ce.sln" [level=1] [ref=f40e566]:
+                  - generic [ref=f40e568] [cursor=pointer]:
+                    - img [ref=f40e571]
+                    - generic [ref=f40e573]: x360ce.sln
+                - treeitem "x360ce.sln.vsspell" [level=1] [ref=f40e574]:
+                  - generic [ref=f40e576] [cursor=pointer]:
+                    - img [ref=f40e579]
+                    - generic [ref=f40e581]: x360ce.sln.vsspell
+                - treeitem "x360ce_3x.sln" [level=1] [ref=f40e582]:
+                  - generic [ref=f40e584] [cursor=pointer]:
+                    - img [ref=f40e587]
+                    - generic [ref=f40e589]: x360ce_3x.sln
+                - treeitem "x360ce_dll.sln" [level=1] [ref=f40e590]:
+                  - generic [ref=f40e592] [cursor=pointer]:
+                    - img [ref=f40e595]
+                    - generic [ref=f40e597]: x360ce_dll.sln
+          - slider "Draggable pane splitter" [ref=f40e599]
+        - generic [ref=f40e602]:
+          - generic [ref=f40e606]:
+            - generic [ref=f40e608]:
+              - navigation "Breadcrumbs" [ref=f40e609]:
+                - heading "Breadcrumbs" [level=2] [ref=f40e610]
+                - list [ref=f40e611]:
+                  - listitem [ref=f40e612]:
+                    - link "x360ce" [ref=f40e613] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/tree/master
+              - generic [ref=f40e614]:
+                - text: /
+                - heading "x360ce.Engine" [level=1] [ref=f40e615]
+                - text: /
+              - button "Copy path" [ref=f40e616] [cursor=pointer]:
+                - img [ref=f40e617]
+            - generic [ref=f40e622]:
+              - heading "Directory actions" [level=2] [ref=f40e623]
+              - heading "More options" [level=2] [ref=f40e624]
+              - button "More options" [ref=f40e625] [cursor=pointer]:
+                - img [ref=f40e626]
+          - generic [ref=f40e628]:
+            - generic [ref=f40e630]:
+              - heading "Latest commit" [level=2] [ref=f40e631]
+              - generic [ref=f40e634]:
+                - heading "History" [level=2] [ref=f40e635]
+                - link "History" [ref=f40e636] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/commits/master/x360ce.Engine
+                  - generic [ref=f40e637]:
+                    - generic:
+                      - img
+                    - generic [ref=f40e638]: History
+            - generic [ref=f40e640]:
+              - heading "Folders and files" [level=2] [ref=f40e641]
+              - table "Folders and files" [ref=f40e642]:
+                - rowgroup [ref=f40e643]:
+                  - row "Name Last commit message Last commit date" [ref=f40e644]:
+                    - columnheader "Name" [ref=f40e645]
+                    - columnheader "Last commit message" [ref=f40e646]:
+                      - generic "Last commit message" [ref=f40e647]
+                    - columnheader "Last commit date" [ref=f40e648]:
+                      - generic "Last commit date" [ref=f40e649]
+                - rowgroup [ref=f40e650]:
+                  - row "parent directory Parent directory" [ref=f40e651]:
+                    - cell "parent directory Parent directory" [ref=f40e652]:
+                      - heading "parent directory" [level=3] [ref=f40e653]
+                      - link "Parent directory" [ref=f40e654] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/tree/master
+                        - generic [ref=f40e655]:
+                          - img [ref=f40e656]
+                          - text: ..
+                  - row "Common, (Directory)" [ref=f40e658]:
+                    - cell "Common, (Directory)" [ref=f40e659]:
+                      - generic [ref=f40e660]:
+                        - img [ref=f40e661]
+                        - link "Common, (Directory)" [ref=f40e666] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/Common
+                          - text: Common
+                    - cell [ref=f40e667]
+                    - cell [ref=f40e669]
+                  - row "Data, (Directory)" [ref=f40e672]:
+                    - cell "Data, (Directory)" [ref=f40e673]:
+                      - generic [ref=f40e674]:
+                        - img [ref=f40e675]
+                        - link "Data, (Directory)" [ref=f40e680] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/Data
+                          - text: Data
+                    - cell [ref=f40e681]
+                    - cell [ref=f40e683]
+                  - row "JocysCom, (Directory)" [ref=f40e686]:
+                    - cell "JocysCom, (Directory)" [ref=f40e687]:
+                      - generic [ref=f40e688]:
+                        - img [ref=f40e689]
+                        - link "JocysCom, (Directory)" [ref=f40e694] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/JocysCom
+                          - text: JocysCom
+                    - cell [ref=f40e695]
+                    - cell [ref=f40e697]
+                  - row "Maps, (Directory)" [ref=f40e700]:
+                    - cell "Maps, (Directory)" [ref=f40e701]:
+                      - generic [ref=f40e702]:
+                        - img [ref=f40e703]
+                        - link "Maps, (Directory)" [ref=f40e708] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/Maps
+                          - text: Maps
+                    - cell [ref=f40e709]
+                    - cell [ref=f40e711]
+                  - row "Properties, (Directory)" [ref=f40e714]:
+                    - cell "Properties, (Directory)" [ref=f40e715]:
+                      - generic [ref=f40e716]:
+                        - img [ref=f40e717]
+                        - link "Properties, (Directory)" [ref=f40e722] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/Properties
+                          - text: Properties
+                    - cell [ref=f40e723]
+                    - cell [ref=f40e725]
+                  - row "Resources/Icons, (Directory)" [ref=f40e728]:
+                    - cell "Resources/Icons, (Directory)" [ref=f40e729]:
+                      - generic [ref=f40e730]:
+                        - img [ref=f40e731]
+                        - link "Resources/Icons, (Directory)" [ref=f40e736] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/Resources/Icons
+                          - text: Resources/Icons
+                    - cell [ref=f40e737]
+                    - cell [ref=f40e739]
+                  - row "SharpDX.XInput, (Directory)" [ref=f40e742]:
+                    - cell "SharpDX.XInput, (Directory)" [ref=f40e743]:
+                      - generic [ref=f40e744]:
+                        - img [ref=f40e745]
+                        - link "SharpDX.XInput, (Directory)" [ref=f40e750] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/tree/master/x360ce.Engine/SharpDX.XInput
+                          - text: SharpDX.XInput
+                    - cell [ref=f40e751]
+                    - cell [ref=f40e753]
+                  - row "App.Config, (File)" [ref=f40e756]:
+                    - cell "App.Config, (File)" [ref=f40e757]:
+                      - generic [ref=f40e758]:
+                        - img [ref=f40e759]
+                        - link "App.Config, (File)" [ref=f40e764] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/App.Config
+                          - text: App.Config
+                    - cell [ref=f40e765]
+                    - cell [ref=f40e767]
+                  - row "GlobalSuppressions.cs, (File)" [ref=f40e770]:
+                    - cell "GlobalSuppressions.cs, (File)" [ref=f40e771]:
+                      - generic [ref=f40e772]:
+                        - img [ref=f40e773]
+                        - link "GlobalSuppressions.cs, (File)" [ref=f40e778] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/GlobalSuppressions.cs
+                          - text: GlobalSuppressions.cs
+                    - cell [ref=f40e779]
+                    - cell [ref=f40e781]
+                  - row "packages.config, (File)" [ref=f40e784]:
+                    - cell "packages.config, (File)" [ref=f40e785]:
+                      - generic [ref=f40e786]:
+                        - img [ref=f40e787]
+                        - link "packages.config, (File)" [ref=f40e792] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/packages.config
+                          - text: packages.config
+                    - cell [ref=f40e793]
+                    - cell [ref=f40e795]
+                  - row "x360ce.Engine.csproj, (File)" [ref=f40e798]:
+                    - cell "x360ce.Engine.csproj, (File)" [ref=f40e799]:
+                      - generic [ref=f40e800]:
+                        - img [ref=f40e801]
+                        - link "x360ce.Engine.csproj, (File)" [ref=f40e806] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/x360ce.Engine.csproj
+                          - text: x360ce.Engine.csproj
+                    - cell [ref=f40e807]
+                    - cell [ref=f40e809]
+  - alert [ref=f40e815]

@@ -1,0 +1,299 @@
+- generic [ref=f11e2]:
+  - generic:
+    - generic:
+      - tooltip "This user is the author of this issue"
+  - generic [ref=f11e3]:
+    - link "Skip to content" [ref=f11e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f11e6]:
+      - heading "Navigation Menu" [level=2] [ref=f11e7]
+      - generic [ref=f11e8]:
+        - link "Homepage" [ref=f11e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=f11e11]
+        - generic [ref=f11e13]:
+          - navigation "Global" [ref=f11e16]:
+            - list [ref=f11e17]:
+              - listitem [ref=f11e18]:
+                - button "Platform" [ref=f11e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=f11e21]
+              - listitem [ref=f11e23]:
+                - button "Solutions" [ref=f11e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=f11e26]
+              - listitem [ref=f11e28]:
+                - button "Resources" [ref=f11e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=f11e31]
+              - listitem [ref=f11e33]:
+                - button "Open Source" [ref=f11e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=f11e36]
+              - listitem [ref=f11e38]:
+                - button "Enterprise" [ref=f11e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=f11e41]
+              - listitem [ref=f11e43]:
+                - link "Pricing" [ref=f11e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=f11e45]: Pricing
+          - generic [ref=f11e46]:
+            - button "Search or jump to…" [ref=f11e49] [cursor=pointer]:
+              - img [ref=f11e51]
+              - generic [ref=f11e53]: Search or jump to...
+              - img [ref=f11e55]
+            - link "Sign in" [ref=f11e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering%2Fissues%2F94
+            - link "Sign up" [ref=f11e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fissues_fragments%2Fissue_layout&source=header-repo&source_repo=dekuNukem%2FNintendo_Switch_Reverse_Engineering
+            - button "Appearance settings" [ref=f11e63] [cursor=pointer]:
+              - img
+  - main [ref=f11e67]:
+    - generic [ref=f11e68]:
+      - generic [ref=f11e69]:
+        - generic [ref=f11e71]:
+          - img [ref=f11e72]
+          - link "dekuNukem" [ref=f11e75] [cursor=pointer]:
+            - /url: /dekuNukem
+          - generic [ref=f11e76]: /
+          - strong [ref=f11e77]:
+            - link "Nintendo_Switch_Reverse_Engineering" [ref=f11e78] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering
+          - generic [ref=f11e79]: Public
+        - generic [ref=f11e80]:
+          - list:
+            - listitem [ref=f11e81]:
+              - link "You must be signed in to change notification settings" [ref=f11e82] [cursor=pointer]:
+                - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                - img [ref=f11e83]
+                - text: Notifications
+            - listitem [ref=f11e85]:
+              - link "Fork 206" [ref=f11e86] [cursor=pointer]:
+                - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                - img [ref=f11e87]
+                - text: Fork
+                - generic "206" [ref=f11e89]
+            - listitem [ref=f11e90]:
+              - link "You must be signed in to star a repository" [ref=f11e92] [cursor=pointer]:
+                - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                - img [ref=f11e93]
+                - text: Star
+                - generic "3752 users starred this repository" [ref=f11e95]: 3.8k
+      - navigation "Repository" [ref=f11e96]:
+        - list [ref=f11e97]:
+          - listitem [ref=f11e98]:
+            - link "Code" [ref=f11e99] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering
+              - img [ref=f11e100]
+              - generic [ref=f11e102]: Code
+          - listitem [ref=f11e103]:
+            - link "Issues 90" [ref=f11e104] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/issues
+              - img [ref=f11e105]
+              - generic [ref=f11e108]: Issues
+              - generic "90" [ref=f11e109]
+          - listitem [ref=f11e110]:
+            - link "Pull requests 2" [ref=f11e111] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/pulls
+              - img [ref=f11e112]
+              - generic [ref=f11e114]: Pull requests
+              - generic "2" [ref=f11e115]
+          - listitem [ref=f11e116]:
+            - link "Actions" [ref=f11e117] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/actions
+              - img [ref=f11e118]
+              - generic [ref=f11e120]: Actions
+          - listitem [ref=f11e121]:
+            - link "Projects" [ref=f11e122] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/projects
+              - img [ref=f11e123]
+              - generic [ref=f11e125]: Projects
+          - listitem [ref=f11e126]:
+            - link "Security and quality" [ref=f11e127] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/security
+              - img [ref=f11e128]
+              - generic [ref=f11e130]: Security and quality
+          - listitem [ref=f11e131]:
+            - link "Insights" [ref=f11e132] [cursor=pointer]:
+              - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/pulse
+              - img [ref=f11e133]
+              - generic [ref=f11e135]: Insights
+    - generic [ref=f11e143]:
+      - region "Header" [ref=f11e145]:
+        - generic [ref=f11e146]:
+          - 'heading "What happens when joycon reconnects? #94" [level=1] [ref=f11e148]':
+            - text: What happens when joycon reconnects?
+            - generic [ref=f11e150]: "#94"
+          - generic [ref=f11e152]:
+            - link "New issue" [ref=f11e154] [cursor=pointer]:
+              - /url: /login?return_to=https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94
+              - generic [ref=f11e156]: New issue
+            - button "Copy link" [ref=f11e157] [cursor=pointer]:
+              - img [ref=f11e158]
+      - generic [ref=f11e166]:
+        - img "Issue" [ref=f11e167]
+        - text: Closed
+      - generic [ref=f11e171]:
+        - generic [ref=f11e172]:
+          - generic [ref=f11e175]:
+            - heading "Description" [level=2] [ref=f11e176]
+            - generic [ref=f11e178]:
+              - generic [ref=f11e180]:
+                - link "@thisiscam's profile" [ref=f11e182] [cursor=pointer]:
+                  - /url: https://github.com/thisiscam
+                  - img "@thisiscam" [ref=f11e183]
+                - generic [ref=f11e184]:
+                  - link "thisiscam" [ref=f11e186] [cursor=pointer]:
+                    - /url: https://github.com/thisiscam
+                  - generic [ref=f11e187]:
+                    - text: opened
+                    - link "on Apr 2, 2020on Apr 2, 2020" [ref=f11e188] [cursor=pointer]:
+                      - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94#issue-592836857
+                - generic [ref=f11e189]:
+                  - button "Last edited by thisiscam" [ref=f11e192] [cursor=pointer]:
+                    - generic [ref=f11e195]: Last edited by thisiscam
+                    - generic:
+                      - img
+                  - button "Issue body actions" [ref=f11e198] [cursor=pointer]:
+                    - img [ref=f11e199]
+              - generic [ref=f11e201]:
+                - generic [ref=f11e203]:
+                  - paragraph [ref=f11e204]:
+                    - text: This is my question from this
+                    - link "issue" [ref=f11e205] [cursor=pointer]:
+                      - /url: https://github.com/mart1nro/joycontrol/issues/14
+                    - text: ", catching fire in my head and landing here."
+                  - paragraph [ref=f11e206]: Does anyone know what happens when a paired controller disconnects with the console, and tries to reconnect again?
+                  - paragraph [ref=f11e207]:
+                    - link "https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_subcommands_notes.md#subcommand-0x06-set-hci-state-disconnectpagepairturn-off" [ref=f11e208] [cursor=pointer]:
+                      - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_subcommands_notes.md#subcommand-0x06-set-hci-state-disconnectpagepairturn-off
+                    - text: says that the switch may reconnect to the last BD_ADDR; I tried this but the console was not replying anything back. Is there a specific protocol here that I can look into?
+                - generic:
+                  - toolbar "Reactions"
+          - generic [ref=f11e210]:
+            - generic [ref=f11e211]:
+              - heading "Activity" [level=2] [ref=f11e212]
+              - generic [ref=f11e213]:
+                - generic [ref=f11e221]:
+                  - generic [ref=f11e223]:
+                    - heading "thisiscam commented on Apr 3, 2020 on Apr 3, 2020" [level=3] [ref=f11e224]:
+                      - text: thisiscam commented
+                      - generic "Apr 3, 2020, 7:58 AM MST" [ref=f11e225]: on Apr 3, 2020 on Apr 3, 2020
+                    - link "@thisiscam's profile" [ref=f11e227] [cursor=pointer]:
+                      - /url: /thisiscam
+                      - img "@thisiscam" [ref=f11e228]
+                    - generic [ref=f11e229]:
+                      - link "thisiscam" [ref=f11e231] [cursor=pointer]:
+                        - /url: /thisiscam
+                      - link "on Apr 3, 2020on Apr 3, 2020" [ref=f11e234] [cursor=pointer]:
+                        - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94#issuecomment-608490716
+                    - generic [ref=f11e235]:
+                      - button "Last edited by thisiscam" [ref=f11e238] [cursor=pointer]:
+                        - generic [ref=f11e241]: Last edited by thisiscam
+                        - generic:
+                          - img
+                      - generic [ref=f11e242]:
+                        - generic "This user is the author of this issue" [ref=f11e244]: Author
+                        - button "Actions for thisiscam's comment, 7:58 AM on April 3, 2020" [ref=f11e246] [cursor=pointer]:
+                          - img [ref=f11e247]
+                  - generic [ref=f11e249]:
+                    - paragraph [ref=f11e252]: Figured out, nothing special happens. Just the regular input mode reports. However, note that the (re)connections have to be made to both the control and the message ports.
+                    - toolbar "Reactions"
+                - region "Events" [ref=f11e253]:
+                  - generic [ref=f11e260]:
+                    - img [ref=f11e264]
+                    - generic [ref=f11e268]:
+                      - link "thisiscam" [ref=f11e270] [cursor=pointer]:
+                        - /url: /thisiscam
+                        - generic [ref=f11e271]: thisiscam
+                      - text: closed this as
+                      - link "completed" [ref=f11e272] [cursor=pointer]:
+                        - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/issues?q=is%3Aissue%20state%3Aclosed%20archived%3Afalse%20reason%3Acompleted
+                      - link "on Apr 3, 2020on Apr 3, 2020" [ref=f11e273] [cursor=pointer]:
+                        - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94#event-3196779850
+            - generic [ref=f11e274]:
+              - link "Sign up for free" [ref=f11e275] [cursor=pointer]:
+                - /url: /signup?return_to=https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94
+                - generic [ref=f11e277]: Sign up for free
+              - generic [ref=f11e278]:
+                - strong [ref=f11e279]: to join this conversation on GitHub.
+                - text: Already have an account?
+              - link "Sign in to comment" [ref=f11e280] [cursor=pointer]:
+                - /url: /login?return_to=https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94
+        - generic [ref=f11e282]:
+          - heading "Metadata" [level=2] [ref=f11e283]
+          - generic [ref=f11e285]:
+            - generic [ref=f11e287]:
+              - generic [ref=f11e288]:
+                - heading "Assignees" [level=3]
+              - generic [ref=f11e289]: No one assigned
+            - generic [ref=f11e291]:
+              - generic [ref=f11e292]:
+                - heading "Labels" [level=3]
+              - generic [ref=f11e293]: No labels
+            - generic [ref=f11e295]:
+              - generic [ref=f11e296]:
+                - heading "Projects" [level=3]
+              - generic [ref=f11e297]: No projects
+            - generic [ref=f11e299]:
+              - generic [ref=f11e300]:
+                - heading "Milestone" [level=3]
+              - generic [ref=f11e301]: No milestone
+            - generic [ref=f11e303]:
+              - generic [ref=f11e304]:
+                - heading "Relationships" [level=3]
+              - generic [ref=f11e305]: None yet
+            - generic [ref=f11e306]:
+              - generic [ref=f11e308]:
+                - heading "Development" [level=3]
+              - generic [ref=f11e309]:
+                - generic [ref=f11e310]: No branches or pull requests
+                - list
+            - generic [ref=f11e311]:
+              - generic [ref=f11e313]:
+                - heading "Participants" [level=3]
+              - link "@thisiscam" [ref=f11e317] [cursor=pointer]:
+                - /url: /thisiscam
+                - img "@thisiscam" [ref=f11e318]
+            - heading "Issue actions" [level=2] [ref=f11e319]
+            - list [ref=f11e320]:
+              - listitem [ref=f11e321]:
+                - button "Open in GitHub Copilot app" [ref=f11e322] [cursor=pointer]:
+                  - generic [ref=f11e325]: Open in GitHub Copilot app
+  - contentinfo [ref=f11e326]:
+    - heading "Footer" [level=2] [ref=f11e327]
+    - generic [ref=f11e328]:
+      - generic [ref=f11e329]:
+        - link "GitHub Homepage" [ref=f11e330] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=f11e331]
+        - generic [ref=f11e333]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f11e334]:
+        - heading "Footer navigation" [level=3] [ref=f11e335]
+        - list "Footer navigation" [ref=f11e336]:
+          - listitem [ref=f11e337]:
+            - link "Terms" [ref=f11e338] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f11e339]:
+            - link "Privacy" [ref=f11e340] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f11e341]:
+            - link "Security" [ref=f11e342] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f11e343]:
+            - link "Status" [ref=f11e344] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f11e345]:
+            - link "Community" [ref=f11e346] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f11e347]:
+            - link "Docs" [ref=f11e348] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f11e349]:
+            - link "Contact" [ref=f11e350] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f11e351]:
+            - button "Manage cookies" [ref=f11e353] [cursor=pointer]
+          - listitem [ref=f11e354]:
+            - button "Do not share my personal information" [ref=f11e356] [cursor=pointer]

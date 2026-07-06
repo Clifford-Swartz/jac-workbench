@@ -7,7 +7,7 @@ type SendFn = (msg: Record<string, unknown>) => void;
 type CallToolFn = (qualifiedName: string, args: Record<string, unknown>) => Promise<{ text: string; isError: boolean }>;
 type PermitFn = (qualifiedName: string, args: Record<string, unknown>) => Promise<'allow' | 'deny'> | 'allow' | 'deny';
 
-const MAX_ITERS = 10;
+const MAX_ITERS = 50;   // tool-call rounds before the loop bails — agentic debugging needs many steps
 
 interface OAToolCall { id: string; type: 'function'; function: { name: string; arguments: string }; }
 
@@ -107,10 +107,11 @@ export async function runAgenticQuery(opts: AgenticOpts): Promise<void> {
     const permit = opts.permit;
 
     try {
+        let hitCap = true;
         for (let iter = 0; iter < MAX_ITERS; iter++) {
             const { toolCalls, text } = await streamChat(opts.url, opts.headers, opts.model, convo, oaTools, opts.send, opts.signal);
             if (opts.signal?.aborted) return;
-            if (toolCalls.length === 0) break;   // model produced a final answer
+            if (toolCalls.length === 0) { hitCap = false; break; }   // model produced a final answer
 
             convo.push({ role: 'assistant', content: text || null, tool_calls: toolCalls });
 
@@ -131,12 +132,19 @@ export async function runAgenticQuery(opts: AgenticOpts): Promise<void> {
                     const r = await opts.callTool(name, args);
                     content = r.text || (r.isError ? 'Tool returned an error.' : '(no output)');
                     isError = r.isError;
+                    // Backstop: one tool result must never bloat the DOM/context to megabytes (a 15M-char
+                    // conversation makes typing lag from GC/memory pressure). Cap it; slice a file for more.
+                    if (content.length > 24000) {
+                        content = content.slice(0, 24000) + `\n…[tool output truncated to 24000 chars — read a specific file/slice for the rest]`;
+                    }
                 }
                 // renderToolResult expects { tool_use_id, content, is_error }
                 opts.send({ type: 'tool_result', tool_use_id: tc.id, tool_name: name, content, is_error: isError });
                 convo.push({ role: 'tool', tool_call_id: tc.id, content });
             }
         }
+        // Don't stop silently mid-task at the cap — tell the user so they can continue.
+        if (hitCap) opts.send({ type: 'assistant_text_delta', text: `\n\n_[Paused at the ${MAX_ITERS}-step tool limit — reply "continue" to keep going.]_` });
     } catch (err: unknown) {
         if ((err as Error)?.name !== 'AbortError') opts.send({ type: 'error', message: `agent loop: ${String((err as Error).message ?? err)}` });
     }

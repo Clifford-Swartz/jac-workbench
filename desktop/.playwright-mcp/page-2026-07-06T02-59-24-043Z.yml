@@ -1,0 +1,312 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e3]:
+    - link "Skip to content" [ref=f2e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f2e6]:
+      - heading "Navigation Menu" [level=2] [ref=f2e7]
+      - generic [ref=f2e8]:
+        - link "Homepage" [ref=f2e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=f2e11]
+        - generic [ref=f2e13]:
+          - navigation "Global" [ref=f2e16]:
+            - list [ref=f2e17]:
+              - listitem [ref=f2e18]:
+                - button "Platform" [ref=f2e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=f2e21]
+              - listitem [ref=f2e23]:
+                - button "Solutions" [ref=f2e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=f2e26]
+              - listitem [ref=f2e28]:
+                - button "Resources" [ref=f2e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=f2e31]
+              - listitem [ref=f2e33]:
+                - button "Open Source" [ref=f2e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=f2e36]
+              - listitem [ref=f2e38]:
+                - button "Enterprise" [ref=f2e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=f2e41]
+              - listitem [ref=f2e43]:
+                - link "Pricing" [ref=f2e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=f2e45]: Pricing
+          - generic [ref=f2e46]:
+            - button "Search or jump to…" [ref=f2e49] [cursor=pointer]:
+              - img [ref=f2e51]
+              - generic [ref=f2e53]: Search or jump to...
+              - img [ref=f2e55]
+            - link "Sign in" [ref=f2e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Fwiki%2FBeta-Testing
+            - link "Sign up" [ref=f2e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fwiki%2Fshow&source=header-repo&source_repo=x360ce%2Fx360ce
+            - button "Appearance settings" [ref=f2e63] [cursor=pointer]:
+              - img
+  - main [ref=f2e67]:
+    - generic [ref=f2e68]:
+      - generic [ref=f2e69]:
+        - generic [ref=f2e71]:
+          - img [ref=f2e72]
+          - link "x360ce" [ref=f2e75] [cursor=pointer]:
+            - /url: /x360ce
+          - generic [ref=f2e76]: /
+          - strong [ref=f2e77]:
+            - link "x360ce" [ref=f2e78] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+          - generic [ref=f2e79]: Public
+        - generic [ref=f2e80]:
+          - list:
+            - listitem [ref=f2e81]:
+              - link "You must be signed in to change notification settings" [ref=f2e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f2e83]
+                - text: Notifications
+            - listitem [ref=f2e85]:
+              - link "Fork 504" [ref=f2e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f2e87]
+                - text: Fork
+                - generic "504" [ref=f2e89]
+            - listitem [ref=f2e90]:
+              - link "You must be signed in to star a repository" [ref=f2e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f2e93]
+                - text: Star
+                - generic "2866 users starred this repository" [ref=f2e95]: 2.9k
+      - navigation "Repository" [ref=f2e96]:
+        - list [ref=f2e97]:
+          - listitem [ref=f2e98]:
+            - link "Code" [ref=f2e99] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+              - img [ref=f2e100]
+              - generic [ref=f2e102]: Code
+          - listitem [ref=f2e103]:
+            - link "Issues 837" [ref=f2e104] [cursor=pointer]:
+              - /url: /x360ce/x360ce/issues
+              - img [ref=f2e105]
+              - generic [ref=f2e108]: Issues
+              - generic "837" [ref=f2e109]
+          - listitem [ref=f2e110]:
+            - link "Pull requests 7" [ref=f2e111] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulls
+              - img [ref=f2e112]
+              - generic [ref=f2e114]: Pull requests
+              - generic "7" [ref=f2e115]
+          - listitem [ref=f2e116]:
+            - link "Discussions" [ref=f2e117] [cursor=pointer]:
+              - /url: /x360ce/x360ce/discussions
+              - img [ref=f2e118]
+              - generic [ref=f2e120]: Discussions
+          - listitem [ref=f2e121]:
+            - link "Actions" [ref=f2e122] [cursor=pointer]:
+              - /url: /x360ce/x360ce/actions
+              - img [ref=f2e123]
+              - generic [ref=f2e125]: Actions
+          - listitem [ref=f2e126]:
+            - link "Projects" [ref=f2e127] [cursor=pointer]:
+              - /url: /x360ce/x360ce/projects
+              - img [ref=f2e128]
+              - generic [ref=f2e130]: Projects
+          - listitem [ref=f2e131]:
+            - link "Wiki" [ref=f2e132] [cursor=pointer]:
+              - /url: /x360ce/x360ce/wiki
+              - img [ref=f2e133]
+              - generic [ref=f2e135]: Wiki
+          - listitem [ref=f2e136]:
+            - link "Security and quality" [ref=f2e137] [cursor=pointer]:
+              - /url: /x360ce/x360ce/security
+              - img [ref=f2e138]
+              - generic [ref=f2e140]: Security and quality
+          - listitem [ref=f2e141]:
+            - link "Insights" [ref=f2e142] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulse
+              - img [ref=f2e143]
+              - generic [ref=f2e145]: Insights
+    - generic [ref=f2e148]:
+      - heading "Beta Testing" [level=1] [ref=f2e150]
+      - generic [ref=f2e151]:
+        - text: Evaldas Jocys edited this page Sep 9, 2022on Sep 9, 2022 ·
+        - link "28 revisions" [ref=f2e152] [cursor=pointer]:
+          - /url: /x360ce/x360ce/wiki/Beta-Testing/_history
+      - generic [ref=f2e154]:
+        - generic [ref=f2e157]:
+          - generic [ref=f2e158]:
+            - heading "Xbox 360 Controller Emulator 4.x Alpha - Beta Testing" [level=1] [ref=f2e159]
+            - 'link "Permalink: Xbox 360 Controller Emulator 4.x Alpha - Beta Testing" [ref=f2e160] [cursor=pointer]':
+              - /url: "#xbox-360-controller-emulator-4x-alpha---beta-testing"
+              - img [ref=f2e161]
+          - paragraph [ref=f2e163]: This is ALPHA release. Some things will not work and this release is intended to test games with Virtual X360 controller only.
+          - generic [ref=f2e164]:
+            - heading "IMPORTANT Notes" [level=2] [ref=f2e165]
+            - 'link "Permalink: IMPORTANT Notes" [ref=f2e166] [cursor=pointer]':
+              - /url: "#important-notes"
+              - img [ref=f2e167]
+          - list [ref=f2e169]:
+            - listitem [ref=f2e170]:
+              - paragraph [ref=f2e171]: "There is no need to place x360ce.exe inside the game folder. You can keep single copy of executable at one place (for example: C:\\Program Files\\x360ce\\x360ce.exe), because same virtual \"Xbox 360 Controller\" will be visible for all games in Windows."
+            - listitem [ref=f2e172]:
+              - paragraph [ref=f2e173]: Do not close "Xbox 360 Controller Emulator" during the game, just minimize it in order to reduce CPU use.
+            - listitem [ref=f2e174]:
+              - paragraph [ref=f2e175]:
+                - text: "Make sure your game is set to use XInput Devices. For example, in \"Tom Clancy's Ghost Recon Wildlands\" you have to set OPTIONS -> CONTROLLER -> ENABLE CONTROLLER:"
+                - emphasis [ref=f2e176]: ONLY GAMEPADS
+          - generic [ref=f2e177]:
+            - heading "Install and Use Instructions" [level=2] [ref=f2e178]
+            - 'link "Permalink: Install and Use Instructions" [ref=f2e179] [cursor=pointer]':
+              - /url: "#install-and-use-instructions"
+              - img [ref=f2e180]
+          - list [ref=f2e182]:
+            - listitem [ref=f2e183]:
+              - paragraph [ref=f2e184]: "Download latest Xbox 360 Controller Emulator (same file for 32-bit and 64-bit Windows) from:"
+              - paragraph [ref=f2e185]:
+                - link "x360ce 4.x.x.x - Releases Page" [ref=f2e186] [cursor=pointer]:
+                  - /url: https://github.com/x360ce/x360ce/releases
+            - listitem [ref=f2e187]:
+              - paragraph [ref=f2e188]: Extract ZIP file and launch x360ce.exe file.
+          - paragraph [ref=f2e189]: "Enabling Virtual Drivers:"
+          - list [ref=f2e190]:
+            - listitem [ref=f2e191]: "[Issues] tab will start blinking it Virtual Drivers are missing."
+            - listitem [ref=f2e192]: Press [Issues] tab and hit [Install] button to install Virtual Controller Drivers.
+          - paragraph [ref=f2e193]: "Mapping DirectInput Device:"
+          - list [ref=f2e194]:
+            - listitem [ref=f2e195]: Connect your DirectInput Device to PC
+            - listitem [ref=f2e196]: Select [Controller 1] tab and press [Add..] button.
+            - listitem [ref=f2e197]: Select controller you want to map and press [OK] button.
+            - listitem [ref=f2e198]: Click "[x] Enable 1 Mapped Device" checkbox inside [Controller 1] tab.
+          - paragraph [ref=f2e199]: "Configuring Mapping:"
+          - list [ref=f2e200]:
+            - listitem [ref=f2e201]:
+              - paragraph [ref=f2e202]: Map buttons and axis by clicking on dropdowns, selecting [Record] and pressing on button or moving axis. 10 Hit [Save] button (at top right corner of application) when done.
+            - listitem [ref=f2e203]:
+              - paragraph [ref=f2e204]: "Minimize \"Xbox 360 Controller Emulator\" in order to reduce CPU use. Note: Grey controller icon will be visible in tray."
+            - listitem [ref=f2e205]:
+              - paragraph [ref=f2e206]: Launch the game and see how it works.
+          - paragraph [ref=f2e207]: "How to Uninstall Virtual Driver: Run \"Xbox 360 Controller Emulator\" as an Administrator, go to [Options] tab and press [Uninstall] button inside \"Virtual Device\" group box."
+          - generic [ref=f2e208]:
+            - heading "Screenshots" [level=2] [ref=f2e209]
+            - 'link "Permalink: Screenshots" [ref=f2e210] [cursor=pointer]':
+              - /url: "#screenshots"
+              - img [ref=f2e211]
+          - paragraph [ref=f2e213]:
+            - img "https://raw.githubusercontent.com/x360ce/x360ce/master/x360ce.App.Beta/Documents/Images/v4_Controller_1.png" [ref=f2e214]
+        - generic [ref=f2e219]:
+          - navigation "Pages 7" [ref=f2e220]:
+            - generic [ref=f2e221]:
+              - heading "Wiki pages Pages 7" [level=2] [ref=f2e223] [cursor=pointer]:
+                - button "Wiki pages" [expanded] [ref=f2e224]:
+                  - img
+                - generic [ref=f2e225]:
+                  - text: Pages
+                  - generic "7" [ref=f2e226]
+              - generic [ref=f2e227]:
+                - textbox "Find a page or section" [ref=f2e229]:
+                  - /placeholder: Find a page or section…
+                - list [ref=f2e230]:
+                  - listitem [ref=f2e231]:
+                    - generic [ref=f2e233]:
+                      - button "Structure for Home" [ref=f2e234] [cursor=pointer]:
+                        - img [ref=f2e237]
+                      - link "Home" [ref=f2e239] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki
+                        - generic [ref=f2e240]: Home
+                  - listitem [ref=f2e241]:
+                    - generic [ref=f2e242]:
+                      - generic [ref=f2e243]:
+                        - button "Structure for Beta Testing" [expanded] [ref=f2e244] [cursor=pointer]:
+                          - img [ref=f2e247]
+                        - link "Beta Testing" [ref=f2e249] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/wiki/Beta-Testing
+                          - generic [ref=f2e250]: Beta Testing
+                      - list [ref=f2e252]:
+                        - listitem [ref=f2e253]:
+                          - link "Xbox 360 Controller Emulator 4.x Alpha - Beta Testing" [ref=f2e254] [cursor=pointer]:
+                            - /url: /x360ce/x360ce/wiki/Beta-Testing#xbox-360-controller-emulator-4x-alpha---beta-testing
+                        - listitem [ref=f2e255]:
+                          - link "IMPORTANT Notes" [ref=f2e256] [cursor=pointer]:
+                            - /url: /x360ce/x360ce/wiki/Beta-Testing#important-notes
+                        - listitem [ref=f2e257]:
+                          - link "Install and Use Instructions" [ref=f2e258] [cursor=pointer]:
+                            - /url: /x360ce/x360ce/wiki/Beta-Testing#install-and-use-instructions
+                        - listitem [ref=f2e259]:
+                          - link "Screenshots" [ref=f2e260] [cursor=pointer]:
+                            - /url: /x360ce/x360ce/wiki/Beta-Testing#screenshots
+                  - listitem [ref=f2e261]:
+                    - generic [ref=f2e263]:
+                      - button "Structure for Compatibility List" [ref=f2e264] [cursor=pointer]:
+                        - img [ref=f2e267]
+                      - link "Compatibility List" [ref=f2e269] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki/Compatibility-List
+                        - generic [ref=f2e270]: Compatibility List
+                  - listitem [ref=f2e271]:
+                    - generic [ref=f2e273]:
+                      - button "Structure for HID Guardian" [ref=f2e274] [cursor=pointer]:
+                        - img [ref=f2e277]
+                      - link "HID Guardian" [ref=f2e279] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki/HID-Guardian
+                        - generic [ref=f2e280]: HID Guardian
+                  - listitem [ref=f2e281]:
+                    - generic [ref=f2e283]:
+                      - button "Structure for How To" [ref=f2e284] [cursor=pointer]:
+                        - img [ref=f2e287]
+                      - link "How To" [ref=f2e289] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki/How-To
+                        - generic [ref=f2e290]: How To
+                  - listitem [ref=f2e291]:
+                    - generic [ref=f2e293]:
+                      - button "Structure for Reporting Compatibility" [ref=f2e294] [cursor=pointer]:
+                        - img [ref=f2e297]
+                      - link "Reporting Compatibility" [ref=f2e299] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki/Reporting-Compatibility
+                        - generic [ref=f2e300]: Reporting Compatibility
+                  - listitem [ref=f2e301]:
+                    - generic [ref=f2e303]:
+                      - button "Structure for Tutorial" [ref=f2e304] [cursor=pointer]:
+                        - img [ref=f2e307]
+                      - link "Tutorial" [ref=f2e309] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/wiki/Tutorial
+                        - generic [ref=f2e310]: Tutorial
+          - heading "Clone this wiki locally" [level=3] [ref=f2e311]
+          - generic [ref=f2e312]:
+            - textbox "Clone URL for this wiki" [ref=f2e313]: https://github.com/x360ce/x360ce.wiki.git
+            - button "Copy to clipboard" [ref=f2e316] [cursor=pointer]:
+              - img [ref=f2e317]
+  - contentinfo [ref=f2e321]:
+    - heading "Footer" [level=2] [ref=f2e322]
+    - generic [ref=f2e323]:
+      - generic [ref=f2e324]:
+        - link "GitHub Homepage" [ref=f2e325] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=f2e326]
+        - generic [ref=f2e328]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f2e329]:
+        - heading "Footer navigation" [level=3] [ref=f2e330]
+        - list "Footer navigation" [ref=f2e331]:
+          - listitem [ref=f2e332]:
+            - link "Terms" [ref=f2e333] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f2e334]:
+            - link "Privacy" [ref=f2e335] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f2e336]:
+            - link "Security" [ref=f2e337] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f2e338]:
+            - link "Status" [ref=f2e339] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f2e340]:
+            - link "Community" [ref=f2e341] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f2e342]:
+            - link "Docs" [ref=f2e343] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f2e344]:
+            - link "Contact" [ref=f2e345] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f2e346]:
+            - button "Manage cookies" [ref=f2e348] [cursor=pointer]
+          - listitem [ref=f2e349]:
+            - button "Do not share my personal information" [ref=f2e351] [cursor=pointer]

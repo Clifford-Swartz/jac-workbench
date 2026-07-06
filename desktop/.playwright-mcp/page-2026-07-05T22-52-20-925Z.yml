@@ -1,0 +1,327 @@
+- generic [active] [ref=f17e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f17e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f17e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f17e8]:
+    - search [ref=f17e9]:
+      - generic [ref=f17e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f17e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0QPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f17e14]'
+        - generic [ref=f17e15]:
+          - generic [ref=f17e16]:
+            - combobox "Search" [ref=f17e19]: site:github.com "sniff mode" "switch" controller broadcom "fast connect" disconnect site:github.com "sniff mode" "switch" controller broadcom "fast connect" disconnect
+            - generic [ref=f17e20]:
+              - button "Clear" [ref=f17e22] [cursor=pointer]:
+                - img [ref=f17e24]
+              - generic [ref=f17e27]:
+                - button "Search by voice" [ref=f17e28] [cursor=pointer]:
+                  - img [ref=f17e29]
+                - button "Search by image" [ref=f17e31] [cursor=pointer]:
+                  - img [ref=f17e32]
+          - button "Search" [ref=f17e34] [cursor=pointer]:
+            - img [ref=f17e37]
+    - generic [ref=f17e39]:
+      - button "Settings" [ref=f17e41] [cursor=pointer]:
+        - img [ref=f17e44]
+      - button "Share" [ref=f17e47] [cursor=pointer]:
+        - img [ref=f17e51]
+      - generic [ref=f17e53]:
+        - button "Google apps" [ref=f17e55] [cursor=pointer]:
+          - img [ref=f17e56]
+        - link "Sign in" [ref=f17e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dsite:github.com%2B%2522sniff%2Bmode%2522%2B%2522switch%2522%2Bcontroller%2Bbroadcom%2B%2522fast%2Bconnect%2522%2Bdisconnect&ec=futura_srp_og_si_72236_p
+  - generic [ref=f17e62]:
+    - navigation [ref=f17e68]:
+      - generic [ref=f17e74]:
+        - list [ref=f17e75]:
+          - listitem [ref=f17e76]:
+            - link "AI Mode" [ref=f17e79] [cursor=pointer]:
+              - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&aep=1&ntc=1&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q2J8OegQICRAD
+              - generic [ref=f17e82]: AI Mode
+          - listitem [ref=f17e83]:
+            - link "All" [disabled] [ref=f17e84]:
+              - generic [ref=f17e86]: All
+          - listitem [ref=f17e87]:
+            - link "Images" [ref=f17e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0QtKgLegQIFhAB
+              - generic [ref=f17e90]: Images
+          - listitem [ref=f17e91]:
+            - link "Videos" [ref=f17e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0QtKgLegQIDxAB
+              - generic [ref=f17e94]: Videos
+          - listitem [ref=f17e95]:
+            - link "Forums" [ref=f17e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Qs6gLegQICxAB
+              - generic [ref=f17e98]: Forums
+          - listitem [ref=f17e99]:
+            - link "Shopping" [ref=f17e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&ved=1t:220175&ictx=111
+              - generic [ref=f17e102]: Shopping
+          - listitem [ref=f17e103]:
+            - link "Short videos" [ref=f17e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8c4u0nXx4bEIpwm1lnNH832a9BVCEiB2iPJNekNderQwLP8msUKsz-6AMxGyueJZ9cK2mNBy2II_6WvkKSZWdegvvKnEPeeArWgEP9exNATg6oybL0Q4MEKOxPxFbct-gPoxJydwQkFVgNkm6vNXPQZjfoWDOyzkktih_Z6lssQmfbdqIKqxUyGROmvXoo-iyz5AhpVQ&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Qs6gLegQIDhAB
+              - generic [ref=f17e106]: Short videos
+          - listitem [ref=f17e107]:
+            - button "More filters" [ref=f17e108] [cursor=pointer]:
+              - generic "More filters" [ref=f17e109]:
+                - generic [ref=f17e110]:
+                  - generic [ref=f17e111]: More
+                  - img [ref=f17e113]
+        - button "Tools" [ref=f17e116] [cursor=pointer]:
+          - generic [ref=f17e118]:
+            - generic [ref=f17e119]: Tools
+            - img [ref=f17e121]
+    - heading "Search Results" [level=1] [ref=f17e123]
+    - main [ref=f17e129]:
+      - generic [ref=f17e130]:
+        - generic [ref=f17e134]:
+          - heading "No results found for site:github.com \"sniff mode\" \"switch\" controller broadcom \"fast connect\" disconnect." [level=2] [ref=f17e135]
+          - text: Results for
+          - link "site:github.com sniff mode switch controller broadcom fast connect disconnect" [ref=f17e136] [cursor=pointer]:
+            - /url: /search?sca_esv=ddfd6cfe34cb7336&q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sa=X&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0QgwN6BAg4EAE
+          - text: "(without quotes):"
+        - generic [ref=f17e139]:
+          - generic [ref=f17e142]:
+            - heading "Web results" [level=2] [ref=f17e143]
+            - generic [ref=f17e144]:
+              - generic [ref=f17e147]:
+                - 'link "HID Protocol for Bluetooth / USB · Issue #7 GitHub https://github.com › dekuNukem › issues" [ref=f17e149] [cursor=pointer]':
+                  - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1
+                  - 'heading "HID Protocol for Bluetooth / USB · Issue #7" [level=3] [ref=f17e150]'
+                  - generic [ref=f17e156]:
+                    - generic [ref=f17e158]: GitHub
+                    - generic [ref=f17e160]: https://github.com › dekuNukem › issues
+                - button "About this result" [ref=f17e163] [cursor=pointer]:
+                  - img [ref=f17e166]
+              - generic [ref=f17e169]:
+                - generic [ref=f17e170]:
+                  - text: ...
+                  - emphasis [ref=f17e171]: sniff
+                  - text: packets and go to
+                  - emphasis [ref=f17e172]: Switch
+                  - text: "'"
+                  - emphasis [ref=f17e173]: controllers
+                  - text: menu. ... If not, go to Settings and
+                  - emphasis [ref=f17e174]: disconnect
+                  - text: all
+                  - emphasis [ref=f17e175]: controllers
+                  - text: and
+                  - emphasis [ref=f17e176]: connect
+                  - text: and send a good x02 reply again.
+                - link "Read more" [ref=f17e177] [cursor=pointer]:
+                  - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1#:~:text=sniff%20packets%20and%20go%20to,Switch'%20controllers%20menu.&text=If%20not%2C%20go%20to%20Settings,a%20good%20x02%20reply%20again.
+          - generic [ref=f17e181]:
+            - generic [ref=f17e184]:
+              - link "Porting Guide · sonic-net/SONiC Wiki GitHub https://github.com › sonic-net › wiki › Porting-Guide" [ref=f17e186] [cursor=pointer]:
+                - /url: https://github.com/sonic-net/SONiC/wiki/Porting-Guide
+                - heading "Porting Guide · sonic-net/SONiC Wiki" [level=3] [ref=f17e187]
+                - generic [ref=f17e193]:
+                  - generic [ref=f17e195]: GitHub
+                  - generic [ref=f17e197]: https://github.com › sonic-net › wiki › Porting-Guide
+              - button "About this result" [ref=f17e200] [cursor=pointer]:
+                - img [ref=f17e203]
+            - generic [ref=f17e206]:
+              - generic [ref=f17e207]: Nov 29, 2022 —
+              - text: This guide describes requirements and general guidelines to follow when porting SONiC to a new device which contains a supported ASIC platform.
+              - link "Read more" [ref=f17e208] [cursor=pointer]:
+                - /url: https://github.com/sonic-net/SONiC/wiki/Porting-Guide#:~:text=This%20guide%20describes%20requirements%20and,contains%20a%20supported%20ASIC%20platform.
+          - generic [ref=f17e212]:
+            - generic [ref=f17e215]:
+              - link "Advanced Networking GitHub https://github.com › advanced-networking › _index" [ref=f17e217] [cursor=pointer]:
+                - /url: https://github.com/freebsd/freebsd-doc/blob/main/documentation/content/en/books/handbook/advanced-networking/_index.adoc
+                - heading "Advanced Networking" [level=3] [ref=f17e218]
+                - generic [ref=f17e224]:
+                  - generic [ref=f17e226]: GitHub
+                  - generic [ref=f17e228]: https://github.com › advanced-networking › _index
+              - button "About this result" [ref=f17e231] [cursor=pointer]:
+                - img [ref=f17e234]
+            - generic [ref=f17e237]:
+              - text: This section provides an overview of routing basics. It then demonstrates how to configure a FreeBSD system as a router and offers some troubleshooting tips.
+              - link "Read more" [ref=f17e238] [cursor=pointer]:
+                - /url: https://github.com/freebsd/freebsd-doc/blob/main/documentation/content/en/books/handbook/advanced-networking/_index.adoc#:~:text=This%20section%20provides%20an%20overview,and%20offers%20some%20troubleshooting%20tips.
+          - generic [ref=f17e242]:
+            - generic [ref=f17e245]:
+              - 'link "Bluetooth: hci0: Frame reassembly failed (-84) · Issue #1150 GitHub https://github.com › raspberrypi › firmware › issues" [ref=f17e247] [cursor=pointer]':
+                - /url: https://github.com/raspberrypi/firmware/issues/1150?timeline_page=1
+                - 'heading "Bluetooth: hci0: Frame reassembly failed (-84) · Issue #1150" [level=3] [ref=f17e248]'
+                - generic [ref=f17e254]:
+                  - generic [ref=f17e256]: GitHub
+                  - generic [ref=f17e258]: https://github.com › raspberrypi › firmware › issues
+              - button "About this result" [ref=f17e261] [cursor=pointer]:
+                - img [ref=f17e264]
+            - generic [ref=f17e267]:
+              - generic [ref=f17e268]: Jun 5, 2019 —
+              - generic [ref=f17e269]:
+                - text: ...
+                - emphasis [ref=f17e270]: "SNIFF Link mode: SLAVE ACCEPT"
+                - text: "Name: 'hass' Class: 0x000000 Service Classes: Unspecified Device Class: Miscellaneous, HCI Version: 4.1 (0x7) ..."
+              - link "Read more" [ref=f17e271] [cursor=pointer]:
+                - /url: https://github.com/raspberrypi/firmware/issues/1150?timeline_page=1#:~:text=SNIFF%20Link%20mode%3A%20SLAVE%20ACCEPT,0x2209%20Manufacturer%3A%20Broadcom%20Corporation%20(15)
+          - generic [ref=f17e275]:
+            - generic [ref=f17e278]:
+              - link "Porting Guide · sonic-net/SONiC Wiki GitHub https://github.com › sonic-net › wiki › Porting-Guide" [ref=f17e280] [cursor=pointer]:
+                - /url: https://github.com/sonic-net/SONiC/wiki/Porting-Guide/347b0c24ce7c317f9d4eceace7a2ba7db711cd42
+                - heading "Porting Guide · sonic-net/SONiC Wiki" [level=3] [ref=f17e281]
+                - generic [ref=f17e287]:
+                  - generic [ref=f17e289]: GitHub
+                  - generic [ref=f17e291]: https://github.com › sonic-net › wiki › Porting-Guide
+              - button "About this result" [ref=f17e294] [cursor=pointer]:
+                - img [ref=f17e297]
+            - generic [ref=f17e300]:
+              - text: This guide describes requirements and general guidelines to follow when porting SONiC to a new device which contains a supported ASIC platform.
+              - link "Read more" [ref=f17e301] [cursor=pointer]:
+                - /url: https://github.com/sonic-net/SONiC/wiki/Porting-Guide/347b0c24ce7c317f9d4eceace7a2ba7db711cd42#:~:text=This%20guide%20describes%20requirements%20and,contains%20a%20supported%20ASIC%20platform.
+          - generic [ref=f17e305]:
+            - generic [ref=f17e308]:
+              - link "VMware/ESXi .vmx Configuration Parameters Gist https://gist.github.com › denji" [ref=f17e310] [cursor=pointer]:
+                - /url: https://gist.github.com/denji/4dc6d508550014582814ba2ed692b77f
+                - heading "VMware/ESXi .vmx Configuration Parameters" [level=3] [ref=f17e311]
+                - generic [ref=f17e317]:
+                  - generic [ref=f17e319]: Gist
+                  - generic [ref=f17e321]: https://gist.github.com › denji
+              - button "About this result" [ref=f17e324] [cursor=pointer]:
+                - img [ref=f17e327]
+            - generic [ref=f17e330]:
+              - generic [ref=f17e331]:
+                - text: USE AT YOUR OWN RISK Most parameters listed here are undocumented and unsupported by VMware/
+                - emphasis [ref=f17e332]: Broadcom
+                - text: . Always back up your .vmx file before editing.
+              - link "Read more" [ref=f17e333] [cursor=pointer]:
+                - /url: https://gist.github.com/denji/4dc6d508550014582814ba2ed692b77f#:~:text=USE%20AT%20YOUR%20OWN%20RISK,your%20.vmx%20file%20before%20editing.
+          - generic [ref=f17e337]:
+            - generic [ref=f17e340]:
+              - link "bluez/ChangeLog at master GitHub https://github.com › bluez › bluez › blob › ChangeLog" [ref=f17e342] [cursor=pointer]:
+                - /url: https://github.com/bluez/bluez/blob/master/ChangeLog
+                - heading "bluez/ChangeLog at master" [level=3] [ref=f17e343]
+                - generic [ref=f17e349]:
+                  - generic [ref=f17e351]: GitHub
+                  - generic [ref=f17e353]: https://github.com › bluez › bluez › blob › ChangeLog
+              - button "About this result" [ref=f17e356] [cursor=pointer]:
+                - img [ref=f17e359]
+            - generic [ref=f17e362]:
+              - generic [ref=f17e363]:
+                - text: Fix issue with bearer selection and single
+                - emphasis [ref=f17e364]: mode controllers
+                - text: . Fix issue with
+                - emphasis [ref=f17e365]: Connect
+                - text: and ConnectProfile returning in progress. Fix issue with missing Paired ...
+              - link "Read more" [ref=f17e366] [cursor=pointer]:
+                - /url: https://github.com/bluez/bluez/blob/master/ChangeLog#:~:text=Fix%20issue%20with%20bearer%20selection,property%20change%20when%20not%20bonded.
+          - generic [ref=f17e370]:
+            - generic [ref=f17e373]:
+              - link "althetinkerer/LLM-Self-Hosting-Guide GitHub https://github.com › althetinkerer › LLM-Self-Hosting-..." [ref=f17e375] [cursor=pointer]:
+                - /url: https://github.com/althetinkerer/LLM-Self-Hosting-Guide
+                - heading "althetinkerer/LLM-Self-Hosting-Guide" [level=3] [ref=f17e376]
+                - generic [ref=f17e382]:
+                  - generic [ref=f17e384]: GitHub
+                  - generic [ref=f17e386]: https://github.com › althetinkerer › LLM-Self-Hosting-...
+              - button "About this result" [ref=f17e389] [cursor=pointer]:
+                - img [ref=f17e392]
+            - generic [ref=f17e395]:
+              - generic [ref=f17e396]:
+                - text: It works with any wireless network interface
+                - emphasis [ref=f17e397]: controller
+                - text: whose driver supports raw monitoring
+                - emphasis [ref=f17e398]: mode
+                - text: and can
+                - emphasis [ref=f17e399]: sniff
+                - text: 802.11a, 802.11b and 802.11g traffic. Burp ...
+              - link "Read more" [ref=f17e400] [cursor=pointer]:
+                - /url: https://github.com/althetinkerer/LLM-Self-Hosting-Guide#:~:text=It%20works%20with%20any%20wireless,leading%20range%20of%20cybersecurity%20tools.
+          - generic [ref=f17e404]:
+            - generic [ref=f17e407]:
+              - link "CHANGELOG.md - bluekitchen/btstack GitHub https://github.com › bluekitchen › btstack › blob › master" [ref=f17e409] [cursor=pointer]:
+                - /url: https://github.com/bluekitchen/btstack/blob/master/CHANGELOG.md
+                - heading "CHANGELOG.md - bluekitchen/btstack" [level=3] [ref=f17e410]
+                - generic [ref=f17e416]:
+                  - generic [ref=f17e418]: GitHub
+                  - generic [ref=f17e420]: https://github.com › bluekitchen › btstack › blob › master
+              - button "About this result" [ref=f17e423] [cursor=pointer]:
+                - img [ref=f17e426]
+            - generic [ref=f17e429]:
+              - generic [ref=f17e430]:
+                - text: "GAP: Support enter/exit"
+                - emphasis [ref=f17e431]: sniff mode
+                - text: via gap_sniff_mode_enter/exit. gap_set_default_link_policy_settings is needed to enable
+                - emphasis [ref=f17e432]: sniff mode
+                - text: in general. HIDS ...
+              - link "Read more" [ref=f17e433] [cursor=pointer]:
+                - /url: https://github.com/bluekitchen/btstack/blob/master/CHANGELOG.md#:~:text=GAP%3A%20Support%20enter%2Fexit%20sniff%20mode,Devices%2C%20like%20keyboard%20and%20mouse.
+          - generic [ref=f17e437]:
+            - generic [ref=f17e440]:
+              - link "avafinger/bananapi-zero-ubuntu-base-minimal ... GitHub https://github.com › avafinger › bananapi-zero-ubuntu-..." [ref=f17e442] [cursor=pointer]:
+                - /url: https://github.com/avafinger/bananapi-zero-ubuntu-base-minimal
+                - heading "avafinger/bananapi-zero-ubuntu-base-minimal ..." [level=3] [ref=f17e443]
+                - generic [ref=f17e449]:
+                  - generic [ref=f17e451]: GitHub
+                  - generic [ref=f17e453]: https://github.com › avafinger › bananapi-zero-ubuntu-...
+              - button "About this result" [ref=f17e456] [cursor=pointer]:
+                - img [ref=f17e459]
+            - generic [ref=f17e462]:
+              - generic [ref=f17e463]: Apr 20, 2017 —
+              - generic [ref=f17e464]:
+                - text: "To do before first boot: edit /etc/network/interfaces and add your SSID and password in order to use"
+                - emphasis [ref=f17e465]: connect
+                - text: to your Wifi. Generate wpa-psk for ...
+              - link "Read more" [ref=f17e466] [cursor=pointer]:
+                - /url: https://github.com/avafinger/bananapi-zero-ubuntu-base-minimal#:~:text=To%20do%20before%20first%20boot%3A,wpa_passphrase%20from%20your%20linux%20box
+            - list [ref=f17e468]:
+              - listitem [ref=f17e469]:
+                - link "Mainline Stable Kernel 4.20..." [ref=f17e470] [cursor=pointer]:
+                  - /url: https://github.com/avafinger/bananapi-zero-ubuntu-base-minimal#:~:text=Mainline%20stable%20Kernel%204.20.%2017%20%28Kodi%29
+                  - generic [ref=f17e472]: Mainline Stable Kernel 4.20...
+              - listitem [ref=f17e473]:
+                - link "Hdmi-Sound" [ref=f17e474] [cursor=pointer]:
+                  - /url: https://github.com/avafinger/bananapi-zero-ubuntu-base-minimal#:~:text=hdmi%2Dsound,-To%20be%20able%20to%20acess
+                  - generic [ref=f17e476]: Hdmi-Sound
+              - listitem [ref=f17e477]:
+                - link "Bluetooth - How To Pair A..." [ref=f17e478] [cursor=pointer]:
+                  - /url: https://github.com/avafinger/bananapi-zero-ubuntu-base-minimal#:~:text=Bluetooth%20%2D%20How%20to%20pair%20a%20Bluetooth%20Phone%20with%20command%20line
+                  - generic [ref=f17e480]: Bluetooth - How To Pair A...
+      - navigation [ref=f17e483]:
+        - heading "Page Navigation" [level=1] [ref=f17e484]
+        - text: "1"
+        - link "Page 2" [ref=f17e487] [cursor=pointer]:
+          - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&ei=JOBKav-rFKnykPIP-tPD6AI&start=10&sa=N&sstk=AU9db-BnsZMrPNhOo71_6eEWtGU84wYrz2KOmgP8GmTGa1nr-7L9P0cWPcamSUMOgsXBF-Pk7PrzFfs7hxEvcPDM4F3IKL3lIlTxVQ&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q8tMDegQIORAE
+          - text: "2"
+        - link "Page 3" [ref=f17e489] [cursor=pointer]:
+          - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&ei=JOBKav-rFKnykPIP-tPD6AI&start=20&sa=N&sstk=AU9db-BnsZMrPNhOo71_6eEWtGU84wYrz2KOmgP8GmTGa1nr-7L9P0cWPcamSUMOgsXBF-Pk7PrzFfs7hxEvcPDM4F3IKL3lIlTxVQ&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q8tMDegQIORAG
+          - text: "3"
+        - link "Page 4" [ref=f17e491] [cursor=pointer]:
+          - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&ei=JOBKav-rFKnykPIP-tPD6AI&start=30&sa=N&sstk=AU9db-BnsZMrPNhOo71_6eEWtGU84wYrz2KOmgP8GmTGa1nr-7L9P0cWPcamSUMOgsXBF-Pk7PrzFfs7hxEvcPDM4F3IKL3lIlTxVQ&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q8tMDegQIORAI
+          - text: "4"
+        - link "Page 5" [ref=f17e493] [cursor=pointer]:
+          - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&ei=JOBKav-rFKnykPIP-tPD6AI&start=40&sa=N&sstk=AU9db-BnsZMrPNhOo71_6eEWtGU84wYrz2KOmgP8GmTGa1nr-7L9P0cWPcamSUMOgsXBF-Pk7PrzFfs7hxEvcPDM4F3IKL3lIlTxVQ&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q8tMDegQIORAK
+          - text: "5"
+        - heading "Next" [level=2] [ref=f17e495]:
+          - link "Next" [ref=f17e496] [cursor=pointer]:
+            - /url: /search?q=site:github.com+sniff+mode+switch+controller+broadcom+fast+connect+disconnect&sca_esv=ddfd6cfe34cb7336&ei=JOBKav-rFKnykPIP-tPD6AI&start=10&sa=N&sstk=AU9db-BnsZMrPNhOo71_6eEWtGU84wYrz2KOmgP8GmTGa1nr-7L9P0cWPcamSUMOgsXBF-Pk7PrzFfs7hxEvcPDM4F3IKL3lIlTxVQ&ved=2ahUKEwj_zYmV0LyVAxUpOUQIHfrpEC0Q8NMDegQIORAM
+            - generic [ref=f17e498]: Next
+      - navigation
+    - contentinfo [ref=f17e499]:
+      - heading "Footer Links" [level=1] [ref=f17e500]
+      - generic [ref=f17e504]:
+        - generic [ref=f17e508]:
+          - button "90062, Los Angeles, CA - Based on your past activity" [ref=f17e510] [cursor=pointer]:
+            - generic [ref=f17e511]: 90062, Los Angeles, CA
+            - generic [ref=f17e513]:
+              - text: "-"
+              - generic [ref=f17e514]: Based on your past activity
+          - text: "-"
+          - button "Update location" [ref=f17e516] [cursor=pointer]: Update location
+        - generic [ref=f17e519]:
+          - link "Help" [ref=f17e520] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f17e521] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f17e522] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f17e523] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

@@ -1,0 +1,170 @@
+- generic [active] [ref=f12e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f12e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f12e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f12e8]:
+    - search [ref=f12e9]:
+      - generic [ref=f12e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f12e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f12e14]'
+        - generic [ref=f12e15]:
+          - generic [ref=f12e16]:
+            - combobox "Search" [ref=f12e19]: site:github.com joycontrol OR MissionControl sniff mode disconnect switch controller site:github.com joycontrol OR MissionControl sniff mode disconnect switch controller
+            - generic [ref=f12e20]:
+              - button "Clear" [ref=f12e22] [cursor=pointer]:
+                - img [ref=f12e24]
+              - generic [ref=f12e27]:
+                - button "Search by voice" [ref=f12e28] [cursor=pointer]:
+                  - img [ref=f12e29]
+                - button "Search by image" [ref=f12e31] [cursor=pointer]:
+                  - img [ref=f12e32]
+          - button "Search" [ref=f12e34] [cursor=pointer]:
+            - img [ref=f12e37]
+    - generic [ref=f12e39]:
+      - button "Settings" [ref=f12e41] [cursor=pointer]:
+        - img [ref=f12e44]
+      - button "Share" [ref=f12e47] [cursor=pointer]:
+        - img [ref=f12e51]
+      - generic [ref=f12e53]:
+        - button "Google apps" [ref=f12e55] [cursor=pointer]:
+          - img [ref=f12e56]
+        - link "Sign in" [ref=f12e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dsite:github.com%2Bjoycontrol%2BOR%2BMissionControl%2Bsniff%2Bmode%2Bdisconnect%2Bswitch%2Bcontroller&ec=futura_srp_og_si_72236_p
+  - generic [ref=f12e62]:
+    - navigation [ref=f12e68]:
+      - generic [ref=f12e74]:
+        - list [ref=f12e75]:
+          - listitem [ref=f12e76]:
+            - link "AI Mode" [ref=f12e79] [cursor=pointer]:
+              - /url: /search?q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&aep=1&ntc=1&sa=X&ved=2ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQ2J8OegQIEBAD
+              - generic [ref=f12e82]: AI Mode
+          - listitem [ref=f12e83]:
+            - link "All" [disabled] [ref=f12e84]:
+              - generic [ref=f12e86]: All
+          - listitem [ref=f12e87]:
+            - link "Shopping" [ref=f12e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&ved=1t:220175&ictx=111
+              - generic [ref=f12e90]: Shopping
+          - listitem [ref=f12e91]:
+            - link "Images" [ref=f12e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&sa=X&ved=2ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQtKgLegQIEhAB
+              - generic [ref=f12e94]: Images
+          - listitem [ref=f12e95]:
+            - link "Videos" [ref=f12e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&sa=X&ved=2ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQtKgLegQIFBAB
+              - generic [ref=f12e98]: Videos
+          - listitem [ref=f12e99]:
+            - link "Short videos" [ref=f12e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&sa=X&ved=2ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQs6gLegQIFRAB
+              - generic [ref=f12e102]: Short videos
+          - listitem [ref=f12e103]:
+            - link "Forums" [ref=f12e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jnxvATrUU2Yg9dwuUGnsUHcXPuOM0_k1dPPnMiKJgy16YDDqH-_iHFiQkOW8hi7RXxbx-p0rrtPynGdM4Y3BzbgasK2jck2RijcHMRNvbjn_f35QtGOxCPNpiN8_uM2f1KfHZZ4ljNFPrvlswpgLP1ETmolpA&q=site:github.com+joycontrol+OR+MissionControl+sniff+mode+disconnect+switch+controller&sa=X&ved=2ahUKEwjmoqvSz7yVAxUDH0QIHcfbIeMQs6gLegQIFhAB
+              - generic [ref=f12e106]: Forums
+          - listitem [ref=f12e107]:
+            - button "More filters" [ref=f12e108] [cursor=pointer]:
+              - generic "More filters" [ref=f12e109]:
+                - generic [ref=f12e110]:
+                  - generic [ref=f12e111]: More
+                  - img [ref=f12e113]
+        - button "Tools" [ref=f12e116] [cursor=pointer]:
+          - generic [ref=f12e118]:
+            - generic [ref=f12e119]: Tools
+            - img [ref=f12e121]
+    - heading "Search Results" [level=1] [ref=f12e123]
+    - main [ref=f12e129]:
+      - generic [ref=f12e133]:
+        - generic [ref=f12e136]:
+          - heading "Web results" [level=2] [ref=f12e137]
+          - generic [ref=f12e138]:
+            - generic [ref=f12e141]:
+              - 'link "connection dropped as soon as pair screen has been left #26 GitHub https://github.com › joycontrol › issues" [ref=f12e143] [cursor=pointer]':
+                - /url: https://github.com/mart1nro/joycontrol/issues/26
+                - 'heading "connection dropped as soon as pair screen has been left #26" [level=3] [ref=f12e144]'
+                - generic [ref=f12e150]:
+                  - generic [ref=f12e152]: GitHub
+                  - generic [ref=f12e154]: https://github.com › joycontrol › issues
+              - button "About this result" [ref=f12e157] [cursor=pointer]:
+                - img [ref=f12e160]
+            - generic [ref=f12e163]:
+              - generic [ref=f12e164]: Apr 17, 2020 —
+              - generic [ref=f12e165]:
+                - text: Could you open bluetoothctl in another terminal. Run
+                - emphasis [ref=f12e166]: joycontrol
+                - text: ", and then put the full output of both"
+                - emphasis [ref=f12e167]: joycontrol
+                - text: and bluetoothctl here?
+              - link "Read more" [ref=f12e168] [cursor=pointer]:
+                - /url: https://github.com/mart1nro/joycontrol/issues/26#:~:text=Could%20you%20open%20bluetoothctl%20in,both%20joycontrol%20and%20bluetoothctl%20here%3F
+        - generic [ref=f12e172]:
+          - heading "Images" [level=2] [ref=f12e176]
+          - generic [ref=f12e180]:
+            - generic [ref=f12e184] [cursor=pointer]:
+              - link "connection dropped as soon as pair screen has been left ... GitHub" [ref=f12e185]:
+                - /url: https://github.com/mart1nro/joycontrol/issues/26
+              - button "connection dropped as soon as pair screen has been left ..." [ref=f12e187]:
+                - img "connection dropped as soon as pair screen has been left ..." [ref=f12e189]
+              - generic [ref=f12e191]:
+                - generic [ref=f12e193]: connection dropped as soon as pair screen has been left ...
+                - generic [ref=f12e194]:
+                  - generic [ref=f12e201]: GitHub
+                  - button "About this result" [ref=f12e204]:
+                    - img [ref=f12e207]
+            - generic [ref=f12e212] [cursor=pointer]:
+              - link "connection dropped as soon as pair screen has been left ... GitHub" [ref=f12e213]:
+                - /url: https://github.com/mart1nro/joycontrol/issues/26
+              - button "connection dropped as soon as pair screen has been left ..." [ref=f12e215]:
+                - img "connection dropped as soon as pair screen has been left ..." [ref=f12e217]
+              - generic [ref=f12e219]:
+                - generic [ref=f12e221]: connection dropped as soon as pair screen has been left ...
+                - generic [ref=f12e222]:
+                  - generic [ref=f12e229]: GitHub
+                  - button "About this result" [ref=f12e232]:
+                    - img [ref=f12e235]
+            - generic [ref=f12e240] [cursor=pointer]:
+              - 'link "Switch 2 controllers support · Issue #1249 · darthcloud ... GitHub" [ref=f12e241]':
+                - /url: https://github.com/darthcloud/BlueRetro/issues/1249?timeline_page=1
+              - 'button "Switch 2 controllers support · Issue #1249 · darthcloud ..." [ref=f12e243]':
+                - 'img "Switch 2 controllers support · Issue #1249 · darthcloud ..." [ref=f12e245]'
+              - generic [ref=f12e247]:
+                - generic [ref=f12e249]: "Switch 2 controllers support · Issue #1249 · darthcloud ..."
+                - generic [ref=f12e250]:
+                  - generic [ref=f12e257]: GitHub
+                  - button "About this result" [ref=f12e260]:
+                    - img [ref=f12e263]
+          - button "Show more images" [ref=f12e266] [cursor=pointer]:
+            - separator [ref=f12e267]
+            - generic [ref=f12e268]:
+              - generic [ref=f12e269]: Show more images
+              - img [ref=f12e271]
+      - generic:
+        - generic:
+          - navigation
+      - navigation
+    - contentinfo [ref=f12e273]:
+      - heading "Footer Links" [level=1] [ref=f12e274]
+      - generic [ref=f12e278]:
+        - generic [ref=f12e282]:
+          - button "90062, Los Angeles, CA - Based on your past activity" [ref=f12e284] [cursor=pointer]:
+            - generic [ref=f12e285]: 90062, Los Angeles, CA
+            - generic [ref=f12e287]:
+              - text: "-"
+              - generic [ref=f12e288]: Based on your past activity
+          - text: "-"
+          - button "Update location" [ref=f12e290] [cursor=pointer]: Update location
+        - generic [ref=f12e293]:
+          - link "Help" [ref=f12e294] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f12e295] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f12e296] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f12e297] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

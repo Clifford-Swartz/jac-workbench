@@ -1,0 +1,253 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e3]:
+    - link "Skip to content" [ref=f1e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f1e6]:
+      - heading "Navigation Menu" [level=2] [ref=f1e7]
+      - generic [ref=f1e8]:
+        - link "Homepage" [ref=f1e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=f1e11]
+        - generic [ref=f1e13]:
+          - navigation "Global" [ref=f1e16]:
+            - list [ref=f1e17]:
+              - listitem [ref=f1e18]:
+                - button "Platform" [ref=f1e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=f1e21]
+              - listitem [ref=f1e23]:
+                - button "Solutions" [ref=f1e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=f1e26]
+              - listitem [ref=f1e28]:
+                - button "Resources" [ref=f1e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=f1e31]
+              - listitem [ref=f1e33]:
+                - button "Open Source" [ref=f1e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=f1e36]
+              - listitem [ref=f1e38]:
+                - button "Enterprise" [ref=f1e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=f1e41]
+              - listitem [ref=f1e43]:
+                - link "Pricing" [ref=f1e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=f1e45]: Pricing
+          - generic [ref=f1e46]:
+            - button "Search or jump to…" [ref=f1e49] [cursor=pointer]:
+              - img [ref=f1e51]
+              - generic [ref=f1e53]: Search or jump to...
+              - img [ref=f1e55]
+            - link "Sign in" [ref=f1e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Fissues%2F1294
+            - link "Sign up" [ref=f1e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fissues_fragments%2Fissue_layout&source=header-repo&source_repo=x360ce%2Fx360ce
+            - button "Appearance settings" [disabled] [ref=f1e63]:
+              - img
+  - main [ref=f1e67]:
+    - generic [ref=f1e68]:
+      - generic [ref=f1e69]:
+        - generic [ref=f1e71]:
+          - img [ref=f1e72]
+          - link "x360ce" [ref=f1e75] [cursor=pointer]:
+            - /url: /x360ce
+          - generic [ref=f1e76]: /
+          - strong [ref=f1e77]:
+            - link "x360ce" [ref=f1e78] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+          - generic [ref=f1e79]: Public
+        - generic [ref=f1e80]:
+          - list:
+            - listitem [ref=f1e81]:
+              - link "You must be signed in to change notification settings" [ref=f1e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f1e83]
+                - text: Notifications
+            - listitem [ref=f1e85]:
+              - link "Fork 504" [ref=f1e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f1e87]
+                - text: Fork
+                - generic "504" [ref=f1e89]
+            - listitem [ref=f1e90]:
+              - link "You must be signed in to star a repository" [ref=f1e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=f1e93]
+                - text: Star
+                - generic "2866 users starred this repository" [ref=f1e95]: 2.9k
+      - navigation "Repository" [ref=f1e96]:
+        - list [ref=f1e97]:
+          - listitem [ref=f1e98]:
+            - link "Code" [ref=f1e99] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+              - img [ref=f1e100]
+              - generic [ref=f1e102]: Code
+          - listitem [ref=f1e103]:
+            - link "Issues 837" [ref=f1e104] [cursor=pointer]:
+              - /url: /x360ce/x360ce/issues
+              - img [ref=f1e105]
+              - generic [ref=f1e108]: Issues
+              - generic "837" [ref=f1e109]
+          - listitem [ref=f1e110]:
+            - link "Pull requests 7" [ref=f1e111] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulls
+              - img [ref=f1e112]
+              - generic [ref=f1e114]: Pull requests
+              - generic "7" [ref=f1e115]
+          - listitem [ref=f1e116]:
+            - link "Discussions" [ref=f1e117] [cursor=pointer]:
+              - /url: /x360ce/x360ce/discussions
+              - img [ref=f1e118]
+              - generic [ref=f1e120]: Discussions
+          - listitem [ref=f1e121]:
+            - link "Actions" [ref=f1e122] [cursor=pointer]:
+              - /url: /x360ce/x360ce/actions
+              - img [ref=f1e123]
+              - generic [ref=f1e125]: Actions
+          - listitem [ref=f1e126]:
+            - link "Projects" [ref=f1e127] [cursor=pointer]:
+              - /url: /x360ce/x360ce/projects
+              - img [ref=f1e128]
+              - generic [ref=f1e130]: Projects
+          - listitem [ref=f1e131]:
+            - link "Wiki" [ref=f1e132] [cursor=pointer]:
+              - /url: /x360ce/x360ce/wiki
+              - img [ref=f1e133]
+              - generic [ref=f1e135]: Wiki
+          - listitem [ref=f1e136]:
+            - link "Security and quality" [ref=f1e137] [cursor=pointer]:
+              - /url: /x360ce/x360ce/security
+              - img [ref=f1e138]
+              - generic [ref=f1e140]: Security and quality
+          - listitem [ref=f1e141]:
+            - link "Insights" [ref=f1e142] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulse
+              - img [ref=f1e143]
+              - generic [ref=f1e145]: Insights
+    - generic [ref=f1e153]:
+      - region "Header" [ref=f1e155]:
+        - generic [ref=f1e156]:
+          - 'heading "It works in game controller settings,but not in a game #1294" [level=1] [ref=f1e158]':
+            - text: It works in game controller settings,but not in a game
+            - generic [ref=f1e160]: "#1294"
+          - generic [ref=f1e162]:
+            - button "New issue" [ref=f1e164] [cursor=pointer]:
+              - generic [ref=f1e166]: New issue
+            - button "Copy link" [ref=f1e167] [cursor=pointer]:
+              - img [ref=f1e168]
+      - generic [ref=f1e176]:
+        - img "Issue" [ref=f1e177]
+        - text: Open
+      - generic [ref=f1e181]:
+        - generic [ref=f1e182]:
+          - generic [ref=f1e185]:
+            - heading "Description" [level=2] [ref=f1e186]
+            - generic [ref=f1e188]:
+              - generic [ref=f1e190]:
+                - link "@ghost's profile" [ref=f1e192] [cursor=pointer]:
+                  - /url: /ghost
+                  - img "@ghost" [ref=f1e193]
+                - generic [ref=f1e194]:
+                  - link "ghost" [ref=f1e196] [cursor=pointer]:
+                    - /url: /ghost
+                  - generic [ref=f1e197]:
+                    - text: opened
+                    - link "on Jul 18, 2021on Jul 17, 2021" [ref=f1e198] [cursor=pointer]:
+                      - /url: https://github.com/x360ce/x360ce/issues/1294#issue-946933369
+              - generic [ref=f1e199]:
+                - paragraph [ref=f1e202]: I connected my switch pro controller via bluetooth to my pc,then installed x360ce and set all the settings and after that I can see it in game controller settings and it works and the virtual xbox 360 controller is set as default controller,then I tried it via Projekt 64 but it just doesn't work.
+                - toolbar "Reactions" [ref=f1e204]:
+                  - switch "👍 1 reaction" [ref=f1e205]:
+                    - generic [ref=f1e206]:
+                      - generic: 👍
+                      - generic [ref=f1e207]:
+                        - generic [ref=f1e208]: React with 👍
+                        - text: "1"
+          - generic [ref=f1e210]:
+            - heading "Activity" [level=2] [ref=f1e211]
+            - generic [ref=f1e212]:
+              - link "Sign up for free" [ref=f1e213] [cursor=pointer]:
+                - /url: /signup?return_to=https://github.com/x360ce/x360ce/issues/1294
+                - generic [ref=f1e215]: Sign up for free
+              - generic [ref=f1e216]:
+                - strong [ref=f1e217]: to join this conversation on GitHub.
+                - text: Already have an account?
+              - link "Sign in to comment" [ref=f1e218] [cursor=pointer]:
+                - /url: /login?return_to=https://github.com/x360ce/x360ce/issues/1294
+        - generic [ref=f1e220]:
+          - heading "Metadata" [level=2] [ref=f1e221]
+          - generic [ref=f1e223]:
+            - generic [ref=f1e225]:
+              - generic [ref=f1e226]:
+                - heading "Assignees" [level=3]
+              - generic [ref=f1e227]: No one assigned
+            - generic [ref=f1e229]:
+              - generic [ref=f1e230]:
+                - heading "Labels" [level=3]
+              - generic [ref=f1e231]: No labels
+            - generic [ref=f1e233]:
+              - generic [ref=f1e234]:
+                - heading "Type" [level=3]
+              - generic [ref=f1e235]: No type
+            - generic [ref=f1e236]:
+              - heading "Fields" [level=3] [ref=f1e239]
+              - generic [ref=f1e241]: No fields configured for issues without a type.
+            - generic [ref=f1e243]:
+              - generic [ref=f1e244]:
+                - heading "Projects" [level=3]
+              - generic [ref=f1e245]: No projects
+            - generic [ref=f1e247]:
+              - generic [ref=f1e248]:
+                - heading "Milestone" [level=3]
+              - generic [ref=f1e249]: No milestone
+            - generic [ref=f1e251]:
+              - generic [ref=f1e252]:
+                - heading "Relationships" [level=3]
+              - generic [ref=f1e253]: None yet
+            - generic [ref=f1e255]:
+              - generic [ref=f1e256]:
+                - heading "Development" [level=3]
+              - generic [ref=f1e257]: No branches or pull requests
+            - heading "Issue actions" [level=2] [ref=f1e258]
+            - list [ref=f1e259]:
+              - listitem [ref=f1e260]:
+                - button "Open in GitHub Copilot app" [ref=f1e261] [cursor=pointer]:
+                  - generic [ref=f1e264]: Open in GitHub Copilot app
+  - contentinfo [ref=f1e265]:
+    - heading "Footer" [level=2] [ref=f1e266]
+    - generic [ref=f1e267]:
+      - generic [ref=f1e268]:
+        - link "GitHub Homepage" [ref=f1e269] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=f1e270]
+        - generic [ref=f1e272]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f1e273]:
+        - heading "Footer navigation" [level=3] [ref=f1e274]
+        - list "Footer navigation" [ref=f1e275]:
+          - listitem [ref=f1e276]:
+            - link "Terms" [ref=f1e277] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f1e278]:
+            - link "Privacy" [ref=f1e279] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f1e280]:
+            - link "Security" [ref=f1e281] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f1e282]:
+            - link "Status" [ref=f1e283] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f1e284]:
+            - link "Community" [ref=f1e285] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f1e286]:
+            - link "Docs" [ref=f1e287] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f1e288]:
+            - link "Contact" [ref=f1e289] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f1e290]:
+            - button "Manage cookies" [ref=f1e292] [cursor=pointer]
+          - listitem [ref=f1e293]:
+            - button "Do not share my personal information" [ref=f1e295] [cursor=pointer]

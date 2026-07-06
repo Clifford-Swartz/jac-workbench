@@ -1,0 +1,582 @@
+- generic [active] [ref=f2e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f2e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f2e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f2e8]:
+    - search [ref=f2e9]:
+      - generic [ref=f2e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f2e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f2e14]'
+        - generic [ref=f2e15]:
+          - generic [ref=f2e16]:
+            - combobox "Search" [ref=f2e19]: nintendo switch bluetooth sniff mode unsniff disconnect controller debug nintendo switch bluetooth sniff mode unsniff disconnect controller debug
+            - generic [ref=f2e20]:
+              - button "Clear" [ref=f2e22] [cursor=pointer]:
+                - img [ref=f2e24]
+              - generic [ref=f2e27]:
+                - button "Search by voice" [ref=f2e28] [cursor=pointer]:
+                  - img [ref=f2e29]
+                - button "Search by image" [ref=f2e31] [cursor=pointer]:
+                  - img [ref=f2e32]
+          - button "Search" [ref=f2e34] [cursor=pointer]:
+            - img [ref=f2e37]
+    - generic [ref=f2e39]:
+      - button "Settings" [ref=f2e41] [cursor=pointer]:
+        - img [ref=f2e44]
+      - button "Share" [ref=f2e47] [cursor=pointer]:
+        - img [ref=f2e51]
+      - generic [ref=f2e53]:
+        - button "Google apps" [ref=f2e55] [cursor=pointer]:
+          - img [ref=f2e56]
+        - link "Sign in" [ref=f2e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dnintendo%2Bswitch%2Bbluetooth%2Bsniff%2Bmode%2Bunsniff%2Bdisconnect%2Bcontroller%2Bdebug%26sei%3DaN9KarOiF9HIkPIP7Ly8mAw&ec=futura_srp_og_si_72236_p
+  - generic [ref=f2e62]:
+    - navigation [ref=f2e68]:
+      - generic [ref=f2e74]:
+        - list [ref=f2e75]:
+          - listitem [ref=f2e76]:
+            - link "AI Mode" [ref=f2e79] [cursor=pointer]:
+              - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&aep=1&ntc=1&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ2J8OegQIEhAD
+              - generic [ref=f2e82]: AI Mode
+          - listitem [ref=f2e83]:
+            - link "All" [disabled] [ref=f2e84]:
+              - generic [ref=f2e86]: All
+          - listitem [ref=f2e87]:
+            - link "Shopping" [ref=f2e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&ved=1t:220175&ictx=111
+              - generic [ref=f2e90]: Shopping
+          - listitem [ref=f2e91]:
+            - link "Videos" [ref=f2e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQtKgLegQIFxAB
+              - generic [ref=f2e94]: Videos
+          - listitem [ref=f2e95]:
+            - link "Images" [ref=f2e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQtKgLegQIFRAB
+              - generic [ref=f2e98]: Images
+          - listitem [ref=f2e99]:
+            - link "Forums" [ref=f2e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQs6gLegQIFhAB
+              - generic [ref=f2e102]: Forums
+          - listitem [ref=f2e103]:
+            - link "Short videos" [ref=f2e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQs6gLegQIGBAB
+              - generic [ref=f2e106]: Short videos
+          - listitem [ref=f2e107]:
+            - button "More filters" [ref=f2e108] [cursor=pointer]:
+              - generic "More filters" [ref=f2e109]:
+                - generic [ref=f2e110]:
+                  - generic [ref=f2e111]: More
+                  - img [ref=f2e113]
+        - button "Tools" [ref=f2e116] [cursor=pointer]:
+          - generic [ref=f2e118]:
+            - generic [ref=f2e119]: Tools
+            - img [ref=f2e121]
+    - heading "Search Results" [level=1] [ref=f2e123]
+    - generic [ref=f2e128]:
+      - generic [ref=f2e147]:
+        - generic [ref=f2e149]:
+          - generic [ref=f2e151]:
+            - generic [ref=f2e152]:
+              - img [ref=f2e153]
+              - heading "AI Overview" [level=2] [ref=f2e155]
+            - button "About this result" [ref=f2e159]:
+              - img [ref=f2e161]
+          - generic [ref=f2e181]:
+            - generic [ref=f2e184]:
+              - generic [ref=f2e185]:
+                - text: To debug Nintendo Switch Bluetooth controller disconnections, reset the controller sync, verify there are no active local wireless communications, and update the controller firmware. Issues like dropping out or failing to reconnect are often caused by Bluetooth protocol hiccups or environmental interference rather than sniff mode configurations.
+                - generic [ref=f2e187]:
+                  - link "Reddit (+1) - View related links" [ref=f2e188] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/NintendoSwitch/comments/qbu1i4/why_such_a_horrible_bluetooth_implementation/
+                  - button "Reddit (+1) - View related links" [ref=f2e189] [cursor=pointer]:
+                    - generic [ref=f2e191]:
+                      - generic [ref=f2e192]: Reddit
+                      - generic [ref=f2e193]: "+1"
+                    - img [ref=f2e196]
+              - generic [ref=f2e199]:
+                - generic [ref=f2e200]: "For step-by-step visual guidance on unpairing and re-syncing controllers to fix wireless dropouts:"
+                - generic [ref=f2e202]:
+                  - button [ref=f2e206] [cursor=pointer]:
+                    - generic [ref=f2e207]:
+                      - img [ref=f2e208]
+                      - img [ref=f2e209]:
+                        - img [ref=f2e210]
+                      - generic [ref=f2e214]:
+                        - generic:
+                          - generic: 2:43
+                      - img [ref=f2e217]
+                  - link [ref=f2e222] [cursor=pointer]:
+                    - /url: https://www.youtube.com/watch?v=d8QZeYF7ZUw&vl=en
+                    - generic [ref=f2e223]:
+                      - generic [ref=f2e224]: How To Fix The Nintendo Switch Joy-Con Sync Issue!
+                      - generic [ref=f2e231]:
+                        - generic [ref=f2e232]: Tech Analytic 360
+                        - generic [ref=f2e233]: YouTube · Oct 4, 2025
+              - heading [level=3] [ref=f2e235]: Quick Fixes & Debugging
+              - generic [ref=f2e237]: "Follow these concrete, localized steps to resolve controller connection issues:"
+              - heading [level=3] [ref=f2e239]: 1. Hard Reset the Controllers
+              - list [ref=f2e241]:
+                - listitem [ref=f2e242]:
+                  - generic [ref=f2e243]:
+                    - strong [ref=f2e244]: "Joy-Cons:"
+                    - text: Press the tiny
+                    - strong [ref=f2e245]: SYNC button
+                    - text: on the rail of the Joy-Con once to power it down. Press any button on the face to turn it back on and re-sync.
+                - listitem [ref=f2e246]:
+                  - generic [ref=f2e247]:
+                    - strong [ref=f2e248]: "Pro Controller:"
+                    - text: Press and hold the
+                    - strong [ref=f2e249]: SYNC button
+                    - text: on the top (next to the USB-C port) until the LEDs turn off. Press any button to wake it up.
+                  - generic [ref=f2e251]:
+                    - link [ref=f2e252] [cursor=pointer]:
+                      - /url: https://www.nintendo.com/en-gb/Support/Nintendo-Switch/Joy-Con-Repeatedly-Connects-Disconnects-From-the-Console-1655598.html
+                    - button [ref=f2e253] [cursor=pointer]:
+                      - generic [ref=f2e255]:
+                        - generic [ref=f2e256]: Nintendo
+                        - generic [ref=f2e257]: "+1"
+                      - img [ref=f2e260]
+              - heading [level=3] [ref=f2e263]: 2. Full Unpair and Re-sync
+              - list [ref=f2e265]:
+                - listitem [ref=f2e266]:
+                  - generic [ref=f2e267]:
+                    - text: Go to the
+                    - strong [ref=f2e268]: HOME Menu
+                    - text: on your Nintendo Switch.
+                - listitem [ref=f2e269]:
+                  - generic [ref=f2e270]:
+                    - text: Select
+                    - strong [ref=f2e271]: System Settings
+                    - text: ">"
+                    - strong [ref=f2e272]: Controllers and Sensors
+                    - text: .
+                - listitem [ref=f2e273]:
+                  - generic [ref=f2e274]:
+                    - text: Choose
+                    - strong [ref=f2e275]: Disconnect Controllers
+                    - text: and hold the X button to clear all wireless pairings.
+                - listitem [ref=f2e276]:
+                  - generic [ref=f2e277]: Physically slide the Joy-Cons back onto the Switch rails until they click to re-pair them automatically.
+                  - button [ref=f2e280] [cursor=pointer]:
+                    - img [ref=f2e283]
+              - heading [level=3] [ref=f2e286]: 3. Update Controller Firmware
+              - generic [ref=f2e288]: Outdated firmware is a common culprit for Bluetooth instability.
+              - list [ref=f2e290]:
+                - listitem [ref=f2e291]:
+                  - generic [ref=f2e292]:
+                    - text: Go to
+                    - strong [ref=f2e293]: System Settings
+                    - text: ">"
+                    - strong [ref=f2e294]: Controllers and Sensors
+                    - text: .
+                - listitem [ref=f2e295]:
+                  - generic [ref=f2e296]:
+                    - text: Select
+                    - strong [ref=f2e297]: Update Controllers
+                    - text: to ensure all connected devices are running the latest version.
+                  - generic [ref=f2e299]:
+                    - link [ref=f2e300] [cursor=pointer]:
+                      - /url: https://www.youtube.com/watch?v=Q2x-X75IAwk
+                    - button [ref=f2e301] [cursor=pointer]:
+                      - generic [ref=f2e304]: YouTube
+                      - img [ref=f2e307]
+              - heading [level=3] [ref=f2e310]: 4. Check for Local Wireless Interference
+              - list [ref=f2e312]:
+                - listitem [ref=f2e313]:
+                  - generic [ref=f2e314]:
+                    - strong [ref=f2e315]: "Bluetooth Audio Constraints:"
+                    - text: The Switch disables Bluetooth audio when a game uses local wireless features (e.g., local multiplayer). Turn on
+                    - strong [ref=f2e316]: Airplane Mode
+                    - text: in the
+                    - strong [ref=f2e317]: Quick Settings
+                    - text: menu to disable local wireless communications and test if your controllers stabilize.
+                - listitem [ref=f2e318]:
+                  - generic [ref=f2e319]:
+                    - strong [ref=f2e320]: "Physical Objects:"
+                    - text: Move the console away from metal objects, Wi-Fi routers, or other electronic devices that could block the 2.4 GHz Bluetooth frequency.
+                  - generic [ref=f2e322]:
+                    - link [ref=f2e323] [cursor=pointer]:
+                      - /url: https://www.reddit.com/r/SteamDeck/comments/10rhqvm/okay_whats_really_the_deal_with_switch/
+                    - button [ref=f2e324] [cursor=pointer]:
+                      - generic [ref=f2e326]:
+                        - generic [ref=f2e327]: Reddit
+                        - generic [ref=f2e328]: "+4"
+                      - img [ref=f2e331]
+              - separator [ref=f2e334]
+              - heading [level=3] [ref=f2e336]: Bluetooth Sniff Mode Specifics
+              - generic [ref=f2e338]: "If you are reverse engineering or debugging the Switch's Bluetooth HID protocol:"
+              - list [ref=f2e340]:
+                - listitem [ref=f2e341]:
+                  - generic [ref=f2e342]:
+                    - strong [ref=f2e343]: "Sniff Mode:"
+                    - text: The Switch uses Bluetooth's low-power
+                    - emphasis [ref=f2e344]: Sniff
+                    - text: mode to conserve controller battery, periodically listening for inputs at specific intervals.
+                - listitem [ref=f2e345]:
+                  - generic [ref=f2e346]:
+                    - strong [ref=f2e347]: "Connection Drops:"
+                    - text: When connecting Switch Joy-Cons or Pro Controllers to third-party devices (like a PC or Steam Deck), issues arise if the host platform aggressively attempts to negotiate Sniff mode parameters or incorrectly handles Nintendo's proprietary reports (especially during rumble).
+                - listitem [ref=f2e348]:
+                  - generic [ref=f2e349]:
+                    - strong [ref=f2e350]: "Third-Party Workaround:"
+                    - text: On Linux/SteamOS, using the open-source
+                    - code [ref=f2e351]: hid-nintendo
+                    - text: driver, rumble features can sometimes cause connection drops. For users on Linux attempting to unbind/rebind a dropping controller manually, they unbind via
+                    - code [ref=f2e352]: /sys/bus/hid/drivers/nintendo/unbind
+                    - text: and rebind via
+                    - code [ref=f2e353]: /sys/bus/hid/drivers/nintendo/bind
+                    - text: as an automated script fallback.
+                  - generic [ref=f2e355]:
+                    - link [ref=f2e356] [cursor=pointer]:
+                      - /url: https://www.reddit.com/r/linux_gaming/comments/zmqreq/switch_pro_controller_wont_reconnect_after/
+                    - button [ref=f2e357] [cursor=pointer]:
+                      - generic [ref=f2e359]:
+                        - generic [ref=f2e360]: Reddit
+                        - generic [ref=f2e361]: "+2"
+                      - img [ref=f2e364]
+              - generic [ref=f2e368]:
+                - text: If you are trying to use the controller on a
+                - strong [ref=f2e369]: PC or different Bluetooth host
+                - text: ", or if you are working with a"
+                - strong [ref=f2e370]: custom homebrew/reverse engineering script
+                - text: ", let me know to help narrow down the connection fix."
+            - generic [ref=f2e375]:
+              - generic [ref=f2e377]:
+                - button "11 sites" [ref=f2e378] [cursor=pointer]:
+                  - generic [ref=f2e387]: 11 sites
+                - button "About this result" [ref=f2e392] [cursor=pointer]:
+                  - img [ref=f2e394]
+              - list [ref=f2e397]:
+                - listitem [ref=f2e398]:
+                  - generic [ref=f2e399]:
+                    - link "Joy-Con Repeatedly Connects/Disconnects ... - Nintendo. Opens in new tab." [ref=f2e400] [cursor=pointer]:
+                      - /url: https://www.nintendo.com/en-gb/Support/Nintendo-Switch/Joy-Con-Repeatedly-Connects-Disconnects-From-the-Console-1655598.html
+                    - generic [ref=f2e401]:
+                      - generic [ref=f2e403]:
+                        - generic [ref=f2e404]: Joy-Con Repeatedly Connects/Disconnects ... - Nintendo
+                        - generic [ref=f2e405]: Delete the pairing information from the system and then pair the Joy-Con controllers again. If the problem is still occurring, try...
+                      - generic [ref=f2e406]:
+                        - generic [ref=f2e411]: Nintendo
+                        - button "About this result" [ref=f2e415] [cursor=pointer]:
+                          - img [ref=f2e417]
+                - listitem [ref=f2e421]:
+                  - generic [ref=f2e422]:
+                    - link "Bluetooth® Audio Device Repeatedly Connects/Disconnects .... Opens in new tab." [ref=f2e423] [cursor=pointer]:
+                      - /url: https://www.nintendo.com/en-za/Support/Nintendo-Switch/Bluetooth-Audio-Device-Repeatedly-Connects-Disconnects-from-the-Console-2040287.html?srsltid=AfmBOorOwhTZIxKMlvVSdwKD2Gn4LvfejBJ0Ja1trK1xFW_CWpA34_3z
+                    - generic [ref=f2e424]:
+                      - generic [ref=f2e426]:
+                        - generic [ref=f2e427]: Bluetooth® Audio Device Repeatedly Connects/Disconnects ...
+                        - generic [ref=f2e428]: What to do. Update your console to the latest system version. Restart the console by holding down the POWER Button for three secon...
+                      - generic [ref=f2e430]:
+                        - generic [ref=f2e435]: Nintendo
+                        - button [ref=f2e439] [cursor=pointer]:
+                          - img [ref=f2e441]
+                - listitem [ref=f2e445]:
+                  - generic [ref=f2e446]:
+                    - link [ref=f2e447] [cursor=pointer]:
+                      - /url: https://www.reddit.com/r/SteamDeck/comments/10rhqvm/okay_whats_really_the_deal_with_switch/
+                    - generic [ref=f2e448]:
+                      - generic [ref=f2e450]:
+                        - generic [ref=f2e451]: Okay, what's REALLY the deal with Switch Controllers ... - Reddit
+                        - generic [ref=f2e452]: "Feb 2, 2023 — Valve's Acknowledgment: Valve acknowledges that Switch controller disconnects are a known but difficult-to-identify issue, potenti..."
+                      - generic [ref=f2e454]:
+                        - generic [ref=f2e459]: Reddit
+                        - button [ref=f2e463] [cursor=pointer]:
+                          - img [ref=f2e465]
+              - button [ref=f2e469] [cursor=pointer]:
+                - generic [ref=f2e470]: Show all
+        - button "Show more AI Overview" [ref=f2e474]:
+          - generic [ref=f2e476] [cursor=pointer]:
+            - generic [ref=f2e477]: Show more
+            - img [ref=f2e479]
+      - main [ref=f2e482]:
+        - generic [ref=f2e486]:
+          - generic [ref=f2e489]:
+            - heading "Web results" [level=2] [ref=f2e490]
+            - generic [ref=f2e491]:
+              - generic [ref=f2e494]:
+                - link "Okay, what's REALLY the deal with Switch Controllers ... Reddit · r/SteamDeck 30+ comments · 3 years ago" [ref=f2e496] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/SteamDeck/comments/10rhqvm/okay_whats_really_the_deal_with_switch/
+                  - heading "Okay, what's REALLY the deal with Switch Controllers ..." [level=3] [ref=f2e497]
+                  - generic [ref=f2e503]:
+                    - generic [ref=f2e505]: Reddit · r/SteamDeck
+                    - generic [ref=f2e507]: 30+ comments · 3 years ago
+                - button "About this result" [ref=f2e510] [cursor=pointer]:
+                  - img [ref=f2e513]
+              - generic [ref=f2e516]: First off, I've disabled rumble and haptics on all of my connected controllers. It doesn't help. I mention this because its the top suggestion to try, ...
+              - generic [ref=f2e521]:
+                - link "36 answers" [ref=f2e522] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/SteamDeck/comments/10rhqvm/okay_whats_really_the_deal_with_switch/j6vsoty/
+                - generic [ref=f2e523]: ·
+                - generic [ref=f2e524]: "Top answer:"
+                - generic [ref=f2e525]: I had this disconnecting issue with my Switch controller and it drove me nuts. Disabling rumble ...
+              - generic [ref=f2e528]:
+                - generic [ref=f2e529]:
+                  - 'link "Controller bluetooth issues: No Fault Found by Nintendo" [ref=f2e532] [cursor=pointer]':
+                    - /url: https://www.reddit.com/r/NintendoSwitch/comments/8i7jcg/controller_bluetooth_issues_no_fault_found_by/
+                    - generic [ref=f2e533]:
+                      - emphasis [ref=f2e534]: Controller bluetooth
+                      - text: "issues: No Fault Found by"
+                      - emphasis [ref=f2e535]: Nintendo
+                  - generic [ref=f2e537]: 14 answers
+                  - generic [ref=f2e539]: May 9, 2018
+                - generic [ref=f2e540]:
+                  - link "Why such a horrible Bluetooth implementation? - Reddit" [ref=f2e543] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/NintendoSwitch/comments/qbu1i4/why_such_a_horrible_bluetooth_implementation/
+                    - generic [ref=f2e544]:
+                      - text: Why such a horrible
+                      - emphasis [ref=f2e545]: Bluetooth
+                      - text: implementation? - Reddit
+                  - generic [ref=f2e547]: 51 answers
+                  - generic [ref=f2e549]: Oct 20, 2021
+                - link "More results from www.reddit.com" [ref=f2e553] [cursor=pointer]:
+                  - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug+site:www.reddit.com&sca_esv=ddfd6cfe34cb7336&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQrQIoAnoECB4QAw
+          - generic [ref=f2e558]:
+            - heading "People also ask" [level=2] [ref=f2e560]
+            - generic [ref=f2e561]:
+              - button "Why do my Controllers keep disconnecting from my Nintendo Switch?" [ref=f2e567] [cursor=pointer]:
+                - generic [ref=f2e569]: Why do my Controllers keep disconnecting from my Nintendo Switch?
+                - img [ref=f2e572]
+              - button "Why is my switch making me play with Controllers detached?" [ref=f2e581] [cursor=pointer]:
+                - generic [ref=f2e583]: Why is my switch making me play with Controllers detached?
+                - img [ref=f2e586]
+              - button "How to unpair a Bluetooth controller from Switch?" [ref=f2e595] [cursor=pointer]:
+                - generic [ref=f2e597]: How to unpair a Bluetooth controller from Switch?
+                - img [ref=f2e600]
+              - button "How to fix joy cons that keep disconnecting when on the console?" [ref=f2e609] [cursor=pointer]:
+                - generic [ref=f2e611]: How to fix joy cons that keep disconnecting when on the console?
+                - img [ref=f2e614]
+          - generic [ref=f2e619]:
+            - heading "Web results" [level=2] [ref=f2e620]
+            - generic [ref=f2e621]:
+              - generic [ref=f2e624]:
+                - 'link "Bluetooth Spoofing to unmodded Switch? #895 GitHub https://github.com › MissionControl › discussions" [ref=f2e626] [cursor=pointer]':
+                  - /url: https://github.com/ndeadly/MissionControl/discussions/895
+                  - 'heading "Bluetooth Spoofing to unmodded Switch? #895" [level=3] [ref=f2e627]'
+                  - generic [ref=f2e633]:
+                    - generic [ref=f2e635]: GitHub
+                    - generic [ref=f2e637]: https://github.com › MissionControl › discussions
+                - button "About this result" [ref=f2e640] [cursor=pointer]:
+                  - img [ref=f2e643]
+              - generic [ref=f2e646]:
+                - generic [ref=f2e647]:
+                  - text: Is it possible to use the
+                  - emphasis [ref=f2e648]: Bluetooth
+                  - text: spoofing feature in such a way that
+                  - emphasis [ref=f2e649]: controllers
+                  - text: can seamlessly connect to two different
+                  - emphasis [ref=f2e650]: Switches
+                  - text: (one of them being ...
+                - link "Read more" [ref=f2e651] [cursor=pointer]:
+                  - /url: https://github.com/ndeadly/MissionControl/discussions/895#:~:text=Is%20it%20possible%20to%20use,and%20without%20a%20Link%20Key%3F
+          - generic [ref=f2e655]:
+            - generic [ref=f2e658]:
+              - link "Bluetooth® Audio Device Repeatedly Connects ... Nintendo https://www.nintendo.com › Support › Nintendo-Switch" [ref=f2e660] [cursor=pointer]:
+                - /url: https://www.nintendo.com/en-za/Support/Nintendo-Switch/Bluetooth-Audio-Device-Repeatedly-Connects-Disconnects-from-the-Console-2040287.html?srsltid=AfmBOoo487_SAPGMPUIyinZePmopk9dFSTqUt8OhC8qK9mdmo6uzzPUT
+                - heading "Bluetooth® Audio Device Repeatedly Connects ..." [level=3] [ref=f2e661]
+                - generic [ref=f2e667]:
+                  - generic [ref=f2e669]: Nintendo
+                  - generic [ref=f2e671]: https://www.nintendo.com › Support › Nintendo-Switch
+              - button "About this result" [ref=f2e674] [cursor=pointer]:
+                - img [ref=f2e677]
+            - generic [ref=f2e680]:
+              - text: What to do. Update your console to the latest system version. Restart the console by holding down the POWER Button for three seconds, then selecting Power ...
+              - link "Read more" [ref=f2e681] [cursor=pointer]:
+                - /url: https://www.nintendo.com/en-za/Support/Nintendo-Switch/Bluetooth-Audio-Device-Repeatedly-Connects-Disconnects-from-the-Console-2040287.html?srsltid=AfmBOoo487_SAPGMPUIyinZePmopk9dFSTqUt8OhC8qK9mdmo6uzzPUT#:~:text=What%20to%20do,selecting%20Power%20Options%20and%20Restart.
+          - generic [ref=f2e688]:
+            - generic [ref=f2e691]:
+              - link "HOW TO FIX RIGHT JOY-CON ISSUES!! - Nintendo Switch ... YouTube · Hi Tech Hero 29.7K+ views · 2 years ago" [ref=f2e693] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=Q2x-X75IAwk
+                - heading "HOW TO FIX RIGHT JOY-CON ISSUES!! - Nintendo Switch ..." [level=3] [ref=f2e694]
+                - generic [ref=f2e700]:
+                  - generic [ref=f2e702]: YouTube · Hi Tech Hero
+                  - generic [ref=f2e704]: 29.7K+ views · 2 years ago
+              - button "About this result" [ref=f2e707] [cursor=pointer]:
+                - img [ref=f2e710]
+            - generic [ref=f2e712]:
+              - button "HOW TO FIX RIGHT JOY-CON ISSUES!! - Nintendo Switch ... by Hi Tech Hero on YouTube. Play on Google. 3:03" [ref=f2e713] [cursor=pointer]:
+                - generic [ref=f2e715]:
+                  - img [ref=f2e718]
+                  - generic [ref=f2e721]:
+                    - generic [ref=f2e722]: 3:03
+                    - img [ref=f2e725]
+              - generic [ref=f2e728]: Make sure your Joy-Cons are ALSO updated to the latest software version!! Works for BOTH right Joy-Con and left Joy-Con controllers. 1.
+            - generic [ref=f2e730]: "Missing: sniff ‎unsniff ‎debug"
+          - generic [ref=f2e734]:
+            - generic [ref=f2e737]:
+              - link "Nintendo Switch game controller failing to connect to ... openSUSE Forums https://forums.opensuse.org › English › Hardware" [ref=f2e739] [cursor=pointer]:
+                - /url: https://forums.opensuse.org/t/nintendo-switch-game-controller-failing-to-connect-to-bluetooth/178196
+                - heading "Nintendo Switch game controller failing to connect to ..." [level=3] [ref=f2e740]
+                - generic [ref=f2e746]:
+                  - generic [ref=f2e748]: openSUSE Forums
+                  - generic [ref=f2e750]: https://forums.opensuse.org › English › Hardware
+              - button "About this result" [ref=f2e753] [cursor=pointer]:
+                - img [ref=f2e756]
+            - generic [ref=f2e759]:
+              - generic [ref=f2e760]: Aug 29, 2024 —
+              - generic [ref=f2e761]:
+                - text: I am trying to find out why the
+                - emphasis [ref=f2e762]: Nintendo Switch controller
+                - text: fails to connect as a
+                - emphasis [ref=f2e763]: bluetooth
+                - text: device. The device is discovered during the scan, ...
+          - generic [ref=f2e770]:
+            - generic [ref=f2e773]:
+              - link "SOLVED! Fix Nintendo Switch USB Pro Controller ... YouTube · RoXolid Productions 41.9K+ views · 3 years ago" [ref=f2e775] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=Ec5LXvP_lrA
+                - heading "SOLVED! Fix Nintendo Switch USB Pro Controller ..." [level=3] [ref=f2e776]
+                - generic [ref=f2e782]:
+                  - generic [ref=f2e784]: YouTube · RoXolid Productions
+                  - generic [ref=f2e786]: 41.9K+ views · 3 years ago
+              - button "About this result" [ref=f2e789] [cursor=pointer]:
+                - img [ref=f2e792]
+            - generic [ref=f2e794]:
+              - button "SOLVED! Fix Nintendo Switch USB Pro Controller ... by RoXolid Productions on YouTube. Play on Google. 7:46" [ref=f2e795] [cursor=pointer]:
+                - generic [ref=f2e797]:
+                  - img [ref=f2e803]
+                  - generic [ref=f2e806]:
+                    - generic [ref=f2e807]: 7:46
+                    - img [ref=f2e810]
+              - generic [ref=f2e813]: In this episode, we show you how to fix USB Controller Connectivity issues with the Nintendo Switch and Switch OLED related to the Retro ...
+            - button "9 key moments in this video" [ref=f2e818] [cursor=pointer]:
+              - generic [ref=f2e827]:
+                - generic [ref=f2e830]: 9 key moments in this video
+                - img [ref=f2e832]
+            - generic [ref=f2e835]: "Missing: sniff ‎unsniff ‎debug"
+          - generic [ref=f2e839]:
+            - generic [ref=f2e842]:
+              - 'link "HID Protocol for Bluetooth / USB · Issue #7 GitHub https://github.com › dekuNukem › issues" [ref=f2e844] [cursor=pointer]':
+                - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1
+                - 'heading "HID Protocol for Bluetooth / USB · Issue #7" [level=3] [ref=f2e845]'
+                - generic [ref=f2e851]:
+                  - generic [ref=f2e853]: GitHub
+                  - generic [ref=f2e855]: https://github.com › dekuNukem › issues
+              - button "About this result" [ref=f2e858] [cursor=pointer]:
+                - img [ref=f2e861]
+            - generic [ref=f2e864]:
+              - generic [ref=f2e865]:
+                - text: Have you been able to
+                - emphasis [ref=f2e866]: sniff
+                - text: the USB or
+                - emphasis [ref=f2e867]: Bluetooth
+                - text: HID protocol it's using? Been trying to bodge a driver together, and don't really have the tools to analyse the ...
+              - link "Read more" [ref=f2e868] [cursor=pointer]:
+                - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1#:~:text=Have%20you%20been%20able%20to,tools%20to%20analyse%20the%20protocol.
+            - generic [ref=f2e870]:
+              - text: "Missing: unsniff ‎| Show results with:"
+              - link "unsniff" [ref=f2e871] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=nintendo+switch+bluetooth+sniff+mode+%22unsniff%22+disconnect+controller+debug&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ5t4CegQIQxAB
+          - generic [ref=f2e878]:
+            - generic [ref=f2e881]:
+              - link "How to Fix ANY Nintendo Switch 2 Pro Controller Connection ... YouTube · Garrett Lindsay 4.7K+ views · 8 months ago" [ref=f2e883] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=t4R8CFpF4pk
+                - heading "How to Fix ANY Nintendo Switch 2 Pro Controller Connection ..." [level=3] [ref=f2e884]
+                - generic [ref=f2e890]:
+                  - generic [ref=f2e892]: YouTube · Garrett Lindsay
+                  - generic [ref=f2e894]: 4.7K+ views · 8 months ago
+              - button "About this result" [ref=f2e897] [cursor=pointer]:
+                - img [ref=f2e900]
+            - generic [ref=f2e902]:
+              - button "How to Fix ANY Nintendo Switch 2 Pro Controller Connection ... by Garrett Lindsay on YouTube. Play on Google. 2:42" [ref=f2e903] [cursor=pointer]:
+                - generic [ref=f2e905]:
+                  - img [ref=f2e908]
+                  - generic [ref=f2e911]:
+                    - generic [ref=f2e912]: 2:42
+                    - img [ref=f2e915]
+              - generic [ref=f2e918]: Having trouble connecting your Nintendo Switch 2 Pro Controller? In this quick and easy guide, I'll show you how to fix ALL connection ...
+            - generic [ref=f2e920]: "Missing: sniff ‎unsniff ‎debug"
+          - generic [ref=f2e924]:
+            - generic [ref=f2e927]:
+              - link "[RESOLVED] Intel AX200 Bluetooth – Switch Pro controller ... Arch Linux Forums https://bbs.archlinux.org › Kernel & Hardware" [ref=f2e929] [cursor=pointer]:
+                - /url: https://bbs.archlinux.org/viewtopic.php?id=269724
+                - heading "[RESOLVED] Intel AX200 Bluetooth – Switch Pro controller ..." [level=3] [ref=f2e930]
+                - generic [ref=f2e936]:
+                  - generic [ref=f2e938]: Arch Linux Forums
+                  - generic [ref=f2e940]: https://bbs.archlinux.org › Kernel & Hardware
+              - button "About this result" [ref=f2e943] [cursor=pointer]:
+                - img [ref=f2e946]
+            - generic [ref=f2e949]:
+              - generic [ref=f2e950]: Sep 17, 2021 —
+              - generic [ref=f2e951]:
+                - text: Hello everyone,. I have a problem with the
+                - emphasis [ref=f2e952]: Bluetooth
+                - text: connection between my
+                - emphasis [ref=f2e953]: Switch
+                - text: Pro
+                - emphasis [ref=f2e954]: controller
+                - text: and my Intel AX200 adapter.
+              - link "Read more" [ref=f2e955] [cursor=pointer]:
+                - /url: https://bbs.archlinux.org/viewtopic.php?id=269724#:~:text=Hello%20everyone%2C,and%20my%20Intel%20AX200%20adapter.
+        - generic [ref=f2e957]:
+          - generic [ref=f2e962]:
+            - heading "People also search for" [level=2] [ref=f2e964]
+            - generic [ref=f2e966]:
+              - generic [ref=f2e967]:
+                - link "Switch pro controller keeps disconnecting reddit" [ref=f2e971] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+pro+controller+keeps+disconnecting+reddit&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ1QJ6BAgwEAE
+                  - generic [ref=f2e972]:
+                    - generic [ref=f2e977]: Switch pro controller keeps disconnecting reddit
+                    - img [ref=f2e981]
+                - link "How to turn off local communication on Switch" [ref=f2e986] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=How+to+turn+off+local+communication+on+Switch&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ1QJ6BAgxEAE
+                  - generic [ref=f2e987]:
+                    - generic [ref=f2e992]: How to turn off local communication on Switch
+                    - img [ref=f2e996]
+              - generic [ref=f2e998]:
+                - link "Pro Controller won t connect to Steam Deck" [ref=f2e1002] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Pro+Controller+won+t+connect+to+Steam+Deck&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ1QJ6BAg1EAE
+                  - generic [ref=f2e1003]:
+                    - generic [ref=f2e1008]: Pro Controller won t connect to Steam Deck
+                    - img [ref=f2e1012]
+                - link "Bluetooth audio is disabled during local communication" [ref=f2e1017] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Bluetooth+audio+is+disabled+during+local+communication&sa=X&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ1QJ6BAgvEAE
+                  - generic [ref=f2e1018]:
+                    - generic [ref=f2e1023]: Bluetooth audio is disabled during local communication
+                    - img [ref=f2e1027]
+          - navigation [ref=f2e1029]:
+            - heading "Page Navigation" [level=1] [ref=f2e1030]
+            - text: "1"
+            - link "Page 2" [ref=f2e1033] [cursor=pointer]:
+              - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&ei=aN9KaumAHcDAkPIPpYzWUA&start=10&sa=N&sstk=AU9db-CY8FODH3-0KhZsiEDfz0QT9J2OwbjdynqFGc0CVf3UJPRD5_keSZUuyKEeI1znsn1N78INEKggyxSboJt2pEQKJ7StEhx2yQ&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ8tMDegQILRAE
+              - text: "2"
+            - link "Page 3" [ref=f2e1035] [cursor=pointer]:
+              - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&ei=aN9KaumAHcDAkPIPpYzWUA&start=20&sa=N&sstk=AU9db-CY8FODH3-0KhZsiEDfz0QT9J2OwbjdynqFGc0CVf3UJPRD5_keSZUuyKEeI1znsn1N78INEKggyxSboJt2pEQKJ7StEhx2yQ&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ8tMDegQILRAG
+              - text: "3"
+            - link "Page 4" [ref=f2e1037] [cursor=pointer]:
+              - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&ei=aN9KaumAHcDAkPIPpYzWUA&start=30&sa=N&sstk=AU9db-CY8FODH3-0KhZsiEDfz0QT9J2OwbjdynqFGc0CVf3UJPRD5_keSZUuyKEeI1znsn1N78INEKggyxSboJt2pEQKJ7StEhx2yQ&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ8tMDegQILRAI
+              - text: "4"
+            - link "Page 5" [ref=f2e1039] [cursor=pointer]:
+              - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&ei=aN9KaumAHcDAkPIPpYzWUA&start=40&sa=N&sstk=AU9db-CY8FODH3-0KhZsiEDfz0QT9J2OwbjdynqFGc0CVf3UJPRD5_keSZUuyKEeI1znsn1N78INEKggyxSboJt2pEQKJ7StEhx2yQ&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ8tMDegQILRAK
+              - text: "5"
+            - heading "Next" [level=2] [ref=f2e1041]:
+              - link "Next" [ref=f2e1042] [cursor=pointer]:
+                - /url: /search?q=nintendo+switch+bluetooth+sniff+mode+unsniff+disconnect+controller+debug&sca_esv=ddfd6cfe34cb7336&ei=aN9KaumAHcDAkPIPpYzWUA&start=10&sa=N&sstk=AU9db-CY8FODH3-0KhZsiEDfz0QT9J2OwbjdynqFGc0CVf3UJPRD5_keSZUuyKEeI1znsn1N78INEKggyxSboJt2pEQKJ7StEhx2yQ&ved=2ahUKEwjp1L-7z7yVAxVAIEQIHSWGFQoQ8NMDegQILRAM
+                - generic [ref=f2e1044]: Next
+        - navigation
+    - contentinfo [ref=f2e1045]:
+      - heading "Footer Links" [level=1] [ref=f2e1046]
+      - generic [ref=f2e1050]:
+        - generic [ref=f2e1054]:
+          - button "90062, Los Angeles, CA - From your IP address" [ref=f2e1056] [cursor=pointer]:
+            - generic [ref=f2e1057]: 90062, Los Angeles, CA
+            - generic [ref=f2e1059]:
+              - text: "-"
+              - generic [ref=f2e1060]: From your IP address
+          - text: "-"
+          - button "Update location" [ref=f2e1062] [cursor=pointer]: Update location
+        - generic [ref=f2e1065]:
+          - link "Help" [ref=f2e1066] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f2e1067] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f2e1068] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f2e1069] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

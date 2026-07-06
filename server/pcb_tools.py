@@ -248,8 +248,39 @@ session = {
     "components": [],  # [{id, type, ref, x, y, rotation, properties, ...}]
     "wires": [],       # [{id, points: [[x1,y1],[x2,y2],...], net: str}]
     "nets": {},        # {net_name: [{"comp_id": str, "pin": str}, ...]}
+    "tracks": [],      # [{id, segs:[{ax,ay,bx,by,layer}], vias:[{x,y}], net, a, b, width}] — routed copper
+    "zones": [],       # [{id, layer, net, poly:[[x,y],...]}] — copper pours (ground/power planes)
+    # per-net design rules; routing/DRC use the class of each net. Widths/clearance in mm.
+    "netclasses": {
+        "Default": {"track_width": 0.25, "clearance": 0.2, "via_dia": 0.6, "via_drill": 0.3},
+        "Power":   {"track_width": 0.6,  "clearance": 0.2, "via_dia": 0.8, "via_drill": 0.4},
+    },
+    "net_assign": {},  # explicit net -> class overrides (else auto: power rails -> "Power")
+    "custom_lib": {},  # KiCad symbols the user searched + placed: {libId: {name,pins,svg,footprint_ref,...}}
     "next_id": 1,
 }
+
+def _lib_of(comp_type):
+    """Definition for a component type — a built-in OR a session-custom KiCad symbol."""
+    return COMPONENT_LIB.get(comp_type) or session.get("custom_lib", {}).get(comp_type) or {}
+
+import re as _re
+_POWER_NETS = {"GND", "VCC", "VDD", "VDDA", "VSS", "VSSA", "VEE", "VBUS", "VBAT", "VIN", "VOUT",
+               "AGND", "DGND", "PGND", "AVCC", "AVDD"}
+# Voltage-rail names: 5V, +3V3, 3.3V, 12V, 1V8, -5V, 2V5 …
+_VOLT_RE = _re.compile(r'^[+-]?\d+(\.\d+)?V\d*$')
+def net_class_of(net_name):
+    """Which netclass a net belongs to: explicit override, else power rails -> Power."""
+    if net_name in session.get("net_assign", {}):
+        return session["net_assign"][net_name]
+    n = (net_name or "").upper()
+    if n in _POWER_NETS or n.startswith("+") or _VOLT_RE.match(n):
+        return "Power"
+    return "Default"
+
+def net_track_width_mm(net_name):
+    cls = net_class_of(net_name)
+    return session["netclasses"].get(cls, session["netclasses"]["Default"]).get("track_width", 0.25)
 
 
 def _next_id():
@@ -259,7 +290,7 @@ def _next_id():
 
 def _get_ref(comp_type):
     """Generate next reference designator (R1, R2, C1, etc.)."""
-    lib = COMPONENT_LIB.get(comp_type, {})
+    lib = _lib_of(comp_type)
     prefix = lib.get("prefix", "X")
     existing = [c["ref"] for c in session["components"] if c["ref"].startswith(prefix)]
     nums = []
@@ -274,9 +305,36 @@ def _get_ref(comp_type):
 
 # ── Tool Functions ─────────────────────────────────────────────────────────
 
+# Real LCSC part numbers for common JLCPCB Basic Parts (verified from the JLCPCB parts
+# library). Keyed by (type, VALUE, PACKAGE); package/value None = wildcard. So a placed
+# 10K 0402 resistor gets a real, orderable LCSC # in the BOM instead of a blank.
+# Source: JLCPCB Basic Parts list (github.com/josemariaaraujo/JLCPCB-Basic-Parts).
+LCSC_TABLE = {
+    ("resistor", "100", "0402"): "C25076", ("resistor", "220", "0402"): "C25092",
+    ("resistor", "330", "0402"): "C25105", ("resistor", "1K", "0402"): "C11702",
+    ("resistor", "4.7K", "0402"): "C25900", ("resistor", "10K", "0402"): "C25744",
+    ("resistor", "100K", "0402"): "C25741",
+    ("capacitor", "100NF", "0402"): "C1525", ("capacitor", "1UF", "0402"): "C52923",
+    ("capacitor", "10UF", "0402"): "C15525", ("capacitor", "10UF", "0805"): "C15850",
+    ("led", "RED", "0603"): "C2286",
+    ("diode", None, None): "C81598",     # general-purpose (1N4148-class, SOD-123)
+    ("npn", None, None): "C20526",       # MMBT3904 SOT-23
+    ("pnp", None, None): "C8326",        # MMBT3906 SOT-23
+}
+
+def lookup_lcsc(comp_type, value, footprint):
+    """Best real LCSC # for a (type, value, package), most-specific match first. '' if unknown."""
+    v = (value or "").upper().replace(" ", "").replace("Ω", "").replace("OHM", "")
+    fp = (footprint or "").upper()
+    for key in ((comp_type, v, fp), (comp_type, v, None), (comp_type, None, None)):
+        if key in LCSC_TABLE:
+            return LCSC_TABLE[key]
+    return ""
+
+
 def add_component(comp_type: str, x: float = 0, y: float = 0, rotation: float = 0, properties: dict = None) -> dict:
     """Add a component to the schematic."""
-    lib = COMPONENT_LIB.get(comp_type)
+    lib = _lib_of(comp_type)
     if not lib:
         return {"ok": False, "error": f"Unknown component: {comp_type}. Available: {list(COMPONENT_LIB.keys())}"}
 
@@ -285,12 +343,15 @@ def add_component(comp_type: str, x: float = 0, y: float = 0, rotation: float = 
     props = dict(lib.get("properties", {}))
     if properties:
         props.update(properties)
+    if not props.get("lcsc"):                        # auto-fill a real LCSC # for common parts
+        props["lcsc"] = lookup_lcsc(comp_type, props.get("value"), props.get("footprint"))
 
     comp = {
         "id": comp_id,
         "type": comp_type,
         "ref": ref,
-        "x": x, "y": y,
+        "x": x, "y": y,               # schematic position
+        "pcb_x": x, "pcb_y": y,       # PCB (board) position — independent layout, like KiCad
         "rotation": rotation,
         "properties": props,
     }
@@ -298,23 +359,100 @@ def add_component(comp_type: str, x: float = 0, y: float = 0, rotation: float = 
     return {"ok": True, "component": comp, **get_schematic()}
 
 
+def add_symbol(defn: dict, x: float = 0, y: float = 0, rotation: float = 0) -> dict:
+    """Place a real KiCad symbol from the library search. Registers its definition into the
+    session's custom lib (pins/graphics/footprint), then adds it like any other component.
+    `defn` is what kicad-symbol-get returns (pins already in JAC world units)."""
+    lib_id = defn.get("libId")
+    if not lib_id:
+        return {"ok": False, "error": "Symbol definition has no libId."}
+    if lib_id not in session["custom_lib"]:
+        pins = defn.get("pins", {}) or {}
+        session["custom_lib"][lib_id] = {
+            "name": defn.get("name", lib_id), "prefix": defn.get("prefix", "U"), "category": "kicad",
+            "pins": {k: {"x": p["x"], "y": p["y"]} for k, p in pins.items()},
+            "pin_names": {k: p.get("name", "") for k, p in pins.items()},
+            "w": defn.get("w", 40), "h": defn.get("h", 30), "svg": defn.get("svg", ""),
+            "footprint_ref": defn.get("footprint", "") or "",
+            "properties": {"value": defn.get("value", ""), "footprint": defn.get("footprint", ""), "lcsc": ""},
+        }
+    return add_component(lib_id, x, y, rotation)
+
+
+def _resolve_comp(comp_id: str):
+    """Find a component by id OR ref designator (e.g. 'item_3' or 'R1')."""
+    return next((c for c in session["components"] if c["id"] == comp_id or c.get("ref") == comp_id), None)
+
+
 def remove_component(comp_id: str) -> dict:
-    """Remove a component and its connections."""
-    session["components"] = [c for c in session["components"] if c["id"] != comp_id]
+    """Remove a component and its connections (by id or ref)."""
+    target = _resolve_comp(comp_id)
+    real_id = target["id"] if target else comp_id
+    session["components"] = [c for c in session["components"] if c["id"] != real_id]
     # Remove wires connected to this component
     for net_name, pins in list(session["nets"].items()):
-        session["nets"][net_name] = [p for p in pins if p["comp_id"] != comp_id]
+        session["nets"][net_name] = [p for p in pins if p["comp_id"] != real_id]
     return {"ok": True, **get_schematic()}
 
 
-def move_component(comp_id: str, x: float, y: float) -> dict:
-    """Move a component."""
-    for c in session["components"]:
-        if c["id"] == comp_id:
-            c["x"] = x
-            c["y"] = y
-            return {"ok": True, **get_schematic()}
+def move_component(comp_id: str, x: float, y: float, view: str = "schematic") -> dict:
+    """Move a component (by id or ref). view='pcb' moves it on the board layout only;
+    view='schematic' moves it on the schematic sheet. The two layouts are independent."""
+    c = _resolve_comp(comp_id)
+    if c:
+        if view == "pcb":
+            c["pcb_x"] = x; c["pcb_y"] = y
+        else:
+            c["x"] = x; c["y"] = y
+        return {"ok": True, **get_schematic()}
     return {"ok": False, "error": f"Component not found: {comp_id}"}
+
+
+def set_component_property(comp_id: str, key: str, value: str) -> dict:
+    """Edit a component property (value / footprint / lcsc). Changing value or footprint
+    re-auto-fills the LCSC # from the parts table (a manual lcsc edit overrides it)."""
+    c = _resolve_comp(comp_id)
+    if not c:
+        return {"ok": False, "error": f"Component not found: {comp_id}"}
+    c.setdefault("properties", {})[key] = value
+    # Assigning a footprint to a placed KiCad symbol updates its land pattern (makes it routable).
+    if key == "footprint" and c["type"] in session.get("custom_lib", {}) and ":" in str(value):
+        session["custom_lib"][c["type"]]["footprint_ref"] = value
+    if key in ("value", "footprint"):
+        hit = lookup_lcsc(c["type"], c["properties"].get("value"), c["properties"].get("footprint"))
+        if hit:
+            c["properties"]["lcsc"] = hit          # keep LCSC in sync with the chosen part
+    return {"ok": True, "lcsc": c["properties"].get("lcsc", ""), **get_schematic()}
+
+
+def auto_place_pcb() -> dict:
+    """Arrange the placed parts into a tidy grid on the board (their PCB positions),
+    spaced by each real footprint's courtyard so nothing overlaps. Leaves the schematic
+    untouched. This is the 'lay out the board' step after pulling parts from the schematic."""
+    parts = [c for c in session["components"]
+             if _lib_of(c["type"]).get("category") != "power"]
+    if not parts:
+        return {"ok": True, **get_schematic()}
+    S = 0.05  # world units per mm
+    # cell size = largest footprint courtyard across all parts + a gap, in world units
+    def extent(c):
+        g = footprint_geometry(c["type"])
+        if g and g.get("bbox"):
+            b = g["bbox"]
+            return (max(abs(b[0]), abs(b[2])) * 2 / S, max(abs(b[1]), abs(b[3])) * 2 / S)
+        lib = _lib_of(c["type"])
+        return (lib.get("w", 40), lib.get("h", 30))
+    sizes = [extent(c) for c in parts]
+    gap = 60  # world units (~3 mm) between courtyards
+    cell_w = max(s[0] for s in sizes) + gap
+    cell_h = max(s[1] for s in sizes) + gap
+    cols = max(1, int(len(parts) ** 0.5 + 0.999))
+    x0, y0 = 120, 120
+    for i, c in enumerate(parts):
+        r, col = divmod(i, cols)
+        c["pcb_x"] = round(x0 + col * cell_w)
+        c["pcb_y"] = round(y0 + r * cell_h)
+    return {"ok": True, "placed": len(parts), **get_schematic()}
 
 
 def _get_obstacles():
@@ -322,7 +460,7 @@ def _get_obstacles():
     obstacles = []
     MARGIN = 10  # routing clearance around components
     for c in session["components"]:
-        lib = COMPONENT_LIB.get(c["type"], {})
+        lib = _lib_of(c["type"])
         w = lib.get("w", 40) / 2 + MARGIN
         h = lib.get("h", 20) / 2 + MARGIN
         obstacles.append({
@@ -439,8 +577,8 @@ def add_wire(from_comp: str, from_pin: str, to_comp: str, to_pin: str, net_name:
         return {"ok": False, "error": f"Component not found: {to_comp}"}
 
     # Get pin positions
-    lib_a = COMPONENT_LIB.get(comp_a["type"], {})
-    lib_b = COMPONENT_LIB.get(comp_b["type"], {})
+    lib_a = _lib_of(comp_a["type"])
+    lib_b = _lib_of(comp_b["type"])
     pin_a = lib_a.get("pins", {}).get(from_pin)
     pin_b = lib_b.get("pins", {}).get(to_pin)
     if not pin_a:
@@ -454,9 +592,25 @@ def add_wire(from_comp: str, from_pin: str, to_comp: str, to_pin: str, net_name:
     bx = comp_b["x"] + pin_b["x"]
     by = comp_b["y"] + pin_b["y"]
 
-    # Auto-name net if not provided
+    # Reuse the net a pin already belongs to, so wiring a 3rd pin JOINS the
+    # existing net instead of forking a new one (that's how a real net grows).
+    def _net_of(comp_id, pin):
+        for nn, members in session["nets"].items():
+            if any(m["comp_id"] == comp_id and str(m["pin"]) == str(pin) for m in members):
+                return nn
+        return None
+    # A power flag names the rail: wiring to GND/VCC/3V3 puts the pin on that named net,
+    # so power/ground nets merge into one rail (and a ground pour has a real net to fill).
+    def _power_net(c):
+        lib = _lib_of(c["type"])
+        if lib.get("category") == "power":
+            return c.get("properties", {}).get("net") or lib.get("properties", {}).get("net")
+        return None
     if not net_name:
-        net_name = f"NET_{len(session['wires']) + 1}"
+        net_name = (_power_net(comp_a) or _power_net(comp_b)
+                    or _net_of(comp_a["id"], from_pin)
+                    or _net_of(comp_b["id"], to_pin)
+                    or f"NET_{len(session['wires']) + 1}")
 
     wire_id = _next_id()
 
@@ -483,11 +637,24 @@ def add_wire(from_comp: str, from_pin: str, to_comp: str, to_pin: str, net_name:
     }
     session["wires"].append(wire)
 
-    # Update netlist
+    # Update netlist (dedup — a pin appears once per net even if wired repeatedly)
     if net_name not in session["nets"]:
         session["nets"][net_name] = []
-    session["nets"][net_name].append({"comp_id": comp_a["id"], "pin": from_pin})
-    session["nets"][net_name].append({"comp_id": comp_b["id"], "pin": to_pin})
+    # MERGE: if either pin already sits on a DIFFERENT net, fold that whole net into this one
+    # (else grounding an already-wired pin would leave it in two nets and drop the connection).
+    for cid, pn in [(comp_a["id"], from_pin), (comp_b["id"], to_pin)]:
+        old = _net_of(cid, pn)
+        if old and old != net_name:
+            for mbr in session["nets"].pop(old, []):
+                if not any(m["comp_id"] == mbr["comp_id"] and str(m["pin"]) == str(mbr["pin"])
+                           for m in session["nets"][net_name]):
+                    session["nets"][net_name].append(mbr)
+            for w in session["wires"]:
+                if w.get("net") == old:
+                    w["net"] = net_name
+    for cid, pn in [(comp_a["id"], from_pin), (comp_b["id"], to_pin)]:
+        if not any(m["comp_id"] == cid and str(m["pin"]) == str(pn) for m in session["nets"][net_name]):
+            session["nets"][net_name].append({"comp_id": cid, "pin": pn})
 
     return {"ok": True, "wire": wire, **get_schematic()}
 
@@ -498,9 +665,14 @@ def get_schematic() -> dict:
         "components": session["components"],
         "wires": session["wires"],
         "nets": session["nets"],
+        "tracks": session["tracks"],
+        "zones": session.get("zones", []),
+        "netclasses": session.get("netclasses", {}),
+        "net_class": {n: net_class_of(n) for n in session["nets"]},   # net -> class assignment
         "n_components": len(session["components"]),
         "n_wires": len(session["wires"]),
         "n_nets": len(session["nets"]),
+        "n_tracks": len(session["tracks"]),
         "library": {k: {"name": v["name"], "category": v.get("category", "")} for k, v in COMPONENT_LIB.items()},
     }
 
@@ -526,8 +698,705 @@ def reset_schematic() -> dict:
     session["components"] = []
     session["wires"] = []
     session["nets"] = {}
+    session["tracks"] = []
+    session["zones"] = []
+    session["net_assign"] = {}
+    session["custom_lib"] = {}
+    session["netclasses"] = {
+        "Default": {"track_width": 0.25, "clearance": 0.2, "via_dia": 0.6, "via_drill": 0.3},
+        "Power":   {"track_width": 0.6,  "clearance": 0.2, "via_dia": 0.8, "via_drill": 0.4},
+    }
     session["next_id"] = 1
     return {"ok": True, **get_schematic()}
+
+
+# ── Routed tracks (from the KiCad WASM router) ──────────────────────────────
+
+def add_track(track: dict = None, **kw) -> dict:
+    """Persist a routed track (segments + optional vias) on the board."""
+    track = track or kw
+    tid = _next_id()
+    t = {
+        "id": tid,
+        "segs": track.get("segs", []),        # [{ax,ay,bx,by,layer}] in world units
+        "vias": track.get("vias", []),        # [{x,y}]
+        "net": track.get("net"),
+        "a": track.get("a"), "b": track.get("b"),
+        "width": track.get("width", 5),
+    }
+    session["tracks"].append(t)
+    return {"ok": True, "id": tid, **get_schematic()}
+
+
+def remove_track(track_id: str) -> dict:
+    session["tracks"] = [t for t in session["tracks"] if t["id"] != track_id]
+    return {"ok": True, **get_schematic()}
+
+
+def clear_tracks() -> dict:
+    session["tracks"] = []
+    return {"ok": True, **get_schematic()}
+
+
+# ── Copper zones (ground / power planes) ────────────────────────────────────
+
+def _board_bbox_world(margin=40):
+    """Bounding box of placed footprints (PCB positions) + margin, in world units."""
+    xs, ys = [], []
+    for comp in session["components"]:
+        lib = _lib_of(comp["type"])
+        if lib.get("category") == "power":
+            continue
+        geo = footprint_geometry(comp["type"])
+        if geo and geo.get("bbox"):
+            b = geo["bbox"]; hw = max(abs(b[0]), abs(b[2])) / 0.05; hh = max(abs(b[1]), abs(b[3])) / 0.05
+        else:
+            hw, hh = lib.get("w", 40) / 2, lib.get("h", 30) / 2
+        pcx, pcy = comp.get("pcb_x", comp["x"]), comp.get("pcb_y", comp["y"])
+        xs += [pcx - hw, pcx + hw]; ys += [pcy - hh, pcy + hh]
+    if not xs:
+        return [0, 0, 400, 400]
+    return [min(xs) - margin, min(ys) - margin, max(xs) + margin, max(ys) + margin]
+
+
+def add_zone(layer: int = 0, net: str = "GND", poly=None) -> dict:
+    """Add a copper pour (plane). Default: a ground plane on F.Cu covering the board
+    (F.Cu so it connects the top-side SMD pads on that net; B.Cu needs via stitching).
+    `poly` is an optional outline [[x,y],...] in world units; if omitted, the board rect."""
+    if poly is None:
+        x0, y0, x1, y1 = _board_bbox_world()
+        poly = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]
+    zid = _next_id()
+    z = {"id": zid, "layer": int(layer), "net": net or "GND", "poly": poly}
+    session["zones"].append(z)
+    return {"ok": True, "id": zid, "zone": z, **get_schematic()}
+
+
+def remove_zone(zone_id: str) -> dict:
+    session["zones"] = [z for z in session["zones"] if z["id"] != zone_id]
+    return {"ok": True, **get_schematic()}
+
+
+def clear_zones() -> dict:
+    session["zones"] = []
+    return {"ok": True, **get_schematic()}
+
+
+# ── Netclasses (per-net trace width / clearance) ────────────────────────────
+
+def set_netclass(name: str, track_width: float = None, clearance: float = None,
+                 via_dia: float = None, via_drill: float = None) -> dict:
+    """Update a netclass's design rules (mm). Creates the class if new."""
+    nc = session["netclasses"].setdefault(name, {"track_width": 0.25, "clearance": 0.2, "via_dia": 0.6, "via_drill": 0.3})
+    if track_width is not None: nc["track_width"] = float(track_width)
+    if clearance is not None:   nc["clearance"] = float(clearance)
+    if via_dia is not None:     nc["via_dia"] = float(via_dia)
+    if via_drill is not None:   nc["via_drill"] = float(via_drill)
+    return {"ok": True, **get_schematic()}
+
+
+def assign_net(net: str, netclass: str) -> dict:
+    """Force a net into a netclass (overrides the power-rail auto-assignment)."""
+    session["net_assign"][net] = netclass
+    return {"ok": True, **get_schematic()}
+
+
+# ── BOM (assembly bill of materials) ────────────────────────────────────────
+
+def export_bom(path: str = None) -> dict:
+    """Write a JLCPCB-style assembly BOM CSV — parts grouped by (value, footprint,
+    LCSC), designators comma-joined. Power flags are skipped (not physical parts)."""
+    import csv
+    if not path:
+        out_dir = Path.home() / ".jac" / "cad_out"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = str(out_dir / "bom.csv")
+    groups = {}   # (value, footprint, lcsc) -> [refs]
+    for c in session["components"]:
+        lib = _lib_of(c["type"])
+        if lib.get("category") == "power":
+            continue
+        props = c.get("properties", {})
+        value = props.get("value", "") or c.get("type", "")
+        fp = props.get("footprint", "")
+        lcsc = props.get("lcsc", "")
+        groups.setdefault((value, fp, lcsc), []).append(c.get("ref", "") or "?")
+    rows = 0; parts = 0; no_lcsc = 0
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
+        for (value, fp, lcsc), refs in sorted(groups.items(), key=lambda kv: sorted(kv[1])):
+            refs_sorted = sorted(refs)
+            w.writerow([value, ",".join(refs_sorted), fp, lcsc])
+            rows += 1; parts += len(refs_sorted)
+            if not lcsc:
+                no_lcsc += 1
+    return {"ok": True, "path": path, "lines": rows, "parts": parts, "missing_lcsc": no_lcsc}
+
+
+# ── ERC (electrical rules check on the schematic) ───────────────────────────
+
+# Electrical type per pin. Most JAC parts are passive; power flags drive rails; ICs
+# have real in/out/power pins. Kept as a side map so COMPONENT_LIB stays position-only.
+_PIN_TYPES = {
+    "vcc": {"1": "power_out"}, "gnd": {"1": "power_out"}, "3v3": {"1": "power_out"},
+    "555": {"GND": "power_in", "VCC": "power_in", "OUT": "output", "DISCH": "output",
+            "TRIG": "input", "RESET": "input", "CTRL": "input", "THRES": "input"},
+    "esp32": {"3V3": "power_in", "GND": "power_in", "EN": "input", "RX": "input", "TX": "output",
+              "GPIO0": "bidi", "GPIO1": "bidi", "GPIO2": "bidi", "USB_D+": "bidi", "USB_D-": "bidi"},
+    "ic_generic": {str(i): "bidi" for i in range(1, 7)},
+    "usb_c": {"VBUS": "power_in", "GND": "power_in", "CC1": "bidi", "CC2": "bidi", "D+": "bidi", "D-": "bidi"},
+    # npn/pnp intentionally left passive (base-resistor topologies would false-positive as "undriven")
+}
+_DRIVERS = {"output", "power_out", "bidi"}
+
+def pin_type(comp_type, pin_name):
+    return _PIN_TYPES.get(comp_type, {}).get(str(pin_name), "passive")
+
+
+def run_erc() -> dict:
+    """Electrical Rules Check on the schematic model: floating pins, dangling nets,
+    duplicate refs, and a no-ground sanity check. (Pin electrical types aren't modeled
+    yet, so output-conflict / no-driver checks are future work.)"""
+    issues = []
+    pin_net = {}
+    for nn, members in session["nets"].items():
+        for m in members:
+            pin_net[(m["comp_id"], str(m["pin"]))] = nn
+
+    # 1) unconnected pins — every pin should go somewhere
+    for c in session["components"]:
+        lib = _lib_of(c["type"])
+        is_power = lib.get("category") == "power"
+        for pin_name in lib.get("pins", {}):
+            if (c["id"], str(pin_name)) not in pin_net:
+                issues.append({
+                    "severity": "warning", "type": "unconnected_pin",
+                    "message": ("Unused power flag " + c["ref"] if is_power
+                                else f'{c["ref"]} pin {pin_name} is unconnected'),
+                    "comp_id": c["id"], "pin": str(pin_name)})
+
+    # 2) single-connection nets — a net that reaches only one pin does nothing
+    for nn, members in session["nets"].items():
+        uniq = {(m["comp_id"], str(m["pin"])) for m in members}
+        if len(uniq) < 2:
+            first = members[0] if members else {}
+            issues.append({"severity": "warning", "type": "single_pin_net",
+                           "message": f'Net "{nn}" has only one connection',
+                           "comp_id": first.get("comp_id"), "pin": (str(first["pin"]) if first else None)})
+
+    # 3) duplicate reference designators (annotation error)
+    seen = {}
+    for c in session["components"]:
+        seen.setdefault(c["ref"], []).append(c["id"])
+    for ref, ids in seen.items():
+        if ref and len(ids) > 1:
+            issues.append({"severity": "error", "type": "duplicate_ref",
+                           "message": f'Reference "{ref}" used by {len(ids)} parts',
+                           "comp_id": ids[0], "pin": None})
+
+    # 4) sanity: a board with real parts but no ground net
+    has_parts = any(_lib_of(c["type"]).get("category") != "power" for c in session["components"])
+    has_gnd = any(n.upper() in ("GND", "AGND", "DGND", "GNDA", "PGND", "VSS") for n in session["nets"])
+    if has_parts and not has_gnd:
+        issues.append({"severity": "warning", "type": "no_ground",
+                       "message": "No ground (GND) net on the board", "comp_id": None, "pin": None})
+
+    # 5) pin-electrical-type checks (needs the pin type map)
+    comp_by_id = {c["id"]: c for c in session["components"]}
+    for nn, members in session["nets"].items():
+        typed = []   # (comp, pin, etype)
+        for m in members:
+            c = comp_by_id.get(m["comp_id"])
+            if c:
+                typed.append((c, str(m["pin"]), pin_type(c["type"], m["pin"])))
+        etypes = [t[2] for t in typed]
+        outs = [t for t in typed if t[2] == "output"]
+        if len(outs) >= 2:      # two drivers fighting on one net
+            issues.append({"severity": "error", "type": "output_conflict",
+                           "message": f'Net "{nn}" has {len(outs)} outputs driving it ('
+                                      + ", ".join(f'{c["ref"]}.{p}' for c, p, _ in outs) + ")",
+                           "comp_id": outs[0][0]["id"], "pin": outs[0][1]})
+        if "power_in" in etypes and "power_out" not in etypes:   # a supply pin with no source
+            pi = next(t for t in typed if t[2] == "power_in")
+            issues.append({"severity": "warning", "type": "power_unpowered",
+                           "message": f'{pi[0]["ref"]} pin {pi[1]} needs a power source — net "{nn}" has no supply (add a {("GND" if "GND" in nn.upper() else "power")} flag)',
+                           "comp_id": pi[0]["id"], "pin": pi[1]})
+
+    errors = sum(1 for i in issues if i["severity"] == "error")
+    warnings = sum(1 for i in issues if i["severity"] == "warning")
+    return {"ok": True, "issues": issues, "errors": errors, "warnings": warnings}
+
+
+# ── Project persistence (open / save a whole board) ─────────────────────────
+
+_PROJECT_KEYS = ("components", "wires", "nets", "tracks", "zones", "netclasses", "net_assign", "custom_lib")
+
+def save_project(path: str) -> dict:
+    """Save the whole schematic + board session to a .jac (JSON) file."""
+    import json as _json
+    try:
+        data = {"version": 1, "next_id": session.get("next_id", 1)}
+        for k in _PROJECT_KEYS:
+            data[k] = session.get(k)
+        with open(path, "w", encoding="utf-8") as f:
+            _json.dump(data, f, indent=1)
+        return {"ok": True, "path": path, "n_components": len(session["components"])}
+    except Exception as e:
+        return {"ok": False, "error": f"Save failed: {e}"}
+
+
+def load_project(path: str) -> dict:
+    """Load a saved .jac project, replacing the current session."""
+    import json as _json
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = _json.load(f)
+    except Exception as e:
+        return {"ok": False, "error": f"Cannot read project: {e}"}
+    if not isinstance(data, dict) or "components" not in data:
+        return {"ok": False, "error": "Not a JAC project file."}
+    for k in _PROJECT_KEYS:
+        if k in data and data[k] is not None:
+            session[k] = data[k]
+    session["next_id"] = data.get("next_id", session.get("next_id", 1))
+    session.setdefault("zones", [])
+    session.setdefault("net_assign", {})
+    session.setdefault("netclasses", {
+        "Default": {"track_width": 0.25, "clearance": 0.2, "via_dia": 0.6, "via_drill": 0.3},
+        "Power":   {"track_width": 0.6,  "clearance": 0.2, "via_dia": 0.8, "via_drill": 0.4},
+    })
+    return {"ok": True, "path": path, **get_schematic()}
+
+
+def _net_of_pad(comp_id, pin):
+    for nn, pins in session["nets"].items():
+        if any(p["comp_id"] == comp_id and str(p["pin"]) == str(pin) for p in pins):
+            return nn
+    return ""
+
+
+# ── Real KiCad footprints (blocker #1) ──────────────────────────────────────
+# Replace toy 0.8mm pads with real KiCad land patterns: read the shipped .kicad_mod
+# files, parse geometry for the canvas, and splice the raw footprint (with nets
+# injected) into the exported board — self-contained, no fp-lib-table needed.
+import os as _os
+
+_FP_DIR = None
+def _ver_key(name):
+    """Sort '10.0' after '9.0' numerically (a plain string sort gets this backwards)."""
+    key = []
+    for p in name.split("."):
+        try: key.append((1, int(p)))
+        except ValueError: key.append((0, p))
+    return key
+def find_footprints_dir():
+    """Locate KiCad's shipped footprints dir (mirrors the app's findKicad). Only a
+    successful result is cached, so a transient early-boot miss retries next call."""
+    global _FP_DIR
+    if _FP_DIR:
+        return _FP_DIR
+    env = _os.environ.get("KICAD_FOOTPRINT_DIR")
+    if env and _os.path.isdir(env):
+        _FP_DIR = env; return env
+    roots = []
+    la = _os.path.join(_os.path.expanduser("~"), "AppData", "Local", "Programs", "KiCad")
+    for base in (la, r"C:\Program Files\KiCad", r"C:\Program Files (x86)\KiCad"):
+        try:
+            for v in sorted(_os.listdir(base), key=_ver_key, reverse=True):   # newest version first
+                roots.append(_os.path.join(base, v))
+        except OSError:
+            pass
+    roots += ["/usr/share/kicad", "/usr/local/share/kicad",
+              "/Applications/KiCad/KiCad.app/Contents/SharedSupport"]
+    for r in roots:
+        for cand in (_os.path.join(r, "share", "kicad", "footprints"),
+                     _os.path.join(r, "footprints")):
+            if _os.path.isdir(cand):
+                _FP_DIR = cand; return cand
+    return None                                              # not found — don't cache, retry later
+
+# type -> (pretty_lib, footprint_name, {symbol_pin: fp_pad | [fp_pads]})
+# Pin->pad maps verified against the .kicad_mod files (polarity/order matters):
+# LED/diode cathode = pad 1; SOT-23 BJT B/E/C = 1/2/3; tantalum + = pad 1.
+FOOTPRINTS = {
+    "resistor":       ("Resistor_SMD", "R_0402_1005Metric", {"1": "1", "2": "2"}),
+    "capacitor":      ("Capacitor_SMD", "C_0402_1005Metric", {"1": "1", "2": "2"}),
+    "cap_polar":      ("Capacitor_Tantalum_SMD", "CP_EIA-3216-18_Kemet-A", {"+": "1", "-": "2"}),
+    "inductor":       ("Inductor_SMD", "L_0805_2012Metric", {"1": "1", "2": "2"}),
+    "led":            ("LED_SMD", "LED_0603_1608Metric", {"K": "1", "A": "2"}),
+    "diode":          ("Diode_SMD", "D_SOD-323", {"K": "1", "A": "2"}),
+    "npn":            ("Package_TO_SOT_SMD", "SOT-23", {"B": "1", "E": "2", "C": "3"}),
+    "pnp":            ("Package_TO_SOT_SMD", "SOT-23", {"B": "1", "E": "2", "C": "3"}),
+    "ic_generic":     ("Package_SO", "SOIC-8_3.9x4.9mm_P1.27mm",
+                       {"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6"}),
+    "555":            ("Package_SO", "SOIC-8_3.9x4.9mm_P1.27mm",
+                       {"GND": "1", "TRIG": "2", "OUT": "3", "RESET": "4", "CTRL": "5", "THRES": "6", "DISCH": "7", "VCC": "8"}),
+    "connector_2pin": ("Connector_PinHeader_2.54mm", "PinHeader_1x02_P2.54mm_Vertical", {"1": "1", "2": "2"}),
+    "esp32":          ("RF_Module", "ESP32-S3-WROOM-1",
+                       {"3V3": "2", "EN": "3", "GND": ["1", "40", "41"], "GPIO0": "27", "TX": "37", "RX": "36",
+                        "USB_D+": "14", "USB_D-": "13", "GPIO1": "39", "GPIO2": "38"}),   # 41 = thermal EPAD → GND
+    "usb_c":          ("Connector_USB", "USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+                       {"VBUS": ["A4", "B4", "A9", "B9"], "GND": ["A1", "B1", "A12", "B12", "SH"],   # SH = shield shell → GND
+                        "CC1": ["A5"], "CC2": ["B5"], "D+": ["A6", "B6"], "D-": ["A7", "B7"]}),
+}
+
+def _fp_tok(s):
+    toks, i, n = [], 0, len(s)
+    while i < n:
+        c = s[i]
+        if c in "()":
+            toks.append(c); i += 1
+        elif c == '"':
+            j = i + 1; buf = []
+            while j < n and s[j] != '"':
+                if s[j] == "\\" and j + 1 < n: buf.append(s[j + 1]); j += 2
+                else: buf.append(s[j]); j += 1
+            toks.append(("str", "".join(buf))); i = j + 1
+        elif c.isspace():
+            i += 1
+        else:
+            j = i
+            while j < n and s[j] not in "() \t\r\n": j += 1
+            toks.append(("atom", s[i:j])); i = j
+    return toks
+
+def _fp_parse(s):
+    toks = _fp_tok(s); pos = 0
+    def rd():
+        nonlocal pos
+        t = toks[pos]; pos += 1
+        if t == "(":
+            lst = []
+            while toks[pos] != ")": lst.append(rd())
+            pos += 1; return lst
+        return t
+    out = []
+    while pos < len(toks): out.append(rd())
+    return out[0] if len(out) == 1 else out
+
+def _fp_sym(node):
+    return node[0][1] if node and isinstance(node[0], tuple) else None
+def _fp_atoms(node):
+    return [t[1] for t in node if isinstance(t, tuple)]
+def _fp_subs(node, head):
+    return [c for c in node if isinstance(c, list) and _fp_sym(c) == head]
+def _fp_mk(items):
+    return [it if isinstance(it, tuple) else ("atom", str(it)) for it in items]
+def _fp_ser(node):
+    if isinstance(node, tuple):
+        k, v = node
+        if k == "str": return '"%s"' % str(v).replace("\\", "\\\\").replace('"', '\\"')
+        return str(v)
+    return "(" + " ".join(_fp_ser(c) for c in node) + ")"
+
+_FP_TREE_CACHE = {}
+def _fp_load(pretty, name):
+    key = (pretty, name)
+    if _FP_TREE_CACHE.get(key) is not None:
+        return _FP_TREE_CACHE[key]
+    d = find_footprints_dir(); tree = None
+    if d:
+        p = _os.path.join(d, pretty + ".pretty", name + ".kicad_mod")
+        try: tree = _fp_parse(open(p, encoding="utf-8").read())
+        except OSError: tree = None
+    if tree is not None:                                     # only cache a real parse — a miss retries
+        _FP_TREE_CACHE[key] = tree
+    return tree
+
+def _fp_points(node):
+    pts = []
+    for st in ("start", "end", "center", "mid"):
+        sl = _fp_subs(node, st)
+        if sl:
+            a = _fp_atoms(sl[0])
+            if len(a) >= 3: pts.append((float(a[1]), float(a[2])))
+    pl = _fp_subs(node, "pts")
+    if pl:
+        for xy in _fp_subs(pl[0], "xy"):
+            a = _fp_atoms(xy)
+            if len(a) >= 3: pts.append((float(a[1]), float(a[2])))
+    return pts
+
+def _footprint_spec(comp_type):
+    """(pretty_lib, footprint_name, pin_map|None) for a type. pin_map None = identity
+    (footprint pad number IS the symbol pin) — used for placed KiCad symbols."""
+    if comp_type in FOOTPRINTS:
+        return FOOTPRINTS[comp_type]
+    cl = session.get("custom_lib", {}).get(comp_type)
+    if cl and cl.get("footprint_ref") and ":" in cl["footprint_ref"]:
+        pretty, name = cl["footprint_ref"].split(":", 1)
+        return (pretty, name, None)
+    return None
+
+
+def footprint_geometry(comp_type):
+    """Parsed land pattern for the canvas: all pads (mm), a representative pad
+    per symbol pin (for routing/ratsnest), courtyard, silk, bbox. None for power."""
+    spec = _footprint_spec(comp_type)
+    if not spec: return None
+    pretty, name, pin_map = spec
+    tree = _fp_load(pretty, name)
+    if not tree: return None
+    pads = {}; silk = []; crtyd = []
+    for node in tree:
+        if not isinstance(node, list): continue
+        h = _fp_sym(node)
+        if h == "pad":
+            a = _fp_atoms(node)
+            num, ptype, shape = a[1], a[2], (a[3] if len(a) > 3 else "rect")
+            at = _fp_atoms(_fp_subs(node, "at")[0])[1:]
+            sz = _fp_atoms(_fp_subs(node, "size")[0])[1:]
+            dl = _fp_subs(node, "drill"); rr = _fp_subs(node, "roundrect_rratio")
+            pads[num] = {
+                "x": float(at[0]), "y": float(at[1]),
+                "w": float(sz[0]), "h": float(sz[1]), "shape": shape,
+                "thru": ptype != "smd",
+                "drill": (float(_fp_atoms(dl[0])[1]) if dl and len(_fp_atoms(dl[0])) > 1 else None),
+                "rratio": (float(_fp_atoms(rr[0])[1]) if rr else None),
+            }
+        elif h in ("fp_line", "fp_rect", "fp_poly"):
+            ll = _fp_subs(node, "layer"); layer = _fp_atoms(ll[0])[1] if ll else ""
+            p = _fp_points(node)
+            if layer == "F.CrtYd": crtyd += p
+            elif layer == "F.SilkS" and p: silk.append(p)
+    pins = {}
+    if pin_map is None:                        # KiCad symbol: symbol pin number == footprint pad number
+        for pid, pad in pads.items():
+            pins[pid] = {"x": pad["x"], "y": pad["y"]}
+    else:
+        for spin, pad in pin_map.items():
+            for pid in (pad if isinstance(pad, list) else [pad]):
+                if pid in pads:
+                    pins[spin] = {"x": pads[pid]["x"], "y": pads[pid]["y"]}; break
+    xs, ys = [], []
+    for p in pads.values():
+        xs += [p["x"] - p["w"] / 2, p["x"] + p["w"] / 2]
+        ys += [p["y"] - p["h"] / 2, p["y"] + p["h"] / 2]
+    court = None
+    if crtyd:
+        cx = [p[0] for p in crtyd]; cy = [p[1] for p in crtyd]
+        court = [min(cx), min(cy), max(cx), max(cy)]
+    bbox = court or ([min(xs), min(ys), max(xs), max(ys)] if xs else [-1, -1, 1, 1])
+    return {"ref": name,
+            "pads": [dict(id=k, **v) for k, v in pads.items()],
+            "pins": pins, "courtyard": court, "silk": silk, "bbox": bbox}
+
+def footprint_export(comp, net_index, net_of_pad, mm, uid):
+    """Splice the real .kicad_mod for `comp`: bare name, placed (at cx cy rot),
+    nets injected onto mapped pads, 3D model dropped. Returns an s-expr string, or
+    None if this type has no footprint (power flags) or the file can't be read."""
+    spec = _footprint_spec(comp["type"])
+    if not spec: return None
+    pretty, name, pin_map = spec
+    tree = _fp_load(pretty, name)
+    if not tree: return None
+    import copy
+    fp = copy.deepcopy(tree)
+    # KiCad's (at ... angle) rotates pads with the OPPOSITE handedness to the canvas/router
+    # (which use R(+rot) in a Y-down frame). Negate so exported pads land where tracks were routed.
+    cx, cy, rot = mm(comp.get("pcb_x", comp["x"])), mm(comp.get("pcb_y", comp["y"])), (-comp.get("rotation", 0)) % 360
+    inv = {}   # fp_pad_id -> symbol_pin (empty when identity: pad number == symbol pin)
+    if pin_map is not None:
+        for spin, pad in pin_map.items():
+            for pid in (pad if isinstance(pad, list) else [pad]): inv[pid] = spin
+    new, placed = [], False
+    for child in fp:
+        if not isinstance(child, list):
+            new.append(child); continue                      # 'footprint' atom, name str
+        h = _fp_sym(child)
+        if h in ("model",):                                  # drop 3D ref (env var may be unset)
+            continue
+        if h == "property":
+            pa = _fp_atoms(child)
+            if len(pa) >= 3 and pa[1] == "Reference" and isinstance(child[2], tuple):
+                child[2] = ("str", str(comp.get("ref", "")))
+            new.append(child); continue
+        if h == "pad":
+            pid = _fp_atoms(child)[1]; spin = pid if pin_map is None else inv.get(pid)
+            if spin is not None:
+                netn = net_of_pad(comp["id"], spin)
+                if netn:
+                    child.append(_fp_mk(["net", net_index.get(netn, 0), ("str", netn)]))
+            new.append(child); continue
+        new.append(child)
+        if h == "layer" and not placed:                      # place the footprint after its layer
+            new.append(_fp_mk(["at", cx, cy, rot]))
+            new.append(_fp_mk(["uuid", ("str", uid())]))
+            placed = True
+    return "  " + _fp_ser(new)
+
+
+def export_pcb(path: str = None) -> dict:
+    """Export a real KiCad .kicad_pcb — footprints (pads on nets) + routed segments + vias."""
+    import uuid as _uuid
+
+    if not path:
+        out_dir = Path.home() / ".jac" / "cad_out"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        path = str(out_dir / "board.kicad_pcb")
+
+    S = 0.05                                    # world units -> mm (router used 0.05 mm/unit)
+    def mm(v): return round(float(v) * S, 4)
+    def uid(): return str(_uuid.uuid4())
+    layer_name = {0: "F.Cu", 1: "B.Cu"}
+
+    # net table: net 0 is the no-net; then one per schematic net
+    net_names = [""]
+    def _reg(nn):
+        if nn and nn not in net_names:
+            net_names.append(nn)
+    for nn in session["nets"].keys():
+        _reg(nn)
+    for t in session["tracks"]:                 # tracks/zones may reference a net; give it a real index
+        _reg(t.get("net"))
+    for z in session.get("zones", []):
+        _reg(z.get("net"))
+    net_index = {n: i for i, n in enumerate(net_names)}
+
+    L = []
+    L.append('(kicad_pcb (version 20221018) (generator "jac_pcb_tools")')
+    L.append('  (general (thickness 1.6))')
+    L.append('  (paper "A4")')
+    L.append('  (layers')
+    L.append('    (0 "F.Cu" signal)')
+    L.append('    (31 "B.Cu" signal)')
+    L.append('    (34 "B.Paste" user)')
+    L.append('    (35 "F.Paste" user)')
+    L.append('    (36 "B.SilkS" user)')
+    L.append('    (37 "F.SilkS" user)')
+    L.append('    (38 "B.Mask" user)')
+    L.append('    (39 "F.Mask" user)')
+    L.append('    (44 "Edge.Cuts" user)')
+    L.append('    (48 "F.CrtYd" user)')
+    L.append('    (49 "B.CrtYd" user)')
+    L.append('    (50 "F.Fab" user)')
+    L.append('    (51 "B.Fab" user)')
+    L.append('  )')
+    L.append('  (setup (pad_to_mask_clearance 0))')
+    for n, i in net_index.items():
+        L.append(f'  (net {i} "{n}")')
+
+    # board outline (Edge.Cuts) — bounding box of the placed parts + a 2 mm margin, or a
+    # default 20x20 mm if the board is empty. Fab houses require a closed outline.
+    xs, ys = [], []
+    for comp in session["components"]:
+        lib = _lib_of(comp["type"])
+        if lib.get("category") == "power":
+            continue                                          # power flags aren't on the board
+        geo = footprint_geometry(comp["type"])
+        if geo and geo.get("bbox"):                           # real footprint extents (mm → world)
+            b = geo["bbox"]
+            hw = max(abs(b[0]), abs(b[2])) / S; hh = max(abs(b[1]), abs(b[3])) / S
+        else:
+            hw, hh = lib.get("w", 40) / 2, lib.get("h", 30) / 2
+        pcx, pcy = comp.get("pcb_x", comp["x"]), comp.get("pcb_y", comp["y"])
+        xs += [pcx - hw, pcx + hw]
+        ys += [pcy - hh, pcy + hh]
+    for t in session["tracks"]:
+        for s in t.get("segs", []):
+            xs += [s["ax"], s["bx"]]; ys += [s["ay"], s["by"]]
+    marg = 40  # world units (~2 mm)
+    if xs:
+        x0, y0, x1, y1 = min(xs) - marg, min(ys) - marg, max(xs) + marg, max(ys) + marg
+    else:
+        x0, y0, x1, y1 = 0, 0, 400, 400
+    L.append(f'  (gr_rect (start {mm(x0)} {mm(y0)}) (end {mm(x1)} {mm(y1)}) '
+             f'(stroke (width 0.1) (type solid)) (fill none) (layer "Edge.Cuts") (uuid "{uid()}"))')
+
+    # footprints — one per component. Real KiCad land pattern spliced in (proper pads,
+    # soldermask + paste, silk, courtyard, drills), nets injected on the mapped pads.
+    for comp in session["components"]:
+        lib = _lib_of(comp["type"])
+        if lib.get("category") == "power":
+            continue                                          # vcc/gnd/3v3 are net flags, not placed parts
+        cx, cy, rot = mm(comp.get("pcb_x", comp["x"])), mm(comp.get("pcb_y", comp["y"])), comp.get("rotation", 0)
+        ref = comp["ref"]
+        spliced = footprint_export(comp, net_index, _net_of_pad, mm, uid)
+        if spliced is not None:
+            L.append(spliced)
+            continue
+        # Fallback (footprint file missing / unmapped type): the old inline stub, on real layers.
+        fp = comp["properties"].get("footprint", "") or comp["type"]
+        L.append(f'  (footprint "{fp}" (layer "F.Cu")')
+        L.append(f'    (at {cx} {cy} {rot})')
+        L.append(f'    (uuid "{uid()}")')
+        L.append(f'    (attr smd)')
+        L.append(f'    (property "Reference" "{ref}" (at 0 -2 {rot}) (layer "F.SilkS") (uuid "{uid()}") (effects (font (size 1 1) (thickness 0.15))))')
+        L.append(f'    (property "Value" "{comp["properties"].get("value","")}" (at 0 2 {rot}) (layer "F.Fab") (uuid "{uid()}") (effects (font (size 1 1) (thickness 0.15))))')
+        for pin_name, pin_pos in lib.get("pins", {}).items():
+            netn = _net_of_pad(comp["id"], pin_name)
+            ni = net_index.get(netn, 0)
+            px, py = mm(pin_pos["x"]), mm(pin_pos["y"])
+            L.append(f'    (pad "{pin_name}" smd roundrect (at {px} {py} {rot}) (size 0.8 0.8) (layers "F.Cu" "F.Mask" "F.Paste") (roundrect_rratio 0.25) (net {ni} "{netn}") (uuid "{uid()}"))')
+        L.append('  )')
+
+    # routed copper: segments + vias (vias sized by the net's netclass)
+    for t in session["tracks"]:
+        netn = t.get("net") or ""
+        ni = net_index.get(netn, 0)
+        w = max(mm(t.get("width", 5)), 0.1)
+        cls = session.get("netclasses", {}).get(net_class_of(netn), session.get("netclasses", {}).get("Default", {}))
+        vdia = cls.get("via_dia", 0.6); vdrill = cls.get("via_drill", 0.3)
+        for s in t.get("segs", []):
+            lay = layer_name.get(s.get("layer", 0), "F.Cu")
+            L.append(f'  (segment (start {mm(s["ax"])} {mm(s["ay"])}) (end {mm(s["bx"])} {mm(s["by"])}) (width {w}) (layer "{lay}") (net {ni}) (uuid "{uid()}"))')
+        for v in t.get("vias", []):
+            L.append(f'  (via (at {mm(v["x"])} {mm(v["y"])}) (size {vdia}) (drill {vdrill}) (layers "F.Cu" "B.Cu") (net {ni}) (uuid "{uid()}"))')
+
+    # copper zones (ground / power planes) — outline only; KiCad fills them (--refill-zones)
+    for z in session.get("zones", []):
+        netn = z.get("net") or ""
+        if not session["nets"].get(netn):        # no pins on this net → a floating pour; don't emit it
+            continue
+        ni = net_index.get(netn, 0)
+        lay = layer_name.get(z.get("layer", 0), "F.Cu")
+        pts = " ".join(f'(xy {mm(p[0])} {mm(p[1])})' for p in z.get("poly", []))
+        L.append(f'  (zone (net {ni}) (net_name "{netn}") (layer "{lay}") (uuid "{uid()}")')
+        L.append(f'    (hatch edge 0.508)')
+        L.append(f'    (connect_pads (clearance 0.508))')
+        L.append(f'    (min_thickness 0.254)')
+        L.append(f'    (fill yes (thermal_gap 0.508) (thermal_bridge_width 0.508))')
+        L.append(f'    (polygon (pts {pts})))')
+
+    L.append(')')
+    content = '\n'.join(L) + '\n'
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(content, encoding="utf-8")
+
+    # Sibling .kicad_pro (netclasses + net->class assignments) and .kicad_dru (per-class min
+    # track width) so kicad-cli DRC ENFORCES per-net design rules — e.g. a too-thin power trace
+    # gets flagged. kicad-cli auto-loads both when they share the board's basename.
+    import json as _json
+    ncs = session.get("netclasses", {}) or {}
+    classes = [{
+        "name": name, "clearance": nc.get("clearance", 0.2), "track_width": nc.get("track_width", 0.25),
+        "via_diameter": nc.get("via_dia", 0.6), "via_drill": nc.get("via_drill", 0.3),
+        "diff_pair_gap": 0.25, "diff_pair_width": 0.2, "diff_pair_via_gap": 0.25,
+        "microvia_diameter": 0.3, "microvia_drill": 0.1, "bus_width": 12, "line_style": 0,
+        "wire_width": 6, "priority": 0, "tuning_profile": "",
+        "pcb_color": "rgba(0, 0, 0, 0.000)", "schematic_color": "rgba(0, 0, 0, 0.000)",
+    } for name, nc in ncs.items()]
+    pro = {
+        "board": {"design_settings": {"rules": {
+            "min_track_width": 0.13, "min_clearance": 0.0, "min_connection": 0.0,
+            "min_via_diameter": 0.4, "min_through_hole_diameter": 0.3, "min_hole_to_hole": 0.25,
+            "min_copper_edge_clearance": 0.2, "min_hole_clearance": 0.2, "min_annular_width": 0.13,
+        }}},
+        "net_settings": {"classes": classes, "netclass_patterns": [],
+                         "netclass_assignments": {nn: net_class_of(nn) for nn in session["nets"]},
+                         "meta": {"version": 4}},
+    }
+    Path(str(out_path.with_suffix(".kicad_pro"))).write_text(_json.dumps(pro, indent=2), encoding="utf-8")
+    dru = ["(version 1)"]
+    for name, nc in ncs.items():
+        w = nc.get("track_width", 0.25)
+        dru.append(f'(rule "min_{name}_width"\n  (constraint track_width (min {w}mm))\n  (condition "A.NetClass == \'{name}\'"))')
+    Path(str(out_path.with_suffix(".kicad_dru"))).write_text("\n".join(dru) + "\n", encoding="utf-8")
+
+    return {"ok": True, "path": str(out_path), "size": len(content),
+            "n_tracks": len(session["tracks"]), "n_footprints": len(session["components"])}
 
 
 def export_kicad(path: str = None) -> dict:
@@ -550,7 +1419,7 @@ def export_kicad(path: str = None) -> dict:
 
     # Emit each component as a symbol instance
     for comp in session["components"]:
-        lib = COMPONENT_LIB.get(comp["type"], {})
+        lib = _lib_of(comp["type"])
         c_uuid = str(_uuid.uuid4())
         cx, cy = comp["x"], comp["y"]
         rot = comp.get("rotation", 0)
@@ -614,7 +1483,7 @@ def export_kicad(path: str = None) -> dict:
             first = pins[0]
             comp = next((c for c in session["components"] if c["id"] == first["comp_id"]), None)
             if comp:
-                lib = COMPONENT_LIB.get(comp["type"], {})
+                lib = _lib_of(comp["type"])
                 pin_pos = lib.get("pins", {}).get(first["pin"], {"x": 0, "y": 0})
                 lx = comp["x"] + pin_pos["x"]
                 ly = comp["y"] + pin_pos["y"]
@@ -639,13 +1508,29 @@ def export_kicad(path: str = None) -> dict:
 TOOL_MAP = {
     "add_component": lambda a: add_component(a["type"], a.get("x", 0), a.get("y", 0), a.get("rotation", 0), a.get("properties")),
     "remove_component": lambda a: remove_component(a["id"]),
-    "move_component": lambda a: move_component(a["id"], a["x"], a["y"]),
+    "move_component": lambda a: move_component(a["id"], a["x"], a["y"], a.get("view", "schematic")),
+    "set_component_property": lambda a: set_component_property(a["id"], a["key"], a["value"]),
+    "add_symbol": lambda a: add_symbol(a["def"], a.get("x", 0), a.get("y", 0), a.get("rotation", 0)),
+    "auto_place_pcb": lambda a: auto_place_pcb(),
+    "add_zone": lambda a: add_zone(a.get("layer", 0), a.get("net", "GND"), a.get("poly")),
+    "remove_zone": lambda a: remove_zone(a["id"]),
+    "clear_zones": lambda a: clear_zones(),
+    "set_netclass": lambda a: set_netclass(a["name"], a.get("track_width"), a.get("clearance"), a.get("via_dia"), a.get("via_drill")),
+    "assign_net": lambda a: assign_net(a["net"], a["netclass"]),
+    "export_bom": lambda a: export_bom(a.get("path")),
+    "run_erc": lambda a: run_erc(),
+    "save_project": lambda a: save_project(a["path"]),
+    "load_project": lambda a: load_project(a["path"]),
     "add_wire": lambda a: add_wire(a["from_comp"], a["from_pin"], a["to_comp"], a["to_pin"], a.get("net")),
     "get_schematic": lambda a: {"ok": True, **get_schematic()},
     "get_context": lambda a: {"ok": True, "context": get_context()},
     "reset": lambda a: reset_schematic(),
     "get_library": lambda a: {"ok": True, "library": {k: {kk: vv for kk, vv in v.items() if kk != "svg"} for k, v in COMPONENT_LIB.items()}},
     "export_kicad": lambda a: export_kicad(a.get("path")),
+    "add_track": lambda a: add_track(a.get("track") or a),
+    "remove_track": lambda a: remove_track(a.get("id")),
+    "clear_tracks": lambda a: clear_tracks(),
+    "export_pcb": lambda a: export_pcb(a.get("path")),
 }
 
 
@@ -675,7 +1560,18 @@ class PcbHandler(BaseHTTPRequestHandler):
         elif self.path == "/context":
             self.respond(200, {"context": get_context()})
         elif self.path == "/library":
-            self.respond(200, {"ok": True, "library": COMPONENT_LIB})
+            # Enrich each type with its real footprint geometry (pads/courtyard/silk) so the
+            # PCB view can draw actual land patterns; None for power flags. Includes the
+            # session's placed KiCad symbols so custom parts render like the built-ins.
+            lib = {}
+            for k, v in list(COMPONENT_LIB.items()) + list(session.get("custom_lib", {}).items()):
+                entry = dict(v)
+                try:
+                    entry["footprint"] = footprint_geometry(k)
+                except Exception:
+                    entry["footprint"] = None
+                lib[k] = entry
+            self.respond(200, {"ok": True, "library": lib})
         else:
             self.respond(404, {"error": "not found"})
 

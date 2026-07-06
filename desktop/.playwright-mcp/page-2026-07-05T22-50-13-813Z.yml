@@ -1,0 +1,699 @@
+- generic [ref=f15e2]:
+  - generic:
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the owner of the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+    - generic:
+      - tooltip "This user has previously committed to the joycontrol repository."
+    - generic:
+      - tooltip "This user is the author of this issue"
+  - generic [ref=f15e3]:
+    - link "Skip to content" [ref=f15e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=f15e6]:
+      - heading "Navigation Menu" [level=2] [ref=f15e7]
+      - generic [ref=f15e8]:
+        - link "Homepage" [ref=f15e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=f15e11]
+        - generic [ref=f15e13]:
+          - navigation "Global" [ref=f15e16]:
+            - list [ref=f15e17]:
+              - listitem [ref=f15e18]:
+                - button "Platform" [ref=f15e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=f15e21]
+              - listitem [ref=f15e23]:
+                - button "Solutions" [ref=f15e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=f15e26]
+              - listitem [ref=f15e28]:
+                - button "Resources" [ref=f15e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=f15e31]
+              - listitem [ref=f15e33]:
+                - button "Open Source" [ref=f15e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=f15e36]
+              - listitem [ref=f15e38]:
+                - button "Enterprise" [ref=f15e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=f15e41]
+              - listitem [ref=f15e43]:
+                - link "Pricing" [ref=f15e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=f15e45]: Pricing
+          - generic [ref=f15e46]:
+            - button "Search or jump to…" [ref=f15e49] [cursor=pointer]:
+              - img [ref=f15e51]
+              - generic [ref=f15e53]: Search or jump to...
+              - img [ref=f15e55]
+            - link "Sign in" [ref=f15e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fmart1nro%2Fjoycontrol%2Fissues%2F26
+            - link "Sign up" [ref=f15e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fvoltron%2Fissues_fragments%2Fissue_layout&source=header-repo&source_repo=mart1nro%2Fjoycontrol
+            - button "Appearance settings" [ref=f15e63] [cursor=pointer]:
+              - img
+  - main [ref=f15e67]:
+    - generic [ref=f15e68]:
+      - generic [ref=f15e69]:
+        - generic [ref=f15e71]:
+          - img [ref=f15e72]
+          - link "mart1nro" [ref=f15e75] [cursor=pointer]:
+            - /url: /mart1nro
+          - generic [ref=f15e76]: /
+          - strong [ref=f15e77]:
+            - link "joycontrol" [ref=f15e78] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol
+          - generic [ref=f15e79]: Public
+        - generic [ref=f15e80]:
+          - list:
+            - listitem [ref=f15e81]:
+              - link "You must be signed in to change notification settings" [ref=f15e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fmart1nro%2Fjoycontrol
+                - img [ref=f15e83]
+                - text: Notifications
+            - listitem [ref=f15e85]:
+              - link "Fork 277" [ref=f15e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fmart1nro%2Fjoycontrol
+                - img [ref=f15e87]
+                - text: Fork
+                - generic "277" [ref=f15e89]
+            - listitem [ref=f15e90]:
+              - link "You must be signed in to star a repository" [ref=f15e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fmart1nro%2Fjoycontrol
+                - img [ref=f15e93]
+                - text: Star
+                - generic "1350 users starred this repository" [ref=f15e95]: 1.4k
+      - navigation "Repository" [ref=f15e96]:
+        - list [ref=f15e97]:
+          - listitem [ref=f15e98]:
+            - link "Code" [ref=f15e99] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol
+              - img [ref=f15e100]
+              - generic [ref=f15e102]: Code
+          - listitem [ref=f15e103]:
+            - link "Issues 52" [ref=f15e104] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/issues
+              - img [ref=f15e105]
+              - generic [ref=f15e108]: Issues
+              - generic "52" [ref=f15e109]
+          - listitem [ref=f15e110]:
+            - link "Pull requests 6" [ref=f15e111] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/pulls
+              - img [ref=f15e112]
+              - generic [ref=f15e114]: Pull requests
+              - generic "6" [ref=f15e115]
+          - listitem [ref=f15e116]:
+            - link "Actions" [ref=f15e117] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/actions
+              - img [ref=f15e118]
+              - generic [ref=f15e120]: Actions
+          - listitem [ref=f15e121]:
+            - link "Projects" [ref=f15e122] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/projects
+              - img [ref=f15e123]
+              - generic [ref=f15e125]: Projects
+          - listitem [ref=f15e126]:
+            - link "Security and quality" [ref=f15e127] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/security
+              - img [ref=f15e128]
+              - generic [ref=f15e130]: Security and quality
+          - listitem [ref=f15e131]:
+            - link "Insights" [ref=f15e132] [cursor=pointer]:
+              - /url: /mart1nro/joycontrol/pulse
+              - img [ref=f15e133]
+              - generic [ref=f15e135]: Insights
+    - generic [ref=f15e143]:
+      - region "Header" [ref=f15e145]:
+        - generic [ref=f15e146]:
+          - 'heading "connection dropped as soon as pair screen has been left #26" [level=1] [ref=f15e148]':
+            - text: connection dropped as soon as pair screen has been left
+            - generic [ref=f15e150]: "#26"
+          - generic [ref=f15e152]:
+            - link "New issue" [ref=f15e154] [cursor=pointer]:
+              - /url: /login?return_to=https://github.com/mart1nro/joycontrol/issues/26
+              - generic [ref=f15e156]: New issue
+            - button "Copy link" [ref=f15e157] [cursor=pointer]:
+              - img [ref=f15e158]
+      - generic [ref=f15e166]:
+        - img "Issue" [ref=f15e167]
+        - text: Open
+      - generic [ref=f15e171]:
+        - generic [ref=f15e172]:
+          - generic [ref=f15e175]:
+            - heading "Description" [level=2] [ref=f15e176]
+            - generic [ref=f15e178]:
+              - generic [ref=f15e180]:
+                - link "@realquantumsource's profile" [ref=f15e182] [cursor=pointer]:
+                  - /url: https://github.com/realquantumsource
+                  - img "@realquantumsource" [ref=f15e183]
+                - generic [ref=f15e184]:
+                  - link "realquantumsource" [ref=f15e186] [cursor=pointer]:
+                    - /url: https://github.com/realquantumsource
+                  - generic [ref=f15e187]:
+                    - text: opened
+                    - link "on Apr 18, 2020on Apr 17, 2020" [ref=f15e188] [cursor=pointer]:
+                      - /url: https://github.com/mart1nro/joycontrol/issues/26#issue-602334003
+                - button "Issue body actions" [ref=f15e192] [cursor=pointer]:
+                  - img [ref=f15e193]
+              - generic [ref=f15e195]:
+                - generic [ref=f15e197]:
+                  - paragraph [ref=f15e198]:
+                    - text: I was working on your code, and all of the sudden after what may have been dozens of successful pairs and tests I started getting this weird error every time I exited the pairing menu. I even made a new folder re cloned the repo and re installed the package, but I still have this joycontrol.transport_read::105 Error - No data received
+                    - text: joycontrol.protocol connectyyion_lost::112 Error
+                  - paragraph [ref=f15e199]: I have attached two screens. I get the same error on both switches I don't know what I could have done to my ubuntu laptop system to have caused this to recur even on a clean clone. Please help if you can
+                  - paragraph [ref=f15e200]:
+                    - link "Screenshot from 2020-04-17 17-31-46" [ref=f15e201] [cursor=pointer]:
+                      - /url: https://user-images.githubusercontent.com/20935116/79623593-00047100-80d2-11ea-8587-a730705ad63a.png
+                      - img "Screenshot from 2020-04-17 17-31-46" [ref=f15e202]
+                    - link "Screenshot from 2020-04-17 17-32-18" [ref=f15e203] [cursor=pointer]:
+                      - /url: https://user-images.githubusercontent.com/20935116/79623594-00047100-80d2-11ea-9a24-2e81e4ab0499.png
+                      - img "Screenshot from 2020-04-17 17-32-18" [ref=f15e204]
+                - generic:
+                  - toolbar "Reactions"
+          - generic [ref=f15e206]:
+            - generic [ref=f15e207]:
+              - heading "Activity" [level=2] [ref=f15e208]
+              - link [ref=f15e209] [cursor=pointer]:
+                - /url: /mart1nro/joycontrol/issues/26?timeline_page=1
+                - text: Next
+              - generic [ref=f15e210]:
+                - generic [ref=f15e218]:
+                  - generic [ref=f15e220]:
+                    - heading "JuanPotato commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e221]:
+                      - text: JuanPotato commented
+                      - generic "Apr 17, 2020, 7:17 PM MST" [ref=f15e222]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@JuanPotato's profile" [ref=f15e224] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e225]
+                    - generic [ref=f15e226]:
+                      - link "JuanPotato" [ref=f15e228] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e231] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615540160
+                    - generic [ref=f15e233]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e235]: Contributor
+                      - button "Actions for JuanPotato's comment, 7:17 PM on April 17, 2020" [ref=f15e237] [cursor=pointer]:
+                        - img [ref=f15e238]
+                  - generic [ref=f15e240]:
+                    - paragraph [ref=f15e243]: I wonder if this has anything to do with new switch update or the fix for that update. Has your switch updated to the 10.0 update?
+                    - toolbar "Reactions"
+                - generic [ref=f15e251]:
+                  - generic [ref=f15e253]:
+                    - heading "realquantumsource commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e254]:
+                      - text: realquantumsource commented
+                      - generic "Apr 17, 2020, 8:21 PM MST" [ref=f15e255]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@realquantumsource's profile" [ref=f15e257] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e258]
+                    - generic [ref=f15e259]:
+                      - link "realquantumsource" [ref=f15e261] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e264] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615547223
+                    - generic [ref=f15e266]:
+                      - generic "This user is the author of this issue" [ref=f15e268]: Author
+                      - button "Actions for realquantumsource's comment, 8:21 PM on April 17, 2020" [ref=f15e270] [cursor=pointer]:
+                        - img [ref=f15e271]
+                  - generic [ref=f15e273]:
+                    - paragraph [ref=f15e276]: It has , but I have another switch on older version and it has the same issue. Also it was working for hours until I suspect an ubuntu update happened. The switch didn't change in that time
+                    - toolbar "Reactions"
+                - generic [ref=f15e284]:
+                  - generic [ref=f15e286]:
+                    - heading "JuanPotato commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e287]:
+                      - text: JuanPotato commented
+                      - generic "Apr 17, 2020, 9:42 PM MST" [ref=f15e288]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@JuanPotato's profile" [ref=f15e290] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e291]
+                    - generic [ref=f15e292]:
+                      - link "JuanPotato" [ref=f15e294] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e297] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615557577
+                    - generic [ref=f15e299]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e301]: Contributor
+                      - button "Actions for JuanPotato's comment, 9:42 PM on April 17, 2020" [ref=f15e303] [cursor=pointer]:
+                        - img [ref=f15e304]
+                  - generic [ref=f15e306]:
+                    - paragraph [ref=f15e309]:
+                      - text: You can check if an update has actually occurred if you open the
+                      - code [ref=f15e310]: /var/log/dpkg.log
+                      - text: file. You should be able to see what changed and then find what broke.
+                    - toolbar "Reactions"
+                - generic [ref=f15e318]:
+                  - generic [ref=f15e320]:
+                    - heading "realquantumsource commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e321]:
+                      - text: realquantumsource commented
+                      - generic "Apr 17, 2020, 10:04 PM MST" [ref=f15e322]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@realquantumsource's profile" [ref=f15e324] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e325]
+                    - generic [ref=f15e326]:
+                      - link "realquantumsource" [ref=f15e328] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e331] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615562283
+                    - generic [ref=f15e333]:
+                      - generic "This user is the author of this issue" [ref=f15e335]: Author
+                      - button "Actions for realquantumsource's comment, 10:04 PM on April 17, 2020" [ref=f15e337] [cursor=pointer]:
+                        - img [ref=f15e338]
+                  - generic [ref=f15e340]:
+                    - paragraph [ref=f15e343]: I even re formatted the hdd and reinstall from the same image I used a few months back, and it still failed, i'm guessing ubuntu did some kind of firmware change to my bluetooth chip or changed some bios setting I have no idea at this point why no matter what I do I can't leave (by any means) on any switch. Trying to get an image of ubuntu on my raspi now
+                    - toolbar "Reactions"
+                - generic [ref=f15e351]:
+                  - generic [ref=f15e353]:
+                    - heading "JuanPotato commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e354]:
+                      - text: JuanPotato commented
+                      - generic "Apr 17, 2020, 10:11 PM MST" [ref=f15e355]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@JuanPotato's profile" [ref=f15e357] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e358]
+                    - generic [ref=f15e359]:
+                      - link "JuanPotato" [ref=f15e361] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e364] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615564481
+                    - generic [ref=f15e366]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e368]: Contributor
+                      - button "Actions for JuanPotato's comment, 10:11 PM on April 17, 2020" [ref=f15e370] [cursor=pointer]:
+                        - img [ref=f15e371]
+                  - generic [ref=f15e373]:
+                    - generic [ref=f15e375]:
+                      - paragraph [ref=f15e376]: That's incredibly odd, I don't think Ubuntu would update the Bluetooth firmware unless you did a reboot. That may be possible then. May I ask what laptop you're running it on?
+                      - paragraph [ref=f15e377]:
+                        - text: Could you open
+                        - code [ref=f15e378]: bluetoothctl
+                        - text: in another terminal. Run joycontrol, and then put the full output of both joycontrol and bluetoothctl here?
+                    - toolbar "Reactions"
+                - generic [ref=f15e386]:
+                  - generic [ref=f15e388]:
+                    - heading "mart1nro commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e389]:
+                      - text: mart1nro commented
+                      - generic "Apr 17, 2020, 10:11 PM MST" [ref=f15e390]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@mart1nro's profile" [ref=f15e392] [cursor=pointer]:
+                      - /url: /mart1nro
+                      - img "@mart1nro" [ref=f15e393]
+                    - generic [ref=f15e394]:
+                      - link "mart1nro" [ref=f15e396] [cursor=pointer]:
+                        - /url: /mart1nro
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e399] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615564629
+                    - generic [ref=f15e401]:
+                      - generic "This user is the owner of the joycontrol repository." [ref=f15e403]: Owner
+                      - button "Actions for mart1nro's comment, 10:11 PM on April 17, 2020" [ref=f15e405] [cursor=pointer]:
+                        - img [ref=f15e406]
+                  - generic [ref=f15e408]:
+                    - generic [ref=f15e410]:
+                      - paragraph [ref=f15e411]: Have you tried the reconnect option without opening the Change Grip/Order menu?
+                      - paragraph [ref=f15e412]: Maybe rather try Raspian on the pi instead of Ubuntu. There was an issue here where the connection didn't work with Ubuntu on the Raspberry Pi. It would probably require more setup.
+                      - paragraph [ref=f15e413]: Also someone also had the same issue that the connection dropped almost immediately and it worked once he used an usb Bluetooth adapter.
+                      - paragraph [ref=f15e414]: That does not explain why it was working before though.
+                    - toolbar "Reactions"
+                - generic [ref=f15e422]:
+                  - generic [ref=f15e424]:
+                    - heading "realquantumsource commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e425]:
+                      - text: realquantumsource commented
+                      - generic "Apr 17, 2020, 10:16 PM MST" [ref=f15e426]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@realquantumsource's profile" [ref=f15e428] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e429]
+                    - generic [ref=f15e430]:
+                      - link "realquantumsource" [ref=f15e432] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e435] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615565900
+                    - generic [ref=f15e436]:
+                      - button "Last edited by realquantumsource" [ref=f15e439] [cursor=pointer]:
+                        - generic [ref=f15e442]: Last edited by realquantumsource
+                        - generic:
+                          - img
+                      - generic [ref=f15e443]:
+                        - generic "This user is the author of this issue" [ref=f15e445]: Author
+                        - button "Actions for realquantumsource's comment, 10:16 PM on April 17, 2020" [ref=f15e447] [cursor=pointer]:
+                          - img [ref=f15e448]
+                  - generic [ref=f15e450]:
+                    - generic [ref=f15e452]:
+                      - paragraph [ref=f15e453]:
+                        - text: TO juanPotato's point I may have restarted the computer... I can't recall
+                        - text: its a dell latitude 7480
+                      - paragraph [ref=f15e454]: And I did try the reconnect option too, get the exact same peer reset connection error. Downloading raspbian now, I'd use a usb adapter if I had one but amazon is slow.... lol hopefully this works on my pi3
+                      - paragraph [ref=f15e455]: Oh and JuanPotato, i'm getting the output from both app windows now
+                    - toolbar "Reactions"
+                - generic [ref=f15e463]:
+                  - generic [ref=f15e465]:
+                    - heading "realquantumsource commented on Apr 17, 2020 on Apr 17, 2020" [level=3] [ref=f15e466]:
+                      - text: realquantumsource commented
+                      - generic "Apr 17, 2020, 10:24 PM MST" [ref=f15e467]: on Apr 17, 2020 on Apr 17, 2020
+                    - link "@realquantumsource's profile" [ref=f15e469] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e470]
+                    - generic [ref=f15e471]:
+                      - link "realquantumsource" [ref=f15e473] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 17, 2020on Apr 17, 2020" [ref=f15e476] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615568383
+                    - generic [ref=f15e478]:
+                      - generic "This user is the author of this issue" [ref=f15e480]: Author
+                      - button "Actions for realquantumsource's comment, 10:24 PM on April 17, 2020" [ref=f15e482] [cursor=pointer]:
+                        - img [ref=f15e483]
+                  - generic [ref=f15e485]:
+                    - paragraph [ref=f15e488]:
+                      - text: I did a output capture of both devices before and after pressing home on the switch(or leaving the sync menu)
+                      - link "joycontrol_beforeHome.txt" [ref=f15e489] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/files/4496090/joycontrol_beforeHome.txt
+                      - link "Bluetoothctl-afterHome.txt" [ref=f15e490] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/files/4496091/Bluetoothctl-afterHome.txt
+                      - link "Bluetoothctl-beforeHome.txt" [ref=f15e491] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/files/4496092/Bluetoothctl-beforeHome.txt
+                      - link "joycontrol_afterHome.txt" [ref=f15e492] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/files/4496093/joycontrol_afterHome.txt
+                    - toolbar "Reactions"
+                - generic [ref=f15e500]:
+                  - generic [ref=f15e502]:
+                    - heading "Quantum-Hui commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e503]:
+                      - text: Quantum-Hui commented
+                      - generic "Apr 18, 2020, 8:02 AM MST" [ref=f15e504]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@Quantum-Hui's profile" [ref=f15e506] [cursor=pointer]:
+                      - /url: /Quantum-Hui
+                      - img "@Quantum-Hui" [ref=f15e507]
+                    - generic [ref=f15e508]:
+                      - link "Quantum-Hui" [ref=f15e510] [cursor=pointer]:
+                        - /url: /Quantum-Hui
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e513] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615885717
+                    - button "Actions for Quantum-Hui's comment, 8:02 AM on April 18, 2020" [ref=f15e517] [cursor=pointer]:
+                      - img [ref=f15e518]
+                  - generic [ref=f15e520]:
+                    - paragraph [ref=f15e523]: I have the same issue on my jetson nano with an intel 8265AC wireless network adapter. But after adding an usb Bluetooth adapter, the connection goes well. Have no idea where the problem is. I was using a switch lite, haven't tried on a standard switch.
+                    - toolbar "Reactions"
+                - generic [ref=f15e531]:
+                  - generic [ref=f15e533]:
+                    - heading "JuanPotato commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e534]:
+                      - text: JuanPotato commented
+                      - generic "Apr 18, 2020, 2:06 PM MST" [ref=f15e535]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@JuanPotato's profile" [ref=f15e537] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e538]
+                    - generic [ref=f15e539]:
+                      - link "JuanPotato" [ref=f15e541] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e544] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615949592
+                    - generic [ref=f15e546]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e548]: Contributor
+                      - button "Actions for JuanPotato's comment, 2:06 PM on April 18, 2020" [ref=f15e550] [cursor=pointer]:
+                        - img [ref=f15e551]
+                  - generic [ref=f15e553]:
+                    - paragraph [ref=f15e556]:
+                      - text: I wonder if certain bluetooth modules just don't work well. I find it really odd that it disconnects after leaving the pairing page.
+                      - link "@mart1nro" [ref=f15e557] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro
+                      - text: Do you think it could have anything to do with certain bluetooth modules not allowing the ability to modify certain attributes? I don't even know if that is a thing, but if different bluetooth modules behave differently then I guess it might be
+                    - toolbar "Reactions"
+                - generic [ref=f15e565]:
+                  - generic [ref=f15e567]:
+                    - heading "realquantumsource commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e568]:
+                      - text: realquantumsource commented
+                      - generic "Apr 18, 2020, 2:42 PM MST" [ref=f15e569]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@realquantumsource's profile" [ref=f15e571] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e572]
+                    - generic [ref=f15e573]:
+                      - link "realquantumsource" [ref=f15e575] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e578] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615954640
+                    - generic [ref=f15e579]:
+                      - button "Last edited by realquantumsource" [ref=f15e582] [cursor=pointer]:
+                        - generic [ref=f15e585]: Last edited by realquantumsource
+                        - generic:
+                          - img
+                      - generic [ref=f15e586]:
+                        - generic "This user is the author of this issue" [ref=f15e588]: Author
+                        - button "Actions for realquantumsource's comment, 2:42 PM on April 18, 2020" [ref=f15e590] [cursor=pointer]:
+                          - img [ref=f15e591]
+                  - generic [ref=f15e593]:
+                    - paragraph [ref=f15e596]:
+                      - text: Thats the only conclusion I can think of, and whats weird is it was working for many many reconnects then I took a break and when I came back (maybe after a system/firmware update it failed). I was/am working on a interpreter for the program to do time skips from shiney frames, and now a TASbot compiler for it.
+                      - text: so good news/bad news, I got my program to work on my raspi3, but after a few minutes of button script it tends to skip or miss send a signal here and there which is a problem if every button press is key. I am playing with buffering teh waits a bit more
+                    - toolbar "Reactions"
+                - generic [ref=f15e604]:
+                  - generic [ref=f15e606]:
+                    - heading "JuanPotato commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e607]:
+                      - text: JuanPotato commented
+                      - generic "Apr 18, 2020, 2:48 PM MST" [ref=f15e608]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@JuanPotato's profile" [ref=f15e610] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e611]
+                    - generic [ref=f15e612]:
+                      - link "JuanPotato" [ref=f15e614] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e617] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615955652
+                    - generic [ref=f15e619]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e621]: Contributor
+                      - button "Actions for JuanPotato's comment, 2:48 PM on April 18, 2020" [ref=f15e623] [cursor=pointer]:
+                        - img [ref=f15e624]
+                  - generic [ref=f15e626]:
+                    - paragraph [ref=f15e629]: I don't imagine a bluetooth connection would be the best in terms of precise input timing for TASbot.
+                    - toolbar "Reactions"
+                - generic [ref=f15e637]:
+                  - generic [ref=f15e639]:
+                    - heading "realquantumsource commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e640]:
+                      - text: realquantumsource commented
+                      - generic "Apr 18, 2020, 2:57 PM MST" [ref=f15e641]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@realquantumsource's profile" [ref=f15e643] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e644]
+                    - generic [ref=f15e645]:
+                      - link "realquantumsource" [ref=f15e647] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e650] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615957687
+                    - generic [ref=f15e652]:
+                      - generic "This user is the author of this issue" [ref=f15e654]: Author
+                      - button "Actions for realquantumsource's comment, 2:57 PM on April 18, 2020" [ref=f15e656] [cursor=pointer]:
+                        - img [ref=f15e657]
+                  - generic [ref=f15e659]:
+                    - paragraph [ref=f15e662]: I see that now, and may turn my eyes to figuring out how to emulating in a similar way a usb controller. any recommendations are appreciated. THANKS to all for your help!
+                    - toolbar "Reactions"
+                - generic [ref=f15e670]:
+                  - generic [ref=f15e672]:
+                    - heading "JuanPotato commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e673]:
+                      - text: JuanPotato commented
+                      - generic "Apr 18, 2020, 4:22 PM MST" [ref=f15e674]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@JuanPotato's profile" [ref=f15e676] [cursor=pointer]:
+                      - /url: /JuanPotato
+                      - img "@JuanPotato" [ref=f15e677]
+                    - generic [ref=f15e678]:
+                      - link "JuanPotato" [ref=f15e680] [cursor=pointer]:
+                        - /url: /JuanPotato
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e683] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615976871
+                    - generic [ref=f15e685]:
+                      - generic "This user has previously committed to the joycontrol repository." [ref=f15e687]: Contributor
+                      - button "Actions for JuanPotato's comment, 4:22 PM on April 18, 2020" [ref=f15e689] [cursor=pointer]:
+                        - img [ref=f15e690]
+                  - generic [ref=f15e692]:
+                    - generic [ref=f15e694]:
+                      - paragraph [ref=f15e695]: I actually have already found a couple resources that may help you with this.
+                      - paragraph [ref=f15e696]:
+                        - link "https://medium.com/better-programming/creating-a-fake-nintendo-switch-controller-to-level-up-my-character-in-world-of-final-fantasy-b50adc269a1e" [ref=f15e697] [cursor=pointer]:
+                          - /url: https://medium.com/better-programming/creating-a-fake-nintendo-switch-controller-to-level-up-my-character-in-world-of-final-fantasy-b50adc269a1e
+                        - link "https://medium.com/@bertrandom/automating-zelda-3b37127e24c8" [ref=f15e698] [cursor=pointer]:
+                          - /url: https://medium.com/@bertrandom/automating-zelda-3b37127e24c8
+                      - paragraph [ref=f15e699]:
+                        - link "https://github.com/wchill/SwitchInputEmulator" [ref=f15e700] [cursor=pointer]:
+                          - /url: https://github.com/wchill/SwitchInputEmulator
+                        - link "https://github.com/shinyquagsire23/Switch-Fightstick" [ref=f15e701] [cursor=pointer]:
+                          - /url: https://github.com/shinyquagsire23/Switch-Fightstick
+                        - link "https://github.com/progmem/Switch-Fightstick" [ref=f15e702] [cursor=pointer]:
+                          - /url: https://github.com/progmem/Switch-Fightstick
+                        - link "https://github.com/ItsDeidara/CommunityController" [ref=f15e703] [cursor=pointer]:
+                          - /url: https://github.com/ItsDeidara/CommunityController
+                        - link "https://github.com/fossephate/switch-controller" [ref=f15e704] [cursor=pointer]:
+                          - /url: https://github.com/fossephate/switch-controller
+                        - link "https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick/" [ref=f15e705] [cursor=pointer]:
+                          - /url: https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick/
+                    - toolbar "Reactions" [ref=f15e706]:
+                      - switch "❤️ 1 reaction" [ref=f15e707]:
+                        - generic [ref=f15e708]:
+                          - generic: ❤️
+                          - generic [ref=f15e709]:
+                            - generic [ref=f15e710]: React with ❤️
+                            - text: "1"
+                - generic [ref=f15e718]:
+                  - generic [ref=f15e720]:
+                    - heading "realquantumsource commented on Apr 18, 2020 on Apr 18, 2020" [level=3] [ref=f15e721]:
+                      - text: realquantumsource commented
+                      - generic "Apr 18, 2020, 4:24 PM MST" [ref=f15e722]: on Apr 18, 2020 on Apr 18, 2020
+                    - link "@realquantumsource's profile" [ref=f15e724] [cursor=pointer]:
+                      - /url: /realquantumsource
+                      - img "@realquantumsource" [ref=f15e725]
+                    - generic [ref=f15e726]:
+                      - link "realquantumsource" [ref=f15e728] [cursor=pointer]:
+                        - /url: /realquantumsource
+                      - link "on Apr 18, 2020on Apr 18, 2020" [ref=f15e731] [cursor=pointer]:
+                        - /url: https://github.com/mart1nro/joycontrol/issues/26#issuecomment-615977335
+                    - generic [ref=f15e733]:
+                      - generic "This user is the author of this issue" [ref=f15e735]: Author
+                      - button "Actions for realquantumsource's comment, 4:24 PM on April 18, 2020" [ref=f15e737] [cursor=pointer]:
+                        - img [ref=f15e738]
+                  - generic [ref=f15e740]:
+                    - generic [ref=f15e742]:
+                      - blockquote [ref=f15e743]:
+                        - paragraph [ref=f15e744]: I actually have already found a couple resources that may help you with this.
+                        - paragraph [ref=f15e745]:
+                          - link "https://medium.com/better-programming/creating-a-fake-nintendo-switch-controller-to-level-up-my-character-in-world-of-final-fantasy-b50adc269a1e" [ref=f15e746] [cursor=pointer]:
+                            - /url: https://medium.com/better-programming/creating-a-fake-nintendo-switch-controller-to-level-up-my-character-in-world-of-final-fantasy-b50adc269a1e
+                          - link "https://medium.com/@bertrandom/automating-zelda-3b37127e24c8" [ref=f15e747] [cursor=pointer]:
+                            - /url: https://medium.com/@bertrandom/automating-zelda-3b37127e24c8
+                        - paragraph [ref=f15e748]:
+                          - link "https://github.com/wchill/SwitchInputEmulator" [ref=f15e749] [cursor=pointer]:
+                            - /url: https://github.com/wchill/SwitchInputEmulator
+                          - link "https://github.com/shinyquagsire23/Switch-Fightstick" [ref=f15e750] [cursor=pointer]:
+                            - /url: https://github.com/shinyquagsire23/Switch-Fightstick
+                          - link "https://github.com/progmem/Switch-Fightstick" [ref=f15e751] [cursor=pointer]:
+                            - /url: https://github.com/progmem/Switch-Fightstick
+                          - link "https://github.com/ItsDeidara/CommunityController" [ref=f15e752] [cursor=pointer]:
+                            - /url: https://github.com/ItsDeidara/CommunityController
+                          - link "https://github.com/fossephate/switch-controller" [ref=f15e753] [cursor=pointer]:
+                            - /url: https://github.com/fossephate/switch-controller
+                          - link "https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick/" [ref=f15e754] [cursor=pointer]:
+                            - /url: https://github.com/fluffymadness/ATMega32U4-Switch-Fightstick/
+                      - paragraph [ref=f15e755]: WOW man that's amazing, thanks so much
+                    - toolbar "Reactions"
+                - generic [ref=f15e758]:
+                  - generic [ref=f15e764]:
+                    - heading "35 remaining items" [level=3] [ref=f15e766]:
+                      - text: "35"
+                      - generic [ref=f15e767]: remaining items
+                    - button "Load more" [ref=f15e769] [cursor=pointer]:
+                      - generic [ref=f15e772]: Load more
+                  - generic [ref=f15e774]:
+                    - img [ref=f15e775]
+                    - generic [ref=f15e778]: Loading
+            - generic [ref=f15e779]:
+              - link "Sign up for free" [ref=f15e780] [cursor=pointer]:
+                - /url: /signup?return_to=https://github.com/mart1nro/joycontrol/issues/26
+                - generic [ref=f15e782]: Sign up for free
+              - generic [ref=f15e783]:
+                - strong [ref=f15e784]: to join this conversation on GitHub.
+                - text: Already have an account?
+              - link "Sign in to comment" [ref=f15e785] [cursor=pointer]:
+                - /url: /login?return_to=https://github.com/mart1nro/joycontrol/issues/26
+        - generic [ref=f15e787]:
+          - heading "Metadata" [level=2] [ref=f15e788]
+          - generic [ref=f15e790]:
+            - generic [ref=f15e792]:
+              - generic [ref=f15e793]:
+                - heading "Assignees" [level=3]
+              - generic [ref=f15e794]: No one assigned
+            - generic [ref=f15e796]:
+              - generic [ref=f15e797]:
+                - heading "Labels" [level=3]
+              - generic [ref=f15e798]: No labels
+            - generic [ref=f15e800]:
+              - generic [ref=f15e801]:
+                - heading "Projects" [level=3]
+              - generic [ref=f15e802]: No projects
+            - generic [ref=f15e804]:
+              - generic [ref=f15e805]:
+                - heading "Milestone" [level=3]
+              - generic [ref=f15e806]: No milestone
+            - generic [ref=f15e808]:
+              - generic [ref=f15e809]:
+                - heading "Relationships" [level=3]
+              - generic [ref=f15e810]: None yet
+            - generic [ref=f15e811]:
+              - generic [ref=f15e813]:
+                - heading "Development" [level=3]
+              - generic [ref=f15e814]:
+                - generic [ref=f15e815]: No branches or pull requests
+                - list
+            - generic [ref=f15e816]:
+              - generic [ref=f15e818]:
+                - heading "Participants" [level=3]
+              - generic [ref=f15e820]:
+                - generic [ref=f15e821]:
+                  - link "@marcan" [ref=f15e822] [cursor=pointer]:
+                    - /url: /marcan
+                    - img "@marcan" [ref=f15e823]
+                  - link "@yellows8" [ref=f15e824] [cursor=pointer]:
+                    - /url: /yellows8
+                    - img "@yellows8" [ref=f15e825]
+                  - link "@acriphonic" [ref=f15e826] [cursor=pointer]:
+                    - /url: /acriphonic
+                    - img "@acriphonic" [ref=f15e827]
+                  - link "@dpxcc" [ref=f15e828] [cursor=pointer]:
+                    - /url: /dpxcc
+                    - img "@dpxcc" [ref=f15e829]
+                  - link "@s0r00t" [ref=f15e830] [cursor=pointer]:
+                    - /url: /s0r00t
+                    - img "@s0r00t" [ref=f15e831]
+                - button "and 10 other participants, click to see the full list" [ref=f15e832] [cursor=pointer]:
+                  - generic [ref=f15e834]: "+10"
+            - heading "Issue actions" [level=2] [ref=f15e835]
+            - list [ref=f15e836]:
+              - listitem [ref=f15e837]:
+                - button "Open in GitHub Copilot app" [ref=f15e838] [cursor=pointer]:
+                  - generic [ref=f15e841]: Open in GitHub Copilot app
+  - contentinfo [ref=f15e842]:
+    - heading "Footer" [level=2] [ref=f15e843]
+    - generic [ref=f15e844]:
+      - generic [ref=f15e845]:
+        - link "GitHub Homepage" [ref=f15e846] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=f15e847]
+        - generic [ref=f15e849]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=f15e850]:
+        - heading "Footer navigation" [level=3] [ref=f15e851]
+        - list "Footer navigation" [ref=f15e852]:
+          - listitem [ref=f15e853]:
+            - link "Terms" [ref=f15e854] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=f15e855]:
+            - link "Privacy" [ref=f15e856] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=f15e857]:
+            - link "Security" [ref=f15e858] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=f15e859]:
+            - link "Status" [ref=f15e860] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=f15e861]:
+            - link "Community" [ref=f15e862] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=f15e863]:
+            - link "Docs" [ref=f15e864] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=f15e865]:
+            - link "Contact" [ref=f15e866] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=f15e867]:
+            - button "Manage cookies" [ref=f15e869] [cursor=pointer]
+          - listitem [ref=f15e870]:
+            - button "Do not share my personal information" [ref=f15e872] [cursor=pointer]

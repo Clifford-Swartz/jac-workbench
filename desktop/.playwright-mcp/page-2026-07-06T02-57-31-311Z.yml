@@ -1,0 +1,540 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]:
+      - heading "Navigation Menu" [level=2] [ref=e7]
+      - generic [ref=e8]:
+        - link "Homepage" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+        - generic [ref=e13]:
+          - navigation "Global" [ref=e16]:
+            - list [ref=e17]:
+              - listitem [ref=e18]:
+                - button "Platform" [ref=e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=e21]
+              - listitem [ref=e23]:
+                - button "Solutions" [ref=e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=e26]
+              - listitem [ref=e28]:
+                - button "Resources" [ref=e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=e31]
+              - listitem [ref=e33]:
+                - button "Open Source" [ref=e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=e36]
+              - listitem [ref=e38]:
+                - button "Enterprise" [ref=e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=e41]
+              - listitem [ref=e43]:
+                - link "Pricing" [ref=e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=e45]: Pricing
+          - generic [ref=e46]:
+            - button "Search or jump to…" [ref=e49] [cursor=pointer]:
+              - img [ref=e51]
+              - generic [ref=e53]: Search or jump to...
+              - img [ref=e55]
+            - link "Sign in" [ref=e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Fissues%3Fq%3Dswitch%2Bcontroller%2Bbluetooth
+            - link "Sign up" [ref=e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fissues%2Findex&source=header-repo&source_repo=x360ce%2Fx360ce
+            - button "Appearance settings" [ref=e63] [cursor=pointer]:
+              - img
+  - main [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e71]:
+          - img [ref=e72]
+          - link "x360ce" [ref=e75] [cursor=pointer]:
+            - /url: /x360ce
+          - generic [ref=e76]: /
+          - strong [ref=e77]:
+            - link "x360ce" [ref=e78] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+          - generic [ref=e79]: Public
+        - generic [ref=e80]:
+          - list:
+            - listitem [ref=e81]:
+              - link "You must be signed in to change notification settings" [ref=e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e83]
+                - text: Notifications
+            - listitem [ref=e85]:
+              - link "Fork 504" [ref=e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e87]
+                - text: Fork
+                - generic "504" [ref=e89]
+            - listitem [ref=e90]:
+              - link "You must be signed in to star a repository" [ref=e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e93]
+                - text: Star
+                - generic "2866 users starred this repository" [ref=e95]: 2.9k
+      - navigation "Repository" [ref=e96]:
+        - list [ref=e97]:
+          - listitem [ref=e98]:
+            - link "Code" [ref=e99] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+              - img [ref=e100]
+              - generic [ref=e102]: Code
+          - listitem [ref=e103]:
+            - link "Issues 837" [ref=e104] [cursor=pointer]:
+              - /url: /x360ce/x360ce/issues
+              - img [ref=e105]
+              - generic [ref=e108]: Issues
+              - generic "837" [ref=e109]
+          - listitem [ref=e110]:
+            - link "Pull requests 7" [ref=e111] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulls
+              - img [ref=e112]
+              - generic [ref=e114]: Pull requests
+              - generic "7" [ref=e115]
+          - listitem [ref=e116]:
+            - link "Discussions" [ref=e117] [cursor=pointer]:
+              - /url: /x360ce/x360ce/discussions
+              - img [ref=e118]
+              - generic [ref=e120]: Discussions
+          - listitem [ref=e121]:
+            - link "Actions" [ref=e122] [cursor=pointer]:
+              - /url: /x360ce/x360ce/actions
+              - img [ref=e123]
+              - generic [ref=e125]: Actions
+          - listitem [ref=e126]:
+            - link "Projects" [ref=e127] [cursor=pointer]:
+              - /url: /x360ce/x360ce/projects
+              - img [ref=e128]
+              - generic [ref=e130]: Projects
+          - listitem [ref=e131]:
+            - link "Wiki" [ref=e132] [cursor=pointer]:
+              - /url: /x360ce/x360ce/wiki
+              - img [ref=e133]
+              - generic [ref=e135]: Wiki
+          - listitem [ref=e136]:
+            - link "Security and quality" [ref=e137] [cursor=pointer]:
+              - /url: /x360ce/x360ce/security
+              - img [ref=e138]
+              - generic [ref=e140]: Security and quality
+          - listitem [ref=e141]:
+            - link "Insights" [ref=e142] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulse
+              - img [ref=e143]
+              - generic [ref=e145]: Insights
+    - generic [ref=e153]:
+      - generic [ref=e154]:
+        - generic [ref=e155]:
+          - navigation "Issue filters" [ref=e156]:
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - link "Issues" [ref=e159] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Issues" [ref=e162]
+              - listitem [ref=e163]:
+                - link "Assigned to me" [ref=e164] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+assignee%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Assigned to me" [ref=e167]
+              - listitem [ref=e168]:
+                - link "Created by me" [ref=e169] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+author%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Created by me" [ref=e172]
+              - listitem [ref=e173]:
+                - link "Mentioned" [ref=e174] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+mentions%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Mentioned" [ref=e177]
+              - listitem [ref=e178]:
+                - link "Recent activity" [ref=e179] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+updated%3A%3E%40today-1w+sort%3Aupdated-desc
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Recent activity" [ref=e182]
+          - separator [ref=e183]
+          - navigation "Pages" [ref=e184]:
+            - list [ref=e185]:
+              - listitem [ref=e186]:
+                - link "Views" [ref=e187] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues/views
+                  - generic:
+                    - img
+                  - generic [ref=e189]: Views
+              - listitem [ref=e190]:
+                - link "Projects" [ref=e191] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/projects
+                  - generic:
+                    - img
+                  - generic [ref=e193]: Projects
+              - listitem [ref=e194]:
+                - link "Milestones" [ref=e195] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/milestones
+                  - generic:
+                    - img
+                  - generic [ref=e197]: Milestones
+              - listitem [ref=e198]:
+                - link "Labels" [ref=e199] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/labels
+                  - generic:
+                    - img
+                  - generic [ref=e201]: Labels
+        - generic [ref=e202]:
+          - navigation "Feedback" [ref=e203]:
+            - list [ref=e204]:
+              - listitem [ref=e205]:
+                - link "Feedback Preview" [ref=e206] [cursor=pointer]:
+                  - /url: https://gh.io/issues-sidebar-feedback
+                  - generic:
+                    - img
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: Feedback
+                    - generic:
+                      - generic: Preview
+          - list [ref=e209]:
+            - listitem [ref=e210]:
+              - button "Collapse sidebar" [expanded] [ref=e211] [cursor=pointer]:
+                - generic:
+                  - img
+                - generic [ref=e213]: Collapse sidebar
+      - generic [ref=e218]:
+        - heading "Issues" [level=1] [ref=e219]
+        - generic [ref=e220]:
+          - generic [ref=e222]:
+            - form "Search Issues" [ref=e224]:
+              - generic [ref=e225]: Search Issues
+              - generic [ref=e227]:
+                - generic [ref=e229]:
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: switch
+                    - generic [ref=e233]: controller
+                    - generic [ref=e235]: bluetooth
+                  - combobox "Search Issues" [ref=e237]: switch controller bluetooth
+                - button "Search" [ref=e238] [cursor=pointer]:
+                  - img [ref=e239]
+            - button "New issue" [ref=e242]:
+              - generic [ref=e244]: New issue
+          - generic [ref=e248]:
+            - heading "Search results" [level=2] [ref=e249]
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - link "Open" [ref=e252] [cursor=pointer]:
+                  - /url: ""
+                  - generic [ref=e253]: Open
+                - link "Closed" [ref=e255] [cursor=pointer]:
+                  - /url: ""
+                  - generic [ref=e256]: Closed
+              - toolbar "Actions" [ref=e258]:
+                - generic [ref=e259]:
+                  - button "Filter by author" [ref=e261] [cursor=pointer]:
+                    - generic [ref=e262]:
+                      - generic [ref=e263]: Author
+                      - generic:
+                        - img
+                  - button "Filter by label" [ref=e265] [cursor=pointer]:
+                    - generic [ref=e266]:
+                      - generic [ref=e267]: Labels
+                      - generic:
+                        - img
+                  - button "Filter by project" [ref=e269] [cursor=pointer]:
+                    - generic [ref=e270]:
+                      - generic [ref=e271]: Projects
+                      - generic:
+                        - img
+                  - button "Filter by milestone" [ref=e273] [cursor=pointer]:
+                    - generic [ref=e274]:
+                      - generic [ref=e275]: Milestones
+                      - generic:
+                        - img
+                  - button "Filter by assignees" [ref=e277] [cursor=pointer]:
+                    - generic [ref=e278]:
+                      - generic [ref=e279]: Assignees
+                      - generic:
+                        - img
+                  - button "Filter by issue type" [ref=e281] [cursor=pointer]:
+                    - generic [ref=e282]:
+                      - generic [ref=e283]: Types
+                      - generic:
+                        - img
+                  - button "Sort by Newest , descending" [ref=e285] [cursor=pointer]:
+                    - generic [ref=e286]:
+                      - generic:
+                        - img
+                      - generic [ref=e287]:
+                        - generic [ref=e288]: Sort by
+                        - text: Newest
+                        - generic [ref=e289]: ", descending"
+                    - generic:
+                      - img
+            - list "Search results" [ref=e290]:
+              - listitem "More information available below." [ref=e293]:
+                - heading "It works in game controller settings,but not in a game" [level=3] [ref=e295]:
+                  - link "It works in game controller settings,but not in a game" [ref=e296] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1294
+                    - generic [ref=e297]: It works in game controller settings,but not in a game
+                - generic [ref=e302]:
+                  - img [ref=e304]
+                  - generic [ref=e307]: "Status: Open."
+                - generic [ref=e311]:
+                  - generic [ref=e312]:
+                    - generic [ref=e313]: "#1294"
+                    - generic [ref=e314]: In x360ce/x360ce;
+                  - generic [ref=e315]:
+                    - text: ·
+                    - link "ghost" [ref=e316] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Aghost
+                    - text: opened on Jul 17, 2021on Jul 17, 2021
+              - listitem "More information available below." [ref=e320]:
+                - heading "Disconnect from Bluetooth feature ?" [level=3] [ref=e322]:
+                  - link "Disconnect from Bluetooth feature ?" [ref=e323] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1246
+                    - generic [ref=e324]: Disconnect from Bluetooth feature ?
+                - generic [ref=e329]:
+                  - img [ref=e331]
+                  - generic [ref=e334]: "Status: Open."
+                - generic [ref=e338]:
+                  - generic [ref=e339]:
+                    - generic [ref=e340]: "#1246"
+                    - generic [ref=e341]: In x360ce/x360ce;
+                  - generic [ref=e342]:
+                    - text: ·
+                    - link "aburke20" [ref=e343] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Aaburke20
+                    - text: opened on Feb 15, 2021on Feb 15, 2021
+              - listitem "More information available below." [ref=e347]:
+                - heading "When using multiple Bluetooth controllers of the same model and make, disconnecting only one controller deactivates input from all of them" [level=3] [ref=e349]:
+                  - link "When using multiple Bluetooth controllers of the same model and make, disconnecting only one controller deactivates input from all of them" [ref=e350] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1236
+                    - generic [ref=e351]: When using multiple Bluetooth controllers of the same model and make, disconnecting only one controller deactivates input from all of them
+                - generic [ref=e356]:
+                  - img [ref=e358]
+                  - generic [ref=e361]: "Status: Open."
+                - generic [ref=e365]:
+                  - generic [ref=e366]:
+                    - generic [ref=e367]: "#1236"
+                    - generic [ref=e368]: In x360ce/x360ce;
+                  - generic [ref=e369]:
+                    - text: ·
+                    - link "hifihedgehog" [ref=e370] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Ahifihedgehog
+                    - text: opened on Jan 18, 2021on Jan 18, 2021
+              - listitem "More information available below." [ref=e374]:
+                - heading "No Analog Trigger or Rumble support for Google Stadia Controller" [level=3] [ref=e376]:
+                  - link "No Analog Trigger or Rumble support for Google Stadia Controller" [ref=e377] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1210
+                    - generic [ref=e378]: No Analog Trigger or Rumble support for Google Stadia Controller
+                - generic [ref=e383]:
+                  - img [ref=e385]
+                  - generic [ref=e388]: "Status: Open."
+                - generic [ref=e392]:
+                  - generic [ref=e393]:
+                    - generic [ref=e394]: "#1210"
+                    - generic [ref=e395]: In x360ce/x360ce;
+                  - generic [ref=e396]:
+                    - text: ·
+                    - link "GBatman28" [ref=e397] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3AGBatman28
+                    - text: opened on Nov 29, 2020on Nov 29, 2020
+              - listitem "More information available below." [ref=e401]:
+                - heading "X360CE/HIDGuardian won't hide original controller" [level=3] [ref=e403]:
+                  - link "X360CE/HIDGuardian won't hide original controller" [ref=e404] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1201
+                    - generic [ref=e405]: X360CE/HIDGuardian won't hide original controller
+                - generic [ref=e410]:
+                  - img [ref=e412]
+                  - generic [ref=e415]: "Status: Open."
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: "#1201"
+                    - generic [ref=e422]: In x360ce/x360ce;
+                  - generic [ref=e423]:
+                    - text: ·
+                    - link "yousie642" [ref=e424] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Ayousie642
+                    - text: opened on Nov 14, 2020on Nov 14, 2020
+              - listitem "More information available below." [ref=e428]:
+                - heading "Replica of switch pro controller connect to WIn10 via BT (2)" [level=3] [ref=e430]:
+                  - link "Replica of switch pro controller connect to WIn10 via BT (2)" [ref=e431] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1181
+                    - generic [ref=e432]: Replica of switch pro controller connect to WIn10 via BT (2)
+                - generic [ref=e437]:
+                  - img [ref=e439]
+                  - generic [ref=e442]: "Status: Open."
+                - generic [ref=e446]:
+                  - generic [ref=e447]:
+                    - generic [ref=e448]: "#1181"
+                    - generic [ref=e449]: In x360ce/x360ce;
+                  - generic [ref=e450]:
+                    - text: ·
+                    - link "mrbarnie" [ref=e451] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Amrbarnie
+                    - text: opened on Oct 11, 2020on Oct 11, 2020
+              - listitem "More information available below." [ref=e455]:
+                - heading "replica of switch pro controller connect to WIn10 via BT" [level=3] [ref=e457]:
+                  - link "replica of switch pro controller connect to WIn10 via BT" [ref=e458] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1179
+                    - generic [ref=e459]: replica of switch pro controller connect to WIn10 via BT
+                - generic [ref=e464]:
+                  - img [ref=e466]
+                  - generic [ref=e469]: "Status: Closed (completed)."
+                - generic [ref=e473]:
+                  - generic [ref=e474]:
+                    - generic [ref=e475]: "#1179"
+                    - generic [ref=e476]: In x360ce/x360ce;
+                  - generic [ref=e477]:
+                    - text: · by
+                    - link "mrbarnie" [ref=e478] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Amrbarnie
+                    - text: was closed on Oct 10, 2020on Oct 10, 2020
+              - listitem "More information available below." [ref=e482]:
+                - heading "Switch Pro Controller in FFXIV:ARR causes random inputs to be dropped" [level=3] [ref=e484]:
+                  - link "Switch Pro Controller in FFXIV:ARR causes random inputs to be dropped" [ref=e485] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/896
+                    - generic [ref=e486]: Switch Pro Controller in FFXIV:ARR causes random inputs to be dropped
+                - generic [ref=e491]:
+                  - img [ref=e493]
+                  - generic [ref=e496]: "Status: Open."
+                - generic [ref=e500]:
+                  - generic [ref=e501]:
+                    - generic [ref=e502]: "#896"
+                    - generic [ref=e503]: In x360ce/x360ce;
+                  - generic [ref=e504]:
+                    - text: ·
+                    - link "Proloe" [ref=e505] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3AProloe
+                    - text: opened on Dec 22, 2018on Dec 22, 2018
+              - listitem "More information available below." [ref=e509]:
+                - heading "Switch Pro Controller Troubles" [level=3] [ref=e511]:
+                  - link "Switch Pro Controller Troubles" [ref=e512] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/812
+                    - generic [ref=e513]: Switch Pro Controller Troubles
+                - generic [ref=e518]:
+                  - img [ref=e520]
+                  - generic [ref=e523]: "Status: Closed (completed)."
+                - generic [ref=e527]:
+                  - generic [ref=e528]:
+                    - generic [ref=e529]: "#812"
+                    - generic [ref=e530]: In x360ce/x360ce;
+                  - generic [ref=e531]:
+                    - text: · by
+                    - link "ghost" [ref=e532] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Aghost
+                    - text: was closed on Jul 10, 2018on Jul 10, 2018
+              - listitem "More information available below." [ref=e536]:
+                - heading "It shows a connected device as a controller but i do not have a single device connected on my PC" [level=3] [ref=e538]:
+                  - link "It shows a connected device as a controller but i do not have a single device connected on my PC" [ref=e539] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/604
+                    - generic [ref=e540]: It shows a connected device as a controller but i do not have a single device connected on my PC
+                - generic [ref=e545]:
+                  - img [ref=e547]
+                  - generic [ref=e550]: "Status: Open."
+                - generic [ref=e554]:
+                  - generic [ref=e555]:
+                    - generic [ref=e556]: "#604"
+                    - generic [ref=e557]: In x360ce/x360ce;
+                  - generic [ref=e558]:
+                    - text: ·
+                    - link "sn255" [ref=e559] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Asn255
+                    - text: opened on May 3, 2017on May 3, 2017
+              - listitem "More information available below." [ref=e563]:
+                - heading "Cannot combine controllers" [level=3] [ref=e565]:
+                  - link "Cannot combine controllers" [ref=e566] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/575
+                    - generic [ref=e567]: Cannot combine controllers
+                - generic [ref=e572]:
+                  - img [ref=e574]
+                  - generic [ref=e577]: "Status: Open."
+                - generic [ref=e581]:
+                  - generic [ref=e582]:
+                    - generic [ref=e583]: "#575"
+                    - generic [ref=e584]: In x360ce/x360ce;
+                  - generic [ref=e585]:
+                    - text: ·
+                    - link "Incineroar" [ref=e586] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3AIncineroar
+                    - text: opened on Mar 8, 2017on Mar 8, 2017
+              - listitem "More information available below." [ref=e590]:
+                - heading "[Enhancement] DS4 Controller Functionality Settings Tab" [level=3] [ref=e592]:
+                  - link "[Enhancement] DS4 Controller Functionality Settings Tab" [ref=e593] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/329
+                    - generic [ref=e594]: "[Enhancement] DS4 Controller Functionality Settings Tab"
+                - generic [ref=e599]:
+                  - img [ref=e601]
+                  - generic [ref=e604]: "Status: Closed (completed)."
+                - generic [ref=e608]:
+                  - generic [ref=e609]:
+                    - generic [ref=e610]: "#329"
+                    - generic [ref=e611]: In x360ce/x360ce;
+                  - generic [ref=e612]:
+                    - text: · by
+                    - link "shinra358" [ref=e613] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3Ashinra358
+                    - text: was closed on Jan 13, 2016on Jan 13, 2016
+              - listitem "More information available below." [ref=e617]:
+                - heading "Computer falls asleep" [level=3] [ref=e619]:
+                  - link "Computer falls asleep" [ref=e620] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/141
+                    - generic [ref=e621]: Computer falls asleep
+                - generic [ref=e626]:
+                  - img [ref=e628]
+                  - generic [ref=e631]: "Status: Closed (completed)."
+                - generic [ref=e635]:
+                  - generic [ref=e636]:
+                    - generic [ref=e637]: "#141"
+                    - generic [ref=e638]: In x360ce/x360ce;
+                  - generic [ref=e639]:
+                    - text: · by
+                    - link "CeruleanSky" [ref=e640] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=switch%20controller%20bluetooth%20author%3ACeruleanSky
+                    - text: was closed on Jun 25, 2015on Jun 25, 2015
+  - contentinfo [ref=e642]:
+    - heading "Footer" [level=2] [ref=e643]
+    - generic [ref=e644]:
+      - generic [ref=e645]:
+        - link "GitHub Homepage" [ref=e646] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e647]
+        - generic [ref=e649]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e650]:
+        - heading "Footer navigation" [level=3] [ref=e651]
+        - list "Footer navigation" [ref=e652]:
+          - listitem [ref=e653]:
+            - link "Terms" [ref=e654] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e655]:
+            - link "Privacy" [ref=e656] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e657]:
+            - link "Security" [ref=e658] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e659]:
+            - link "Status" [ref=e660] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e661]:
+            - link "Community" [ref=e662] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e663]:
+            - link "Docs" [ref=e664] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e665]:
+            - link "Contact" [ref=e666] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e667]:
+            - button "Manage cookies" [ref=e669] [cursor=pointer]
+          - listitem [ref=e670]:
+            - button "Do not share my personal information" [ref=e672] [cursor=pointer]

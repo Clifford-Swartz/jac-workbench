@@ -1,0 +1,348 @@
+- generic [active] [ref=f7e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f7e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f7e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f7e8]:
+    - search [ref=f7e9]:
+      - generic [ref=f7e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f7e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f7e14]'
+        - generic [ref=f7e15]:
+          - generic [ref=f7e16]:
+            - combobox "Search" [ref=f7e19]: switch joycon bluetooth reverse engineer HCI mode_change sniff active disconnect github switch joycon bluetooth reverse engineer HCI mode_change sniff active disconnect github
+            - generic [ref=f7e20]:
+              - button "Clear" [ref=f7e22] [cursor=pointer]:
+                - img [ref=f7e24]
+              - generic [ref=f7e27]:
+                - button "Search by voice" [ref=f7e28] [cursor=pointer]:
+                  - img [ref=f7e29]
+                - button "Search by image" [ref=f7e31] [cursor=pointer]:
+                  - img [ref=f7e32]
+          - button "Search" [ref=f7e34] [cursor=pointer]:
+            - img [ref=f7e37]
+    - generic [ref=f7e39]:
+      - button "Settings" [ref=f7e41] [cursor=pointer]:
+        - img [ref=f7e44]
+      - button "Share" [ref=f7e47] [cursor=pointer]:
+        - img [ref=f7e51]
+      - generic [ref=f7e53]:
+        - button "Google apps" [ref=f7e55] [cursor=pointer]:
+          - img [ref=f7e56]
+        - link "Sign in" [ref=f7e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dswitch%2Bjoycon%2Bbluetooth%2Breverse%2Bengineer%2BHCI%2Bmode_change%2Bsniff%2Bactive%2Bdisconnect%2Bgithub&ec=futura_srp_og_si_72236_p
+  - generic [ref=f7e62]:
+    - navigation [ref=f7e68]:
+      - generic [ref=f7e74]:
+        - list [ref=f7e75]:
+          - listitem [ref=f7e76]:
+            - link "AI Mode" [ref=f7e79] [cursor=pointer]:
+              - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&aep=1&ntc=1&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ2J8OegQIDRAD
+              - generic [ref=f7e82]: AI Mode
+          - listitem [ref=f7e83]:
+            - link "All" [disabled] [ref=f7e84]:
+              - generic [ref=f7e86]: All
+          - listitem [ref=f7e87]:
+            - link "Videos" [ref=f7e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQtKgLegQIEBAB
+              - generic [ref=f7e90]: Videos
+          - listitem [ref=f7e91]:
+            - link "Forums" [ref=f7e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQs6gLegQIERAB
+              - generic [ref=f7e94]: Forums
+          - listitem [ref=f7e95]:
+            - link "Shopping" [ref=f7e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&ved=1t:220175&ictx=111
+              - generic [ref=f7e98]: Shopping
+          - listitem [ref=f7e99]:
+            - link "Short videos" [ref=f7e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQs6gLegQIFRAB
+              - generic [ref=f7e102]: Short videos
+          - listitem [ref=f7e103]:
+            - link "Images" [ref=f7e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cxpBkeIeqYwoCbfNVc4vKE4f6ZJqUzPbNrAmWktdS6nEmzE_HP_vT3y_fecA6LnXE-rzpR3Awl0CpGDANRzryy_mXrjnQfguWUhYqDoVFguLRLiIkNnWkIM8KFuEGviM_pCzUeHBpZQiHj6Jnm5nsd5zroDfqYPliI15g_-ntTOxCw4OQ0TXoOYXIn15dnGIaeeHGHg&q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQtKgLegQIFhAB
+              - generic [ref=f7e106]: Images
+          - listitem [ref=f7e107]:
+            - button "More filters" [ref=f7e108] [cursor=pointer]:
+              - generic "More filters" [ref=f7e109]:
+                - generic [ref=f7e110]:
+                  - generic [ref=f7e111]: More
+                  - img [ref=f7e113]
+        - button "Tools" [ref=f7e116] [cursor=pointer]:
+          - generic [ref=f7e118]:
+            - generic [ref=f7e119]: Tools
+            - img [ref=f7e121]
+    - heading "Search Results" [level=1] [ref=f7e123]
+    - main [ref=f7e146]:
+      - generic [ref=f7e150]:
+        - generic [ref=f7e153]:
+          - heading "Web results" [level=2] [ref=f7e154]
+          - generic [ref=f7e155]:
+            - generic [ref=f7e158]:
+              - 'link "HID Protocol for Bluetooth / USB · Issue #7 GitHub https://github.com › dekuNukem › issues" [ref=f7e160] [cursor=pointer]':
+                - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1
+                - 'heading "HID Protocol for Bluetooth / USB · Issue #7" [level=3] [ref=f7e161]'
+                - generic [ref=f7e167]:
+                  - generic [ref=f7e169]: GitHub
+                  - generic [ref=f7e171]: https://github.com › dekuNukem › issues
+              - button "About this result" [ref=f7e174] [cursor=pointer]:
+                - img [ref=f7e177]
+            - generic [ref=f7e180]:
+              - generic [ref=f7e181]:
+                - text: It's a lot of work but before the
+                - emphasis [ref=f7e182]: joycon
+                - text: is completely
+                - emphasis [ref=f7e183]: reverse engineered
+                - text: "this is probably the only way. Here s a video: https://www.youtube.com/watch?v ..."
+              - link "Read more" [ref=f7e184] [cursor=pointer]:
+                - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=1#:~:text=It's%20a%20lot%20of%20work,way.%20Here%20s%20a%20video%3A%20https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Daj1JLARaZQg
+            - generic [ref=f7e186]: "Missing: mode_change ‎active"
+        - generic [ref=f7e190]:
+          - generic [ref=f7e193]:
+            - 'link "HID Protocol for Bluetooth / USB · Issue #7 GitHub https://github.com › dekuNukem › issues" [ref=f7e195] [cursor=pointer]':
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7
+              - 'heading "HID Protocol for Bluetooth / USB · Issue #7" [level=3] [ref=f7e196]'
+              - generic [ref=f7e202]:
+                - generic [ref=f7e204]: GitHub
+                - generic [ref=f7e206]: https://github.com › dekuNukem › issues
+            - button "About this result" [ref=f7e209] [cursor=pointer]:
+              - img [ref=f7e212]
+          - generic [ref=f7e215]:
+            - generic [ref=f7e216]:
+              - text: Hello,. I'm trying to work on a project that involves
+              - emphasis [ref=f7e217]: sniffing Bluetooth
+              - text: packets sent between the
+              - emphasis [ref=f7e218]: Joycon
+              - text: and the
+              - emphasis [ref=f7e219]: Switch
+              - text: Console using an FPGA. The
+              - emphasis [ref=f7e220]: Joycon
+              - text: ...
+            - link "Read more" [ref=f7e221] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7#:~:text=Hello%2C,using%20an%20FPGA.%20The%20Joycon
+          - generic [ref=f7e223]: "Missing: HCI ‎mode_change ‎active"
+        - generic [ref=f7e227]:
+          - generic [ref=f7e230]:
+            - link "My Nintendo Switch reverse engineering attempts GitHub https://github.com › dekuNukem › Nintendo_Switch_R..." [ref=f7e232] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering
+              - heading "My Nintendo Switch reverse engineering attempts" [level=3] [ref=f7e233]
+              - generic [ref=f7e239]:
+                - generic [ref=f7e241]: GitHub
+                - generic [ref=f7e243]: https://github.com › dekuNukem › Nintendo_Switch_R...
+            - button "About this result" [ref=f7e246] [cursor=pointer]:
+              - img [ref=f7e249]
+          - generic [ref=f7e252]:
+            - generic [ref=f7e253]:
+              - emphasis [ref=f7e254]: My Nintendo Switch reverse engineering attempts
+              - text: . I'm just going to dump all my discoveries here, and hopefully they would be useful to the Nintendo Switch ...
+            - link "Read more" [ref=f7e255] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering#:~:text=My%20Nintendo%20Switch%20reverse%20engineering,attempts&text=I'm%20just%20going%20to%20dump,to%20the%20Nintendo%20Switch%20community.
+          - generic [ref=f7e257]: "Missing: HCI ‎mode_change ‎sniff ‎active ‎disconnect"
+        - generic [ref=f7e261]:
+          - generic [ref=f7e264]:
+            - link "Nintendo_Switch_Reverse_Engi... GitHub https://github.com › blob › master › bluetooth_hid_notes" [ref=f7e266] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+              - heading "Nintendo_Switch_Reverse_Engi..." [level=3] [ref=f7e267]
+              - generic [ref=f7e273]:
+                - generic [ref=f7e275]: GitHub
+                - generic [ref=f7e277]: https://github.com › blob › master › bluetooth_hid_notes
+            - button "About this result" [ref=f7e280] [cursor=pointer]:
+              - img [ref=f7e283]
+          - generic [ref=f7e286]:
+            - text: This input packet is pushed to the host when a button is pressed or released, and provides the normal controller interface for the OS.
+            - link "Read more" [ref=f7e287] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md#:~:text=This%20input%20packet%20is%20pushed,controller%22%20interface%20for%20the%20OS.
+          - generic [ref=f7e289]: "Missing: HCI ‎mode_change ‎sniff ‎active ‎disconnect"
+        - generic [ref=f7e293]:
+          - generic [ref=f7e296]:
+            - 'link "What happens when joycon reconnects? · Issue #94 GitHub https://github.com › dekuNukem › issues" [ref=f7e298] [cursor=pointer]':
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94
+              - 'heading "What happens when joycon reconnects? · Issue #94" [level=3] [ref=f7e299]'
+              - generic [ref=f7e305]:
+                - generic [ref=f7e307]: GitHub
+                - generic [ref=f7e309]: https://github.com › dekuNukem › issues
+            - button "About this result" [ref=f7e312] [cursor=pointer]:
+              - img [ref=f7e315]
+          - generic [ref=f7e318]:
+            - generic [ref=f7e319]: Apr 2, 2020 —
+            - generic [ref=f7e320]:
+              - text: Does anyone know what happens when a paired controller
+              - emphasis [ref=f7e321]: disconnects
+              - text: with the console, and tries to reconnect again? ...
+              - emphasis [ref=f7e322]: hci
+              - text: "-state- ..."
+            - link "Read more" [ref=f7e323] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/94#:~:text=Does%20anyone%20know%20what%20happens,and%20tries%20to%20reconnect%20again%3F&text=https%3A%2F%2Fgithub.com%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering%2Fblob%2Fmaster%2Fbluetooth_hid_subcommands_notes.md%23subcommand%2D0x06%2Dset%2Dhci%2Dstate%2Ddisconnectpagepairturn%2Doff%20says%20that%20the%20switch
+          - generic [ref=f7e325]: "Missing: bluetooth ‎reverse ‎engineer ‎mode_change ‎sniff ‎active"
+        - generic [ref=f7e329]:
+          - generic [ref=f7e332]:
+            - 'link "Sopsy/joycon-turnoff: A simple program to shut down ... GitHub https://github.com › Sopsy › joycon-turnoff" [ref=f7e334] [cursor=pointer]':
+              - /url: https://github.com/Sopsy/joycon-turnoff
+              - 'heading "Sopsy/joycon-turnoff: A simple program to shut down ..." [level=3] [ref=f7e335]'
+              - generic [ref=f7e341]:
+                - generic [ref=f7e343]: GitHub
+                - generic [ref=f7e345]: https://github.com › Sopsy › joycon-turnoff
+            - button "About this result" [ref=f7e348] [cursor=pointer]:
+              - img [ref=f7e351]
+          - generic [ref=f7e354]:
+            - generic [ref=f7e355]:
+              - text: "This program has just one function: To"
+              - emphasis [ref=f7e356]: turn off
+              - text: Joy-Cons and other official Nintendo
+              - emphasis [ref=f7e357]: Switch
+              - text: controllers.
+            - link "Read more" [ref=f7e358] [cursor=pointer]:
+              - /url: https://github.com/Sopsy/joycon-turnoff#:~:text=This%20program%20has%20just%20one,other%20official%20Nintendo%20Switch%20controllers.
+          - generic [ref=f7e360]: "Missing: HCI ‎mode_change ‎sniff ‎active"
+        - generic [ref=f7e364]:
+          - generic [ref=f7e367]:
+            - link "Joy-Con HID Reverse Engineering GBAtemp.net https://gbatemp.net › ... › Nintendo Switch" [ref=f7e369] [cursor=pointer]:
+              - /url: https://gbatemp.net/threads/joy-con-hid-reverse-engineering.467290/
+              - heading "Joy-Con HID Reverse Engineering" [level=3] [ref=f7e370]
+              - generic [ref=f7e376]:
+                - generic [ref=f7e378]: GBAtemp.net
+                - generic [ref=f7e380]: https://gbatemp.net › ... › Nintendo Switch
+            - button "About this result" [ref=f7e383] [cursor=pointer]:
+              - img [ref=f7e386]
+          - generic [ref=f7e389]:
+            - generic [ref=f7e390]: Apr 11, 2017 —
+            - generic [ref=f7e391]:
+              - text: I've been working on
+              - emphasis [ref=f7e392]: reverse engineering
+              - text: parts of the
+              - emphasis [ref=f7e393]: Joy-Con
+              - text: communication methods, and so far I've had success talking straight with the rails using UART and ...
+            - link "Read more" [ref=f7e394] [cursor=pointer]:
+              - /url: https://gbatemp.net/threads/joy-con-hid-reverse-engineering.467290/#:~:text=Making%20a%20thread%20to%20get,HID%20via%20Joy%2DCon%20Charging%20Grip.
+          - generic [ref=f7e396]: "Missing: HCI ‎mode_change ‎sniff"
+        - generic [ref=f7e400]:
+          - generic [ref=f7e403]:
+            - 'link "HID Protocol for Bluetooth / USB · Issue #7 GitHub https://github.com › dekuNukem › issues" [ref=f7e405] [cursor=pointer]':
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=2
+              - 'heading "HID Protocol for Bluetooth / USB · Issue #7" [level=3] [ref=f7e406]'
+              - generic [ref=f7e412]:
+                - generic [ref=f7e414]: GitHub
+                - generic [ref=f7e416]: https://github.com › dekuNukem › issues
+            - button "About this result" [ref=f7e419] [cursor=pointer]:
+              - img [ref=f7e422]
+          - generic [ref=f7e425]:
+            - generic [ref=f7e426]:
+              - text: I've been trying to get the Nintendo
+              - emphasis [ref=f7e427]: switch
+              - text: to initiate a connection to my
+              - emphasis [ref=f7e428]: bluetooth
+              - text: dongle, but its seeming to be fairly stubborn (I advertise and have the ...
+            - link "Read more" [ref=f7e429] [cursor=pointer]:
+              - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/issues/7?timeline_page=2#:~:text=I've%20been%20trying%20to%20get,wireshark%20for%20the%20BT%20adapter).
+          - generic [ref=f7e431]: "Missing: reverse ‎engineer ‎mode_change ‎active"
+        - generic [ref=f7e435]:
+          - generic [ref=f7e438]:
+            - 'link "Picking apart the Joy-Con: Heap Leaks, Bluetooth... douevenknow.us https://douevenknow.us › post › picking-apart-the-joy-c..." [ref=f7e440] [cursor=pointer]':
+              - /url: https://douevenknow.us/post/161336882083/picking-apart-the-joy-con-heap-leaks-bluetooth
+              - 'heading "Picking apart the Joy-Con: Heap Leaks, Bluetooth..." [level=3] [ref=f7e441]'
+              - generic [ref=f7e447]:
+                - generic [ref=f7e449]: douevenknow.us
+                - generic [ref=f7e451]: https://douevenknow.us › post › picking-apart-the-joy-c...
+            - button "About this result" [ref=f7e454] [cursor=pointer]:
+              - img [ref=f7e457]
+          - generic [ref=f7e460]:
+            - generic [ref=f7e461]: Jun 1, 2017 —
+            - generic [ref=f7e462]:
+              - text: The only real way to figure out
+              - emphasis [ref=f7e463]: Bluetooth
+              - text: would probably be to leak the at-runtime firmware being executed.
+            - link "Read more" [ref=f7e464] [cursor=pointer]:
+              - /url: https://douevenknow.us/post/161336882083/picking-apart-the-joy-con-heap-leaks-bluetooth#:~:text=Coming%20from%20our%20last%20post%2C,the%20at%2Druntime%20firmware%20being%20executed.
+          - generic [ref=f7e466]: "Missing: HCI ‎mode_change ‎sniff"
+      - generic [ref=f7e468]:
+        - generic [ref=f7e473]:
+          - heading "People also search for" [level=2] [ref=f7e475]
+          - generic [ref=f7e477]:
+            - generic [ref=f7e478]:
+              - link "Switch joycon pinout" [ref=f7e482] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+joycon+pinout&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAg_EAE
+                - generic [ref=f7e483]:
+                  - generic [ref=f7e488]: Switch joycon pinout
+                  - img [ref=f7e492]
+              - link "Switch joycon reverse engineering" [ref=f7e497] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+joycon+reverse+engineering&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhGEAE
+                - generic [ref=f7e498]:
+                  - generic [ref=f7e503]: Switch joycon reverse engineering
+                  - img [ref=f7e507]
+              - link "Joycon 2 pinout" [ref=f7e512] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joycon+2+pinout&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhCEAE
+                - generic [ref=f7e513]:
+                  - generic [ref=f7e518]: Joycon 2 pinout
+                  - img [ref=f7e522]
+              - link "Joycon github" [ref=f7e527] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joycon+github&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhBEAE
+                - generic [ref=f7e528]:
+                  - generic [ref=f7e533]: Joycon github
+                  - img [ref=f7e537]
+            - generic [ref=f7e539]:
+              - link "Joycon breakout board" [ref=f7e543] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joycon+breakout+board&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhDEAE
+                - generic [ref=f7e544]:
+                  - generic [ref=f7e549]: Joycon breakout board
+                  - img [ref=f7e553]
+              - link "Switch joycon internals" [ref=f7e558] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+joycon+internals&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhEEAE
+                - generic [ref=f7e559]:
+                  - generic [ref=f7e564]: Switch joycon internals
+                  - img [ref=f7e568]
+              - link "Nintendo Switch Joy Con schematic" [ref=f7e573] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Nintendo+Switch+Joy+Con+schematic&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhFEAE
+                - generic [ref=f7e574]:
+                  - generic [ref=f7e579]: Nintendo Switch Joy Con schematic
+                  - img [ref=f7e583]
+              - link "Joy-Con Toolkit Switch 2" [ref=f7e588] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joy-Con+Toolkit+Switch+2&sa=X&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ1QJ6BAhAEAE
+                - generic [ref=f7e589]:
+                  - generic [ref=f7e594]: Joy-Con Toolkit Switch 2
+                  - img [ref=f7e598]
+        - navigation [ref=f7e600]:
+          - heading "Page Navigation" [level=1] [ref=f7e601]
+          - text: "1"
+          - link "Page 2" [ref=f7e604] [cursor=pointer]:
+            - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&ei=fN9KasXPLYDLkPIPqrKAiQg&start=10&sa=N&sstk=AU9db-AbsG_ULImD-Z302CBZ8bBuGSLH0abxBMpiUlsf7i_lJPTW2w7q9OK3WCJSmC6YcmQnpDuz8nvnGLUbaRaW82eBedfsFO9j5w&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ8tMDegQIOhAE
+            - text: "2"
+          - link "Page 3" [ref=f7e606] [cursor=pointer]:
+            - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&ei=fN9KasXPLYDLkPIPqrKAiQg&start=20&sa=N&sstk=AU9db-AbsG_ULImD-Z302CBZ8bBuGSLH0abxBMpiUlsf7i_lJPTW2w7q9OK3WCJSmC6YcmQnpDuz8nvnGLUbaRaW82eBedfsFO9j5w&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ8tMDegQIOhAG
+            - text: "3"
+          - link "Page 4" [ref=f7e608] [cursor=pointer]:
+            - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&ei=fN9KasXPLYDLkPIPqrKAiQg&start=30&sa=N&sstk=AU9db-AbsG_ULImD-Z302CBZ8bBuGSLH0abxBMpiUlsf7i_lJPTW2w7q9OK3WCJSmC6YcmQnpDuz8nvnGLUbaRaW82eBedfsFO9j5w&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ8tMDegQIOhAI
+            - text: "4"
+          - link "Page 5" [ref=f7e610] [cursor=pointer]:
+            - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&ei=fN9KasXPLYDLkPIPqrKAiQg&start=40&sa=N&sstk=AU9db-AbsG_ULImD-Z302CBZ8bBuGSLH0abxBMpiUlsf7i_lJPTW2w7q9OK3WCJSmC6YcmQnpDuz8nvnGLUbaRaW82eBedfsFO9j5w&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ8tMDegQIOhAK
+            - text: "5"
+          - heading "Next" [level=2] [ref=f7e612]:
+            - link "Next" [ref=f7e613] [cursor=pointer]:
+              - /url: /search?q=switch+joycon+bluetooth+reverse+engineer+HCI+mode_change+sniff+active+disconnect+github&sca_esv=ddfd6cfe34cb7336&ei=fN9KasXPLYDLkPIPqrKAiQg&start=10&sa=N&sstk=AU9db-AbsG_ULImD-Z302CBZ8bBuGSLH0abxBMpiUlsf7i_lJPTW2w7q9OK3WCJSmC6YcmQnpDuz8nvnGLUbaRaW82eBedfsFO9j5w&ved=2ahUKEwjF_ZTFz7yVAxWAJUQIHSoZIIEQ8NMDegQIOhAM
+              - generic [ref=f7e615]: Next
+      - navigation
+    - contentinfo [ref=f7e616]:
+      - heading "Footer Links" [level=1] [ref=f7e617]
+      - generic [ref=f7e621]:
+        - generic [ref=f7e625]:
+          - button "90062, Los Angeles, CA - From your IP address" [ref=f7e627] [cursor=pointer]:
+            - generic [ref=f7e628]: 90062, Los Angeles, CA
+            - generic [ref=f7e630]:
+              - text: "-"
+              - generic [ref=f7e631]: From your IP address
+          - text: "-"
+          - button "Update location" [ref=f7e633] [cursor=pointer]: Update location
+        - generic [ref=f7e636]:
+          - link "Help" [ref=f7e637] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f7e638] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f7e639] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f7e640] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

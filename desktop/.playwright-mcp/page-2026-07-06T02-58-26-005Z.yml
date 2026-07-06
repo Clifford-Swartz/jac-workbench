@@ -1,0 +1,2547 @@
+- generic [active] [ref=f39e1]:
+  - generic [ref=f39e2]:
+    - generic [ref=f39e3]:
+      - link "Skip to content" [ref=f39e4] [cursor=pointer]:
+        - /url: "#start-of-content"
+      - banner [ref=f39e6]:
+        - heading "Navigation Menu" [level=2] [ref=f39e7]
+        - generic [ref=f39e8]:
+          - link "Homepage" [ref=f39e10] [cursor=pointer]:
+            - /url: /
+            - img [ref=f39e11]
+          - generic [ref=f39e13]:
+            - navigation "Global" [ref=f39e16]:
+              - list [ref=f39e17]:
+                - listitem [ref=f39e18]:
+                  - button "Platform" [ref=f39e20] [cursor=pointer]:
+                    - text: Platform
+                    - img [ref=f39e21]
+                - listitem [ref=f39e23]:
+                  - button "Solutions" [ref=f39e25] [cursor=pointer]:
+                    - text: Solutions
+                    - img [ref=f39e26]
+                - listitem [ref=f39e28]:
+                  - button "Resources" [ref=f39e30] [cursor=pointer]:
+                    - text: Resources
+                    - img [ref=f39e31]
+                - listitem [ref=f39e33]:
+                  - button "Open Source" [ref=f39e35] [cursor=pointer]:
+                    - text: Open Source
+                    - img [ref=f39e36]
+                - listitem [ref=f39e38]:
+                  - button "Enterprise" [ref=f39e40] [cursor=pointer]:
+                    - text: Enterprise
+                    - img [ref=f39e41]
+                - listitem [ref=f39e43]:
+                  - link "Pricing" [ref=f39e44] [cursor=pointer]:
+                    - /url: https://github.com/pricing
+                    - generic [ref=f39e45]: Pricing
+            - generic [ref=f39e46]:
+              - button "Search or jump to…" [ref=f39e49] [cursor=pointer]:
+                - img [ref=f39e51]
+                - generic [ref=f39e53]: Search or jump to...
+                - img [ref=f39e55]
+              - link "Sign in" [ref=f39e59] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Fblob%2Fmaster%2Fx360ce.RemoteController%2FMainWindow.xaml.cs
+              - link "Sign up" [ref=f39e60] [cursor=pointer]:
+                - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fblob%2Fshow&source=header-repo&source_repo=x360ce%2Fx360ce
+              - button "Appearance settings" [ref=f39e63] [cursor=pointer]:
+                - img
+    - main [ref=f39e67]:
+      - generic [ref=f39e68]:
+        - generic [ref=f39e69]:
+          - generic [ref=f39e71]:
+            - img [ref=f39e72]
+            - link "x360ce" [ref=f39e75] [cursor=pointer]:
+              - /url: /x360ce
+            - generic [ref=f39e76]: /
+            - strong [ref=f39e77]:
+              - link "x360ce" [ref=f39e78] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+            - generic [ref=f39e79]: Public
+          - generic [ref=f39e80]:
+            - list:
+              - listitem [ref=f39e81]:
+                - link "You must be signed in to change notification settings" [ref=f39e82] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f39e83]
+                  - text: Notifications
+              - listitem [ref=f39e85]:
+                - link "Fork 504" [ref=f39e86] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f39e87]
+                  - text: Fork
+                  - generic "504" [ref=f39e89]
+              - listitem [ref=f39e90]:
+                - link "You must be signed in to star a repository" [ref=f39e92] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f39e93]
+                  - text: Star
+                  - generic "2866 users starred this repository" [ref=f39e95]: 2.9k
+        - navigation "Repository" [ref=f39e96]:
+          - list [ref=f39e97]:
+            - listitem [ref=f39e98]:
+              - link "Code" [ref=f39e99] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+                - img [ref=f39e100]
+                - generic [ref=f39e102]: Code
+            - listitem [ref=f39e103]:
+              - link "Issues 837" [ref=f39e104] [cursor=pointer]:
+                - /url: /x360ce/x360ce/issues
+                - img [ref=f39e105]
+                - generic [ref=f39e108]: Issues
+                - generic "837" [ref=f39e109]
+            - listitem [ref=f39e110]:
+              - link "Pull requests 7" [ref=f39e111] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulls
+                - img [ref=f39e112]
+                - generic [ref=f39e114]: Pull requests
+                - generic "7" [ref=f39e115]
+            - listitem [ref=f39e116]:
+              - link "Discussions" [ref=f39e117] [cursor=pointer]:
+                - /url: /x360ce/x360ce/discussions
+                - img [ref=f39e118]
+                - generic [ref=f39e120]: Discussions
+            - listitem [ref=f39e121]:
+              - link "Actions" [ref=f39e122] [cursor=pointer]:
+                - /url: /x360ce/x360ce/actions
+                - img [ref=f39e123]
+                - generic [ref=f39e125]: Actions
+            - listitem [ref=f39e126]:
+              - link "Projects" [ref=f39e127] [cursor=pointer]:
+                - /url: /x360ce/x360ce/projects
+                - img [ref=f39e128]
+                - generic [ref=f39e130]: Projects
+            - listitem [ref=f39e131]:
+              - link "Wiki" [ref=f39e132] [cursor=pointer]:
+                - /url: /x360ce/x360ce/wiki
+                - img [ref=f39e133]
+                - generic [ref=f39e135]: Wiki
+            - listitem [ref=f39e136]:
+              - link "Security and quality" [ref=f39e137] [cursor=pointer]:
+                - /url: /x360ce/x360ce/security
+                - img [ref=f39e138]
+                - generic [ref=f39e140]: Security and quality
+            - listitem [ref=f39e141]:
+              - link "Insights" [ref=f39e142] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulse
+                - img [ref=f39e143]
+                - generic [ref=f39e145]: Insights
+      - generic [ref=f39e153]:
+        - generic [ref=f39e155]:
+          - generic [ref=f39e158]:
+            - generic [ref=f39e159]:
+              - generic [ref=f39e160]:
+                - heading "Collapse file tree" [level=2] [ref=f39e161]:
+                  - button "Collapse file tree" [expanded] [ref=f39e162] [cursor=pointer]:
+                    - img [ref=f39e163]
+                - heading "Files" [level=2] [ref=f39e166]
+              - generic [ref=f39e167]:
+                - button "master branch" [ref=f39e169] [cursor=pointer]:
+                  - generic [ref=f39e170]:
+                    - generic [ref=f39e172]:
+                      - img [ref=f39e174]
+                      - generic [ref=f39e177]: master
+                    - generic:
+                      - img
+                - button "Search this repository (forward slash)" [ref=f39e179] [cursor=pointer]:
+                  - img [ref=f39e180]
+            - generic [ref=f39e183]:
+              - img [ref=f39e185]
+              - combobox "Go to file" [ref=f39e187]
+            - navigation "File Tree Navigation" [ref=f39e193]:
+              - tree "Files" [ref=f39e195]:
+                - treeitem "MinHook" [level=1] [ref=f39e196]:
+                  - generic [ref=f39e198] [cursor=pointer]:
+                    - img [ref=f39e201]
+                    - generic [ref=f39e203]: MinHook
+                - treeitem "Mobile" [level=1] [ref=f39e204]:
+                  - generic [ref=f39e205] [cursor=pointer]:
+                    - img [ref=f39e207]
+                    - generic [ref=f39e209]:
+                      - img [ref=f39e213]
+                      - generic [ref=f39e215]: Mobile
+                - treeitem "x360ce.App.Beta" [level=1] [ref=f39e216]:
+                  - generic [ref=f39e217] [cursor=pointer]:
+                    - img [ref=f39e219]
+                    - generic [ref=f39e221]:
+                      - img [ref=f39e225]
+                      - generic [ref=f39e227]: x360ce.App.Beta
+                - treeitem "x360ce.App.WPF" [level=1] [ref=f39e228]:
+                  - generic [ref=f39e229] [cursor=pointer]:
+                    - img [ref=f39e231]
+                    - generic [ref=f39e233]:
+                      - img [ref=f39e237]
+                      - generic [ref=f39e239]: x360ce.App.WPF
+                - treeitem "x360ce.App" [level=1] [ref=f39e240]:
+                  - generic [ref=f39e241] [cursor=pointer]:
+                    - img [ref=f39e243]
+                    - generic [ref=f39e245]:
+                      - img [ref=f39e249]
+                      - generic [ref=f39e251]: x360ce.App
+                - treeitem "x360ce.Data" [level=1] [ref=f39e252]:
+                  - generic [ref=f39e253] [cursor=pointer]:
+                    - img [ref=f39e255]
+                    - generic [ref=f39e257]:
+                      - img [ref=f39e261]
+                      - generic [ref=f39e263]: x360ce.Data
+                - treeitem "x360ce.Engine" [level=1] [ref=f39e264]:
+                  - generic [ref=f39e265] [cursor=pointer]:
+                    - img [ref=f39e267]
+                    - generic [ref=f39e269]:
+                      - img [ref=f39e273]
+                      - generic [ref=f39e275]: x360ce.Engine
+                - treeitem "x360ce.Net48Test" [level=1] [ref=f39e276]:
+                  - generic [ref=f39e277] [cursor=pointer]:
+                    - img [ref=f39e279]
+                    - generic [ref=f39e281]:
+                      - img [ref=f39e285]
+                      - generic [ref=f39e287]: x360ce.Net48Test
+                - treeitem "x360ce.Net60Test" [level=1] [ref=f39e288]:
+                  - generic [ref=f39e289] [cursor=pointer]:
+                    - img [ref=f39e291]
+                    - generic [ref=f39e293]:
+                      - img [ref=f39e297]
+                      - generic [ref=f39e299]: x360ce.Net60Test
+                - treeitem "x360ce.RemoteController" [expanded] [level=1] [ref=f39e300]:
+                  - generic [ref=f39e301] [cursor=pointer]:
+                    - img [ref=f39e303]
+                    - generic [ref=f39e305]:
+                      - img [ref=f39e309]
+                      - generic [ref=f39e311]: x360ce.RemoteController
+                  - group "x360ce.RemoteController" [ref=f39e312]:
+                    - treeitem "Properties" [level=2] [ref=f39e313]:
+                      - generic [ref=f39e314] [cursor=pointer]:
+                        - img [ref=f39e319]
+                        - generic [ref=f39e321]:
+                          - img [ref=f39e325]
+                          - generic [ref=f39e327]: Properties
+                    - treeitem "Themes" [level=2] [ref=f39e328]:
+                      - generic [ref=f39e329] [cursor=pointer]:
+                        - img [ref=f39e334]
+                        - generic [ref=f39e336]:
+                          - img [ref=f39e340]
+                          - generic [ref=f39e342]: Themes
+                    - treeitem "App.config" [level=2] [ref=f39e343]:
+                      - generic [ref=f39e348] [cursor=pointer]:
+                        - img [ref=f39e351]
+                        - generic [ref=f39e353]: App.config
+                    - treeitem "App.ico" [level=2] [ref=f39e354]:
+                      - generic [ref=f39e359] [cursor=pointer]:
+                        - img [ref=f39e362]
+                        - generic [ref=f39e364]: App.ico
+                    - treeitem "App.xaml" [level=2] [ref=f39e365]:
+                      - generic [ref=f39e370] [cursor=pointer]:
+                        - img [ref=f39e373]
+                        - generic [ref=f39e375]: App.xaml
+                    - treeitem "App.xaml.cs" [level=2] [ref=f39e376]:
+                      - generic [ref=f39e381] [cursor=pointer]:
+                        - img [ref=f39e384]
+                        - generic [ref=f39e386]: App.xaml.cs
+                    - treeitem "MainWindow.xaml" [level=2] [ref=f39e387]:
+                      - generic [ref=f39e392] [cursor=pointer]:
+                        - img [ref=f39e395]
+                        - generic [ref=f39e397]: MainWindow.xaml
+                    - treeitem "MainWindow.xaml.cs" [level=2] [ref=f39e398]:
+                      - generic [ref=f39e403] [cursor=pointer]:
+                        - img [ref=f39e406]
+                        - generic [ref=f39e408]: MainWindow.xaml.cs
+                    - treeitem "OptionsWindow.xaml" [level=2] [ref=f39e409]:
+                      - generic [ref=f39e414] [cursor=pointer]:
+                        - img [ref=f39e417]
+                        - generic [ref=f39e419]: OptionsWindow.xaml
+                    - treeitem "OptionsWindow.xaml.cs" [level=2] [ref=f39e420]:
+                      - generic [ref=f39e425] [cursor=pointer]:
+                        - img [ref=f39e428]
+                        - generic [ref=f39e430]: OptionsWindow.xaml.cs
+                    - treeitem "x360ce.RemoteController.GeneratedMSBuildEditorConfig.editorconfig" [level=2] [ref=f39e431]:
+                      - generic [ref=f39e436] [cursor=pointer]:
+                        - img [ref=f39e439]
+                        - generic [ref=f39e441]: x360ce.RemoteController.GeneratedMSBuildEditorConfig.editorconfig
+                    - treeitem "x360ce.RemoteController.csproj" [level=2] [ref=f39e442]:
+                      - generic [ref=f39e447] [cursor=pointer]:
+                        - img [ref=f39e450]
+                        - generic [ref=f39e452]: x360ce.RemoteController.csproj
+                - treeitem "x360ce.Web" [level=1] [ref=f39e453]:
+                  - generic [ref=f39e454] [cursor=pointer]:
+                    - img [ref=f39e456]
+                    - generic [ref=f39e458]:
+                      - img [ref=f39e462]
+                      - generic [ref=f39e464]: x360ce.Web
+                - treeitem "x360ce" [level=1] [ref=f39e465]:
+                  - generic [ref=f39e466] [cursor=pointer]:
+                    - img [ref=f39e468]
+                    - generic [ref=f39e470]:
+                      - img [ref=f39e474]
+                      - generic [ref=f39e476]: x360ce
+                - treeitem ".editorconfig" [level=1] [ref=f39e477]:
+                  - generic [ref=f39e479] [cursor=pointer]:
+                    - img [ref=f39e482]
+                    - generic [ref=f39e484]: .editorconfig
+                - treeitem ".gitattributes" [level=1] [ref=f39e485]:
+                  - generic [ref=f39e487] [cursor=pointer]:
+                    - img [ref=f39e490]
+                    - generic [ref=f39e492]: .gitattributes
+                - treeitem ".gitignore" [level=1] [ref=f39e493]:
+                  - generic [ref=f39e495] [cursor=pointer]:
+                    - img [ref=f39e498]
+                    - generic [ref=f39e500]: .gitignore
+                - treeitem ".gitmodules" [level=1] [ref=f39e501]:
+                  - generic [ref=f39e503] [cursor=pointer]:
+                    - img [ref=f39e506]
+                    - generic [ref=f39e508]: .gitmodules
+                - treeitem ".runsettings" [level=1] [ref=f39e509]:
+                  - generic [ref=f39e511] [cursor=pointer]:
+                    - img [ref=f39e514]
+                    - generic [ref=f39e516]: .runsettings
+                - treeitem "Cleanup_Solution.ps1" [level=1] [ref=f39e517]:
+                  - generic [ref=f39e519] [cursor=pointer]:
+                    - img [ref=f39e522]
+                    - generic [ref=f39e524]: Cleanup_Solution.ps1
+                - treeitem "MinHook_clone_as_SVN.bat" [level=1] [ref=f39e525]:
+                  - generic [ref=f39e527] [cursor=pointer]:
+                    - img [ref=f39e530]
+                    - generic [ref=f39e532]: MinHook_clone_as_SVN.bat
+                - treeitem "README.MD" [level=1] [ref=f39e533]:
+                  - generic [ref=f39e535] [cursor=pointer]:
+                    - img [ref=f39e538]
+                    - generic [ref=f39e540]: README.MD
+                - treeitem "SECURITY.md" [level=1] [ref=f39e541]:
+                  - generic [ref=f39e543] [cursor=pointer]:
+                    - img [ref=f39e546]
+                    - generic [ref=f39e548]: SECURITY.md
+                - treeitem "TODO.md" [level=1] [ref=f39e549]:
+                  - generic [ref=f39e551] [cursor=pointer]:
+                    - img [ref=f39e554]
+                    - generic [ref=f39e556]: TODO.md
+                - treeitem "x360ce.sln" [level=1] [ref=f39e557]:
+                  - generic [ref=f39e559] [cursor=pointer]:
+                    - img [ref=f39e562]
+                    - generic [ref=f39e564]: x360ce.sln
+                - treeitem "x360ce.sln.vsspell" [level=1] [ref=f39e565]:
+                  - generic [ref=f39e567] [cursor=pointer]:
+                    - img [ref=f39e570]
+                    - generic [ref=f39e572]: x360ce.sln.vsspell
+                - treeitem "x360ce_3x.sln" [level=1] [ref=f39e573]:
+                  - generic [ref=f39e575] [cursor=pointer]:
+                    - img [ref=f39e578]
+                    - generic [ref=f39e580]: x360ce_3x.sln
+                - treeitem "x360ce_dll.sln" [level=1] [ref=f39e581]:
+                  - generic [ref=f39e583] [cursor=pointer]:
+                    - img [ref=f39e586]
+                    - generic [ref=f39e588]: x360ce_dll.sln
+          - slider "Draggable pane splitter" [ref=f39e590]
+        - generic [ref=f39e593]:
+          - generic [ref=f39e597]:
+            - generic [ref=f39e599]:
+              - navigation "Breadcrumbs" [ref=f39e600]:
+                - heading "Breadcrumbs" [level=2] [ref=f39e601]
+                - list [ref=f39e602]:
+                  - listitem [ref=f39e603]:
+                    - link "x360ce" [ref=f39e604] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/tree/master
+                  - listitem [ref=f39e605]:
+                    - text: /
+                    - link "x360ce.RemoteController" [ref=f39e606] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/tree/master/x360ce.RemoteController
+              - generic [ref=f39e607]:
+                - text: /
+                - heading "MainWindow.xaml.cs" [level=1] [ref=f39e608]
+              - button "Copy path" [ref=f39e609] [cursor=pointer]:
+                - img [ref=f39e610]
+            - button "More file actions" [ref=f39e616] [cursor=pointer]:
+              - img [ref=f39e617]
+          - generic [ref=f39e619]:
+            - generic [ref=f39e621]:
+              - heading "Latest commit" [level=2] [ref=f39e622]
+              - generic [ref=f39e623]:
+                - generic [ref=f39e625]:
+                  - link "EJocys" [ref=f39e626] [cursor=pointer]:
+                    - /url: /EJocys
+                    - img "EJocys" [ref=f39e627]
+                  - link "commits by EJocys" [ref=f39e628] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/commits?author=EJocys
+                    - text: EJocys
+                - link "Fix MemoryLeak test with Window. x360ce.Engine pass test now." [ref=f39e632] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/commit/1fbc625810ecfccb6dd71a489508e9f14361519d
+              - generic [ref=f39e633]:
+                - generic [ref=f39e635]:
+                  - link "Commit 1fbc625" [ref=f39e636] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/commit/1fbc625810ecfccb6dd71a489508e9f14361519d
+                    - text: 1fbc625
+                  - text: ·
+                  - generic "Dec 5, 2022, 6:54 AM MST" [ref=f39e637]: Dec 5, 20224 years ago
+                - generic [ref=f39e638]:
+                  - heading "History" [level=2] [ref=f39e639]
+                  - link "History" [ref=f39e640] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/commits/master/x360ce.RemoteController/MainWindow.xaml.cs
+                    - generic [ref=f39e641]:
+                      - generic:
+                        - img
+                      - generic [ref=f39e642]: History
+            - generic [ref=f39e644]:
+              - generic [ref=f39e646]:
+                - heading "File metadata and controls" [level=2] [ref=f39e647]
+                - generic [ref=f39e648]:
+                  - list "File view" [ref=f39e649]:
+                    - listitem [ref=f39e650]:
+                      - button "Code" [ref=f39e651] [cursor=pointer]:
+                        - generic [ref=f39e653]: Code
+                    - listitem [ref=f39e654]:
+                      - button "Blame" [ref=f39e655] [cursor=pointer]:
+                        - generic [ref=f39e657]: Blame
+                  - generic "8.24 KB" [ref=f39e660]: 300 lines (270 loc) · 8.24 KB
+                - generic [ref=f39e661]:
+                  - generic [ref=f39e662]:
+                    - generic [ref=f39e663]:
+                      - link "Raw" [ref=f39e665] [cursor=pointer]:
+                        - /url: https://github.com/x360ce/x360ce/raw/refs/heads/master/x360ce.RemoteController/MainWindow.xaml.cs
+                        - generic [ref=f39e667]: Raw
+                      - button "Copy raw file" [ref=f39e669] [cursor=pointer]:
+                        - img [ref=f39e670]
+                      - button "Download raw file" [ref=f39e674] [cursor=pointer]:
+                        - img [ref=f39e675]
+                    - generic [ref=f39e678]:
+                      - button "You must be signed in to make or propose changes" [disabled] [ref=f39e680]:
+                        - img [ref=f39e681]
+                      - button "More edit options" [ref=f39e684] [cursor=pointer]:
+                        - img [ref=f39e685]
+                  - button "Open symbols panel" [ref=f39e687] [cursor=pointer]:
+                    - img [ref=f39e688]
+              - region "MainWindow.xaml.cs" [ref=f39e691]:
+                - generic [ref=f39e695]:
+                  - textbox "file content" [ref=f39e700]: "using SharpDX.XInput; using System; using System.Collections.Generic; using System.Diagnostics; using System.IO; using System.Linq; using System.Net; using System.Net.Sockets; using System.Windows; using System.Windows.Media; using System.Windows.Shapes; namespace JocysCom.x360ce.RemoteController { /// <summary> /// Interaction logic for MainWindow.xaml /// </summary> /// <remarks>Make sure to set the Owner property to be disposed properly after closing.</remarks> public partial class MainWindow : Window { public MainWindow() { InitializeComponent(); Title = new JocysCom.ClassLibrary.Configuration.AssemblyInfo().GetTitle(); } private void OptionsButton_Click(object sender, RoutedEventArgs e) { var oldPort = Properties.Settings.Default.ComputerPort; var win = new OptionsWindow(); var result = win.ShowDialog(); var newPort = Properties.Settings.Default.ComputerPort; if (result == true) { if (oldPort != newPort) StopServer(); if (Properties.Settings.Default.Connect) StartServer(); } } JocysCom.ClassLibrary.HiResTimer _timer; JocysCom.ClassLibrary.Runtime.TlvSerializer _Serializer; // Control when event can continue. object timerLock = new object(); public bool Suspended; public void Start() { lock (timerLock) { if (_timer != null) return; _timer = new JocysCom.ClassLibrary.HiResTimer(2, \"MainWindowTimer\"); _timer.Elapsed += Timer_Elapsed; _timer.Start(); } } public void Stop() { lock (timerLock) { if (_timer == null) return; _timer.Stop(); _timer.Dispose(); _timer = null; } } public Exception LastException = null; State currentState; State oldState; void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e) { try { // If state changed. if (currentState.Gamepad.Buttons != oldState.Gamepad.Buttons) { Send(currentState); oldState = currentState; } } catch (Exception ex) { LastException = ex; } } Dictionary<Shape, GamepadButtonFlags> list; private void Window_Loaded(object sender, RoutedEventArgs e) { list = new Dictionary<Shape, GamepadButtonFlags>(); list.Add(LeftShoulderRectangle, GamepadButtonFlags.LeftShoulder); list.Add(RightShoulderRectangle, GamepadButtonFlags.RightShoulder); //list.Add(LeftTriggerRectangle, GamepadButtonFlags.); //list.Add(RightTriggerRectangle); list.Add(LeftThumbEllipse, GamepadButtonFlags.LeftThumb); list.Add(RightThumbEllipse, GamepadButtonFlags.RightThumb); list.Add(DPadUpEllipse, GamepadButtonFlags.DPadUp); list.Add(DPadRightEllipse, GamepadButtonFlags.DPadRight); list.Add(DPadDownEllipse, GamepadButtonFlags.DPadDown); list.Add(DPadLeftEllipse, GamepadButtonFlags.DPadLeft); list.Add(ButtonBackEllipse, GamepadButtonFlags.Back); list.Add(ButtonStartEllipse, GamepadButtonFlags.Start); list.Add(ButtonAEllipse, GamepadButtonFlags.A); list.Add(ButtonYEllipse, GamepadButtonFlags.Y); list.Add(ButtonXEllipse, GamepadButtonFlags.X); list.Add(ButtonBEllipse, GamepadButtonFlags.B); foreach (var key in list.Keys) { key.TouchDown += Shape_Down; key.MouseDown += Shape_Down; key.TouchUp += Shape_Up; key.MouseUp += Shape_Up; } var types = new Dictionary<Type, int>(); types.Add(typeof(State), 0); types.Add(typeof(Gamepad), 1); _Serializer = new ClassLibrary.Runtime.TlvSerializer(types); if (Properties.Settings.Default.AutoConnect && Properties.Settings.Default.Connect) StartServer(); } private void Shape_Up(object sender, EventArgs e) { var s = (Shape)sender; s.Fill = (Brush)FindResource(\"TouchUpBrush\"); // Add button. currentState.Gamepad.Buttons |= list[s]; } private void Shape_Down(object sender, EventArgs e) { var s = (Shape)sender; s.Fill = (Brush)FindResource(\"TouchDownBrush\"); // Remove button. currentState.Gamepad.Buttons &= ~list[s]; } #region UDP Server void AddLog(string format, params object[] args) { Trace.Write(string.Format(format, args)); } /// <summary>Recevier</summary> UdpClient udpServer; public bool IsRunning { get; private set; } public void StartServer() { AddLog(\"Starting remote server... \"); if (IsRunning) { AddLog(\" already started.\\r\\n\"); return; } IsRunning = true; Start(); // Set local endpoint (random port). var localPort = FindFreePort(); var localEndpoint = new IPEndPoint(IPAddress.Any, localPort); // Create client. udpServer = new UdpClient(); // Workaround for: UDP SocketException - Only one usage of each socket address is normally permitted. udpServer.DontFragment = true; udpServer.MulticastLoopback = false; udpServer.ExclusiveAddressUse = false; udpServer.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true); udpServer.Client.Bind(localEndpoint); //InitClientServer(); AddLog(\"started.\\r\\n\"); Receive(); } public void StopServer() { AddLog(\"Stopping remote server... \"); if (!IsRunning) { AddLog(\"already stopped.\\r\\n\"); return; } IsRunning = false; Stop(); udpServer.Close(); AddLog(\"stopped.\\r\\n\"); } void Receive() { try { AddLog(\"Receiving on {0}...\\r\\n\", udpServer.Client.LocalEndPoint); udpServer.BeginReceive(new AsyncCallback(ReceiveCallBack), null); } catch (Exception ex) { AddLog(\"Receiving Error {0}.\\r\\n\", ex.Message); IsRunning = false; } } void ReceiveCallBack(IAsyncResult res) { // If disposed then simply return. if (udpServer.Client == null) { IsRunning = false; return; } try { // Allow to receive from any source. var remoteEP = new IPEndPoint(IPAddress.Any, 0); var bytes = udpServer.EndReceive(res, ref remoteEP); var data = string.Join(\"\", bytes.Select(x => x.ToString(\"X2\"))); AddLog(\"Received Data from {0}: {1}\\r\\n\", remoteEP, data); if (!IsRunning) Receive(); } catch (ObjectDisposedException) { // If disposed then simply return. if (!IsRunning) return; throw; } } void Send(State state) { var ms = new MemoryStream(); var status = _Serializer.Serialize(ms, state); var bytes = new byte[0]; if (status == ClassLibrary.Runtime.TlvSerializerError.None) { bytes = ms.ToArray(); IPAddress adddress; IPAddress.TryParse(Properties.Settings.Default.ComputerHost, out adddress); var remoteEndpoint = new IPEndPoint(adddress, Properties.Settings.Default.ComputerPort); udpServer.Send(bytes, bytes.Length, remoteEndpoint); } var data = string.Join(\"\", bytes.Select(x => x.ToString(\"X2\"))); AddLog(\"{0:HH:mm:ss.fff} Send status: {1}\\r\\n\", DateTime.Now, data); } #endregion #region Helper Functions /// <summary> /// Find first free port. IANA Port categories: /// 0 – 1023 – System or Well Known ports. /// 1024 – 49151 – User or Registered ports. /// 49152 - 65535 – Dynamic (Private) or Ephemeral Ports. /// </summary> /// <returns>Free port number if found; otherwise 0.</returns> private ushort FindFreePort(ushort startPort = 49152, ushort endPort = ushort.MaxValue) { var portArray = new List<int>(); var properties = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties(); // Get TCP connection ports. var ports = properties.GetActiveTcpConnections() .Where(x => x.LocalEndPoint.Port >= startPort) .Select(x => x.LocalEndPoint.Port); portArray.AddRange(ports); // Get TCP listener ports. ports = properties.GetActiveTcpListeners() .Where(x => x.Port >= startPort) .Select(x => x.Port); portArray.AddRange(ports); // Get UDP listener ports. ports = properties.GetActiveUdpListeners() .Where(x => x.Port >= startPort) .Select(x => x.Port); portArray.AddRange(ports); // Get first port not in the list. for (int i = startPort; i <= endPort; i++) if (!portArray.Contains(i)) return (ushort)i; return 0; } #endregion } }"
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic [ref=f39e701]:
+                          - generic [ref=f39e702] [cursor=pointer]: "1"
+                          - generic [ref=f39e703] [cursor=pointer]: "2"
+                          - generic [ref=f39e704] [cursor=pointer]: "3"
+                          - generic [ref=f39e705] [cursor=pointer]: "4"
+                          - generic [ref=f39e706] [cursor=pointer]: "5"
+                          - generic [ref=f39e707] [cursor=pointer]: "6"
+                          - generic [ref=f39e708] [cursor=pointer]: "7"
+                          - generic [ref=f39e709] [cursor=pointer]: "8"
+                          - generic [ref=f39e710] [cursor=pointer]: "9"
+                          - generic [ref=f39e711] [cursor=pointer]: "10"
+                          - generic [ref=f39e712] [cursor=pointer]: "11"
+                          - generic [ref=f39e713] [cursor=pointer]: "12"
+                          - generic [ref=f39e714] [cursor=pointer]: "13"
+                          - generic [ref=f39e715] [cursor=pointer]: "14"
+                          - generic [ref=f39e716] [cursor=pointer]: "15"
+                          - generic [ref=f39e717] [cursor=pointer]: "16"
+                          - generic [ref=f39e718] [cursor=pointer]: "17"
+                          - generic [ref=f39e719] [cursor=pointer]: "18"
+                          - generic [ref=f39e720] [cursor=pointer]:
+                            - text: "19"
+                            - button [ref=f39e721]:
+                              - img [ref=f39e722]
+                          - generic [ref=f39e724] [cursor=pointer]: "20"
+                          - generic [ref=f39e725] [cursor=pointer]:
+                            - text: "21"
+                            - button [ref=f39e726]:
+                              - img [ref=f39e727]
+                          - generic [ref=f39e729] [cursor=pointer]: "22"
+                          - generic [ref=f39e730] [cursor=pointer]: "23"
+                          - generic [ref=f39e731] [cursor=pointer]: "24"
+                          - generic [ref=f39e732] [cursor=pointer]: "25"
+                          - generic [ref=f39e733] [cursor=pointer]: "26"
+                          - generic [ref=f39e734] [cursor=pointer]:
+                            - text: "27"
+                            - button [ref=f39e735]:
+                              - img [ref=f39e736]
+                          - generic [ref=f39e738] [cursor=pointer]: "28"
+                          - generic [ref=f39e739] [cursor=pointer]: "29"
+                          - generic [ref=f39e740] [cursor=pointer]: "30"
+                          - generic [ref=f39e741] [cursor=pointer]: "31"
+                          - generic [ref=f39e742] [cursor=pointer]: "32"
+                          - generic [ref=f39e743] [cursor=pointer]: "33"
+                          - generic [ref=f39e744] [cursor=pointer]: "34"
+                          - generic [ref=f39e745] [cursor=pointer]: "35"
+                          - generic [ref=f39e746] [cursor=pointer]: "36"
+                          - generic [ref=f39e747] [cursor=pointer]: "37"
+                          - generic [ref=f39e748] [cursor=pointer]: "38"
+                          - generic [ref=f39e749] [cursor=pointer]: "39"
+                          - generic [ref=f39e750] [cursor=pointer]: "40"
+                          - generic [ref=f39e751] [cursor=pointer]: "41"
+                          - generic [ref=f39e752] [cursor=pointer]: "42"
+                          - generic [ref=f39e753] [cursor=pointer]: "43"
+                          - generic [ref=f39e754] [cursor=pointer]: "44"
+                          - generic [ref=f39e755] [cursor=pointer]: "45"
+                          - generic [ref=f39e756] [cursor=pointer]: "46"
+                          - generic [ref=f39e757] [cursor=pointer]: "47"
+                          - generic [ref=f39e758] [cursor=pointer]: "48"
+                          - generic [ref=f39e759] [cursor=pointer]: "49"
+                          - generic [ref=f39e760] [cursor=pointer]:
+                            - text: "50"
+                            - button [ref=f39e761]:
+                              - img [ref=f39e762]
+                          - generic [ref=f39e764] [cursor=pointer]: "51"
+                          - generic [ref=f39e765] [cursor=pointer]: "52"
+                          - generic [ref=f39e766] [cursor=pointer]: "53"
+                          - generic [ref=f39e767] [cursor=pointer]: "54"
+                          - generic [ref=f39e768] [cursor=pointer]: "55"
+                          - generic [ref=f39e769] [cursor=pointer]: "56"
+                          - generic [ref=f39e770] [cursor=pointer]: "57"
+                          - generic [ref=f39e771] [cursor=pointer]: "58"
+                          - generic [ref=f39e772] [cursor=pointer]: "59"
+                          - generic [ref=f39e773] [cursor=pointer]: "60"
+                          - generic [ref=f39e774] [cursor=pointer]: "61"
+                          - generic [ref=f39e775] [cursor=pointer]:
+                            - text: "62"
+                            - button [ref=f39e776]:
+                              - img [ref=f39e777]
+                          - generic [ref=f39e779] [cursor=pointer]: "63"
+                          - generic [ref=f39e780] [cursor=pointer]: "64"
+                          - generic [ref=f39e781] [cursor=pointer]: "65"
+                          - generic [ref=f39e782] [cursor=pointer]: "66"
+                          - generic [ref=f39e783] [cursor=pointer]: "67"
+                          - generic [ref=f39e784] [cursor=pointer]: "68"
+                          - generic [ref=f39e785] [cursor=pointer]: "69"
+                          - generic [ref=f39e786] [cursor=pointer]: "70"
+                          - generic [ref=f39e787] [cursor=pointer]: "71"
+                          - generic [ref=f39e788] [cursor=pointer]: "72"
+                          - generic [ref=f39e789] [cursor=pointer]: "73"
+                          - generic [ref=f39e790] [cursor=pointer]: "74"
+                          - generic [ref=f39e791] [cursor=pointer]: "75"
+                          - generic [ref=f39e792] [cursor=pointer]: "76"
+                          - generic [ref=f39e793] [cursor=pointer]: "77"
+                          - generic [ref=f39e794] [cursor=pointer]: "78"
+                          - generic [ref=f39e795] [cursor=pointer]:
+                            - text: "79"
+                            - button [ref=f39e796]:
+                              - img [ref=f39e797]
+                          - generic [ref=f39e799] [cursor=pointer]: "80"
+                          - generic [ref=f39e800] [cursor=pointer]: "81"
+                          - generic [ref=f39e801] [cursor=pointer]: "82"
+                          - generic [ref=f39e802] [cursor=pointer]: "83"
+                          - generic [ref=f39e803] [cursor=pointer]: "84"
+                          - generic [ref=f39e804] [cursor=pointer]: "85"
+                          - generic [ref=f39e805] [cursor=pointer]: "86"
+                          - generic [ref=f39e806] [cursor=pointer]: "87"
+                          - generic [ref=f39e807] [cursor=pointer]: "88"
+                          - generic [ref=f39e808] [cursor=pointer]: "89"
+                          - generic [ref=f39e809] [cursor=pointer]: "90"
+                          - generic [ref=f39e810] [cursor=pointer]: "91"
+                          - generic [ref=f39e811] [cursor=pointer]: "92"
+                          - generic [ref=f39e812] [cursor=pointer]: "93"
+                          - generic [ref=f39e813] [cursor=pointer]: "94"
+                          - generic [ref=f39e814] [cursor=pointer]: "95"
+                          - generic [ref=f39e815] [cursor=pointer]: "96"
+                          - generic [ref=f39e816] [cursor=pointer]: "97"
+                          - generic [ref=f39e817] [cursor=pointer]:
+                            - text: "98"
+                            - button [ref=f39e818]:
+                              - img [ref=f39e819]
+                          - generic [ref=f39e821] [cursor=pointer]: "99"
+                          - generic [ref=f39e822] [cursor=pointer]: "100"
+                          - generic [ref=f39e823] [cursor=pointer]: "101"
+                          - generic [ref=f39e824] [cursor=pointer]: "102"
+                          - generic [ref=f39e825] [cursor=pointer]: "103"
+                          - generic [ref=f39e826] [cursor=pointer]: "104"
+                          - generic [ref=f39e827] [cursor=pointer]: "105"
+                          - generic [ref=f39e828] [cursor=pointer]: "106"
+                          - generic [ref=f39e829] [cursor=pointer]: "107"
+                          - generic [ref=f39e830] [cursor=pointer]: "108"
+                          - generic [ref=f39e831] [cursor=pointer]: "109"
+                          - generic [ref=f39e832] [cursor=pointer]: "110"
+                          - generic [ref=f39e833] [cursor=pointer]: "111"
+                          - generic [ref=f39e834] [cursor=pointer]: "112"
+                          - generic [ref=f39e835] [cursor=pointer]: "113"
+                          - generic [ref=f39e836] [cursor=pointer]: "114"
+                          - generic [ref=f39e837] [cursor=pointer]: "115"
+                          - generic [ref=f39e838] [cursor=pointer]: "116"
+                          - generic [ref=f39e839] [cursor=pointer]: "117"
+                          - generic [ref=f39e840] [cursor=pointer]: "118"
+                          - generic [ref=f39e841] [cursor=pointer]: "119"
+                          - generic [ref=f39e842] [cursor=pointer]: "120"
+                          - generic [ref=f39e843] [cursor=pointer]: "121"
+                          - generic [ref=f39e844] [cursor=pointer]: "122"
+                          - generic [ref=f39e845] [cursor=pointer]: "123"
+                          - generic [ref=f39e846] [cursor=pointer]: "124"
+                          - generic [ref=f39e847] [cursor=pointer]: "125"
+                          - generic [ref=f39e848] [cursor=pointer]: "126"
+                          - generic [ref=f39e849] [cursor=pointer]: "127"
+                          - generic [ref=f39e850] [cursor=pointer]: "128"
+                          - generic [ref=f39e851] [cursor=pointer]: "129"
+                          - generic [ref=f39e852] [cursor=pointer]: "130"
+                          - generic [ref=f39e853] [cursor=pointer]: "131"
+                          - generic [ref=f39e854] [cursor=pointer]:
+                            - text: "132"
+                            - button [ref=f39e855]:
+                              - img [ref=f39e856]
+                          - generic [ref=f39e858] [cursor=pointer]: "133"
+                          - generic [ref=f39e859] [cursor=pointer]: "134"
+                          - generic [ref=f39e860] [cursor=pointer]: "135"
+                          - generic [ref=f39e861] [cursor=pointer]: "136"
+                          - generic [ref=f39e862] [cursor=pointer]: "137"
+                          - generic [ref=f39e863] [cursor=pointer]: "138"
+                          - generic [ref=f39e864] [cursor=pointer]: "139"
+                          - generic [ref=f39e865] [cursor=pointer]:
+                            - text: "140"
+                            - button [ref=f39e866]:
+                              - img [ref=f39e867]
+                          - generic [ref=f39e869] [cursor=pointer]: "141"
+                          - generic [ref=f39e870] [cursor=pointer]: "142"
+                          - generic [ref=f39e871] [cursor=pointer]: "143"
+                          - generic [ref=f39e872] [cursor=pointer]: "144"
+                          - generic [ref=f39e873] [cursor=pointer]: "145"
+                          - generic [ref=f39e874] [cursor=pointer]: "146"
+                          - generic [ref=f39e875] [cursor=pointer]: "147"
+                          - generic [ref=f39e876] [cursor=pointer]: "148"
+                          - generic [ref=f39e877] [cursor=pointer]: "149"
+                          - generic [ref=f39e878] [cursor=pointer]: "150"
+                          - generic [ref=f39e879] [cursor=pointer]: "151"
+                          - generic [ref=f39e880] [cursor=pointer]: "152"
+                          - generic [ref=f39e881] [cursor=pointer]: "153"
+                          - generic [ref=f39e882] [cursor=pointer]: "154"
+                          - generic [ref=f39e883] [cursor=pointer]: "155"
+                          - generic [ref=f39e884] [cursor=pointer]: "156"
+                          - generic [ref=f39e885] [cursor=pointer]: "157"
+                          - generic [ref=f39e886] [cursor=pointer]: "158"
+                          - generic [ref=f39e887] [cursor=pointer]: "159"
+                          - generic [ref=f39e888] [cursor=pointer]:
+                            - text: "160"
+                            - button [ref=f39e889]:
+                              - img [ref=f39e890]
+                          - generic [ref=f39e892] [cursor=pointer]: "161"
+                          - generic [ref=f39e893] [cursor=pointer]: "162"
+                          - generic [ref=f39e894] [cursor=pointer]: "163"
+                          - generic [ref=f39e895] [cursor=pointer]: "164"
+                          - generic [ref=f39e896] [cursor=pointer]: "227"
+                          - generic [ref=f39e897] [cursor=pointer]: "228"
+                          - generic [ref=f39e898] [cursor=pointer]: "229"
+                          - generic [ref=f39e899] [cursor=pointer]: "230"
+                          - generic [ref=f39e900] [cursor=pointer]: "231"
+                          - generic [ref=f39e901] [cursor=pointer]: "232"
+                          - generic [ref=f39e902] [cursor=pointer]: "233"
+                          - generic [ref=f39e903] [cursor=pointer]: "234"
+                          - generic [ref=f39e904] [cursor=pointer]: "235"
+                          - generic [ref=f39e905] [cursor=pointer]: "236"
+                          - generic [ref=f39e906] [cursor=pointer]: "237"
+                          - generic [ref=f39e907] [cursor=pointer]: "238"
+                          - generic [ref=f39e908] [cursor=pointer]: "239"
+                          - generic [ref=f39e909] [cursor=pointer]: "240"
+                          - generic [ref=f39e910] [cursor=pointer]:
+                            - text: "241"
+                            - button [ref=f39e911]:
+                              - img [ref=f39e912]
+                          - generic [ref=f39e914] [cursor=pointer]: "242"
+                          - generic [ref=f39e915] [cursor=pointer]: "243"
+                          - generic [ref=f39e916] [cursor=pointer]: "244"
+                          - generic [ref=f39e917] [cursor=pointer]: "245"
+                          - generic [ref=f39e918] [cursor=pointer]: "246"
+                          - generic [ref=f39e919] [cursor=pointer]: "247"
+                          - generic [ref=f39e920] [cursor=pointer]: "248"
+                          - generic [ref=f39e921] [cursor=pointer]: "249"
+                          - generic [ref=f39e922] [cursor=pointer]: "250"
+                          - generic [ref=f39e923] [cursor=pointer]: "251"
+                          - generic [ref=f39e924] [cursor=pointer]: "252"
+                          - generic [ref=f39e925] [cursor=pointer]: "253"
+                          - generic [ref=f39e926] [cursor=pointer]: "254"
+                          - generic [ref=f39e927] [cursor=pointer]: "255"
+                          - generic [ref=f39e928] [cursor=pointer]: "256"
+                          - generic [ref=f39e929] [cursor=pointer]: "257"
+                          - generic [ref=f39e930] [cursor=pointer]: "258"
+                          - generic [ref=f39e931] [cursor=pointer]: "259"
+                          - generic [ref=f39e932] [cursor=pointer]: "260"
+                          - generic [ref=f39e933] [cursor=pointer]: "261"
+                          - generic [ref=f39e934] [cursor=pointer]: "262"
+                          - generic [ref=f39e935] [cursor=pointer]: "263"
+                          - generic [ref=f39e936] [cursor=pointer]: "264"
+                          - generic [ref=f39e937] [cursor=pointer]: "265"
+                          - generic [ref=f39e938] [cursor=pointer]: "266"
+                          - generic [ref=f39e939] [cursor=pointer]: "267"
+                          - generic [ref=f39e940] [cursor=pointer]: "268"
+                          - generic [ref=f39e941] [cursor=pointer]:
+                            - text: "269"
+                            - button [ref=f39e942]:
+                              - img [ref=f39e943]
+                          - generic [ref=f39e945] [cursor=pointer]: "270"
+                          - generic [ref=f39e946] [cursor=pointer]: "271"
+                          - generic [ref=f39e947] [cursor=pointer]: "272"
+                          - generic [ref=f39e948] [cursor=pointer]: "273"
+                          - generic [ref=f39e949] [cursor=pointer]: "274"
+                          - generic [ref=f39e950] [cursor=pointer]: "275"
+                          - generic [ref=f39e951] [cursor=pointer]: "276"
+                          - generic [ref=f39e952] [cursor=pointer]: "277"
+                          - generic [ref=f39e953] [cursor=pointer]: "278"
+                          - generic [ref=f39e954] [cursor=pointer]: "279"
+                          - generic [ref=f39e955] [cursor=pointer]: "280"
+                          - generic [ref=f39e956] [cursor=pointer]: "281"
+                          - generic [ref=f39e957] [cursor=pointer]: "282"
+                          - generic [ref=f39e958] [cursor=pointer]: "283"
+                          - generic [ref=f39e959] [cursor=pointer]: "284"
+                          - generic [ref=f39e960] [cursor=pointer]: "285"
+                          - generic [ref=f39e961] [cursor=pointer]: "286"
+                          - generic [ref=f39e962] [cursor=pointer]: "287"
+                          - generic [ref=f39e963] [cursor=pointer]: "288"
+                          - generic [ref=f39e964] [cursor=pointer]: "289"
+                          - generic [ref=f39e965] [cursor=pointer]: "290"
+                          - generic [ref=f39e966] [cursor=pointer]: "291"
+                          - generic [ref=f39e967] [cursor=pointer]: "292"
+                          - generic [ref=f39e968] [cursor=pointer]: "293"
+                          - generic [ref=f39e969] [cursor=pointer]: "294"
+                          - generic [ref=f39e970] [cursor=pointer]: "295"
+                          - generic [ref=f39e971] [cursor=pointer]: "296"
+                          - generic [ref=f39e972] [cursor=pointer]: "297"
+                          - generic [ref=f39e973] [cursor=pointer]: "298"
+                          - generic [ref=f39e974] [cursor=pointer]: "299"
+                          - generic [ref=f39e975] [cursor=pointer]: "300"
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: SharpDX
+                                - generic: .
+                                - generic: XInput
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Collections
+                                - generic: .
+                                - generic: Generic
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Diagnostics
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: IO
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Linq
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Net
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Net
+                                - generic: .
+                                - generic: Sockets
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Windows
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Windows
+                                - generic: .
+                                - generic: Media
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: using
+                                - generic: System
+                                - generic: .
+                                - generic: Windows
+                                - generic: .
+                                - generic: Shapes
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: namespace
+                                - generic: JocysCom
+                                - generic: .
+                                - generic: x360ce
+                                - generic: .
+                                - generic: RemoteController
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// <summary>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// Interaction logic for MainWindow.xaml
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// </summary>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// <remarks>Make sure to set the Owner property to be disposed properly after closing.</remarks>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: partial
+                                - generic: class
+                                - generic: MainWindow
+                                - generic: ":"
+                                - generic: Window
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: MainWindow
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: InitializeComponent
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Title
+                                - generic: =
+                                - generic: new
+                                - generic: JocysCom
+                                - generic: .
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: Configuration
+                                - generic: .
+                                - generic: AssemblyInfo
+                                - generic: (
+                                - generic: )
+                                - generic: .
+                                - generic: GetTitle
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: private
+                                - generic: void
+                                - generic: OptionsButton_Click
+                                - generic: (
+                                - generic: object
+                                - generic: sender
+                                - generic: ","
+                                - generic: RoutedEventArgs
+                                - generic: e
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: oldPort
+                                - generic: =
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: ComputerPort
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: win
+                                - generic: =
+                                - generic: new
+                                - generic: OptionsWindow
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: result
+                                - generic: =
+                                - generic: win
+                                - generic: .
+                                - generic: ShowDialog
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: newPort
+                                - generic: =
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: ComputerPort
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: result
+                                - generic: ==
+                                - generic: "true"
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: oldPort
+                                - generic: "!="
+                                - generic: newPort
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: StopServer
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: Connect
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: StartServer
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: JocysCom
+                                - generic: .
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: HiResTimer
+                                - generic: _timer
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: JocysCom
+                                - generic: .
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: Runtime
+                                - generic: .
+                                - generic: TlvSerializer
+                                - generic: _Serializer
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Control when event can continue.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: object
+                                - generic: timerLock
+                                - generic: =
+                                - generic: new
+                                - generic: object
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: bool
+                                - generic: Suspended
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: void
+                                - generic: Start
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: lock
+                                - generic: (
+                                - generic: timerLock
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: _timer
+                                - generic: "!="
+                                - generic: "null"
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: return
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: =
+                                - generic: new
+                                - generic: JocysCom
+                                - generic: .
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: HiResTimer
+                                - generic: (
+                                - generic: "2"
+                                - generic: ","
+                                - generic: "\"MainWindowTimer\""
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: .
+                                - generic: Elapsed
+                                - generic: +=
+                                - generic: Timer_Elapsed
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: .
+                                - generic: Start
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: void
+                                - generic: Stop
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: lock
+                                - generic: (
+                                - generic: timerLock
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: _timer
+                                - generic: ==
+                                - generic: "null"
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: return
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: .
+                                - generic: Stop
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: .
+                                - generic: Dispose
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _timer
+                                - generic: =
+                                - generic: "null"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: Exception
+                                - generic: LastException
+                                - generic: =
+                                - generic: "null"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: State
+                                - generic: currentState
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: State
+                                - generic: oldState
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: void
+                                - generic: Timer_Elapsed
+                                - generic: (
+                                - generic: object
+                                - generic: sender
+                                - generic: ","
+                                - generic: System
+                                - generic: .
+                                - generic: Timers
+                                - generic: .
+                                - generic: ElapsedEventArgs
+                                - generic: e
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: try
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // If state changed.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: currentState
+                                - generic: .
+                                - generic: Gamepad
+                                - generic: .
+                                - generic: Buttons
+                                - generic: "!="
+                                - generic: oldState
+                                - generic: .
+                                - generic: Gamepad
+                                - generic: .
+                                - generic: Buttons
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Send
+                                - generic: (
+                                - generic: currentState
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: oldState
+                                - generic: =
+                                - generic: currentState
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: catch
+                                - generic: (
+                                - generic: Exception
+                                - generic: ex
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: LastException
+                                - generic: =
+                                - generic: ex
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Dictionary
+                                - generic: <
+                                - generic: Shape
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: ">"
+                                - generic: list
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: private
+                                - generic: void
+                                - generic: Window_Loaded
+                                - generic: (
+                                - generic: object
+                                - generic: sender
+                                - generic: ","
+                                - generic: RoutedEventArgs
+                                - generic: e
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: =
+                                - generic: new
+                                - generic: Dictionary
+                                - generic: <
+                                - generic: Shape
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: ">"
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: LeftShoulderRectangle
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: LeftShoulder
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: RightShoulderRectangle
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: RightShoulder
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: //list.Add(LeftTriggerRectangle, GamepadButtonFlags.);
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: //list.Add(RightTriggerRectangle);
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: LeftThumbEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: LeftThumb
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: RightThumbEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: RightThumb
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: DPadUpEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: DPadUp
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: DPadRightEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: DPadRight
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: DPadDownEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: DPadDown
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: DPadLeftEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: DPadLeft
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonBackEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: Back
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonStartEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: Start
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonAEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: A
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonYEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: "Y"
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonXEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: X
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: list
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: ButtonBEllipse
+                                - generic: ","
+                                - generic: GamepadButtonFlags
+                                - generic: .
+                                - generic: B
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: foreach
+                                - generic: (
+                                - generic: var
+                                - generic: key
+                                - generic: in
+                                - generic: list
+                                - generic: .
+                                - generic: Keys
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: key
+                                - generic: .
+                                - generic: TouchDown
+                                - generic: +=
+                                - generic: Shape_Down
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: key
+                                - generic: .
+                                - generic: MouseDown
+                                - generic: +=
+                                - generic: Shape_Down
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: key
+                                - generic: .
+                                - generic: TouchUp
+                                - generic: +=
+                                - generic: Shape_Up
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: key
+                                - generic: .
+                                - generic: MouseUp
+                                - generic: +=
+                                - generic: Shape_Up
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: types
+                                - generic: =
+                                - generic: new
+                                - generic: Dictionary
+                                - generic: <
+                                - generic: Type
+                                - generic: ","
+                                - generic: int
+                                - generic: ">"
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: types
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: typeof
+                                - generic: (
+                                - generic: State
+                                - generic: )
+                                - generic: ","
+                                - generic: "0"
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: types
+                                - generic: .
+                                - generic: Add
+                                - generic: (
+                                - generic: typeof
+                                - generic: (
+                                - generic: Gamepad
+                                - generic: )
+                                - generic: ","
+                                - generic: "1"
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: _Serializer
+                                - generic: =
+                                - generic: new
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: Runtime
+                                - generic: .
+                                - generic: TlvSerializer
+                                - generic: (
+                                - generic: types
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: AutoConnect
+                                - generic: "&&"
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: Connect
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: StartServer
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: private
+                                - generic: void
+                                - generic: Shape_Up
+                                - generic: (
+                                - generic: object
+                                - generic: sender
+                                - generic: ","
+                                - generic: EventArgs
+                                - generic: e
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: s
+                                - generic: =
+                                - generic: (
+                                - generic: Shape
+                                - generic: )
+                                - generic: sender
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: s
+                                - generic: .
+                                - generic: Fill
+                                - generic: =
+                                - generic: (
+                                - generic: Brush
+                                - generic: )
+                                - generic: FindResource
+                                - generic: (
+                                - generic: "\"TouchUpBrush\""
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Add button.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: currentState
+                                - generic: .
+                                - generic: Gamepad
+                                - generic: .
+                                - generic: Buttons
+                                - generic: "|="
+                                - generic: list
+                                - generic: "["
+                                - generic: s
+                                - generic: "]"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: private
+                                - generic: void
+                                - generic: Shape_Down
+                                - generic: (
+                                - generic: object
+                                - generic: sender
+                                - generic: ","
+                                - generic: EventArgs
+                                - generic: e
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: s
+                                - generic: =
+                                - generic: (
+                                - generic: Shape
+                                - generic: )
+                                - generic: sender
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: s
+                                - generic: .
+                                - generic: Fill
+                                - generic: =
+                                - generic: (
+                                - generic: Brush
+                                - generic: )
+                                - generic: FindResource
+                                - generic: (
+                                - generic: "\"TouchDownBrush\""
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Remove button.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: currentState
+                                - generic: .
+                                - generic: Gamepad
+                                - generic: .
+                                - generic: Buttons
+                                - generic: "&="
+                                - generic: ~
+                                - generic: list
+                                - generic: "["
+                                - generic: s
+                                - generic: "]"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic: "#region UDP Server"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: void
+                                - generic: AddLog
+                                - generic: (
+                                - generic: string
+                                - generic: format
+                                - generic: ","
+                                - generic: params
+                                - generic: object
+                                - generic: "["
+                                - generic: "]"
+                                - generic: args
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Trace
+                                - generic: .
+                                - generic: Write
+                                - generic: (
+                                - generic: string
+                                - generic: .
+                                - generic: Format
+                                - generic: (
+                                - generic: format
+                                - generic: ","
+                                - generic: args
+                                - generic: )
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// <summary>Recevier</summary>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: UdpClient
+                                - generic: udpServer
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: bool
+                                - generic: IsRunning
+                                - generic: "{"
+                                - generic: get
+                                - generic: ;
+                                - generic: private
+                                - generic: set
+                                - generic: ;
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: public
+                                - generic: void
+                                - generic: StartServer
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: AddLog
+                                - generic: (
+                                - generic: "\"Starting remote server... \""
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: IsRunning
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: data
+                                - generic: =
+                                - generic: string
+                                - generic: .
+                                - generic: Join
+                                - generic: (
+                                - generic: "\"\""
+                                - generic: ","
+                                - generic: bytes
+                                - generic: .
+                                - generic: Select
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: ToString
+                                - generic: (
+                                - generic: "\"X2\""
+                                - generic: )
+                                - generic: )
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: AddLog
+                                - generic: (
+                                - generic:
+                                  - text: "\"Received Data from {0}: {1}"
+                                  - generic: \r
+                                  - generic: \n
+                                  - text: "\""
+                                - generic: ","
+                                - generic: remoteEP
+                                - generic: ","
+                                - generic: data
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: "!"
+                                - generic: IsRunning
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: Receive
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: catch
+                                - generic: (
+                                - generic: ObjectDisposedException
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // If disposed then simply return.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: "!"
+                                - generic: IsRunning
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: return
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: throw
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: void
+                                - generic: Send
+                                - generic: (
+                                - generic: State
+                                - generic: state
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: ms
+                                - generic: =
+                                - generic: new
+                                - generic: MemoryStream
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: status
+                                - generic: =
+                                - generic: _Serializer
+                                - generic: .
+                                - generic: Serialize
+                                - generic: (
+                                - generic: ms
+                                - generic: ","
+                                - generic: state
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: bytes
+                                - generic: =
+                                - generic: new
+                                - generic: byte
+                                - generic: "["
+                                - generic: "0"
+                                - generic: "]"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: status
+                                - generic: ==
+                                - generic: ClassLibrary
+                                - generic: .
+                                - generic: Runtime
+                                - generic: .
+                                - generic: TlvSerializerError
+                                - generic: .
+                                - generic: None
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: bytes
+                                - generic: =
+                                - generic: ms
+                                - generic: .
+                                - generic: ToArray
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: IPAddress
+                                - generic: adddress
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: IPAddress
+                                - generic: .
+                                - generic: TryParse
+                                - generic: (
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: ComputerHost
+                                - generic: ","
+                                - generic: out
+                                - generic: adddress
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: remoteEndpoint
+                                - generic: =
+                                - generic: new
+                                - generic: IPEndPoint
+                                - generic: (
+                                - generic: adddress
+                                - generic: ","
+                                - generic: Properties
+                                - generic: .
+                                - generic: Settings
+                                - generic: .
+                                - generic: Default
+                                - generic: .
+                                - generic: ComputerPort
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: udpServer
+                                - generic: .
+                                - generic: Send
+                                - generic: (
+                                - generic: bytes
+                                - generic: ","
+                                - generic: bytes
+                                - generic: .
+                                - generic: Length
+                                - generic: ","
+                                - generic: remoteEndpoint
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: data
+                                - generic: =
+                                - generic: string
+                                - generic: .
+                                - generic: Join
+                                - generic: (
+                                - generic: "\"\""
+                                - generic: ","
+                                - generic: bytes
+                                - generic: .
+                                - generic: Select
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: ToString
+                                - generic: (
+                                - generic: "\"X2\""
+                                - generic: )
+                                - generic: )
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: AddLog
+                                - generic: (
+                                - generic:
+                                  - text: "\"{0:HH:mm:ss.fff} Send status: {1}"
+                                  - generic: \r
+                                  - generic: \n
+                                  - text: "\""
+                                - generic: ","
+                                - generic: DateTime
+                                - generic: .
+                                - generic: Now
+                                - generic: ","
+                                - generic: data
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic: "#endregion"
+                          - generic:
+                            - generic:
+                              - generic: "#region Helper Functions"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// <summary>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "/// Find first free port. IANA Port categories:"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// 0 – 1023 – System or Well Known ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// 1024 – 49151 – User or Registered ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// 49152 - 65535 – Dynamic (Private) or Ephemeral Ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// </summary>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: /// <returns>Free port number if found; otherwise 0.</returns>
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: private
+                                - generic: ushort
+                                - generic: FindFreePort
+                                - generic: (
+                                - generic: ushort
+                                - generic: startPort
+                                - generic: =
+                                - generic: "49152"
+                                - generic: ","
+                                - generic: ushort
+                                - generic: endPort
+                                - generic: =
+                                - generic: ushort
+                                - generic: .
+                                - generic: MaxValue
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "{"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: portArray
+                                - generic: =
+                                - generic: new
+                                - generic: List
+                                - generic: <
+                                - generic: int
+                                - generic: ">"
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: properties
+                                - generic: =
+                                - generic: System
+                                - generic: .
+                                - generic: Net
+                                - generic: .
+                                - generic: NetworkInformation
+                                - generic: .
+                                - generic: IPGlobalProperties
+                                - generic: .
+                                - generic: GetIPGlobalProperties
+                                - generic: (
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Get TCP connection ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: var
+                                - generic: ports
+                                - generic: =
+                                - generic: properties
+                                - generic: .
+                                - generic: GetActiveTcpConnections
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Where
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: LocalEndPoint
+                                - generic: .
+                                - generic: Port
+                                - generic: ">="
+                                - generic: startPort
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Select
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: LocalEndPoint
+                                - generic: .
+                                - generic: Port
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: portArray
+                                - generic: .
+                                - generic: AddRange
+                                - generic: (
+                                - generic: ports
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Get TCP listener ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: ports
+                                - generic: =
+                                - generic: properties
+                                - generic: .
+                                - generic: GetActiveTcpListeners
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Where
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: Port
+                                - generic: ">="
+                                - generic: startPort
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Select
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: Port
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: portArray
+                                - generic: .
+                                - generic: AddRange
+                                - generic: (
+                                - generic: ports
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Get UDP listener ports.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: ports
+                                - generic: =
+                                - generic: properties
+                                - generic: .
+                                - generic: GetActiveUdpListeners
+                                - generic: (
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Where
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: Port
+                                - generic: ">="
+                                - generic: startPort
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: .
+                                - generic: Select
+                                - generic: (
+                                - text: x
+                                - generic: =>
+                                - generic: x
+                                - generic: .
+                                - generic: Port
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: portArray
+                                - generic: .
+                                - generic: AddRange
+                                - generic: (
+                                - generic: ports
+                                - generic: )
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: // Get first port not in the list.
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: for
+                                - generic: (
+                                - generic: int
+                                - generic: i
+                                - generic: =
+                                - generic: startPort
+                                - generic: ;
+                                - generic: i
+                                - generic: <=
+                                - generic: endPort
+                                - generic: ;
+                                - generic: i
+                                - generic: ++
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: if
+                                - generic: (
+                                - generic: "!"
+                                - generic: portArray
+                                - generic: .
+                                - generic: Contains
+                                - generic: (
+                                - generic: i
+                                - generic: )
+                                - generic: )
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: return
+                                - generic: (
+                                - generic: ushort
+                                - generic: )
+                                - generic: i
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: return
+                                - generic: "0"
+                                - generic: ;
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic: "#endregion"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic: "}"
+  - alert [ref=f39e979]

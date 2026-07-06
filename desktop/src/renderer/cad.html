@@ -4,27 +4,28 @@
 <meta charset="UTF-8" />
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#1a1a2e; --panel:#16213e; --fg:#e0e0e0; --dim:#8a8a8a; --border:#333; --accent:#4daafc; }
   html, body { height:100%; }
-  body { background:#1a1a2e; color:#e0e0e0; font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
-  #top-bar { padding:6px 10px; background:#16213e; display:flex; gap:6px; align-items:center; border-bottom:1px solid #333; font-size:12px; }
+  body { background:var(--bg); color:var(--fg); font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
+  #top-bar { padding:6px 10px; background:var(--panel); display:flex; gap:6px; align-items:center; border-bottom:1px solid var(--border); font-size:12px; }
   #top-bar h1 { font-size:13px; font-weight:600; margin-right:4px; }
-  #top-bar button { background:#0f3460; color:#e0e0e0; border:1px solid #444; border-radius:3px; padding:3px 9px; cursor:pointer; font-size:11px; }
-  #top-bar button:hover { background:#1a5276; }
+  #top-bar button { background:var(--panel); color:var(--fg); border:1px solid var(--border); border-radius:3px; padding:3px 9px; cursor:pointer; font-size:11px; }
+  #top-bar button:hover { background:var(--border); }
   #top-bar .status { margin-left:auto; opacity:0.55; }
   #main { flex:1; display:flex; overflow:hidden; }
-  #tool-sidebar { width:42px; background:#0d1b2e; border-right:1px solid #333; display:flex; flex-direction:column; padding:4px; gap:2px; z-index:10; }
-  .tool-btn { width:34px; height:34px; background:#16213e; border:1px solid #333; border-radius:4px; color:#ccc; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; position:relative; }
-  .tool-btn:hover { background:#1a3a5c; border-color:#4daafc; }
-  .tool-btn.active { background:#4daafc; color:#000; border-color:#4daafc; }
-  .tool-btn::after { content:attr(data-tip); position:absolute; left:42px; top:50%; transform:translateY(-50%); background:#222; color:#ddd; padding:3px 8px; border-radius:4px; font-size:11px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; border:1px solid #444; }
+  #tool-sidebar { width:42px; background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:4px; gap:2px; z-index:10; }
+  .tool-btn { width:34px; height:34px; background:var(--panel); border:1px solid var(--border); border-radius:4px; color:#ccc; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; position:relative; }
+  .tool-btn:hover { background:var(--border); border-color:var(--accent); }
+  .tool-btn.active { background:var(--accent); color:#000; border-color:var(--accent); }
+  .tool-btn::after { content:attr(data-tip); position:absolute; left:42px; top:50%; transform:translateY(-50%); background:#222; color:#ddd; padding:3px 8px; border-radius:4px; font-size:11px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; border:1px solid var(--border); }
   .tool-btn:hover::after { opacity:1; }
-  .tool-sep { height:1px; background:#333; margin:4px 2px; }
+  .tool-sep { height:1px; background:var(--border); margin:4px 2px; }
   #viewer-wrap { flex:1; position:relative; }
   #viewer { width:100%; height:100%; }
-  #parts-panel { position:absolute; right:8px; top:8px; width:210px; background:rgba(22,33,62,0.92); border:1px solid #333; border-radius:6px; padding:8px; font-size:11px; max-height:50%; overflow-y:auto; backdrop-filter:blur(8px); }
-  #parts-panel h3 { font-size:11px; margin-bottom:4px; color:#4daafc; }
+  #parts-panel { position:absolute; right:8px; top:8px; width:210px; background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px; font-size:11px; max-height:50%; overflow-y:auto; backdrop-filter:blur(8px); }
+  #parts-panel h3 { font-size:11px; margin-bottom:4px; color:var(--accent); }
   .part-item { padding:3px 5px; border-radius:3px; cursor:pointer; }
-  .part-item:hover { background:#1a3a5c; }
+  .part-item:hover { background:var(--border); }
   .part-dims { opacity:0.5; font-size:9px; }
   .hint { position:absolute; left:8px; bottom:8px; font-size:10px; opacity:0.4; pointer-events:none; }
 </style>
@@ -33,7 +34,8 @@
   <div id="top-bar">
     <h1>CAD</h1>
     <button id="btn-step" title="Open a GLB/OBJ model">Open</button>
-    <button id="btn-stl" title="Export selected part to STL">Save STL</button>
+    <button id="btn-stl" title="Export selection to STL (printing)">Save STL</button>
+    <button id="btn-glb" title="Export selection to GLB (mesh)">Save GLB</button>
     <button id="btn-reset" title="Clear all geometry">Reset</button>
     <span class="status" id="status">Connecting…</span>
   </div>
@@ -63,6 +65,8 @@
   <script src="OrbitControls.js"></script>
   <script src="TransformControls.js"></script>
   <script src="GLTFLoader.js"></script>
+  <script src="STLExporter.js"></script>
+  <script src="GLTFExporter.js"></script>
   <script>
   (function () {
     const CAD_API = 'http://127.0.0.1:5050';
@@ -84,22 +88,26 @@
             const res = await r.json();
             dispatchMsg({ type:'status', text: res.ok ? ('Saved → ' + filename) : ('Save failed: ' + res.error) });
           } else if (msg.type === 'load_glb_file') {
-            dispatchMsg({ type:'status', text:'Open GLB from disk: coming soon' });
+            const r = await window.parent.jac.openGlb(msg.path);
+            if (r && r.ok) dispatchMsg({ type:'load_glb_base64', data: r.b64, name: r.name });
+            else if (r && !r.canceled) dispatchMsg({ type:'status', text:'Open failed: ' + (r.error || '?') });
           }
         } catch (e) { dispatchMsg({ type:'status', text:'CAD backend offline — is Python + build123d installed?' }); }
       },
     };
 
     let scene, camera, renderer, orbitControls, transformControls;
-    let meshes = [];
-    let selectedIndex = -1;
+    let meshes = [];        // build123d parts (kernel-backed, index syncs to server)
+    let glbModels = [];     // imported models: { group, name } (client-side only, no kernel)
+    let sel = null;         // { kind:'part'|'glb', index } | null
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const COLORS = [0x4daafc, 0x4ec990, 0xf0a030, 0xe06060, 0xa070d0, 0x60c0c0, 0xd0d060, 0xf080b0];
 
     function init() {
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x1a1a2e);
+      var sceneBg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#1a1a2e';
+      scene.background = new THREE.Color(sceneBg);
       camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
       camera.position.set(100, 80, 100);
 
@@ -114,16 +122,17 @@
       transformControls = new THREE.TransformControls(camera, renderer.domElement);
       transformControls.addEventListener('dragging-changed', (e) => { orbitControls.enabled = !e.value; });
       transformControls.addEventListener('mouseUp', () => {
-        if (selectedIndex >= 0 && meshes[selectedIndex]) {
-          const m = meshes[selectedIndex];
-          const mode = transformControls.getMode();
-          if (mode === 'translate') {
-            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'translate', vector:[m.position.x, m.position.z, m.position.y] } });
-          } else if (mode === 'rotate') {
-            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'rotate', axis:'Z', angle: THREE.MathUtils.radToDeg(m.rotation.z) } });
-          } else if (mode === 'scale') {
-            vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: selectedIndex, transform:'scale', factor: m.scale.x } });
-          }
+        // Imported GLBs are client-side only — move/rotate/scale them in the viewer, but don't
+        // sync to the build123d kernel (they're meshes, not B-rep solids; there's nothing to sync).
+        if (!sel || sel.kind !== 'part' || !meshes[sel.index]) return;
+        const m = meshes[sel.index];
+        const mode = transformControls.getMode();
+        if (mode === 'translate') {
+          vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: sel.index, transform:'translate', vector:[m.position.x, m.position.z, m.position.y] } });
+        } else if (mode === 'rotate') {
+          vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: sel.index, transform:'rotate', axis:'Z', angle: THREE.MathUtils.radToDeg(m.rotation.z) } });
+        } else if (mode === 'scale') {
+          vscode.postMessage({ type:'cad_tool', tool:'transform_part', args:{ target: sel.index, transform:'scale', factor: m.scale.x } });
         }
       });
       scene.add(transformControls);
@@ -156,30 +165,74 @@
 
     function animate() { requestAnimationFrame(animate); orbitControls.update(); renderer.render(scene, camera); }
 
+    // Re-fit the camera to a clean iso view. Called when the chat drives CAD so generated geometry
+    // always shows framed (the render loop pauses while the tab is hidden, leaving a stale first frame).
+    function frameScene() {
+      var w = renderer.domElement.clientWidth || document.getElementById('viewer').clientWidth;
+      var h = renderer.domElement.clientHeight || document.getElementById('viewer').clientHeight;
+      if (w && h) { camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); }
+      camera.position.set(100, 80, 100);
+      orbitControls.target.set(0, 0, 0);
+      orbitControls.update();
+      renderer.render(scene, camera);
+    }
+
     function onViewerClick(event) {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(meshes);
-      if (hits.length > 0) selectPart(meshes.indexOf(hits[0].object)); else deselectAll();
+      // Raycast build123d parts and imported GLB models together; nearest hit wins.
+      const targets = meshes.concat(glbModels.map(g => g.group));
+      const hits = raycaster.intersectObjects(targets, true);
+      if (hits.length === 0) { deselectAll(); return; }
+      const obj = hits[0].object;
+      const pi = meshes.indexOf(obj);
+      if (pi >= 0) { select('part', pi); return; }
+      const gi = glbModels.findIndex(g => isDescendant(obj, g.group));
+      if (gi >= 0) select('glb', gi); else deselectAll();
     }
+    function isDescendant(obj, root) { let o = obj; while (o) { if (o === root) return true; o = o.parent; } return false; }
 
-    function selectPart(idx) {
-      deselectAll();
-      if (idx < 0 || idx >= meshes.length) return;
-      selectedIndex = idx;
-      meshes[idx].material.emissive = new THREE.Color(0x444444);
-      transformControls.attach(meshes[idx]);
-      statusEl.textContent = 'Selected part ' + idx;
-      document.querySelectorAll('.part-item').forEach((el, i) => { el.style.background = i === idx ? '#1a3a5c' : ''; });
+    function setEmissive(obj, hex) {
+      obj.traverse(function (c) {
+        if (c.isMesh && c.material) {
+          const mats = Array.isArray(c.material) ? c.material : [c.material];
+          mats.forEach(function (mm) { if (mm && mm.emissive) mm.emissive.setHex(hex); });
+        }
+      });
     }
+    function selObject() {
+      if (!sel) return null;
+      return sel.kind === 'part' ? meshes[sel.index] : (glbModels[sel.index] && glbModels[sel.index].group);
+    }
+    function select(kind, idx) {
+      deselectAll();
+      const arr = kind === 'part' ? meshes : glbModels;
+      if (idx < 0 || idx >= arr.length) return;
+      sel = { kind: kind, index: idx };
+      const obj = selObject();
+      if (!obj) { sel = null; return; }
+      setEmissive(obj, 0x444444);
+      transformControls.attach(obj);
+      statusEl.textContent = kind === 'part' ? ('Selected part ' + idx) : ('Selected ' + (glbModels[idx].name || 'model'));
+      highlightListRow();
+    }
+    // Back-compat shim: parts-list rows and old callers use selectPart(idx).
+    function selectPart(idx) { select('part', idx); }
     function deselectAll() {
-      if (selectedIndex >= 0 && meshes[selectedIndex]) meshes[selectedIndex].material.emissive = new THREE.Color(0x000000);
-      selectedIndex = -1;
+      const obj = selObject();
+      if (obj) setEmissive(obj, 0x000000);
+      sel = null;
       transformControls.detach();
-      statusEl.textContent = 'Ready — ' + meshes.length + ' parts';
-      document.querySelectorAll('.part-item').forEach(el => { el.style.background = ''; });
+      statusEl.textContent = 'Ready — ' + meshes.length + ' parts' + (glbModels.length ? ', ' + glbModels.length + ' imported' : '');
+      highlightListRow();
+    }
+    function highlightListRow() {
+      document.querySelectorAll('.part-item').forEach(function (el) {
+        const on = sel && el.dataset.kind === sel.kind && parseInt(el.dataset.i, 10) === sel.index;
+        el.style.background = on ? '#1a3a5c' : '';
+      });
     }
 
     function setActiveTool(tool) {
@@ -191,16 +244,37 @@
       setActiveTool({ translate:'move', rotate:'rotate', scale:'scale' }[mode] || mode);
     }
     function deleteSelected() {
-      if (selectedIndex < 0) return;
-      vscode.postMessage({ type:'cad_tool', tool:'delete_parts', args:{ targets:[selectedIndex] } });
-      deselectAll();
+      if (!sel) return;
+      if (sel.kind === 'part') {
+        vscode.postMessage({ type:'cad_tool', tool:'delete_parts', args:{ targets:[sel.index] } });
+        deselectAll();
+      } else {
+        const g = glbModels[sel.index];
+        if (g) { scene.remove(g.group); glbModels.splice(sel.index, 1); }
+        deselectAll();
+        updatePartsList(lastParts);
+      }
     }
     function duplicateSelected() {
-      if (selectedIndex < 0) return;
-      vscode.postMessage({ type:'cad_tool', tool:'duplicate_part', args:{ target: selectedIndex, offset:[20,0,0] } });
+      if (!sel) return;
+      if (sel.kind === 'part') {
+        vscode.postMessage({ type:'cad_tool', tool:'duplicate_part', args:{ target: sel.index, offset:[20,0,0] } });
+      } else {
+        const g = glbModels[sel.index];
+        if (!g) return;
+        const clone = g.group.clone(true);
+        clone.position.x += 40;
+        scene.add(clone);
+        glbModels.push({ group: clone, name: (g.name || 'model') + ' copy' });
+        updatePartsList(lastParts);
+        select('glb', glbModels.length - 1);
+      }
     }
 
     function updateViewer(parts) {
+      // Parts are rebuilt from scratch; drop a stale part-selection (mesh objects are recreated).
+      // A GLB selection is unaffected by part rebuilds, so leave it attached.
+      if (sel && sel.kind === 'part') { transformControls.detach(); sel = null; }
       meshes.forEach(m => { scene.remove(m); m.geometry.dispose(); });
       meshes = [];
       parts.forEach((p, i) => {
@@ -225,37 +299,82 @@
       updatePartsList(parts);
     }
 
+    let lastParts = [];
     function updatePartsList(parts) {
+      lastParts = parts || [];
       const el = document.getElementById('parts-list');
-      if (!parts.length) { el.innerHTML = 'No geometry'; return; }
-      el.innerHTML = parts.map((p, i) =>
-        '<div class="part-item" data-i="' + i + '"><span style="color:#' + COLORS[i % COLORS.length].toString(16).padStart(6,'0') + '">■</span> Part ' + i +
+      if (!lastParts.length && !glbModels.length) { el.innerHTML = 'No geometry'; return; }
+      let html = lastParts.map((p, i) =>
+        '<div class="part-item" data-kind="part" data-i="' + i + '"><span style="color:#' + COLORS[i % COLORS.length].toString(16).padStart(6,'0') + '">■</span> Part ' + i +
         '<div class="part-dims">' + (p.dims ? p.dims.join(' × ') + ' mm' : '') + (p.volume ? ' — ' + p.volume + ' mm³' : '') + '</div></div>'
       ).join('');
-      el.querySelectorAll('.part-item').forEach(it => it.addEventListener('click', () => selectPart(parseInt(it.dataset.i, 10))));
+      html += glbModels.map((g, i) =>
+        '<div class="part-item" data-kind="glb" data-i="' + i + '"><span style="opacity:0.7">◆</span> ' + (g.name || ('model ' + i)) +
+        '<div class="part-dims">imported mesh</div></div>'
+      ).join('');
+      el.innerHTML = html;
+      el.querySelectorAll('.part-item').forEach(it => it.addEventListener('click', () => select(it.dataset.kind, parseInt(it.dataset.i, 10))));
+      highlightListRow();
     }
 
     // GLB loader
     const gltfLoader = new THREE.GLTFLoader();
-    let glbMeshes = [];
     function loadGLB(arrayBuffer, name) {
-      glbMeshes.forEach(m => scene.remove(m)); glbMeshes = [];
       gltfLoader.parse(arrayBuffer, '', (gltf) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         const scl = 100 / Math.max(size.x, size.y, size.z);
-        model.position.sub(center); model.scale.setScalar(scl);
-        model.traverse((c) => { if (c.isMesh) { c.material.side = THREE.DoubleSide; glbMeshes.push(c); } });
+        model.scale.setScalar(scl);
+        // Center on X/Z but rest the bottom on the grid (y=0) instead of sinking half below it.
+        model.position.set(-center.x * scl, -box.min.y * scl, -center.z * scl);
+        let n = 0;
+        model.traverse((c) => { if (c.isMesh) { c.material.side = THREE.DoubleSide; n++; } });
         scene.add(model);
-        statusEl.textContent = (name || 'Model') + ' — ' + glbMeshes.length + ' meshes';
+        glbModels.push({ group: model, name: name || 'Model' });
+        updatePartsList(lastParts);
+        select('glb', glbModels.length - 1);
+        statusEl.textContent = (name || 'Model') + ' — ' + n + ' meshes imported';
       }, () => { statusEl.textContent = 'GLB load error'; });
     }
     function loadGLBFromBase64(b64, name) {
       const bin = atob(b64), buf = new ArrayBuffer(bin.length), v = new Uint8Array(buf);
       for (let i = 0; i < bin.length; i++) v[i] = bin.charCodeAt(i);
       loadGLB(buf, name);
+    }
+
+    // ---- Client-side export (works on anything in the scene, no kernel needed) ----
+    function abToB64(buf) {
+      const bytes = new Uint8Array(buf); let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin);
+    }
+    function strToB64(s) { return btoa(unescape(encodeURIComponent(s))); }
+    function baseName() {
+      if (sel && sel.kind === 'glb') return (glbModels[sel.index].name || 'model').replace(/\.[^.]+$/, '');
+      if (sel && sel.kind === 'part') return 'part_' + sel.index;
+      return 'model';
+    }
+    async function saveClient(b64, defaultName) {
+      const r = await window.parent.jac.saveModel(b64, defaultName);
+      if (r && r.ok) statusEl.textContent = 'Saved → ' + r.path;
+      else if (r && !r.canceled) statusEl.textContent = 'Save failed: ' + (r.error || '?');
+    }
+    function exportSTL() {
+      const obj = selObject();
+      // build123d parts: export exact tessellation from the kernel. GLB/no-solid: export the viewer mesh.
+      if (obj && sel && sel.kind === 'glb') {
+        const stl = new THREE.STLExporter().parse(obj, { binary: false });
+        saveClient(strToB64(stl), baseName() + '.stl');
+      } else {
+        vscode.postMessage({ type: 'save_stl', target: (sel && sel.kind === 'part') ? sel.index : 0 });
+      }
+    }
+    function exportGLB() {
+      const obj = selObject();
+      if (!obj) { statusEl.textContent = 'Select a part or model to export'; return; }
+      new THREE.GLTFExporter().parse(obj, (res) => { saveClient(abToB64(res), baseName() + '.glb'); }, { binary: true });
     }
 
     window.addEventListener('message', (event) => {
@@ -268,6 +387,11 @@
         statusEl.textContent = msg.text;
       } else if (msg.type === 'load_glb_base64') {
         loadGLBFromBase64(msg.data, msg.name);
+      } else if (msg.type === 'cad_refresh') {
+        // Chat mutated the kernel out-of-band — pull the fresh part list in and reframe the view
+        // (tab was likely just auto-focused from hidden, so the render loop was paused).
+        vscode.postMessage({ type:'cad_tool', tool:'list_parts' });
+        requestAnimationFrame(function(){ requestAnimationFrame(frameScene); });
       }
     });
 
@@ -276,7 +400,8 @@
     document.getElementById('btn-cyl').addEventListener('click', () => vscode.postMessage({ type:'cad_tool', tool:'cad_execute', args:{ code:'RESULT = Cylinder(15, 40)' } }));
     document.getElementById('btn-sphere').addEventListener('click', () => vscode.postMessage({ type:'cad_tool', tool:'cad_execute', args:{ code:'RESULT = Sphere(25)' } }));
     document.getElementById('btn-reset').addEventListener('click', () => { vscode.postMessage({ type:'cad_tool', tool:'reset' }); updateViewer([]); });
-    document.getElementById('btn-stl').addEventListener('click', () => vscode.postMessage({ type:'save_stl', target: selectedIndex >= 0 ? selectedIndex : 0 }));
+    document.getElementById('btn-stl').addEventListener('click', exportSTL);
+    document.getElementById('btn-glb').addEventListener('click', exportGLB);
     document.getElementById('btn-step').addEventListener('click', () => vscode.postMessage({ type:'load_glb_file' }));
     document.getElementById('btn-select').addEventListener('click', () => { setActiveTool('select'); transformControls.detach(); });
     document.getElementById('btn-move').addEventListener('click', () => setTransformMode('translate'));
@@ -284,10 +409,16 @@
     document.getElementById('btn-scale').addEventListener('click', () => setTransformMode('scale'));
     document.getElementById('btn-del').addEventListener('click', deleteSelected);
     document.getElementById('btn-dup').addEventListener('click', duplicateSelected);
-    document.getElementById('btn-mirror').addEventListener('click', () => { if (selectedIndex >= 0) vscode.postMessage({ type:'cad_tool', tool:'mirror_part', args:{ target: selectedIndex } }); });
+    document.getElementById('btn-mirror').addEventListener('click', () => { if (sel && sel.kind === 'part') vscode.postMessage({ type:'cad_tool', tool:'mirror_part', args:{ target: sel.index } }); else if (sel) statusEl.textContent = 'Mirror is a CAD-kernel op — not available on imported meshes'; });
 
     init();
     vscode.postMessage({ type:'cad_tool', tool:'list_parts' });
+    // Keep the 3D scene background in sync with the app theme (parent sets --bg on our :root).
+    new MutationObserver(function () {
+      if (!scene) return;
+      var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if (bg) scene.background = new THREE.Color(bg);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
   })();
   </script>
 </body>

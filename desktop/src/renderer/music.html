@@ -5,56 +5,60 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src data: blob:;">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #111; color: #d4d4d4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+    :root {
+      --app-bg: #303841; --app-panel: #3c444c; --app-fg: #e0e0e0;
+      --app-dim: #8a929a; --app-border: #4f565e; --app-accent: #4daafc;
+    }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--app-bg); color: var(--app-fg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
 #app { display: flex; flex-direction: column; height: 100%; }
-#toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #191919; border-bottom: 1px solid #2b2b2b; flex-shrink: 0; }
+#toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--app-panel); border-bottom: 1px solid var(--app-border); flex-shrink: 0; }
 #main { display: flex; flex: 1; overflow: hidden; }
-#sidebar { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid #2b2b2b; background: #161616; }
+#sidebar { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid var(--app-border); background: var(--app-panel); }
 #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 #viz-area { flex: 1; position: relative; overflow: hidden; }
-#player-bar { padding: 10px 14px; background: #191919; border-top: 1px solid #2b2b2b; flex-shrink: 0; }
-.tb-btn { background: transparent; border: 1px solid #2b2b2b; color: #d4d4d4; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
-.tb-btn:hover { background: #2b2b2b; }
-.tb-btn.primary { background: #d97757; border-color: #d97757; color: #fff; }
-.tb-btn.primary:hover { background: #c4664a; }
-#folder-label { font-size: 11px; color: #666; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#viz-select { background: #1c1c1c; border: 1px solid #2b2b2b; color: #d4d4d4; padding: 3px 6px; border-radius: 4px; font-size: 12px; cursor: pointer; }
-#sidebar-tabs { display: flex; border-bottom: 1px solid #2b2b2b; flex-shrink: 0; }
-.stab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; cursor: pointer; color: #666; border: none; background: none; }
-.stab.active { color: #d97757; border-bottom: 2px solid #d97757; }
+#player-bar { padding: 10px 14px; background: var(--app-panel); border-top: 1px solid var(--app-border); flex-shrink: 0; }
+.tb-btn { background: transparent; border: 1px solid var(--app-border); color: var(--app-fg); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
+.tb-btn:hover { background: var(--app-border); }
+.tb-btn.primary { background: var(--app-accent); border-color: var(--app-accent); color: #fff; }
+.tb-btn.primary:hover { filter: brightness(0.92); }
+#folder-label { font-size: 11px; color: var(--app-dim); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#viz-select { background: var(--app-bg); border: 1px solid var(--app-border); color: var(--app-fg); padding: 3px 6px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+#sidebar-tabs { display: flex; border-bottom: 1px solid var(--app-border); flex-shrink: 0; }
+.stab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; cursor: pointer; color: var(--app-dim); border: none; background: none; }
+.stab.active { color: var(--app-accent); border-bottom: 2px solid var(--app-accent); }
 #sidebar-body { flex: 1; overflow-y: auto; }
-.track-item { display: flex; align-items: center; padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #1e1e1e; gap: 6px; }
-.track-item:hover { background: #1e1e1e; }
-.track-item.playing { background: #1c1c1c; color: #d97757; }
-.track-num { width: 20px; text-align: right; font-size: 10px; color: #555; flex-shrink: 0; }
+.track-item { display: flex; align-items: center; padding: 5px 10px; cursor: pointer; border-bottom: 1px solid var(--app-border); gap: 6px; }
+.track-item:hover { background: var(--app-border); }
+.track-item.playing { background: var(--app-bg); color: var(--app-accent); }
+.track-num { width: 20px; text-align: right; font-size: 10px; color: var(--app-dim); flex-shrink: 0; }
 .track-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 #playlist-panel { padding: 8px; }
 .pl-item { display: flex; align-items: center; padding: 5px 6px; cursor: pointer; border-radius: 4px; }
-.pl-item:hover { background: #1e1e1e; }
-.pl-item.active { color: #d97757; }
+.pl-item:hover { background: var(--app-border); }
+.pl-item.active { color: var(--app-accent); }
 .pl-name { flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pl-count { font-size: 10px; color: #555; }
+.pl-count { font-size: 10px; color: var(--app-dim); }
 #new-pl-row { display: flex; gap: 4px; margin-top: 6px; }
-#new-pl-input { flex: 1; background: #1c1c1c; border: 1px solid #2b2b2b; color: #d4d4d4; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
+#new-pl-input { flex: 1; background: var(--app-bg); border: 1px solid var(--app-border); color: var(--app-fg); padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 #player-bar { display: flex; flex-direction: column; gap: 6px; }
 #now-playing { display: flex; align-items: center; gap: 10px; }
 #np-title { flex: 1; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#np-time { font-size: 11px; color: #666; white-space: nowrap; }
+#np-time { font-size: 11px; color: var(--app-dim); white-space: nowrap; }
 #controls { display: flex; align-items: center; gap: 8px; }
-.ctrl-btn { background: none; border: none; color: #d4d4d4; cursor: pointer; font-size: 16px; padding: 2px 4px; line-height: 1; }
-.ctrl-btn:hover { color: #d97757; }
-.ctrl-btn.active { color: #d97757; }
+.ctrl-btn { background: none; border: none; color: var(--app-fg); cursor: pointer; font-size: 16px; padding: 2px 4px; line-height: 1; }
+.ctrl-btn:hover { color: var(--app-accent); }
+.ctrl-btn.active { color: var(--app-accent); }
 #play-btn { font-size: 22px; }
 #progress-row { display: flex; align-items: center; gap: 8px; }
-#progress { flex: 1; height: 3px; -webkit-appearance: none; appearance: none; background: #2b2b2b; border-radius: 2px; cursor: pointer; outline: none; }
-#progress::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #d97757; cursor: pointer; }
-#vol-slider { width: 70px; height: 3px; -webkit-appearance: none; appearance: none; background: #2b2b2b; border-radius: 2px; cursor: pointer; outline: none; }
-#vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #888; cursor: pointer; }
-#vol-icon { font-size: 13px; cursor: pointer; color: #666; }
+#progress { flex: 1; height: 3px; -webkit-appearance: none; appearance: none; background: var(--app-border); border-radius: 2px; cursor: pointer; outline: none; }
+#progress::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--app-accent); cursor: pointer; }
+#vol-slider { width: 70px; height: 3px; -webkit-appearance: none; appearance: none; background: var(--app-border); border-radius: 2px; cursor: pointer; outline: none; }
+#vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--app-dim); cursor: pointer; }
+#vol-icon { font-size: 13px; cursor: pointer; color: var(--app-dim); }
 #viz-canvas { width: 100%; height: 100%; display: block; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2b2b2b; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--app-border); border-radius: 2px; }
 </style>
 </head>
 <body>

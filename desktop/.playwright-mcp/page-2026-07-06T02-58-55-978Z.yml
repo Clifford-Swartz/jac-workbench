@@ -1,0 +1,785 @@
+- generic [active] [ref=f42e1]:
+  - generic [ref=f42e2]:
+    - generic [ref=f42e3]:
+      - link "Skip to content" [ref=f42e4] [cursor=pointer]:
+        - /url: "#start-of-content"
+      - banner [ref=f42e6]:
+        - heading "Navigation Menu" [level=2] [ref=f42e7]
+        - generic [ref=f42e8]:
+          - link "Homepage" [ref=f42e10] [cursor=pointer]:
+            - /url: /
+            - img [ref=f42e11]
+          - generic [ref=f42e13]:
+            - navigation "Global" [ref=f42e16]:
+              - list [ref=f42e17]:
+                - listitem [ref=f42e18]:
+                  - button "Platform" [ref=f42e20] [cursor=pointer]:
+                    - text: Platform
+                    - img [ref=f42e21]
+                - listitem [ref=f42e23]:
+                  - button "Solutions" [ref=f42e25] [cursor=pointer]:
+                    - text: Solutions
+                    - img [ref=f42e26]
+                - listitem [ref=f42e28]:
+                  - button "Resources" [ref=f42e30] [cursor=pointer]:
+                    - text: Resources
+                    - img [ref=f42e31]
+                - listitem [ref=f42e33]:
+                  - button "Open Source" [ref=f42e35] [cursor=pointer]:
+                    - text: Open Source
+                    - img [ref=f42e36]
+                - listitem [ref=f42e38]:
+                  - button "Enterprise" [ref=f42e40] [cursor=pointer]:
+                    - text: Enterprise
+                    - img [ref=f42e41]
+                - listitem [ref=f42e43]:
+                  - link "Pricing" [ref=f42e44] [cursor=pointer]:
+                    - /url: https://github.com/pricing
+                    - generic [ref=f42e45]: Pricing
+            - generic [ref=f42e46]:
+              - button "Search or jump to…" [ref=f42e49] [cursor=pointer]:
+                - img [ref=f42e51]
+                - generic [ref=f42e53]: Search or jump to...
+                - img [ref=f42e55]
+              - link "Sign in" [ref=f42e59] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Ftree%2Fmaster%2Fx360ce.Engine%2FSharpDX.XInput
+              - link "Sign up" [ref=f42e60] [cursor=pointer]:
+                - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Ffiles%2Fdisambiguate&source=header-repo&source_repo=x360ce%2Fx360ce
+              - button "Appearance settings" [ref=f42e63] [cursor=pointer]:
+                - img
+    - main [ref=f42e67]:
+      - generic [ref=f42e68]:
+        - generic [ref=f42e69]:
+          - generic [ref=f42e71]:
+            - img [ref=f42e72]
+            - link "x360ce" [ref=f42e75] [cursor=pointer]:
+              - /url: /x360ce
+            - generic [ref=f42e76]: /
+            - strong [ref=f42e77]:
+              - link "x360ce" [ref=f42e78] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+            - generic [ref=f42e79]: Public
+          - generic [ref=f42e80]:
+            - list:
+              - listitem [ref=f42e81]:
+                - link "You must be signed in to change notification settings" [ref=f42e82] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f42e83]
+                  - text: Notifications
+              - listitem [ref=f42e85]:
+                - link "Fork 504" [ref=f42e86] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f42e87]
+                  - text: Fork
+                  - generic "504" [ref=f42e89]
+              - listitem [ref=f42e90]:
+                - link "You must be signed in to star a repository" [ref=f42e92] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                  - img [ref=f42e93]
+                  - text: Star
+                  - generic "2866 users starred this repository" [ref=f42e95]: 2.9k
+        - navigation "Repository" [ref=f42e96]:
+          - list [ref=f42e97]:
+            - listitem [ref=f42e98]:
+              - link "Code" [ref=f42e99] [cursor=pointer]:
+                - /url: /x360ce/x360ce
+                - img [ref=f42e100]
+                - generic [ref=f42e102]: Code
+            - listitem [ref=f42e103]:
+              - link "Issues 837" [ref=f42e104] [cursor=pointer]:
+                - /url: /x360ce/x360ce/issues
+                - img [ref=f42e105]
+                - generic [ref=f42e108]: Issues
+                - generic "837" [ref=f42e109]
+            - listitem [ref=f42e110]:
+              - link "Pull requests 7" [ref=f42e111] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulls
+                - img [ref=f42e112]
+                - generic [ref=f42e114]: Pull requests
+                - generic "7" [ref=f42e115]
+            - listitem [ref=f42e116]:
+              - link "Discussions" [ref=f42e117] [cursor=pointer]:
+                - /url: /x360ce/x360ce/discussions
+                - img [ref=f42e118]
+                - generic [ref=f42e120]: Discussions
+            - listitem [ref=f42e121]:
+              - link "Actions" [ref=f42e122] [cursor=pointer]:
+                - /url: /x360ce/x360ce/actions
+                - img [ref=f42e123]
+                - generic [ref=f42e125]: Actions
+            - listitem [ref=f42e126]:
+              - link "Projects" [ref=f42e127] [cursor=pointer]:
+                - /url: /x360ce/x360ce/projects
+                - img [ref=f42e128]
+                - generic [ref=f42e130]: Projects
+            - listitem [ref=f42e131]:
+              - link "Wiki" [ref=f42e132] [cursor=pointer]:
+                - /url: /x360ce/x360ce/wiki
+                - img [ref=f42e133]
+                - generic [ref=f42e135]: Wiki
+            - listitem [ref=f42e136]:
+              - link "Security and quality" [ref=f42e137] [cursor=pointer]:
+                - /url: /x360ce/x360ce/security
+                - img [ref=f42e138]
+                - generic [ref=f42e140]: Security and quality
+            - listitem [ref=f42e141]:
+              - link "Insights" [ref=f42e142] [cursor=pointer]:
+                - /url: /x360ce/x360ce/pulse
+                - img [ref=f42e143]
+                - generic [ref=f42e145]: Insights
+      - generic [ref=f42e153]:
+        - generic [ref=f42e155]:
+          - generic [ref=f42e158]:
+            - generic [ref=f42e159]:
+              - generic [ref=f42e160]:
+                - heading "Collapse file tree" [level=2] [ref=f42e161]:
+                  - button "Collapse file tree" [expanded] [ref=f42e162] [cursor=pointer]:
+                    - img [ref=f42e163]
+                - heading "Files" [level=2] [ref=f42e166]
+              - generic [ref=f42e167]:
+                - button "master branch" [ref=f42e169] [cursor=pointer]:
+                  - generic [ref=f42e170]:
+                    - generic [ref=f42e172]:
+                      - img [ref=f42e174]
+                      - generic [ref=f42e177]: master
+                    - generic:
+                      - img
+                - button "Search this repository (forward slash)" [ref=f42e179] [cursor=pointer]:
+                  - img [ref=f42e180]
+            - generic [ref=f42e183]:
+              - img [ref=f42e185]
+              - combobox "Go to file" [ref=f42e187]
+            - navigation "File Tree Navigation" [ref=f42e193]:
+              - tree "Files" [ref=f42e195]:
+                - treeitem "MinHook" [level=1] [ref=f42e196]:
+                  - generic [ref=f42e198] [cursor=pointer]:
+                    - img [ref=f42e201]
+                    - generic [ref=f42e203]: MinHook
+                - treeitem "Mobile" [level=1] [ref=f42e204]:
+                  - generic [ref=f42e205] [cursor=pointer]:
+                    - img [ref=f42e207]
+                    - generic [ref=f42e209]:
+                      - img [ref=f42e213]
+                      - generic [ref=f42e215]: Mobile
+                - treeitem "x360ce.App.Beta" [level=1] [ref=f42e216]:
+                  - generic [ref=f42e217] [cursor=pointer]:
+                    - img [ref=f42e219]
+                    - generic [ref=f42e221]:
+                      - img [ref=f42e225]
+                      - generic [ref=f42e227]: x360ce.App.Beta
+                - treeitem "x360ce.App.WPF" [level=1] [ref=f42e228]:
+                  - generic [ref=f42e229] [cursor=pointer]:
+                    - img [ref=f42e231]
+                    - generic [ref=f42e233]:
+                      - img [ref=f42e237]
+                      - generic [ref=f42e239]: x360ce.App.WPF
+                - treeitem "x360ce.App" [level=1] [ref=f42e240]:
+                  - generic [ref=f42e241] [cursor=pointer]:
+                    - img [ref=f42e243]
+                    - generic [ref=f42e245]:
+                      - img [ref=f42e249]
+                      - generic [ref=f42e251]: x360ce.App
+                - treeitem "x360ce.Data" [level=1] [ref=f42e252]:
+                  - generic [ref=f42e253] [cursor=pointer]:
+                    - img [ref=f42e255]
+                    - generic [ref=f42e257]:
+                      - img [ref=f42e261]
+                      - generic [ref=f42e263]: x360ce.Data
+                - treeitem "x360ce.Engine" [expanded] [level=1] [ref=f42e264]:
+                  - generic [ref=f42e265] [cursor=pointer]:
+                    - img [ref=f42e267]
+                    - generic [ref=f42e269]:
+                      - img [ref=f42e273]
+                      - generic [ref=f42e275]: x360ce.Engine
+                  - group "x360ce.Engine" [ref=f42e276]:
+                    - treeitem "Common" [level=2] [ref=f42e277]:
+                      - generic [ref=f42e278] [cursor=pointer]:
+                        - img [ref=f42e283]
+                        - generic [ref=f42e285]:
+                          - img [ref=f42e289]
+                          - generic [ref=f42e291]: Common
+                    - treeitem "Data" [level=2] [ref=f42e292]:
+                      - generic [ref=f42e293] [cursor=pointer]:
+                        - img [ref=f42e298]
+                        - generic [ref=f42e300]:
+                          - img [ref=f42e304]
+                          - generic [ref=f42e306]: Data
+                    - treeitem "JocysCom" [level=2] [ref=f42e307]:
+                      - generic [ref=f42e308] [cursor=pointer]:
+                        - img [ref=f42e313]
+                        - generic [ref=f42e315]:
+                          - img [ref=f42e319]
+                          - generic [ref=f42e321]: JocysCom
+                    - treeitem "Maps" [level=2] [ref=f42e322]:
+                      - generic [ref=f42e323] [cursor=pointer]:
+                        - img [ref=f42e328]
+                        - generic [ref=f42e330]:
+                          - img [ref=f42e334]
+                          - generic [ref=f42e336]: Maps
+                    - treeitem "Properties" [level=2] [ref=f42e337]:
+                      - generic [ref=f42e338] [cursor=pointer]:
+                        - img [ref=f42e343]
+                        - generic [ref=f42e345]:
+                          - img [ref=f42e349]
+                          - generic [ref=f42e351]: Properties
+                    - treeitem "Resources" [level=2] [ref=f42e352]:
+                      - generic [ref=f42e353] [cursor=pointer]:
+                        - img [ref=f42e358]
+                        - generic [ref=f42e360]:
+                          - img [ref=f42e364]
+                          - generic [ref=f42e366]: Resources
+                    - treeitem "SharpDX.XInput" [expanded] [level=2] [ref=f42e367]:
+                      - generic [ref=f42e368] [cursor=pointer]:
+                        - img [ref=f42e373]
+                        - generic [ref=f42e375]:
+                          - img [ref=f42e379]
+                          - generic [ref=f42e381]: SharpDX.XInput
+                      - group "SharpDX.XInput" [ref=f42e382]:
+                        - treeitem "BatteryDeviceType.cs" [level=3] [ref=f42e383]:
+                          - generic [ref=f42e389] [cursor=pointer]:
+                            - img [ref=f42e392]
+                            - generic [ref=f42e394]: BatteryDeviceType.cs
+                        - treeitem "BatteryInformation.cs" [level=3] [ref=f42e395]:
+                          - generic [ref=f42e401] [cursor=pointer]:
+                            - img [ref=f42e404]
+                            - generic [ref=f42e406]: BatteryInformation.cs
+                        - treeitem "BatteryLevel.cs" [level=3] [ref=f42e407]:
+                          - generic [ref=f42e413] [cursor=pointer]:
+                            - img [ref=f42e416]
+                            - generic [ref=f42e418]: BatteryLevel.cs
+                        - treeitem "BatteryType.cs" [level=3] [ref=f42e419]:
+                          - generic [ref=f42e425] [cursor=pointer]:
+                            - img [ref=f42e428]
+                            - generic [ref=f42e430]: BatteryType.cs
+                        - treeitem "Capabilities.cs" [level=3] [ref=f42e431]:
+                          - generic [ref=f42e437] [cursor=pointer]:
+                            - img [ref=f42e440]
+                            - generic [ref=f42e442]: Capabilities.cs
+                        - treeitem "CapabilityFlags.cs" [level=3] [ref=f42e443]:
+                          - generic [ref=f42e449] [cursor=pointer]:
+                            - img [ref=f42e452]
+                            - generic [ref=f42e454]: CapabilityFlags.cs
+                        - treeitem "Controller.cs_" [level=3] [ref=f42e455]:
+                          - generic [ref=f42e461] [cursor=pointer]:
+                            - img [ref=f42e464]
+                            - generic [ref=f42e466]: Controller.cs_
+                        - treeitem "Controller.x360ce.All.cs" [level=3] [ref=f42e467]:
+                          - generic [ref=f42e473] [cursor=pointer]:
+                            - img [ref=f42e476]
+                            - generic [ref=f42e478]: Controller.x360ce.All.cs
+                        - treeitem "Controller.x360ce.cs_" [level=3] [ref=f42e479]:
+                          - generic [ref=f42e485] [cursor=pointer]:
+                            - img [ref=f42e488]
+                            - generic [ref=f42e490]: Controller.x360ce.cs_
+                        - treeitem "DeviceQueryType.cs" [level=3] [ref=f42e491]:
+                          - generic [ref=f42e497] [cursor=pointer]:
+                            - img [ref=f42e500]
+                            - generic [ref=f42e502]: DeviceQueryType.cs
+                        - treeitem "DeviceSubType.cs" [level=3] [ref=f42e503]:
+                          - generic [ref=f42e509] [cursor=pointer]:
+                            - img [ref=f42e512]
+                            - generic [ref=f42e514]: DeviceSubType.cs
+                        - treeitem "DeviceType.cs" [level=3] [ref=f42e515]:
+                          - generic [ref=f42e521] [cursor=pointer]:
+                            - img [ref=f42e524]
+                            - generic [ref=f42e526]: DeviceType.cs
+                        - treeitem "Gamepad.cs" [level=3] [ref=f42e527]:
+                          - generic [ref=f42e533] [cursor=pointer]:
+                            - img [ref=f42e536]
+                            - generic [ref=f42e538]: Gamepad.cs
+                        - treeitem "GamepadButtonFlags.cs" [level=3] [ref=f42e539]:
+                          - generic [ref=f42e545] [cursor=pointer]:
+                            - img [ref=f42e548]
+                            - generic [ref=f42e550]: GamepadButtonFlags.cs
+                        - treeitem "GamepadKeyCode.cs" [level=3] [ref=f42e551]:
+                          - generic [ref=f42e557] [cursor=pointer]:
+                            - img [ref=f42e560]
+                            - generic [ref=f42e562]: GamepadKeyCode.cs
+                        - treeitem "IXInput.cs" [level=3] [ref=f42e563]:
+                          - generic [ref=f42e569] [cursor=pointer]:
+                            - img [ref=f42e572]
+                            - generic [ref=f42e574]: IXInput.cs
+                        - treeitem "IXinput.x360ce.cs" [level=3] [ref=f42e575]:
+                          - generic [ref=f42e581] [cursor=pointer]:
+                            - img [ref=f42e584]
+                            - generic [ref=f42e586]: IXinput.x360ce.cs
+                        - treeitem "KeyStrokeFlags.cs" [level=3] [ref=f42e587]:
+                          - generic [ref=f42e593] [cursor=pointer]:
+                            - img [ref=f42e596]
+                            - generic [ref=f42e598]: KeyStrokeFlags.cs
+                        - treeitem "Keystroke.cs" [level=3] [ref=f42e599]:
+                          - generic [ref=f42e605] [cursor=pointer]:
+                            - img [ref=f42e608]
+                            - generic [ref=f42e610]: Keystroke.cs
+                        - treeitem "ResultCode.cs" [level=3] [ref=f42e611]:
+                          - generic [ref=f42e617] [cursor=pointer]:
+                            - img [ref=f42e620]
+                            - generic [ref=f42e622]: ResultCode.cs
+                        - treeitem "State.cs" [level=3] [ref=f42e623]:
+                          - generic [ref=f42e629] [cursor=pointer]:
+                            - img [ref=f42e632]
+                            - generic [ref=f42e634]: State.cs
+                        - treeitem "ThumbIndex.cs" [level=3] [ref=f42e635]:
+                          - generic [ref=f42e641] [cursor=pointer]:
+                            - img [ref=f42e644]
+                            - generic [ref=f42e646]: ThumbIndex.cs
+                        - treeitem "UserIndex.cs" [level=3] [ref=f42e647]:
+                          - generic [ref=f42e653] [cursor=pointer]:
+                            - img [ref=f42e656]
+                            - generic [ref=f42e658]: UserIndex.cs
+                        - treeitem "Vibration.cs" [level=3] [ref=f42e659]:
+                          - generic [ref=f42e665] [cursor=pointer]:
+                            - img [ref=f42e668]
+                            - generic [ref=f42e670]: Vibration.cs
+                        - treeitem "XInput13.cs" [level=3] [ref=f42e671]:
+                          - generic [ref=f42e677] [cursor=pointer]:
+                            - img [ref=f42e680]
+                            - generic [ref=f42e682]: XInput13.cs
+                        - treeitem "XInput13.x360ce.cs" [level=3] [ref=f42e683]:
+                          - generic [ref=f42e689] [cursor=pointer]:
+                            - img [ref=f42e692]
+                            - generic [ref=f42e694]: XInput13.x360ce.cs
+                        - treeitem "XInput14.cs" [level=3] [ref=f42e695]:
+                          - generic [ref=f42e701] [cursor=pointer]:
+                            - img [ref=f42e704]
+                            - generic [ref=f42e706]: XInput14.cs
+                        - treeitem "XInput14.x360ce.cs" [level=3] [ref=f42e707]:
+                          - generic [ref=f42e713] [cursor=pointer]:
+                            - img [ref=f42e716]
+                            - generic [ref=f42e718]: XInput14.x360ce.cs
+                        - treeitem "XInput910.cs" [level=3] [ref=f42e719]:
+                          - generic [ref=f42e725] [cursor=pointer]:
+                            - img [ref=f42e728]
+                            - generic [ref=f42e730]: XInput910.cs
+                        - treeitem "XInput910.x360ce.cs" [level=3] [ref=f42e731]:
+                          - generic [ref=f42e737] [cursor=pointer]:
+                            - img [ref=f42e740]
+                            - generic [ref=f42e742]: XInput910.x360ce.cs
+                    - treeitem "App.Config" [level=2] [ref=f42e743]:
+                      - generic [ref=f42e748] [cursor=pointer]:
+                        - img [ref=f42e751]
+                        - generic [ref=f42e753]: App.Config
+                    - treeitem "GlobalSuppressions.cs" [level=2] [ref=f42e754]:
+                      - generic [ref=f42e759] [cursor=pointer]:
+                        - img [ref=f42e762]
+                        - generic [ref=f42e764]: GlobalSuppressions.cs
+                    - treeitem "packages.config" [level=2] [ref=f42e765]:
+                      - generic [ref=f42e770] [cursor=pointer]:
+                        - img [ref=f42e773]
+                        - generic [ref=f42e775]: packages.config
+                    - treeitem "x360ce.Engine.csproj" [level=2] [ref=f42e776]:
+                      - generic [ref=f42e781] [cursor=pointer]:
+                        - img [ref=f42e784]
+                        - generic [ref=f42e786]: x360ce.Engine.csproj
+                - treeitem "x360ce.Net48Test" [level=1] [ref=f42e787]:
+                  - generic [ref=f42e788] [cursor=pointer]:
+                    - img [ref=f42e790]
+                    - generic [ref=f42e792]:
+                      - img [ref=f42e796]
+                      - generic [ref=f42e798]: x360ce.Net48Test
+                - treeitem "x360ce.Net60Test" [level=1] [ref=f42e799]:
+                  - generic [ref=f42e800] [cursor=pointer]:
+                    - img [ref=f42e802]
+                    - generic [ref=f42e804]:
+                      - img [ref=f42e808]
+                      - generic [ref=f42e810]: x360ce.Net60Test
+                - treeitem "x360ce.RemoteController" [level=1] [ref=f42e811]:
+                  - generic [ref=f42e812] [cursor=pointer]:
+                    - img [ref=f42e814]
+                    - generic [ref=f42e816]:
+                      - img [ref=f42e820]
+                      - generic [ref=f42e822]: x360ce.RemoteController
+                - treeitem "x360ce.Web" [level=1] [ref=f42e823]:
+                  - generic [ref=f42e824] [cursor=pointer]:
+                    - img [ref=f42e826]
+                    - generic [ref=f42e828]:
+                      - img [ref=f42e832]
+                      - generic [ref=f42e834]: x360ce.Web
+                - treeitem "x360ce" [level=1] [ref=f42e835]:
+                  - generic [ref=f42e836] [cursor=pointer]:
+                    - img [ref=f42e838]
+                    - generic [ref=f42e840]:
+                      - img [ref=f42e844]
+                      - generic [ref=f42e846]: x360ce
+                - treeitem ".editorconfig" [level=1] [ref=f42e847]:
+                  - generic [ref=f42e849] [cursor=pointer]:
+                    - img [ref=f42e852]
+                    - generic [ref=f42e854]: .editorconfig
+                - treeitem ".gitattributes" [level=1] [ref=f42e855]:
+                  - generic [ref=f42e857] [cursor=pointer]:
+                    - img [ref=f42e860]
+                    - generic [ref=f42e862]: .gitattributes
+                - treeitem ".gitignore" [level=1] [ref=f42e863]:
+                  - generic [ref=f42e865] [cursor=pointer]:
+                    - img [ref=f42e868]
+                    - generic [ref=f42e870]: .gitignore
+                - treeitem ".gitmodules" [level=1] [ref=f42e871]:
+                  - generic [ref=f42e873] [cursor=pointer]:
+                    - img [ref=f42e876]
+                    - generic [ref=f42e878]: .gitmodules
+                - treeitem ".runsettings" [level=1] [ref=f42e879]:
+                  - generic [ref=f42e881] [cursor=pointer]:
+                    - img [ref=f42e884]
+                    - generic [ref=f42e886]: .runsettings
+                - treeitem "Cleanup_Solution.ps1" [level=1] [ref=f42e887]:
+                  - generic [ref=f42e889] [cursor=pointer]:
+                    - img [ref=f42e892]
+                    - generic [ref=f42e894]: Cleanup_Solution.ps1
+                - treeitem "MinHook_clone_as_SVN.bat" [level=1] [ref=f42e895]:
+                  - generic [ref=f42e897] [cursor=pointer]:
+                    - img [ref=f42e900]
+                    - generic [ref=f42e902]: MinHook_clone_as_SVN.bat
+                - treeitem "README.MD" [level=1] [ref=f42e903]:
+                  - generic [ref=f42e905] [cursor=pointer]:
+                    - img [ref=f42e908]
+                    - generic [ref=f42e910]: README.MD
+                - treeitem "SECURITY.md" [level=1] [ref=f42e911]:
+                  - generic [ref=f42e913] [cursor=pointer]:
+                    - img [ref=f42e916]
+                    - generic [ref=f42e918]: SECURITY.md
+                - treeitem "TODO.md" [level=1] [ref=f42e919]:
+                  - generic [ref=f42e921] [cursor=pointer]:
+                    - img [ref=f42e924]
+                    - generic [ref=f42e926]: TODO.md
+                - treeitem "x360ce.sln" [level=1] [ref=f42e927]:
+                  - generic [ref=f42e929] [cursor=pointer]:
+                    - img [ref=f42e932]
+                    - generic [ref=f42e934]: x360ce.sln
+                - treeitem "x360ce.sln.vsspell" [level=1] [ref=f42e935]:
+                  - generic [ref=f42e937] [cursor=pointer]:
+                    - img [ref=f42e940]
+                    - generic [ref=f42e942]: x360ce.sln.vsspell
+                - treeitem "x360ce_3x.sln" [level=1] [ref=f42e943]:
+                  - generic [ref=f42e945] [cursor=pointer]:
+                    - img [ref=f42e948]
+                    - generic [ref=f42e950]: x360ce_3x.sln
+                - treeitem "x360ce_dll.sln" [level=1] [ref=f42e951]:
+                  - generic [ref=f42e953] [cursor=pointer]:
+                    - img [ref=f42e956]
+                    - generic [ref=f42e958]: x360ce_dll.sln
+          - slider "Draggable pane splitter" [ref=f42e960]
+        - generic [ref=f42e963]:
+          - generic [ref=f42e967]:
+            - generic [ref=f42e969]:
+              - navigation "Breadcrumbs" [ref=f42e970]:
+                - heading "Breadcrumbs" [level=2] [ref=f42e971]
+                - list [ref=f42e972]:
+                  - listitem [ref=f42e973]:
+                    - link "x360ce" [ref=f42e974] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/tree/master
+                  - listitem [ref=f42e975]:
+                    - text: /
+                    - link "x360ce.Engine" [ref=f42e976] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/tree/master/x360ce.Engine
+              - generic [ref=f42e977]:
+                - text: /
+                - heading "SharpDX.XInput" [level=1] [ref=f42e978]
+                - text: /
+              - button "Copy path" [ref=f42e979] [cursor=pointer]:
+                - img [ref=f42e980]
+            - generic [ref=f42e985]:
+              - heading "Directory actions" [level=2] [ref=f42e986]
+              - heading "More options" [level=2] [ref=f42e987]
+              - button "More options" [ref=f42e988] [cursor=pointer]:
+                - img [ref=f42e989]
+          - generic [ref=f42e991]:
+            - generic [ref=f42e993]:
+              - heading "Latest commit" [level=2] [ref=f42e994]
+              - generic [ref=f42e997]:
+                - heading "History" [level=2] [ref=f42e998]
+                - link "History" [ref=f42e999] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/commits/master/x360ce.Engine/SharpDX.XInput
+                  - generic [ref=f42e1000]:
+                    - generic:
+                      - img
+                    - generic [ref=f42e1001]: History
+            - generic [ref=f42e1003]:
+              - heading "Folders and files" [level=2] [ref=f42e1004]
+              - table "Folders and files" [ref=f42e1005]:
+                - rowgroup [ref=f42e1006]:
+                  - row "Name Last commit message Last commit date" [ref=f42e1007]:
+                    - columnheader "Name" [ref=f42e1008]
+                    - columnheader "Last commit message" [ref=f42e1009]:
+                      - generic "Last commit message" [ref=f42e1010]
+                    - columnheader "Last commit date" [ref=f42e1011]:
+                      - generic "Last commit date" [ref=f42e1012]
+                - rowgroup [ref=f42e1013]:
+                  - row "parent directory Parent directory" [ref=f42e1014]:
+                    - cell "parent directory Parent directory" [ref=f42e1015]:
+                      - heading "parent directory" [level=3] [ref=f42e1016]
+                      - link "Parent directory" [ref=f42e1017] [cursor=pointer]:
+                        - /url: /x360ce/x360ce/tree/master/x360ce.Engine
+                        - generic [ref=f42e1018]:
+                          - img [ref=f42e1019]
+                          - text: ..
+                  - row "BatteryDeviceType.cs, (File)" [ref=f42e1021]:
+                    - cell "BatteryDeviceType.cs, (File)" [ref=f42e1022]:
+                      - generic [ref=f42e1023]:
+                        - img [ref=f42e1024]
+                        - link "BatteryDeviceType.cs, (File)" [ref=f42e1029] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/BatteryDeviceType.cs
+                          - text: BatteryDeviceType.cs
+                    - cell [ref=f42e1030]
+                    - cell [ref=f42e1032]
+                  - row "BatteryInformation.cs, (File)" [ref=f42e1035]:
+                    - cell "BatteryInformation.cs, (File)" [ref=f42e1036]:
+                      - generic [ref=f42e1037]:
+                        - img [ref=f42e1038]
+                        - link "BatteryInformation.cs, (File)" [ref=f42e1043] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/BatteryInformation.cs
+                          - text: BatteryInformation.cs
+                    - cell [ref=f42e1044]
+                    - cell [ref=f42e1046]
+                  - row "BatteryLevel.cs, (File)" [ref=f42e1049]:
+                    - cell "BatteryLevel.cs, (File)" [ref=f42e1050]:
+                      - generic [ref=f42e1051]:
+                        - img [ref=f42e1052]
+                        - link "BatteryLevel.cs, (File)" [ref=f42e1057] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/BatteryLevel.cs
+                          - text: BatteryLevel.cs
+                    - cell [ref=f42e1058]
+                    - cell [ref=f42e1060]
+                  - row "BatteryType.cs, (File)" [ref=f42e1063]:
+                    - cell "BatteryType.cs, (File)" [ref=f42e1064]:
+                      - generic [ref=f42e1065]:
+                        - img [ref=f42e1066]
+                        - link "BatteryType.cs, (File)" [ref=f42e1071] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/BatteryType.cs
+                          - text: BatteryType.cs
+                    - cell [ref=f42e1072]
+                    - cell [ref=f42e1074]
+                  - row "Capabilities.cs, (File)" [ref=f42e1077]:
+                    - cell "Capabilities.cs, (File)" [ref=f42e1078]:
+                      - generic [ref=f42e1079]:
+                        - img [ref=f42e1080]
+                        - link "Capabilities.cs, (File)" [ref=f42e1085] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Capabilities.cs
+                          - text: Capabilities.cs
+                    - cell [ref=f42e1086]
+                    - cell [ref=f42e1088]
+                  - row "CapabilityFlags.cs, (File)" [ref=f42e1091]:
+                    - cell "CapabilityFlags.cs, (File)" [ref=f42e1092]:
+                      - generic [ref=f42e1093]:
+                        - img [ref=f42e1094]
+                        - link "CapabilityFlags.cs, (File)" [ref=f42e1099] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/CapabilityFlags.cs
+                          - text: CapabilityFlags.cs
+                    - cell [ref=f42e1100]
+                    - cell [ref=f42e1102]
+                  - row "Controller.cs_, (File)" [ref=f42e1105]:
+                    - cell "Controller.cs_, (File)" [ref=f42e1106]:
+                      - generic [ref=f42e1107]:
+                        - img [ref=f42e1108]
+                        - link "Controller.cs_, (File)" [ref=f42e1113] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Controller.cs_
+                          - text: Controller.cs_
+                    - cell [ref=f42e1114]
+                    - cell [ref=f42e1116]
+                  - row "Controller.x360ce.All.cs, (File)" [ref=f42e1119]:
+                    - cell "Controller.x360ce.All.cs, (File)" [ref=f42e1120]:
+                      - generic [ref=f42e1121]:
+                        - img [ref=f42e1122]
+                        - link "Controller.x360ce.All.cs, (File)" [ref=f42e1127] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Controller.x360ce.All.cs
+                          - text: Controller.x360ce.All.cs
+                    - cell [ref=f42e1128]
+                    - cell [ref=f42e1130]
+                  - row "Controller.x360ce.cs_, (File)" [ref=f42e1133]:
+                    - cell "Controller.x360ce.cs_, (File)" [ref=f42e1134]:
+                      - generic [ref=f42e1135]:
+                        - img [ref=f42e1136]
+                        - link "Controller.x360ce.cs_, (File)" [ref=f42e1141] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Controller.x360ce.cs_
+                          - text: Controller.x360ce.cs_
+                    - cell [ref=f42e1142]
+                    - cell [ref=f42e1144]
+                  - row "DeviceQueryType.cs, (File)" [ref=f42e1147]:
+                    - cell "DeviceQueryType.cs, (File)" [ref=f42e1148]:
+                      - generic [ref=f42e1149]:
+                        - img [ref=f42e1150]
+                        - link "DeviceQueryType.cs, (File)" [ref=f42e1155] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/DeviceQueryType.cs
+                          - text: DeviceQueryType.cs
+                    - cell [ref=f42e1156]
+                    - cell [ref=f42e1158]
+                  - row "DeviceSubType.cs, (File)" [ref=f42e1161]:
+                    - cell "DeviceSubType.cs, (File)" [ref=f42e1162]:
+                      - generic [ref=f42e1163]:
+                        - img [ref=f42e1164]
+                        - link "DeviceSubType.cs, (File)" [ref=f42e1169] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/DeviceSubType.cs
+                          - text: DeviceSubType.cs
+                    - cell [ref=f42e1170]
+                    - cell [ref=f42e1172]
+                  - row "DeviceType.cs, (File)" [ref=f42e1175]:
+                    - cell "DeviceType.cs, (File)" [ref=f42e1176]:
+                      - generic [ref=f42e1177]:
+                        - img [ref=f42e1178]
+                        - link "DeviceType.cs, (File)" [ref=f42e1183] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/DeviceType.cs
+                          - text: DeviceType.cs
+                    - cell [ref=f42e1184]
+                    - cell [ref=f42e1186]
+                  - row "Gamepad.cs, (File)" [ref=f42e1189]:
+                    - cell "Gamepad.cs, (File)" [ref=f42e1190]:
+                      - generic [ref=f42e1191]:
+                        - img [ref=f42e1192]
+                        - link "Gamepad.cs, (File)" [ref=f42e1197] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Gamepad.cs
+                          - text: Gamepad.cs
+                    - cell [ref=f42e1198]
+                    - cell [ref=f42e1200]
+                  - row "GamepadButtonFlags.cs, (File)" [ref=f42e1203]:
+                    - cell "GamepadButtonFlags.cs, (File)" [ref=f42e1204]:
+                      - generic [ref=f42e1205]:
+                        - img [ref=f42e1206]
+                        - link "GamepadButtonFlags.cs, (File)" [ref=f42e1211] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/GamepadButtonFlags.cs
+                          - text: GamepadButtonFlags.cs
+                    - cell [ref=f42e1212]
+                    - cell [ref=f42e1214]
+                  - row "GamepadKeyCode.cs, (File)" [ref=f42e1217]:
+                    - cell "GamepadKeyCode.cs, (File)" [ref=f42e1218]:
+                      - generic [ref=f42e1219]:
+                        - img [ref=f42e1220]
+                        - link "GamepadKeyCode.cs, (File)" [ref=f42e1225] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/GamepadKeyCode.cs
+                          - text: GamepadKeyCode.cs
+                    - cell [ref=f42e1226]
+                    - cell [ref=f42e1228]
+                  - row "IXInput.cs, (File)" [ref=f42e1231]:
+                    - cell "IXInput.cs, (File)" [ref=f42e1232]:
+                      - generic [ref=f42e1233]:
+                        - img [ref=f42e1234]
+                        - link "IXInput.cs, (File)" [ref=f42e1239] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/IXInput.cs
+                          - text: IXInput.cs
+                    - cell [ref=f42e1240]
+                    - cell [ref=f42e1242]
+                  - row "IXinput.x360ce.cs, (File)" [ref=f42e1245]:
+                    - cell "IXinput.x360ce.cs, (File)" [ref=f42e1246]:
+                      - generic [ref=f42e1247]:
+                        - img [ref=f42e1248]
+                        - link "IXinput.x360ce.cs, (File)" [ref=f42e1253] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/IXinput.x360ce.cs
+                          - text: IXinput.x360ce.cs
+                    - cell [ref=f42e1254]
+                    - cell [ref=f42e1256]
+                  - row "KeyStrokeFlags.cs, (File)" [ref=f42e1259]:
+                    - cell "KeyStrokeFlags.cs, (File)" [ref=f42e1260]:
+                      - generic [ref=f42e1261]:
+                        - img [ref=f42e1262]
+                        - link "KeyStrokeFlags.cs, (File)" [ref=f42e1267] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/KeyStrokeFlags.cs
+                          - text: KeyStrokeFlags.cs
+                    - cell [ref=f42e1268]
+                    - cell [ref=f42e1270]
+                  - row "Keystroke.cs, (File)" [ref=f42e1273]:
+                    - cell "Keystroke.cs, (File)" [ref=f42e1274]:
+                      - generic [ref=f42e1275]:
+                        - img [ref=f42e1276]
+                        - link "Keystroke.cs, (File)" [ref=f42e1281] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Keystroke.cs
+                          - text: Keystroke.cs
+                    - cell [ref=f42e1282]
+                    - cell [ref=f42e1284]
+                  - row "ResultCode.cs, (File)" [ref=f42e1287]:
+                    - cell "ResultCode.cs, (File)" [ref=f42e1288]:
+                      - generic [ref=f42e1289]:
+                        - img [ref=f42e1290]
+                        - link "ResultCode.cs, (File)" [ref=f42e1295] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/ResultCode.cs
+                          - text: ResultCode.cs
+                    - cell [ref=f42e1296]
+                    - cell [ref=f42e1298]
+                  - row "State.cs, (File)" [ref=f42e1301]:
+                    - cell "State.cs, (File)" [ref=f42e1302]:
+                      - generic [ref=f42e1303]:
+                        - img [ref=f42e1304]
+                        - link "State.cs, (File)" [ref=f42e1309] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/State.cs
+                          - text: State.cs
+                    - cell [ref=f42e1310]
+                    - cell [ref=f42e1312]
+                  - row "ThumbIndex.cs, (File)" [ref=f42e1315]:
+                    - cell "ThumbIndex.cs, (File)" [ref=f42e1316]:
+                      - generic [ref=f42e1317]:
+                        - img [ref=f42e1318]
+                        - link "ThumbIndex.cs, (File)" [ref=f42e1323] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/ThumbIndex.cs
+                          - text: ThumbIndex.cs
+                    - cell [ref=f42e1324]
+                    - cell [ref=f42e1326]
+                  - row "UserIndex.cs, (File)" [ref=f42e1329]:
+                    - cell "UserIndex.cs, (File)" [ref=f42e1330]:
+                      - generic [ref=f42e1331]:
+                        - img [ref=f42e1332]
+                        - link "UserIndex.cs, (File)" [ref=f42e1337] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/UserIndex.cs
+                          - text: UserIndex.cs
+                    - cell [ref=f42e1338]
+                    - cell [ref=f42e1340]
+                  - row "Vibration.cs, (File)" [ref=f42e1343]:
+                    - cell "Vibration.cs, (File)" [ref=f42e1344]:
+                      - generic [ref=f42e1345]:
+                        - img [ref=f42e1346]
+                        - link "Vibration.cs, (File)" [ref=f42e1351] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/Vibration.cs
+                          - text: Vibration.cs
+                    - cell [ref=f42e1352]
+                    - cell [ref=f42e1354]
+                  - row "XInput13.cs, (File)" [ref=f42e1357]:
+                    - cell "XInput13.cs, (File)" [ref=f42e1358]:
+                      - generic [ref=f42e1359]:
+                        - img [ref=f42e1360]
+                        - link "XInput13.cs, (File)" [ref=f42e1365] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput13.cs
+                          - text: XInput13.cs
+                    - cell [ref=f42e1366]
+                    - cell [ref=f42e1368]
+                  - row "XInput13.x360ce.cs, (File)" [ref=f42e1371]:
+                    - cell "XInput13.x360ce.cs, (File)" [ref=f42e1372]:
+                      - generic [ref=f42e1373]:
+                        - img [ref=f42e1374]
+                        - link "XInput13.x360ce.cs, (File)" [ref=f42e1379] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput13.x360ce.cs
+                          - text: XInput13.x360ce.cs
+                    - cell [ref=f42e1380]
+                    - cell [ref=f42e1382]
+                  - row "XInput14.cs, (File)" [ref=f42e1385]:
+                    - cell "XInput14.cs, (File)" [ref=f42e1386]:
+                      - generic [ref=f42e1387]:
+                        - img [ref=f42e1388]
+                        - link "XInput14.cs, (File)" [ref=f42e1393] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput14.cs
+                          - text: XInput14.cs
+                    - cell [ref=f42e1394]
+                    - cell [ref=f42e1396]
+                  - row "XInput14.x360ce.cs, (File)" [ref=f42e1399]:
+                    - cell "XInput14.x360ce.cs, (File)" [ref=f42e1400]:
+                      - generic [ref=f42e1401]:
+                        - img [ref=f42e1402]
+                        - link "XInput14.x360ce.cs, (File)" [ref=f42e1407] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput14.x360ce.cs
+                          - text: XInput14.x360ce.cs
+                    - cell [ref=f42e1408]
+                    - cell [ref=f42e1410]
+                  - row "XInput910.cs, (File)" [ref=f42e1413]:
+                    - cell "XInput910.cs, (File)" [ref=f42e1414]:
+                      - generic [ref=f42e1415]:
+                        - img [ref=f42e1416]
+                        - link "XInput910.cs, (File)" [ref=f42e1421] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput910.cs
+                          - text: XInput910.cs
+                    - cell [ref=f42e1422]
+                    - cell [ref=f42e1424]
+                  - row "XInput910.x360ce.cs, (File)" [ref=f42e1427]:
+                    - cell "XInput910.x360ce.cs, (File)" [ref=f42e1428]:
+                      - generic [ref=f42e1429]:
+                        - img [ref=f42e1430]
+                        - link "XInput910.x360ce.cs, (File)" [ref=f42e1435] [cursor=pointer]:
+                          - /url: /x360ce/x360ce/blob/master/x360ce.Engine/SharpDX.XInput/XInput910.x360ce.cs
+                          - text: XInput910.x360ce.cs
+                    - cell [ref=f42e1436]
+                    - cell [ref=f42e1438]
+  - alert [ref=f42e1444]

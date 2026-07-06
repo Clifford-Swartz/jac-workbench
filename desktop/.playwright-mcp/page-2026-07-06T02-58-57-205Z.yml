@@ -1,0 +1,590 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]:
+      - heading "Navigation Menu" [level=2] [ref=e7]
+      - generic [ref=e8]:
+        - link "Homepage" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+        - generic [ref=e13]:
+          - navigation "Global" [ref=e16]:
+            - list [ref=e17]:
+              - listitem [ref=e18]:
+                - button "Platform" [ref=e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=e21]
+              - listitem [ref=e23]:
+                - button "Solutions" [ref=e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=e26]
+              - listitem [ref=e28]:
+                - button "Resources" [ref=e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=e31]
+              - listitem [ref=e33]:
+                - button "Open Source" [ref=e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=e36]
+              - listitem [ref=e38]:
+                - button "Enterprise" [ref=e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=e41]
+              - listitem [ref=e43]:
+                - link "Pricing" [ref=e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=e45]: Pricing
+          - generic [ref=e46]:
+            - button "Search or jump to…" [ref=e49] [cursor=pointer]:
+              - img [ref=e51]
+              - generic [ref=e53]: Search or jump to...
+              - img [ref=e55]
+            - link "Sign in" [ref=e59] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fx360ce%2Fx360ce%2Fissues%3Fq%3Ddisconnect%2Bgame
+            - link "Sign up" [ref=e60] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fissues%2Findex&source=header-repo&source_repo=x360ce%2Fx360ce
+            - button "Appearance settings" [ref=e63] [cursor=pointer]:
+              - img
+  - main [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e71]:
+          - img [ref=e72]
+          - link "x360ce" [ref=e75] [cursor=pointer]:
+            - /url: /x360ce
+          - generic [ref=e76]: /
+          - strong [ref=e77]:
+            - link "x360ce" [ref=e78] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+          - generic [ref=e79]: Public
+        - generic [ref=e80]:
+          - list:
+            - listitem [ref=e81]:
+              - link "You must be signed in to change notification settings" [ref=e82] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e83]
+                - text: Notifications
+            - listitem [ref=e85]:
+              - link "Fork 504" [ref=e86] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e87]
+                - text: Fork
+                - generic "504" [ref=e89]
+            - listitem [ref=e90]:
+              - link "You must be signed in to star a repository" [ref=e92] [cursor=pointer]:
+                - /url: /login?return_to=%2Fx360ce%2Fx360ce
+                - img [ref=e93]
+                - text: Star
+                - generic "2866 users starred this repository" [ref=e95]: 2.9k
+      - navigation "Repository" [ref=e96]:
+        - list [ref=e97]:
+          - listitem [ref=e98]:
+            - link "Code" [ref=e99] [cursor=pointer]:
+              - /url: /x360ce/x360ce
+              - img [ref=e100]
+              - generic [ref=e102]: Code
+          - listitem [ref=e103]:
+            - link "Issues 837" [ref=e104] [cursor=pointer]:
+              - /url: /x360ce/x360ce/issues
+              - img [ref=e105]
+              - generic [ref=e108]: Issues
+              - generic "837" [ref=e109]
+          - listitem [ref=e110]:
+            - link "Pull requests 7" [ref=e111] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulls
+              - img [ref=e112]
+              - generic [ref=e114]: Pull requests
+              - generic "7" [ref=e115]
+          - listitem [ref=e116]:
+            - link "Discussions" [ref=e117] [cursor=pointer]:
+              - /url: /x360ce/x360ce/discussions
+              - img [ref=e118]
+              - generic [ref=e120]: Discussions
+          - listitem [ref=e121]:
+            - link "Actions" [ref=e122] [cursor=pointer]:
+              - /url: /x360ce/x360ce/actions
+              - img [ref=e123]
+              - generic [ref=e125]: Actions
+          - listitem [ref=e126]:
+            - link "Projects" [ref=e127] [cursor=pointer]:
+              - /url: /x360ce/x360ce/projects
+              - img [ref=e128]
+              - generic [ref=e130]: Projects
+          - listitem [ref=e131]:
+            - link "Wiki" [ref=e132] [cursor=pointer]:
+              - /url: /x360ce/x360ce/wiki
+              - img [ref=e133]
+              - generic [ref=e135]: Wiki
+          - listitem [ref=e136]:
+            - link "Security and quality" [ref=e137] [cursor=pointer]:
+              - /url: /x360ce/x360ce/security
+              - img [ref=e138]
+              - generic [ref=e140]: Security and quality
+          - listitem [ref=e141]:
+            - link "Insights" [ref=e142] [cursor=pointer]:
+              - /url: /x360ce/x360ce/pulse
+              - img [ref=e143]
+              - generic [ref=e145]: Insights
+    - generic [ref=e153]:
+      - generic [ref=e154]:
+        - generic [ref=e155]:
+          - navigation "Issue filters" [ref=e156]:
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - link "Issues" [ref=e159] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Issues" [ref=e162]
+              - listitem [ref=e163]:
+                - link "Assigned to me" [ref=e164] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+assignee%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Assigned to me" [ref=e167]
+              - listitem [ref=e168]:
+                - link "Created by me" [ref=e169] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+author%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Created by me" [ref=e172]
+              - listitem [ref=e173]:
+                - link "Mentioned" [ref=e174] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+state%3Aopen+mentions%3A%40me
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Mentioned" [ref=e177]
+              - listitem [ref=e178]:
+                - link "Recent activity" [ref=e179] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues?q=is%3Aissue+updated%3A%3E%40today-1w+sort%3Aupdated-desc
+                  - generic:
+                    - generic:
+                      - img
+                  - generic "Recent activity" [ref=e182]
+          - separator [ref=e183]
+          - navigation "Pages" [ref=e184]:
+            - list [ref=e185]:
+              - listitem [ref=e186]:
+                - link "Views" [ref=e187] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/issues/views
+                  - generic:
+                    - img
+                  - generic [ref=e189]: Views
+              - listitem [ref=e190]:
+                - link "Projects" [ref=e191] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/projects
+                  - generic:
+                    - img
+                  - generic [ref=e193]: Projects
+              - listitem [ref=e194]:
+                - link "Milestones" [ref=e195] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/milestones
+                  - generic:
+                    - img
+                  - generic [ref=e197]: Milestones
+              - listitem [ref=e198]:
+                - link "Labels" [ref=e199] [cursor=pointer]:
+                  - /url: /x360ce/x360ce/labels
+                  - generic:
+                    - img
+                  - generic [ref=e201]: Labels
+        - generic [ref=e202]:
+          - navigation "Feedback" [ref=e203]:
+            - list [ref=e204]:
+              - listitem [ref=e205]:
+                - link "Feedback Preview" [ref=e206] [cursor=pointer]:
+                  - /url: https://gh.io/issues-sidebar-feedback
+                  - generic:
+                    - img
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: Feedback
+                    - generic:
+                      - generic: Preview
+          - list [ref=e209]:
+            - listitem [ref=e210]:
+              - button "Collapse sidebar" [expanded] [ref=e211] [cursor=pointer]:
+                - generic:
+                  - img
+                - generic [ref=e213]: Collapse sidebar
+      - generic [ref=e218]:
+        - heading "Issues" [level=1] [ref=e219]
+        - generic [ref=e220]:
+          - generic [ref=e222]:
+            - form "Search Issues" [ref=e224]:
+              - generic [ref=e225]: Search Issues
+              - generic [ref=e227]:
+                - generic [ref=e229]:
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: disconnect
+                    - generic [ref=e233]: game
+                  - combobox "Search Issues" [ref=e235]: disconnect game
+                - button "Search" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+            - button "New issue" [ref=e240]:
+              - generic [ref=e242]: New issue
+          - generic [ref=e246]:
+            - heading "Search results" [level=2] [ref=e247]
+            - generic [ref=e248]:
+              - generic [ref=e249]:
+                - link "Open" [ref=e250] [cursor=pointer]:
+                  - /url: ""
+                  - generic [ref=e251]: Open
+                - link "Closed" [ref=e253] [cursor=pointer]:
+                  - /url: ""
+                  - generic [ref=e254]: Closed
+              - toolbar "Actions" [ref=e256]:
+                - generic [ref=e257]:
+                  - button "Filter by author" [ref=e259] [cursor=pointer]:
+                    - generic [ref=e260]:
+                      - generic [ref=e261]: Author
+                      - generic:
+                        - img
+                  - button "Filter by label" [ref=e263] [cursor=pointer]:
+                    - generic [ref=e264]:
+                      - generic [ref=e265]: Labels
+                      - generic:
+                        - img
+                  - button "Filter by project" [ref=e267] [cursor=pointer]:
+                    - generic [ref=e268]:
+                      - generic [ref=e269]: Projects
+                      - generic:
+                        - img
+                  - button "Filter by milestone" [ref=e271] [cursor=pointer]:
+                    - generic [ref=e272]:
+                      - generic [ref=e273]: Milestones
+                      - generic:
+                        - img
+                  - button "Filter by assignees" [ref=e275] [cursor=pointer]:
+                    - generic [ref=e276]:
+                      - generic [ref=e277]: Assignees
+                      - generic:
+                        - img
+                  - button "Filter by issue type" [ref=e279] [cursor=pointer]:
+                    - generic [ref=e280]:
+                      - generic [ref=e281]: Types
+                      - generic:
+                        - img
+                  - button "Sort by Newest , descending" [ref=e283] [cursor=pointer]:
+                    - generic [ref=e284]:
+                      - generic:
+                        - img
+                      - generic [ref=e285]:
+                        - generic [ref=e286]: Sort by
+                        - text: Newest
+                        - generic [ref=e287]: ", descending"
+                    - generic:
+                      - img
+            - list "Search results" [ref=e288]:
+              - listitem "More information available below." [ref=e291]:
+                - heading "PLEASE HELP - I WANNA PLAY THIS EXACT WAY SO MUCH - LOGITECH G29 WHEEL - GAME (KINDA FIVEM - MAJESTIC). im sure it should work, cause it worked once perfectly" [level=3] [ref=e293]:
+                  - link "PLEASE HELP - I WANNA PLAY THIS EXACT WAY SO MUCH - LOGITECH G29 WHEEL - GAME (KINDA FIVEM - MAJESTIC). im sure it should work, cause it worked once perfectly" [ref=e294] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1569
+                    - generic [ref=e295]: PLEASE HELP - I WANNA PLAY THIS EXACT WAY SO MUCH - LOGITECH G29 WHEEL - GAME (KINDA FIVEM - MAJESTIC). im sure it should work, cause it worked once perfectly
+                - generic [ref=e300]:
+                  - img [ref=e302]
+                  - generic [ref=e305]: "Status: Open."
+                - generic [ref=e309]:
+                  - generic [ref=e310]:
+                    - generic [ref=e311]: "#1569"
+                    - generic [ref=e312]: In x360ce/x360ce;
+                  - generic [ref=e313]:
+                    - text: ·
+                    - link "miksfun113-bit" [ref=e314] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Amiksfun113-bit
+                    - text: opened on Nov 10, 2025on Nov 10, 2025
+              - listitem "More information available below." [ref=e318]:
+                - heading "Logitech G29 wheel - Xinput recalibrate when i change the game and get tripping PLEASE HELP!!! I WANNA PLAY IT THE WAY SO MUCH (BEFORE it worked once)" [level=3] [ref=e320]:
+                  - link "Logitech G29 wheel - Xinput recalibrate when i change the game and get tripping PLEASE HELP!!! I WANNA PLAY IT THE WAY SO MUCH (BEFORE it worked once)" [ref=e321] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1568
+                    - generic [ref=e322]: Logitech G29 wheel - Xinput recalibrate when i change the game and get tripping PLEASE HELP!!! I WANNA PLAY IT THE WAY SO MUCH (BEFORE it worked once)
+                - generic [ref=e327]:
+                  - img [ref=e329]
+                  - generic [ref=e332]: "Status: Open."
+                - generic [ref=e336]:
+                  - generic [ref=e337]:
+                    - generic [ref=e338]: "#1568"
+                    - generic [ref=e339]: In x360ce/x360ce;
+                  - generic [ref=e340]:
+                    - text: ·
+                    - link "miksfun113-bit" [ref=e341] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Amiksfun113-bit
+                    - text: opened on Nov 10, 2025on Nov 10, 2025
+              - listitem "More information available below." [ref=e345]:
+                - heading "Disconnecting notification sound whenever game starts" [level=3] [ref=e347]:
+                  - link "Disconnecting notification sound whenever game starts" [ref=e348] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1437
+                    - generic [ref=e349]: Disconnecting notification sound whenever game starts
+                - generic [ref=e354]:
+                  - img [ref=e356]
+                  - generic [ref=e359]: "Status: Open."
+                - generic [ref=e363]:
+                  - generic [ref=e364]:
+                    - generic [ref=e365]: "#1437"
+                    - generic [ref=e366]: In x360ce/x360ce;
+                  - generic [ref=e367]:
+                    - text: ·
+                    - link "YOMTAH" [ref=e368] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3AYOMTAH
+                    - text: opened on May 12, 2023on May 12, 2023
+              - listitem "More information available below." [ref=e372]:
+                - heading "Replica of switch pro controller connect to WIn10 via BT (2)" [level=3] [ref=e374]:
+                  - link "Replica of switch pro controller connect to WIn10 via BT (2)" [ref=e375] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1181
+                    - generic [ref=e376]: Replica of switch pro controller connect to WIn10 via BT (2)
+                - generic [ref=e381]:
+                  - img [ref=e383]
+                  - generic [ref=e386]: "Status: Open."
+                - generic [ref=e390]:
+                  - generic [ref=e391]:
+                    - generic [ref=e392]: "#1181"
+                    - generic [ref=e393]: In x360ce/x360ce;
+                  - generic [ref=e394]:
+                    - text: ·
+                    - link "mrbarnie" [ref=e395] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Amrbarnie
+                    - text: opened on Oct 11, 2020on Oct 11, 2020
+              - listitem "More information available below." [ref=e399]:
+                - heading "Virtual Device Polling Rate Dropped to 10Hz when Controller Assigned (x360ce Ver. 4.14.9.0)" [level=3] [ref=e401]:
+                  - link "Virtual Device Polling Rate Dropped to 10Hz when Controller Assigned (x360ce Ver. 4.14.9.0)" [ref=e402] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1166
+                    - generic [ref=e403]: Virtual Device Polling Rate Dropped to 10Hz when Controller Assigned (x360ce Ver. 4.14.9.0)
+                - generic [ref=e408]:
+                  - img [ref=e410]
+                  - generic [ref=e413]: "Status: Closed (completed)."
+                - generic [ref=e417]:
+                  - generic [ref=e418]:
+                    - generic [ref=e419]: "#1166"
+                    - generic [ref=e420]: In x360ce/x360ce;
+                  - generic [ref=e421]:
+                    - text: · by
+                    - link "LibreRain" [ref=e422] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3ALibreRain
+                    - text: was closed on Nov 25, 2020on Nov 25, 2020
+              - listitem "More information available below." [ref=e426]:
+                - heading "x360ce 4.10 , Windows taskbar acts like hold \"up\" key when disconnect gamepad." [level=3] [ref=e428]:
+                  - link "x360ce 4.10 , Windows taskbar acts like hold \"up\" key when disconnect gamepad." [ref=e429] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/1109
+                    - generic [ref=e430]: x360ce 4.10 , Windows taskbar acts like hold "up" key when disconnect gamepad.
+                - generic [ref=e435]:
+                  - img [ref=e437]
+                  - generic [ref=e440]: "Status: Open."
+                - generic [ref=e444]:
+                  - generic [ref=e445]:
+                    - generic [ref=e446]: "#1109"
+                    - generic [ref=e447]: In x360ce/x360ce;
+                  - generic [ref=e448]:
+                    - text: ·
+                    - link "tomudo" [ref=e449] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Atomudo
+                    - text: opened on Jun 5, 2020on Jun 5, 2020
+              - listitem "More information available below." [ref=e453]:
+                - heading "Yakuza 0 3.2 Patch 11 March 2019" [level=3] [ref=e455]:
+                  - link "Yakuza 0 3.2 Patch 11 March 2019" [ref=e456] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/926
+                    - generic [ref=e457]: Yakuza 0 3.2 Patch 11 March 2019
+                - generic [ref=e462]:
+                  - img [ref=e464]
+                  - generic [ref=e467]: "Status: Closed (completed)."
+                - generic [ref=e471]:
+                  - generic [ref=e472]:
+                    - generic [ref=e473]: "#926"
+                    - generic [ref=e474]: In x360ce/x360ce;
+                  - generic [ref=e475]:
+                    - text: · by
+                    - link "DunsyBomb" [ref=e476] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3ADunsyBomb
+                    - text: was closed on Mar 12, 2019on Mar 12, 2019
+              - listitem "More information available below." [ref=e480]:
+                - generic [ref=e481]:
+                  - 'heading "Beta Testing: X360CE 4.8.x.x Alpha" [level=3] [ref=e482]':
+                    - 'link "Beta Testing: X360CE 4.8.x.x Alpha" [ref=e483] [cursor=pointer]':
+                      - /url: /x360ce/x360ce/issues/818
+                      - generic [ref=e484]: "Beta Testing: X360CE 4.8.x.x Alpha"
+                  - generic [ref=e486]:
+                    - link "App" [ref=e488] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20label%3AApp
+                      - generic [ref=e490]: App
+                    - link "Core" [ref=e493] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20label%3ACore
+                      - generic [ref=e495]: Core
+                    - link "enhancement" [ref=e498] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20label%3Aenhancement
+                      - generic [ref=e500]: enhancement
+                    - link "help wanted" [ref=e503] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20label%3A%22help%20wanted%22
+                      - generic [ref=e505]: help wanted
+                    - link "Priority-High" [ref=e508] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20label%3APriority-High
+                      - generic [ref=e510]: Priority-High
+                - generic [ref=e515]:
+                  - img [ref=e517]
+                  - generic [ref=e520]: "Status: Open."
+                - generic [ref=e524]:
+                  - generic [ref=e525]:
+                    - generic [ref=e526]: "#818"
+                    - generic [ref=e527]: In x360ce/x360ce;
+                  - generic [ref=e528]:
+                    - text: ·
+                    - link "EJocys" [ref=e529] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3AEJocys
+                    - text: opened on Jul 6, 2018on Jul 6, 2018
+              - listitem "More information available below." [ref=e533]:
+                - 'heading "Beta Testing: X360CE 4.6.x.x Alpha" [level=3] [ref=e535]':
+                  - 'link "Beta Testing: X360CE 4.6.x.x Alpha" [ref=e536] [cursor=pointer]':
+                    - /url: /x360ce/x360ce/issues/795
+                    - generic [ref=e537]: "Beta Testing: X360CE 4.6.x.x Alpha"
+                - generic [ref=e542]:
+                  - img [ref=e544]
+                  - generic [ref=e547]: "Status: Closed (completed)."
+                - generic [ref=e551]:
+                  - generic [ref=e552]:
+                    - generic [ref=e553]: "#795"
+                    - generic [ref=e554]: In x360ce/x360ce;
+                  - generic [ref=e555]:
+                    - text: · by
+                    - link "EJocys" [ref=e556] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3AEJocys
+                    - text: was closed on Jul 12, 2018on Jul 12, 2018
+              - listitem "More information available below." [ref=e560]:
+                - heading "NBA 2K18 Twin USB Joystick help!!!" [level=3] [ref=e562]:
+                  - link "NBA 2K18 Twin USB Joystick help!!!" [ref=e563] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/678
+                    - generic [ref=e564]: NBA 2K18 Twin USB Joystick help!!!
+                - generic [ref=e569]:
+                  - img [ref=e571]
+                  - generic [ref=e574]: "Status: Closed (completed)."
+                - generic [ref=e578]:
+                  - generic [ref=e579]:
+                    - generic [ref=e580]: "#678"
+                    - generic [ref=e581]: In x360ce/x360ce;
+                  - generic [ref=e582]:
+                    - text: · by
+                    - link "pera405" [ref=e583] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Apera405
+                    - text: was closed on Oct 27, 2017on Oct 27, 2017
+              - listitem "More information available below." [ref=e587]:
+                - heading "Final Fantasy IX (steam) ghost buttons" [level=3] [ref=e589]:
+                  - link "Final Fantasy IX (steam) ghost buttons" [ref=e590] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/419
+                    - generic [ref=e591]: Final Fantasy IX (steam) ghost buttons
+                - generic [ref=e596]:
+                  - img [ref=e598]
+                  - generic [ref=e601]: "Status: Open."
+                - generic [ref=e605]:
+                  - generic [ref=e606]:
+                    - generic [ref=e607]: "#419"
+                    - generic [ref=e608]: In x360ce/x360ce;
+                  - generic [ref=e609]:
+                    - text: ·
+                    - link "lordmedo" [ref=e610] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Alordmedo
+                    - text: opened on Apr 29, 2016on Apr 29, 2016
+              - listitem "More information available below." [ref=e614]:
+                - heading "xbox360ce hangs (doesn't respond) when an xbox one controller is connected" [level=3] [ref=e616]:
+                  - link "xbox360ce hangs (doesn't respond) when an xbox one controller is connected" [ref=e617] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/378
+                    - generic [ref=e618]: xbox360ce hangs (doesn't respond) when an xbox one controller is connected
+                - generic [ref=e623]:
+                  - img [ref=e625]
+                  - generic [ref=e628]: "Status: Open."
+                - generic [ref=e632]:
+                  - generic [ref=e633]:
+                    - generic [ref=e634]: "#378"
+                    - generic [ref=e635]: In x360ce/x360ce;
+                  - generic [ref=e636]:
+                    - text: ·
+                    - link "DanielTrifonov" [ref=e637] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3ADanielTrifonov
+                    - text: opened on Mar 12, 2016on Mar 12, 2016
+              - listitem "More information available below." [ref=e641]:
+                - heading "[Enhancement] DS4 Controller Functionality Settings Tab" [level=3] [ref=e643]:
+                  - link "[Enhancement] DS4 Controller Functionality Settings Tab" [ref=e644] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/329
+                    - generic [ref=e645]: "[Enhancement] DS4 Controller Functionality Settings Tab"
+                - generic [ref=e650]:
+                  - img [ref=e652]
+                  - generic [ref=e655]: "Status: Closed (completed)."
+                - generic [ref=e659]:
+                  - generic [ref=e660]:
+                    - generic [ref=e661]: "#329"
+                    - generic [ref=e662]: In x360ce/x360ce;
+                  - generic [ref=e663]:
+                    - text: · by
+                    - link "shinra358" [ref=e664] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Ashinra358
+                    - text: was closed on Jan 13, 2016on Jan 13, 2016
+              - listitem "More information available below." [ref=e668]:
+                - heading "X360ce Keeps triggers pressed on key binding" [level=3] [ref=e670]:
+                  - link "X360ce Keeps triggers pressed on key binding" [ref=e671] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/126
+                    - generic [ref=e672]: X360ce Keeps triggers pressed on key binding
+                - generic [ref=e677]:
+                  - img [ref=e679]
+                  - generic [ref=e682]: "Status: Closed (completed)."
+                - generic [ref=e686]:
+                  - generic [ref=e687]:
+                    - generic [ref=e688]: "#126"
+                    - generic [ref=e689]: In x360ce/x360ce;
+                  - generic [ref=e690]:
+                    - text: · by
+                    - link "FeonixBrimstone" [ref=e691] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3AFeonixBrimstone
+                    - text: was closed on Jun 5, 2015on Jun 5, 2015
+              - listitem "More information available below." [ref=e695]:
+                - heading "Can't get it to work on GTA V" [level=3] [ref=e697]:
+                  - link "Can't get it to work on GTA V" [ref=e698] [cursor=pointer]:
+                    - /url: /x360ce/x360ce/issues/77
+                    - generic [ref=e699]: Can't get it to work on GTA V
+                - generic [ref=e704]:
+                  - img [ref=e706]
+                  - generic [ref=e709]: "Status: Closed (completed)."
+                - generic [ref=e713]:
+                  - generic [ref=e714]:
+                    - generic [ref=e715]: "#77"
+                    - generic [ref=e716]: In x360ce/x360ce;
+                  - generic [ref=e717]:
+                    - text: · by
+                    - link "mohahm1978" [ref=e718] [cursor=pointer]:
+                      - /url: /x360ce/x360ce/issues?q=disconnect%20game%20author%3Amohahm1978
+                    - text: was closed on May 12, 2015on May 12, 2015
+  - contentinfo [ref=e720]:
+    - heading "Footer" [level=2] [ref=e721]
+    - generic [ref=e722]:
+      - generic [ref=e723]:
+        - link "GitHub Homepage" [ref=e724] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e725]
+        - generic [ref=e727]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e728]:
+        - heading "Footer navigation" [level=3] [ref=e729]
+        - list "Footer navigation" [ref=e730]:
+          - listitem [ref=e731]:
+            - link "Terms" [ref=e732] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e733]:
+            - link "Privacy" [ref=e734] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e735]:
+            - link "Security" [ref=e736] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e737]:
+            - link "Status" [ref=e738] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e739]:
+            - link "Community" [ref=e740] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e741]:
+            - link "Docs" [ref=e742] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e743]:
+            - link "Contact" [ref=e744] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e745]:
+            - button "Manage cookies" [ref=e747] [cursor=pointer]
+          - listitem [ref=e748]:
+            - button "Do not share my personal information" [ref=e750] [cursor=pointer]

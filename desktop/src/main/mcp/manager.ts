@@ -104,14 +104,14 @@ class McpConnection {
         try { this.child?.stdin?.write(JSON.stringify(obj) + '\n'); } catch { /* pipe closed */ }
     }
 
-    private request(method: string, params: unknown): Promise<unknown> {
+    private request(method: string, params: unknown, timeoutMs: number = REQUEST_TIMEOUT_MS): Promise<unknown> {
         const id = this.nextId++;
         return new Promise<unknown>((resolve, reject) => {
             this.pending.set(id, { resolve, reject });
             this.write({ jsonrpc: '2.0', id, method, params });
             setTimeout(() => {
                 if (this.pending.has(id)) { this.pending.delete(id); reject(new Error(`mcp "${this.name}" ${method} timed out`)); }
-            }, REQUEST_TIMEOUT_MS);
+            }, timeoutMs);
         });
     }
 
@@ -138,7 +138,12 @@ class McpConnection {
     }
 
     async callTool(toolName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
-        const res = await this.request('tools/call', { name: toolName, arguments: args ?? {} }) as { content?: Array<{ type: string; text?: string }>; isError?: boolean };
+        // Tools legitimately run long (a build, a test suite, a 30s hardware poll). The 30s default is only
+        // meant for the initialize / tools-list handshake — give tools/call a real budget: honor an explicit
+        // timeout_ms arg (+15s margin so the tool's own timer fires first), else 10 minutes.
+        const declared = typeof (args as { timeout_ms?: unknown })?.timeout_ms === 'number' ? (args as { timeout_ms: number }).timeout_ms : 0;
+        const callTimeout = declared > 0 ? declared + 15_000 : 600_000;
+        const res = await this.request('tools/call', { name: toolName, arguments: args ?? {} }, callTimeout) as { content?: Array<{ type: string; text?: string }>; isError?: boolean };
         const text = (res?.content ?? [])
             .map(c => (c.type === 'text' ? (c.text ?? '') : JSON.stringify(c)))
             .join('\n');

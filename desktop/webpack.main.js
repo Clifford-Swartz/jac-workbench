@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   target: 'electron-main',
@@ -14,5 +15,10 @@ module.exports = {
   module: {
     rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }],
   },
+  plugins: [
+    // The ported KiCad router (Emscripten glue + .wasm) is loaded at runtime via a
+    // non-webpack require, so it must be copied into the build output verbatim.
+    new CopyPlugin({ patterns: [{ from: 'src/main/kicad/wasm', to: 'kicad/wasm' }] }),
+  ],
   externals: { electron: 'commonjs electron', ws: 'commonjs ws', 'electron-updater': 'commonjs electron-updater' },
 };

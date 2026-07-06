@@ -7,6 +7,26 @@ export interface ORModel {
 
 type SendFn = (msg: Record<string, unknown>) => void;
 
+export interface ORCredits { totalCredits: number; totalUsage: number; remaining: number; }
+
+// OpenRouter account balance: total purchased credits, total spent, and what's left.
+export async function fetchORCredits(apiKey: string): Promise<ORCredits | null> {
+    if (!apiKey) return null;
+    try {
+        const resp = await fetch('https://openrouter.ai/api/v1/credits', {
+            headers: { 'Authorization': `Bearer ${apiKey}` },
+        });
+        if (!resp.ok) return null;
+        const json = await resp.json() as { data?: { total_credits?: number; total_usage?: number } };
+        const d = json.data ?? {};
+        const totalCredits = typeof d.total_credits === 'number' ? d.total_credits : 0;
+        const totalUsage = typeof d.total_usage === 'number' ? d.total_usage : 0;
+        return { totalCredits, totalUsage, remaining: totalCredits - totalUsage };
+    } catch {
+        return null;
+    }
+}
+
 export async function fetchORModels(apiKey: string): Promise<ORModel[]> {
     try {
         const resp = await fetch('https://openrouter.ai/api/v1/models', {

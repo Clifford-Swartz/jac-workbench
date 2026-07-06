@@ -4,28 +4,72 @@
 <meta charset="UTF-8" />
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#1a1a2e; --panel:#16213e; --fg:#e0e0e0; --dim:#8a8a8a; --border:#333; --accent:#4daafc; }
   html, body { height:100%; }
-  body { background:#1a1a2e; color:#e0e0e0; font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
-  #top-bar { padding:8px 12px; background:#16213e; display:flex; gap:8px; align-items:center; border-bottom:1px solid #333; font-size:12px; }
+  body { background:var(--bg); color:var(--fg); font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; }
+  #top-bar { padding:8px 12px; background:var(--panel); display:flex; gap:8px; align-items:center; border-bottom:1px solid var(--border); font-size:12px; }
   #top-bar h1 { font-size:14px; font-weight:600; }
-  #top-bar button { background:#0f3460; color:#e0e0e0; border:1px solid #444; border-radius:4px; padding:4px 10px; cursor:pointer; font-size:11px; }
-  #top-bar button:hover { background:#1a5276; }
+  #top-bar button { background:var(--panel); color:var(--fg); border:1px solid var(--border); border-radius:4px; padding:4px 10px; cursor:pointer; font-size:11px; }
+  #top-bar button:hover { background:var(--border); }
   #top-bar .status { margin-left:auto; opacity:0.6; font-size:11px; }
   #main { flex:1; position:relative; overflow:hidden; }
-  #sch-canvas { width:100%; height:100%; background:#1a1a2e; display:block; }
-  #sch-palette { position:absolute; right:10px; top:10px; width:190px; background:rgba(22,33,62,0.94); border:1px solid #333; border-radius:8px; padding:8px; font-size:11px; max-height:80%; overflow-y:auto; backdrop-filter:blur(8px); }
-  #sch-palette h3 { font-size:11px; margin-bottom:6px; color:#4daafc; }
-  .lib-item { padding:4px 6px; cursor:pointer; border-radius:3px; display:flex; justify-content:space-between; }
-  .lib-item:hover { background:#1a3a5c; }
-  .lib-item .fp { opacity:0.45; font-size:9px; }
+  #sch-canvas { width:100%; height:100%; background:var(--bg); display:block; }
+  #sch-palette { position:absolute; right:10px; top:10px; width:190px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px; font-size:11px; max-height:80%; overflow-y:auto; backdrop-filter:blur(8px); }
+  #sch-palette h3 { font-size:11px; margin-bottom:6px; color:var(--accent); }
+  #sch-search { width:100%; box-sizing:border-box; margin-bottom:6px; background:var(--bg); color:var(--fg); border:1px solid var(--border); border-radius:4px; padding:4px 7px; font-size:11px; }
+  #sch-search:focus { outline:none; border-color:var(--accent); }
+  .lib-item { padding:4px 6px; cursor:pointer; border-radius:3px; display:flex; justify-content:space-between; gap:6px; }
+  .lib-item:hover { background:var(--border); }
+  .lib-item .fp { opacity:0.45; font-size:9px; white-space:nowrap; }
+  .lib-item .nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lib-note { opacity:0.5; font-size:9px; padding:4px 6px; }
+  #sch-drc-panel { position:absolute; right:10px; top:10px; width:310px; max-height:82%; overflow-y:auto; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px; font-size:11px; backdrop-filter:blur(8px); }
+  #sch-drc-panel h3 { font-size:11px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  #sch-drc-panel .drc-close { cursor:pointer; opacity:0.5; font-size:12px; }
+  #sch-drc-panel .drc-close:hover { opacity:1; }
+  .drc-item { padding:5px 7px; border-radius:4px; cursor:pointer; border-left:3px solid #888; margin-bottom:4px; background:rgba(255,255,255,0.02); }
+  .drc-item:hover { background:var(--border); }
+  .drc-item.error { border-left-color:#dd5647; }
+  .drc-item.warning { border-left-color:#e2b23c; }
+  .drc-item .dt { font-weight:600; }
+  .drc-item .dd { opacity:0.6; font-size:10px; margin-top:2px; line-height:1.35; }
+  .drc-note { opacity:0.55; padding:6px 7px; font-size:10px; }
+  .drc-ok { color:#3fb783; }
+  #sch-nc-panel { position:absolute; right:10px; top:10px; width:250px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px; font-size:11px; backdrop-filter:blur(8px); }
+  #sch-nc-panel h3 { font-size:11px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; color:var(--accent); }
+  #sch-nc-panel .nc-close { cursor:pointer; opacity:0.5; font-size:12px; color:var(--fg); }
+  .nc-row { display:flex; align-items:center; gap:6px; padding:4px 2px; }
+  .nc-row .nc-name { width:64px; font-weight:600; }
+  .nc-row .nc-nets { flex:1; opacity:0.45; font-size:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nc-row input { width:52px; background:var(--bg); color:var(--fg); border:1px solid var(--border); border-radius:3px; padding:2px 4px; font-size:11px; }
+  .nc-row .nc-unit { opacity:0.5; font-size:9px; }
+  #sch-props-panel { position:absolute; left:10px; bottom:34px; width:236px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px; font-size:11px; backdrop-filter:blur(8px); }
+  #sch-props-panel h3 { font-size:11px; margin-bottom:6px; color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pp-row { display:flex; align-items:center; gap:6px; padding:3px 0; }
+  .pp-row label { width:62px; opacity:0.65; }
+  .pp-row input { flex:1; min-width:0; background:var(--bg); color:var(--fg); border:1px solid var(--border); border-radius:3px; padding:3px 5px; font-size:11px; }
+  .pp-lcsc-auto { font-size:9px; opacity:0.5; padding:2px 0 0 68px; }
   .hint { position:absolute; left:10px; bottom:10px; font-size:10px; opacity:0.4; pointer-events:none; }
 </style>
 </head>
 <body>
   <div id="top-bar">
-    <h1>PCB / Schematic</h1>
+    <h1 id="tool-title">PCB / Schematic</h1>
     <button id="btn-clear">Clear</button>
-    <button id="btn-kicad">Export KiCad</button>
+    <button id="btn-save" title="Save this project (parts, wires, nets, tracks, zones, netclasses) to a .jac file.">💾 Save</button>
+    <button id="btn-open" title="Open a saved .jac project — replaces the current board.">📂 Open</button>
+    <button id="btn-erc" title="Electrical Rules Check — flags schematic problems (unconnected pins, dangling nets, duplicate references, no ground) before you route.">✔ ERC</button>
+    <button id="btn-wire" title="Wire tool — click a pin, then another pin, to connect them into a net. The wires ARE the schematic's electrical connections; they flow into the PCB as the ratsnest.">🔌 Wire: OFF</button>
+    <button id="btn-kicad">Export Schematic</button>
+    <button id="btn-sync" title="Update PCB from Schematic (F8) — pull the latest parts + nets from the schematic and rebuild the ratsnest, just like KiCad's schematic → board sync.">⬇ Update from Schematic</button>
+    <button id="btn-arrange" title="Auto-arrange the parts into a tidy grid on the board — sets their PCB positions (the schematic layout is left untouched). Drag parts to fine-tune.">⌗ Arrange</button>
+    <button id="btn-plane" title="Pour a ground plane on F.Cu over the board — floods copper on the GND net, connecting every GND pad. KiCad fills it (thermal reliefs + clearances) at export/DRC.">▚ Ground Plane</button>
+    <button id="btn-nets" title="Net classes — set the trace width per class. Power rails (GND/VCC/3V3/VBUS) route on the Power class (fat); everything else on Default (thin).">◈ Net Classes</button>
+    <button id="btn-pcb" title="Export a real KiCad .kicad_pcb — footprints + routed tracks + vias. Opens in KiCad.">Export PCB</button>
+    <button id="btn-fab" title="Generate a manufacturing package (Gerbers + drill + pick-and-place, zipped) — the bundle you send to JLCPCB / PCBWay to get boards made.">🏭 Fabricate</button>
+    <button id="btn-drc" title="Run KiCad's real Design-Rule Check on the board — clearance, shorts, unconnected nets, track/via/hole sizing. Violations are listed and marked on the canvas.">✓ DRC</button>
+    <button id="btn-route" title="Toggle KiCad WASM routing — click a pad to start, move to preview, click a pad to commit. Parts + placed tracks are obstacles.">⚡ Route: OFF</button>
+    <button id="btn-layer" title="Copper layer for the next track. B.Cu tracks ignore F.Cu parts/tracks — route on 2 layers.">▦ F.Cu</button>
     <span class="status" id="status">Connecting…</span>
   </div>
   <div id="main">
@@ -36,16 +80,25 @@
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#grid)"/>
+      <g id="sch-zones"></g>
       <g id="sch-components"></g>
       <g id="sch-wires"></g>
+      <g id="sch-route"></g>
+      <g id="sch-drc"></g>
     </svg>
-    <div id="sch-palette"><h3>Components</h3><div id="sch-lib-list"></div></div>
-    <div class="hint">click a part to place · drag to move · Del removes · scroll to zoom · middle/empty-drag to pan</div>
+    <div id="sch-palette"><h3>Components</h3><input id="sch-search" placeholder="🔍 search 22k KiCad parts…" autocomplete="off" spellcheck="false"><div id="sch-lib-list"></div></div>
+    <div id="sch-drc-panel" style="display:none"></div>
+    <div id="sch-nc-panel" style="display:none"></div>
+    <div id="sch-props-panel" style="display:none"></div>
+    <div class="hint" id="hint">click a part to place · drag to move · Del removes · scroll to zoom · middle/empty-drag to pan</div>
   </div>
 
 <script>
 (function () {
   const PCB_API = 'http://127.0.0.1:5051';
+  // One backend, two views: 'sch' = draw + wire (define nets), 'pcb' = place + route + fabricate.
+  // Both iframes share the :5051 session, so the schematic flows into the PCB (KiCad's model).
+  const VIEW = new URLSearchParams(location.search).get('mode') === 'schematic' ? 'sch' : 'pcb';
   const statusEl = document.getElementById('status');
   const svg = document.getElementById('sch-canvas');
   const compsEl = document.getElementById('sch-components');
@@ -59,6 +112,21 @@
   let panX = 0, panY = 0, zoom = 1;
   let isPanning = false, panStartX = 0, panStartY = 0;
   let dragging = false, dragX = 0, dragY = 0;
+  let lastSig = '';           // signature of the last rendered schematic, for idle cross-tab sync
+
+  // Position of a part in the CURRENT view: PCB view uses the board layout (pcb_x/pcb_y),
+  // schematic view uses the sheet layout (x/y). The two are independent, like KiCad.
+  function px(c) { return (VIEW === 'pcb' && c.pcb_x != null) ? c.pcb_x : c.x; }
+  function py(c) { return (VIEW === 'pcb' && c.pcb_y != null) ? c.pcb_y : c.y; }
+
+  // Cheap fingerprint of the shared model — parts (id/type/both positions/rot), wires, nets, tracks.
+  function schemSig(d) {
+    const comps = (d.components || []).map(function (c) {
+      return c.id + ':' + c.type + ':' + c.x + ',' + c.y + ':' + (c.pcb_x) + ',' + (c.pcb_y) + ':' + (c.rotation || 0);
+    }).join('|');
+    const nets = Object.keys(d.nets || {}).sort().join(',');
+    return comps + '#' + (d.n_wires || 0) + '#' + nets + '#' + ((d.tracks || []).length);
+  }
 
   async function post(tool, args) {
     try {
@@ -75,14 +143,25 @@
     const t = 'translate(' + panX + ',' + panY + ') scale(' + zoom + ')';
     compsEl.setAttribute('transform', t);
     wiresEl.setAttribute('transform', t);
+    var re = document.getElementById('sch-route'); if (re) re.setAttribute('transform', t);
+    var de = document.getElementById('sch-drc'); if (de) de.setAttribute('transform', t);
+    var ze = document.getElementById('sch-zones'); if (ze) ze.setAttribute('transform', t);
   }
 
   function renderSchematic(data) {
     compsEl.innerHTML = ''; wiresEl.innerHTML = '';
     compData = data.components || [];
+    netlist = data.nets || {};                 // schematic nets drive the PCB ratsnest
+    if (data.tracks && typeof loadTracksFrom === 'function') loadTracksFrom(data);   // routed copper from the board
+    if (typeof zoneData !== 'undefined') zoneData = data.zones || [];               // copper pours
+    if (data.netclasses) { netclasses = data.netclasses; netClassMap = data.net_class || {}; }   // per-net widths
     if (selectedIdx >= compData.length) selectedIdx = -1;
+    if (typeof drawRoutes === 'function') setTimeout(drawRoutes, 0);   // refresh ratsnest + tracks
+    if (typeof drawZones === 'function') setTimeout(drawZones, 0);     // refresh copper pours
 
-    (data.wires || []).forEach(function (w) {
+    // Green schematic wires are the SCHEMATIC representation of nets; the PCB view
+    // shows the same nets as the gold ratsnest instead, so only draw wires in 'sch'.
+    if (VIEW === 'sch') (data.wires || []).forEach(function (w) {
       if (!w.points || w.points.length < 2) return;
       const d = 'M ' + w.points.map(function (p) { return p[0] + ' ' + p[1]; }).join(' L ');
       const path = document.createElementNS(SVGNS, 'path');
@@ -99,18 +178,20 @@
     compData.forEach(function (comp, idx) {
       const lib = library[comp.type] || {};
       const g = document.createElementNS(SVGNS, 'g');
-      g.setAttribute('transform', 'translate(' + comp.x + ',' + comp.y + ') rotate(' + (comp.rotation || 0) + ')');
+      g.setAttribute('transform', 'translate(' + px(comp) + ',' + py(comp) + ') rotate(' + (comp.rotation || 0) + ')');
       g.style.color = SCH_COLORS[idx % SCH_COLORS.length];
       g.style.cursor = 'pointer';
 
-      if (lib.svg) { const s = document.createElementNS(SVGNS, 'g'); s.innerHTML = lib.svg; g.appendChild(s); }
+      const fpg = (VIEW === 'pcb') ? (lib.footprint || null) : null;   // real land pattern in PCB view
+      if (fpg) { drawFootprint(g, fpg); }
+      else if (lib.svg) { const s = document.createElementNS(SVGNS, 'g'); s.innerHTML = lib.svg; g.appendChild(s); }
       else {
         const rect = document.createElementNS(SVGNS, 'rect');
         rect.setAttribute('x','-20'); rect.setAttribute('y','-15'); rect.setAttribute('width','40'); rect.setAttribute('height','30');
         rect.setAttribute('fill','none'); rect.setAttribute('stroke','currentColor'); rect.setAttribute('stroke-width','1.5');
         g.appendChild(rect);
       }
-      Object.values(lib.pins || {}).forEach(function (pin) {
+      if (!fpg) Object.values(lib.pins || {}).forEach(function (pin) {   // schematic pins (footprint draws its own pads)
         const dot = document.createElementNS(SVGNS, 'circle');
         dot.setAttribute('cx', pin.x); dot.setAttribute('cy', pin.y); dot.setAttribute('r','3'); dot.setAttribute('fill','#4daafc');
         g.appendChild(dot);
@@ -123,7 +204,9 @@
       val.textContent = (comp.properties || {}).value || ''; g.appendChild(val);
 
       if (idx === selectedIdx) {
-        const hw = (lib.w || 40)/2 + 6, hh = (lib.h || 30)/2 + 6;
+        let hw = (lib.w || 40)/2 + 6, hh = (lib.h || 30)/2 + 6;
+        if (fpg && fpg.bbox) { const b = fpg.bbox;
+          hw = mm2w(Math.max(Math.abs(b[0]), Math.abs(b[2]))) + 4; hh = mm2w(Math.max(Math.abs(b[1]), Math.abs(b[3]))) + 4; }
         const sel = document.createElementNS(SVGNS, 'rect');
         sel.setAttribute('x', String(-hw)); sel.setAttribute('y', String(-hh)); sel.setAttribute('width', String(hw*2)); sel.setAttribute('height', String(hh*2));
         sel.setAttribute('fill','none'); sel.setAttribute('stroke','#4daafc'); sel.setAttribute('stroke-width','2'); sel.setAttribute('stroke-dasharray','4,2'); sel.setAttribute('rx','3');
@@ -132,6 +215,8 @@
 
       g.addEventListener('mousedown', (function (capturedIdx) { return function (e) {
         e.stopPropagation();
+        if (wireOn) { onWireClick(e); return; }      // in wire mode, a click on a pin wires it into a net
+        if (routeOn) { onRouteClick(e); return; }   // in route mode, a click routes (parts are obstacles)
         selectedIdx = capturedIdx; dragging = true; isPanning = false;
         const rect = svg.getBoundingClientRect();
         dragX = (e.clientX - rect.left - panX) / zoom;
@@ -142,7 +227,11 @@
       compsEl.appendChild(g);
     });
 
-    statusEl.textContent = (data.n_components || compData.length) + ' components, ' + (data.n_wires || 0) + ' wires';
+    // Only a real model change (full payload) invalidates DRC — not a selection-only redraw.
+    if (data.nets !== undefined || data.n_components !== undefined) { clearDrc(); lastSig = schemSig(data); }
+    if (VIEW === 'sch') statusEl.textContent = (data.n_components || compData.length) + ' parts, ' + (data.n_wires || 0) + ' wires';
+    else statusEl.textContent = (data.n_components || compData.length) + ' parts, ' + Object.keys(netlist).length + ' nets, ' + committed.length + ' tracks';
+    if (typeof renderPropsPanel === 'function') renderPropsPanel();   // selected-part editor (value/footprint/LCSC)
   }
 
   function renderLibrary(lib) {
@@ -166,12 +255,79 @@
   async function refresh() { const r = await getJSON('/schematic'); if (r) renderSchematic(r); }
   async function refreshLibrary() { const r = await getJSON('/library'); if (r && r.library) renderLibrary(r.library); }
 
+  // Search KiCad's real 22k-symbol library; a picked result drops a real part (pins + footprint) onto the board.
+  function escLib(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function renderSearchResults(results, q) {
+    const el = document.getElementById('sch-lib-list'); el.innerHTML = '';
+    if (!results.length) { el.innerHTML = '<div class="lib-note">No KiCad parts match "' + escLib(q) + '".</div>'; return; }
+    results.forEach(function (rr) {
+      const item = document.createElement('div'); item.className = 'lib-item';
+      item.innerHTML = '<span class="nm" title="' + escLib(rr.libId + (rr.desc ? ' — ' + rr.desc : '')) + '">' + escLib(rr.name) + '</span><span class="fp">' + escLib(rr.lib) + '</span>';
+      item.addEventListener('click', function () { placeSymbol(rr.libId, rr.name); });
+      el.appendChild(item);
+    });
+  }
+  async function placeSymbol(libId, name) {
+    statusEl.textContent = 'Loading ' + (name || libId) + '…';
+    const g = await window.parent.jac.kicadSymbolGet(libId);
+    if (!g || !g.ok) { statusEl.textContent = 'Could not load ' + libId + ': ' + (g && g.error || '?'); return; }
+    const r = await post('add_symbol', { def: g.def, x: Math.round((320 - panX) / zoom), y: Math.round((250 - panY) / zoom) });
+    if (r && r.components) {
+      const lr = await getJSON('/library'); if (lr && lr.library) library = lr.library;   // learn the new part (keep search list)
+      renderSchematic(r);
+      statusEl.textContent = 'Placed ' + (g.def.name || libId) + (g.def.footprint ? ' (' + g.def.footprint + ')' : ' — no default footprint') + '.';
+    } else statusEl.textContent = 'Place failed: ' + (r && r.error || '?');
+  }
+  (function () {
+    const box = document.getElementById('sch-search'); if (!box) return;
+    let t;
+    box.addEventListener('input', function () {
+      clearTimeout(t); const q = box.value.trim();
+      t = setTimeout(function () {
+        if (q.length < 2) { renderLibrary(library); return; }              // restore built-ins
+        window.parent.jac.kicadSymbolSearch(q).then(function (res) {
+          if (res && res.ok) renderSearchResults(res.results, q);
+          else statusEl.textContent = 'Symbol search failed: ' + (res && res.error || '?');
+        });
+      }, 250);
+    });
+  })();
+
+  // Center + zoom the view on the placed components (used when the chat builds a schematic).
+  function fitView() {
+    if (!compData.length) return;
+    var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    compData.forEach(function (c) {
+      var lib = library[c.type] || {}, hw = (lib.w || 40) / 2 + 24, hh = (lib.h || 30) / 2 + 24;
+      if (VIEW === 'pcb' && lib.footprint && lib.footprint.bbox) { var b = lib.footprint.bbox;
+        hw = mm2w(Math.max(Math.abs(b[0]), Math.abs(b[2]))) + 24; hh = mm2w(Math.max(Math.abs(b[1]), Math.abs(b[3]))) + 24; }
+      minX = Math.min(minX, px(c) - hw); minY = Math.min(minY, py(c) - hh);
+      maxX = Math.max(maxX, px(c) + hw); maxY = Math.max(maxY, py(c) + hh);
+    });
+    var bw = Math.max(1, maxX - minX), bh = Math.max(1, maxY - minY);
+    var vw = svg.clientWidth || 600, vh = svg.clientHeight || 400;
+    zoom = Math.max(0.2, Math.min(2, Math.min(vw / bw, vh / bh)));
+    panX = vw / 2 - ((minX + maxX) / 2) * zoom;
+    panY = vh / 2 - ((minY + maxY) / 2) * zoom;
+    applyTransform();
+  }
+
   // pan
   svg.addEventListener('mousedown', function (e) {
     if (dragging) return;
+    if (wireOn) { onWireClick(e); return; }      // wire mode: click a pin, not pan
+    if (routeOn) { onRouteClick(e); return; }   // route mode: click = start/commit, not pan
     isPanning = true; panStartX = e.clientX - panX; panStartY = e.clientY - panY; svg.style.cursor = 'grabbing';
   });
   window.addEventListener('mousemove', function (e) {
+    if (wireOn) { wireCursor = worldFromEvent(e); drawWirePreview(); return; }  // rubber-band to the cursor
+    if (routeOn) {
+      const w = worldFromEvent(e);
+      if (routing) { routeMoveTo(w); }
+      else { const np = snapPad(w);
+             if ((np&&!cursorPad) || (!np&&cursorPad) || (np&&cursorPad&&(np.x!==cursorPad.x||np.y!==cursorPad.y))) { cursorPad = np; drawRoutes(); } }
+      return;
+    }
     if (dragging && selectedIdx >= 0) {
       const rect = svg.getBoundingClientRect();
       dragX = (e.clientX - rect.left - panX) / zoom;
@@ -186,7 +342,7 @@
   window.addEventListener('mouseup', function () {
     if (dragging && selectedIdx >= 0) {
       const c = compData[selectedIdx];
-      if (c) post('move_component', { id: c.id, x: Math.round(dragX), y: Math.round(dragY) }).then(function (r) { if (r && r.components) renderSchematic(r); });
+      if (c) post('move_component', { id: c.id, x: Math.round(dragX), y: Math.round(dragY), view: (VIEW === 'pcb' ? 'pcb' : 'schematic') }).then(function (r) { if (r && r.components) renderSchematic(r); });
       dragging = false;
     }
     isPanning = false; svg.style.cursor = 'default';
@@ -200,7 +356,42 @@
     applyTransform();
   }, { passive: false });
 
+  function undoRoute() {
+    if (routing) {   // mid-track: undo cancels the in-progress route
+      resetRoute(); drawRoutes();
+      statusEl.textContent = 'Route cancelled.'; return;
+    }
+    if (committed.length) {
+      const t = committed.pop();
+      if (t.a && t.b) delete routedPairs[pairKey(t.a, t.b)];   // its ratsnest airwire reappears
+      if (t.id) post('remove_track', { id: t.id });            // drop from the board too
+      redoStack.push(t); drawRoutes(); clearDrc();
+      statusEl.textContent = 'Undo — ' + committed.length + ' track(s) left. (Ctrl+Shift+Z to redo)';
+    }
+  }
+  function redoRoute() {
+    if (redoStack.length) {
+      const t = redoStack.pop();
+      if (t.a && t.b) routedPairs[pairKey(t.a, t.b)] = true;
+      committed.push(t); drawRoutes(); persistTrack(t); clearDrc();   // re-add to the board (new id)
+      statusEl.textContent = 'Redo — ' + committed.length + ' track(s).';
+    }
+  }
+
   window.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+      e.preventDefault(); if (e.shiftKey) redoRoute(); else undoRoute(); return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redoRoute(); return; }
+    if (e.key === 'F8' && VIEW === 'pcb') { e.preventDefault(); const b = document.getElementById('btn-sync'); if (b) b.click(); return; }
+    if ((e.key === 'v' || e.key === 'V') && routing) { e.preventDefault(); dropVia(); return; }   // via / layer switch
+    if (e.key === 'Escape' && wireOn && wireA) {
+      wireA = null; wireCursor = null; drawWirePreview(); statusEl.textContent = 'Wire cancelled.'; return;
+    }
+    if (e.key === 'Escape' && routing) {
+      resetRoute(); drawRoutes();
+      statusEl.textContent = 'Route cancelled.'; return;
+    }
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIdx >= 0) {
       const c = compData[selectedIdx];
       if (c) { selectedIdx = -1; post('remove_component', { id: c.id }).then(function (r) { if (r && r.components) renderSchematic(r); else refresh(); }); }
@@ -210,6 +401,20 @@
   document.getElementById('btn-clear').addEventListener('click', function () {
     post('reset', {}).then(function () { selectedIdx = -1; refresh(); });
   });
+  document.getElementById('btn-save').addEventListener('click', async function () {
+    const p = await window.parent.jac.projectSaveDialog();
+    if (!p) return;
+    const r = await post('save_project', { path: p });
+    statusEl.textContent = (r && r.ok) ? ('💾 Saved project → ' + p) : ('Save failed: ' + ((r && r.error) || '?'));
+  });
+  document.getElementById('btn-open').addEventListener('click', async function () {
+    const p = await window.parent.jac.projectOpenDialog();
+    if (!p) return;
+    const r = await post('load_project', { path: p });
+    if (r && r.ok) { selectedIdx = -1; clearDrc(); renderSchematic(r); fitView();
+      statusEl.textContent = '📂 Opened ' + p + ' — ' + (r.n_components || compData.length) + ' parts.'; }
+    else statusEl.textContent = 'Open failed: ' + ((r && r.error) || '?');
+  });
   document.getElementById('btn-kicad').addEventListener('click', async function () {
     const dir = await window.parent.jac.openFolderDialog();
     if (!dir) return;
@@ -217,12 +422,667 @@
     const r = await post('export_kicad', { path: path });
     statusEl.textContent = (r && r.ok) ? ('Exported → ' + path) : ('Export failed: ' + (r && r.error || '?'));
   });
+  document.getElementById('btn-pcb').addEventListener('click', async function () {
+    const dir = await window.parent.jac.openFolderDialog();
+    if (!dir) return;
+    const path = dir + '\\jac_board.kicad_pcb';
+    const r = await post('export_pcb', { path: path });
+    statusEl.textContent = (r && r.ok)
+      ? ('Exported real KiCad PCB → ' + path + ' (' + (r.n_footprints||0) + ' parts, ' + (r.n_tracks||0) + ' tracks)')
+      : ('PCB export failed: ' + (r && r.error || '?'));
+  });
+  document.getElementById('btn-fab').addEventListener('click', async function () {
+    statusEl.textContent = 'Building fab package — Gerbers, drill, pick-and-place, BOM…';
+    const ex = await post('export_pcb', {});          // write .kicad_pcb to the default board path
+    if (!ex || !ex.ok) { statusEl.textContent = 'Board export failed: ' + (ex && ex.error || '?'); return; }
+    const bom = await post('export_bom', {});         // assembly BOM (value/footprint/LCSC per part)
+    const fab = await window.parent.jac.kicadFabricate(ex.path, (bom && bom.path) || null);
+    if (fab && fab.ok) {
+      const bits = [fab.gerbers + ' Gerbers'];
+      if (fab.hasDrill) bits.push('drill');
+      if (fab.hasCpl) bits.push('pick-and-place');
+      if (fab.hasBom) bits.push('BOM' + (bom && bom.missing_lcsc ? ' (⚠ ' + bom.missing_lcsc + ' part(s) missing LCSC #)' : ''));
+      statusEl.textContent = '🏭 Fab package ready → ' + fab.zip + '  (' + bits.join(' + ') + ') — upload to JLCPCB / PCBWay to order assembled boards.';
+    } else {
+      statusEl.textContent = 'Fabricate failed: ' + (fab && fab.error || '?');
+    }
+  });
 
+  // --- Interactive KiCad WASM routing: click to start, move to preview the walkaround, click to commit ---
+  const routeEl = document.getElementById('sch-route');
+  const drcEl = document.getElementById('sch-drc');
+  const mm2w = function (v) { return v / 0.05; };   // KiCad DRC reports mm; export uses 0.05 mm/world-unit → world = mm/0.05
+  function clearDrc() {   // wipe DRC markers + the findings panel whenever the board changes under them
+    if (drcEl) drcEl.innerHTML = '';
+    const p = document.getElementById('sch-drc-panel'); if (p) { p.style.display = 'none'; p.innerHTML = ''; }
+  }
+
+  // Copper pours (ground/power planes). We draw the outline + a translucent flood of the region
+  // (the true KiCad fill — with clearances + thermals — is computed at export/DRC by kicad-cli).
+  let zoneData = [];
+  function drawZones() {
+    const el = document.getElementById('sch-zones'); if (!el) return;
+    el.innerHTML = '';
+    if (VIEW !== 'pcb') return;
+    zoneData.forEach(function (z) {
+      if (!z.poly || z.poly.length < 3) return;
+      const col = LAYER_COLOR[z.layer] || '#4daafc';
+      const d = 'M ' + z.poly.map(function (p) { return p[0] + ' ' + p[1]; }).join(' L ') + ' Z';
+      const pa = document.createElementNS(SVGNS, 'path');
+      pa.setAttribute('d', d); pa.setAttribute('fill', col); pa.setAttribute('fill-opacity', '0.10');
+      pa.setAttribute('stroke', col); pa.setAttribute('stroke-opacity', '0.55');
+      pa.setAttribute('stroke-width', '1.2'); pa.setAttribute('stroke-dasharray', '6,3');
+      el.appendChild(pa);
+      const lbl = document.createElementNS(SVGNS, 'text');
+      lbl.setAttribute('x', z.poly[0][0] + 6); lbl.setAttribute('y', z.poly[0][1] + 14);
+      lbl.setAttribute('font-size', '9'); lbl.setAttribute('fill', col); lbl.setAttribute('opacity', '0.7');
+      lbl.textContent = (z.net || 'GND') + ' plane · ' + (LAYER_NAME[z.layer] || 'F.Cu');
+      el.appendChild(lbl);
+    });
+  }
+
+  // Draw a real KiCad land pattern into a component <g> (already translated+rotated to the part).
+  // Footprint geometry is in mm; the group is in world units, so convert with mm2w.
+  function drawFootprint(g, fp) {
+    if (fp.courtyard) {                                   // keep-out outline (magenta dashed)
+      const c = fp.courtyard, cr = document.createElementNS(SVGNS, 'rect');
+      cr.setAttribute('x', mm2w(c[0])); cr.setAttribute('y', mm2w(c[1]));
+      cr.setAttribute('width', mm2w(c[2] - c[0])); cr.setAttribute('height', mm2w(c[3] - c[1]));
+      cr.setAttribute('fill', 'none'); cr.setAttribute('stroke', '#a24ea2'); cr.setAttribute('stroke-width', '0.5');
+      cr.setAttribute('stroke-dasharray', '3,2'); cr.setAttribute('opacity', '0.5'); g.appendChild(cr);
+    }
+    (fp.silk || []).forEach(function (poly) {              // silk body (light grey)
+      if (!poly || poly.length < 2) return;
+      const d = 'M ' + poly.map(function (p) { return mm2w(p[0]) + ' ' + mm2w(p[1]); }).join(' L ');
+      const pa = document.createElementNS(SVGNS, 'path');
+      pa.setAttribute('d', d); pa.setAttribute('fill', 'none'); pa.setAttribute('stroke', '#d0d0d0');
+      pa.setAttribute('stroke-width', '0.6'); pa.setAttribute('opacity', '0.65'); g.appendChild(pa);
+    });
+    (fp.pads || []).forEach(function (p) {                 // copper pads (gold; THT drawn with a hole)
+      const w = mm2w(p.w), h = mm2w(p.h), pr = document.createElementNS(SVGNS, 'rect');
+      pr.setAttribute('x', mm2w(p.x) - w / 2); pr.setAttribute('y', mm2w(p.y) - h / 2);
+      pr.setAttribute('width', w); pr.setAttribute('height', h);
+      pr.setAttribute('fill', p.thru ? '#caa76a' : '#c8860a');
+      if (p.rratio) { const rr = Math.min(w, h) * p.rratio; pr.setAttribute('rx', rr); pr.setAttribute('ry', rr); }
+      g.appendChild(pr);
+      if (p.thru && p.drill) {
+        const hole = document.createElementNS(SVGNS, 'circle');
+        hole.setAttribute('cx', mm2w(p.x)); hole.setAttribute('cy', mm2w(p.y)); hole.setAttribute('r', mm2w(p.drill) / 2);
+        hole.setAttribute('fill', '#1a1a2e'); g.appendChild(hole);
+      }
+    });
+  }
+  const NM_PER_WORLD = 50000;              // 1 canvas world-unit = 0.05 mm; a 40px part = 2 mm
+  const TRACK_NM = 250000, CLEAR_NM = 200000, MODE = 'walkaround';
+
+  // Netclasses: each net routes at its class's trace width (Power rails fat, signals thin).
+  let netclasses = {};                     // { className: {track_width, clearance, ...} } in mm
+  let netClassMap = {};                    // { netName: className }
+  let curTrackWorld = 5;                   // width (world units) of the track currently being routed
+  function netWidthMm(net) {
+    const cls = netClassMap[net] || 'Default';
+    return (netclasses[cls] && netclasses[cls].track_width) || 0.25;
+  }
+  function netWidthWorld(net) { return netWidthMm(net) / 0.05; }   // mm -> world units
+  const SNAP_W = 16;                        // pad snap radius (world units)
+  const w2nm = function (w) { return Math.round(w * NM_PER_WORLD); };
+  const nm2w = function (nm) { return nm / NM_PER_WORLD; };
+
+  let routeOn = false;         // routing tool armed
+  let routing = false;         // mid-track (between start click and commit click)
+  let committed = [];          // committed tracks: [{ segs:[{ax,ay,bx,by,layer} world], vias, a, b }]
+  let redoStack = [];          // undone tracks, for redo
+  let netlist = {};            // { net_name: [{comp_id, pin}, ...] } — the schematic's nets
+  let routedPairs = {};        // "compA:pinA|compB:pinB" -> true, ratsnest connections already routed
+  let preview = null;          // in-progress polyline (world), on curLayer
+  let startPad = null;         // { x, y, compIdx } start anchor
+  let cursorPad = null;        // pad near the cursor (magnet + ratsnest target)
+  let curLayer = 0;            // 0 = F.Cu (top), 1 = B.Cu (bottom)
+  let routeLegs = [];          // committed legs of the CURRENT track (each { segs } on its layer), split by vias
+  let routeVias = [];          // vias placed mid-route (world points) where the track switches layer
+  let routeCursorW = null;     // latest cursor world position while routing (where a via drops)
+  let routeAnchor = null;      // the ORIGINAL start pad (startPad gets reassigned to each via)
+  function resetRoute() { routing = false; preview = null; startPad = null; cursorPad = null; routeLegs = []; routeVias = []; routeAnchor = null; }
+  const LAYER_COLOR = { 0: '#4daafc', 1: '#f0813c' };   // F.Cu blue, B.Cu orange
+  const LAYER_NAME  = { 0: 'F.Cu', 1: 'B.Cu' };
+
+  // Wire tool (schematic view): pick a pin, pick a second pin -> add_wire -> net.
+  let wireOn = false;          // wire tool armed
+  let wireA = null;            // first picked pin { compId, pin, x, y }
+  let wireCursor = null;       // world cursor while wiring (rubber-band)
+
+  function worldFromEvent(e) {
+    const rect = svg.getBoundingClientRect();
+    return { x: (e.clientX - rect.left - panX) / zoom, y: (e.clientY - rect.top - panY) / zoom };
+  }
+  function nmPathToWorld(poly) { return (poly || []).map(function (p) { return { x: nm2w(p.x), y: nm2w(p.y) }; }); }
+  // Committed geometry (nm items) -> world segments (with layer) + vias.
+  function itemsToWorldSegs(items) {
+    const segs = [], vias = [];
+    (items || []).forEach(function (it) {
+      if (it.kind === 1) vias.push({ x: nm2w(it.ax), y: nm2w(it.ay), layer: it.layer });
+      else segs.push({ ax: nm2w(it.ax), ay: nm2w(it.ay), bx: nm2w(it.bx), by: nm2w(it.by), layer: it.layer });
+    });
+    return { segs: segs, vias: vias };
+  }
+
+  // World positions of every component pad (compId + pin), respecting placement rotation.
+  function allPads() {
+    const pads = [];
+    compData.forEach(function (c, idx) {
+      const lib = library[c.type] || {};
+      const rot = (c.rotation || 0) * Math.PI / 180, cs = Math.cos(rot), sn = Math.sin(rot);
+      // PCB view: pads come from the real footprint (mm), keyed by symbol pin. Power flags
+      // have no footprint → no board pads. Schematic view: symbol pins (world units).
+      const usingFp = (VIEW === 'pcb' && lib.footprint);
+      if (VIEW === 'pcb' && !lib.footprint) return;          // power flags have no board pads — not routable
+      const src = usingFp ? lib.footprint.pins : lib.pins;
+      if (!src) return;
+      Object.keys(src).forEach(function (pinName) {
+        const pin = src[pinName];
+        const lx = usingFp ? mm2w(pin.x) : pin.x, ly = usingFp ? mm2w(pin.y) : pin.y;
+        pads.push({ x: px(c) + lx * cs - ly * sn, y: py(c) + lx * sn + ly * cs,
+                    compIdx: idx, compId: c.id, pin: pinName });
+      });
+    });
+    return pads;
+  }
+  function snapPad(w) {
+    let best = null, bd = SNAP_W * SNAP_W;
+    allPads().forEach(function (p) { const d = (p.x-w.x)*(p.x-w.x) + (p.y-w.y)*(p.y-w.y); if (d < bd) { bd = d; best = p; } });
+    return best;
+  }
+  // Which schematic net a pad belongs to (null if unconnected in the schematic).
+  function padNet(pad) {
+    if (!pad) return null;
+    for (const nn in netlist)
+      if (netlist[nn].some(function (p) { return p.comp_id === pad.compId && String(p.pin) === String(pad.pin); })) return nn;
+    return null;
+  }
+  function pairKey(a, b) {
+    const ka = a.compId + ':' + a.pin, kb = b.compId + ':' + b.pin;
+    return ka < kb ? ka + '|' + kb : kb + '|' + ka;
+  }
+  // The ratsnest: unrouted airwires the schematic says must be connected.
+  function ratsnestLines() {
+    const pads = allPads(), lines = [];
+    function padFor(cid, pin) { return pads.find(function (p) { return p.compId === cid && String(p.pin) === String(pin); }); }
+    for (const nn in netlist) {
+      const np = netlist[nn].map(function (pp) { return padFor(pp.comp_id, pp.pin); }).filter(Boolean);
+      for (let i = 1; i < np.length; i++)                 // chain the net's pads
+        if (!routedPairs[pairKey(np[i-1], np[i])]) lines.push({ a: np[i-1], b: np[i], net: nn });
+    }
+    return lines;
+  }
+
+  function polyEl(poly, color, width, dash) {
+    const d = 'M ' + poly.map(function (p) { return p.x + ' ' + p.y; }).join(' L ');
+    const path = document.createElementNS(SVGNS, 'path');
+    path.setAttribute('d', d); path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color); path.setAttribute('stroke-width', String(width));
+    path.setAttribute('stroke-linecap', 'round'); path.setAttribute('stroke-linejoin', 'round');
+    if (dash) path.setAttribute('stroke-dasharray', dash);
+    return path;
+  }
+  function dotEl(p, color, r) {
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', String(r)); c.setAttribute('fill', color);
+    return c;
+  }
+  function segEl(s, color, width) {
+    const p = document.createElementNS(SVGNS, 'path');
+    p.setAttribute('d', 'M ' + s.ax + ' ' + s.ay + ' L ' + s.bx + ' ' + s.by);
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', color); p.setAttribute('stroke-width', String(width));
+    p.setAttribute('stroke-linecap', 'round');
+    return p;
+  }
+  function padLabel(pad) { const c = pad && compData[pad.compIdx]; return (c && c.ref ? c.ref : '?') + '.' + (pad ? pad.pin : '?'); }
+  // Rubber-band while wiring: the anchor pin + a dashed line to the cursor / snapped pin.
+  function drawWirePreview() {
+    routeEl.innerHTML = '';
+    if (!wireOn) return;
+    const snap = wireCursor ? snapPad(wireCursor) : null;
+    if (wireA) {
+      const target = snap ? { x: snap.x, y: snap.y } : wireCursor;
+      if (target) routeEl.appendChild(polyEl([{ x: wireA.x, y: wireA.y }, target], '#4ec990', 1.5, '4,3'));
+      routeEl.appendChild(dotEl({ x: wireA.x, y: wireA.y }, '#4ec990', 5));
+    }
+    if (snap) routeEl.appendChild(dotEl({ x: snap.x, y: snap.y }, '#ffcc44', 5));
+  }
+  async function onWireClick(e) {
+    const pad = snapPad(worldFromEvent(e));
+    if (!pad) { statusEl.textContent = 'Click a pin (the blue dots) to wire from / to.'; return; }
+    if (!wireA) {
+      wireA = { compId: pad.compId, pin: pad.pin, x: pad.x, y: pad.y };
+      drawWirePreview();
+      statusEl.textContent = 'Wiring from ' + padLabel(pad) + ' — click the pin to connect it to (Esc cancels).';
+      return;
+    }
+    if (pad.compId === wireA.compId && String(pad.pin) === String(wireA.pin)) {
+      wireA = null; wireCursor = null; drawWirePreview(); statusEl.textContent = 'Wire cancelled (same pin).'; return;
+    }
+    const fromLbl = padLabel({ compIdx: compData.findIndex(function (c) { return c.id === wireA.compId; }), pin: wireA.pin });
+    const r = await post('add_wire', { from_comp: wireA.compId, from_pin: wireA.pin, to_comp: pad.compId, to_pin: pad.pin });
+    wireA = null; wireCursor = null;
+    if (r && r.components) {
+      renderSchematic(r);
+      statusEl.textContent = 'Wired ' + fromLbl + ' → ' + padLabel(pad) + '  on net ' + ((r.wire && r.wire.net) || '?') + '.';
+    } else { statusEl.textContent = 'Wire failed: ' + ((r && r.error) || '?'); refresh(); }
+  }
+
+  function drawRoutes() {
+    if (VIEW !== 'pcb') { drawWirePreview(); return; }   // schematic view has no ratsnest/copper
+    routeEl.innerHTML = '';
+    // ratsnest (airwires from the schematic netlist) drawn first, behind the copper
+    ratsnestLines().forEach(function (l) {
+      const ln = polyEl([l.a, l.b], '#c8a24a', 1, '2,3'); ln.setAttribute('opacity', '0.65'); routeEl.appendChild(ln);
+    });
+    committed.forEach(function (t) {
+      t.segs.forEach(function (s) { routeEl.appendChild(segEl(s, LAYER_COLOR[s.layer] || '#4daafc', t.width || 5)); });
+      (t.vias || []).forEach(function (v) { routeEl.appendChild(dotEl(v, '#e8e8e8', 4)); routeEl.appendChild(dotEl(v, '#20242c', 2)); });
+    });
+    // in-progress legs already fixed by a via-switch, + the vias placed so far this track
+    routeLegs.forEach(function (lg) { lg.segs.forEach(function (s) { routeEl.appendChild(segEl(s, LAYER_COLOR[s.layer] || '#4daafc', curTrackWorld)); }); });
+    routeVias.forEach(function (v) { routeEl.appendChild(dotEl(v, '#e8e8e8', 4)); routeEl.appendChild(dotEl(v, '#20242c', 2)); });
+    if (routing && startPad && cursorPad) routeEl.appendChild(polyEl([startPad, cursorPad], '#997744', 1.2, '3,3')); // ratsnest hint
+    if (preview && preview.length >= 2) {
+      const pv = polyEl(preview, LAYER_COLOR[curLayer] || '#7fd0ff', curTrackWorld, '6,4'); pv.setAttribute('opacity', '0.85');
+      routeEl.appendChild(pv);
+    }
+    if (startPad) routeEl.appendChild(dotEl(startPad, '#4ec990', 4));
+    if (cursorPad) routeEl.appendChild(dotEl(cursorPad, '#ffcc44', 5));
+  }
+
+  // Persist / remove a routed track on the :5051 board model (survives reload; feeds Export PCB).
+  async function persistTrack(t) {
+    const r = await post('add_track', { segs: t.segs, vias: t.vias || [], net: t.net || null,
+                                        a: t.a || null, b: t.b || null, width: t.width || 5 });
+    if (r && r.id) t.id = r.id;
+  }
+  function loadTracksFrom(data) {   // rebuild committed[] + routedPairs from the board model
+    committed = (data.tracks || []).map(function (bt) {
+      return { id: bt.id, segs: bt.segs || [], vias: bt.vias || [], net: bt.net, a: bt.a, b: bt.b };
+    });
+    redoStack = []; routedPairs = {};
+    committed.forEach(function (t) { if (t.a && t.b) routedPairs[pairKey(t.a, t.b)] = true; });
+  }
+
+  // Router world = rect obstacles for parts (minus excluded indices) + segment obstacles for placed tracks.
+  function buildWorld(excludeIdx) {
+    const rects = [];
+    compData.forEach(function (c, idx) {
+      if (excludeIdx.indexOf(idx) >= 0) return;
+      const lib = library[c.type] || {};
+      let hw = (lib.w||40)/2, hh = (lib.h||30)/2;         // symbol box (schematic scale)
+      if (VIEW === 'pcb' && lib.footprint && lib.footprint.bbox) {
+        const b = lib.footprint.bbox;                     // real courtyard/land extents (mm)
+        hw = mm2w(Math.max(Math.abs(b[0]), Math.abs(b[2]))); hh = mm2w(Math.max(Math.abs(b[1]), Math.abs(b[3])));
+      } else if (VIEW === 'pcb' && !lib.footprint) { return; }   // power flags aren't obstacles
+      // rotate the keep-out box: axis-aligned AABB of the rotated courtyard (swaps hw/hh at 90/270)
+      const rr = (c.rotation || 0) * Math.PI / 180, rc = Math.abs(Math.cos(rr)), rs = Math.abs(Math.sin(rr));
+      const rw = hw * rc + hh * rs, rh = hw * rs + hh * rc;
+      rects.push({ cx: w2nm(px(c)), cy: w2nm(py(c)), hw: w2nm(rw), hh: w2nm(rh) });
+    });
+    const segs = [];
+    committed.forEach(function (t) {
+      t.segs.forEach(function (s) {
+        segs.push({ x1:w2nm(s.ax), y1:w2nm(s.ay), x2:w2nm(s.bx), y2:w2nm(s.by), width:w2nm(t.width || 5), layer:s.layer });
+      });
+    });
+    return { rects: rects, segs: segs };
+  }
+
+  // Coalesced live preview — always process the newest cursor position, never queue stale ones.
+  let moveInFlight = false, pendingMove = null;
+  function sendMove(nmx, nmy) {
+    if (moveInFlight) { pendingMove = [nmx, nmy]; return; }
+    moveInFlight = true;
+    window.parent.jac.kicadRouteMove(nmx, nmy).then(function (poly) {
+      if (routing) { preview = nmPathToWorld(poly); drawRoutes(); }
+      moveInFlight = false;
+      if (pendingMove) { const p = pendingMove; pendingMove = null; sendMove(p[0], p[1]); }
+    }).catch(function () { moveInFlight = false; });
+  }
+  function routeMoveTo(w) {              // during drag: magnet to a nearby pad + stream a preview
+    routeCursorW = w;                    // a via would drop here (or on the snapped pad below)
+    const pad = snapPad(w); cursorPad = pad;
+    const t = pad ? pad : w;
+    routeCursorW = t;
+    sendMove(w2nm(t.x), w2nm(t.y));
+    if (pad) drawRoutes();
+  }
+
+  // Drop a via at the cursor: finalize the current leg, place a via, flip layers, keep routing.
+  // This is how a single net crosses another — go top → via → bottom → via → top.
+  async function dropVia() {
+    if (!routing || VIEW !== 'pcb') return;
+    const p = routeCursorW || (startPad ? { x: startPad.x, y: startPad.y } : null);
+    if (!p) return;
+    const legItems = await window.parent.jac.kicadRouteFinish(w2nm(p.x), w2nm(p.y));
+    const leg = itemsToWorldSegs(legItems);
+    if (leg.segs.length) routeLegs.push(leg);
+    routeVias.push({ x: p.x, y: p.y });
+    curLayer = curLayer === 0 ? 1 : 0;                    // switch to the other copper layer
+    // restart routing from the via on the new layer
+    const world = buildWorld(startPad && startPad.compIdx >= 0 ? [startPad.compIdx] : []);
+    await window.parent.jac.kicadRouteSetup(world.rects, world.segs, MODE, w2nm(curTrackWorld), CLEAR_NM);
+    const ok = await window.parent.jac.kicadRouteStart(w2nm(p.x), w2nm(p.y), curLayer);
+    if (!ok) { statusEl.textContent = 'Via placed, but cannot continue on ' + LAYER_NAME[curLayer] + ' here.'; return; }
+    startPad = { x: p.x, y: p.y, compIdx: -1 };            // new leg anchors at the via
+    preview = [{ x: p.x, y: p.y }]; drawRoutes();
+    statusEl.textContent = 'Via dropped — now routing on ' + LAYER_NAME[curLayer] + ' (V again to switch back).';
+  }
+
+  async function onRouteClick(e) {
+    const w = worldFromEvent(e);
+    const pad = snapPad(w);
+    const pt = pad ? { x: pad.x, y: pad.y } : w;
+    if (!routing) {
+      startPad = pad ? { x: pad.x, y: pad.y, compIdx: pad.compIdx, compId: pad.compId, pin: pad.pin }
+                     : { x: w.x, y: w.y, compIdx: -1 };
+      routeAnchor = startPad; routeLegs = []; routeVias = [];   // fresh track
+      if (startPad.compId) setLayer(0);                         // SMD pads live on F.Cu — start there (V to switch)
+      const net = padNet(startPad);
+      curTrackWorld = net ? netWidthWorld(net) : 5;             // this net routes at its netclass width
+      const world = buildWorld(startPad.compIdx >= 0 ? [startPad.compIdx] : []);
+      statusEl.textContent = 'Starting route…';
+      await window.parent.jac.kicadRouteSetup(world.rects, world.segs, MODE, w2nm(curTrackWorld), CLEAR_NM);
+      const ok = await window.parent.jac.kicadRouteStart(w2nm(startPad.x), w2nm(startPad.y), curLayer);
+      if (!ok) { statusEl.textContent = 'Cannot start here (blocked) — try a pad or open space.'; resetRoute(); return; }
+      routing = true; preview = [startPad]; drawRoutes();
+      statusEl.textContent = 'Routing ' + (net ? ('net ' + net + ' [' + (netClassMap[net] || 'Default') + ' ' + netWidthMm(net) + 'mm]') : (pad ? 'from a pad' : '')) + ' on ' + LAYER_NAME[curLayer]
+                           + ' — V drops a via to switch layers · click the destination pad to finish (Esc cancels).';
+    } else {
+      let items;
+      const hasVias = routeVias.length > 0;
+      const legStart = hasVias ? routeVias[routeVias.length - 1] : startPad;   // final leg starts at the last via
+      if (pad && routeAnchor && pad.compIdx !== routeAnchor.compIdx) {
+        // final leg into a pad on ANOTHER part: exclude BOTH endpoint parts so the router reaches
+        // the pad center (otherwise it stops at the destination's courtyard edge). Works with/without vias.
+        const world = buildWorld([routeAnchor.compIdx, pad.compIdx].filter(function (i) { return i >= 0; }));
+        await window.parent.jac.kicadRouteSetup(world.rects, world.segs, MODE, w2nm(curTrackWorld), CLEAR_NM);
+        items = await window.parent.jac.kicadRouteAB(w2nm(legStart.x), w2nm(legStart.y), w2nm(pad.x), w2nm(pad.y), curLayer);
+      } else {
+        items = await window.parent.jac.kicadRouteFinish(w2nm(pt.x), w2nm(pt.y));   // finish at an open point / same part
+      }
+      const finalLeg = itemsToWorldSegs(items);
+      const segs = [];                                          // all via-split legs + this final leg
+      routeLegs.forEach(function (lg) { lg.segs.forEach(function (s) { segs.push(s); }); });
+      finalLeg.segs.forEach(function (s) { segs.push(s); });
+      const t = { segs: segs, vias: routeVias.slice(), width: curTrackWorld };
+      const startNet = padNet(routeAnchor), endNet = padNet(pad);
+      let note = '';
+      if (t.segs.length >= 1) {
+        t.net = (startNet && startNet === endNet) ? startNet : (startNet || endNet || null);
+        if (pad && routeAnchor && routeAnchor.compId) {
+          t.a = { compId: routeAnchor.compId, pin: routeAnchor.pin }; t.b = { compId: pad.compId, pin: pad.pin };
+          if (startNet && startNet === endNet) { routedPairs[pairKey(t.a, t.b)] = true; note = ' — routed net ' + startNet + ' ✓'; }
+          else if (startNet && endNet && startNet !== endNet) note = ' — ⚠ different nets (' + startNet + '≠' + endNet + '): that is a short!';
+        }
+        committed.push(t); redoStack = [];   // new action invalidates redo
+        persistTrack(t);                     // save to the board (survives reload, feeds Export PCB)
+        clearDrc();                          // the board just changed — old DRC result no longer applies
+      }
+      const nvias = t.vias.length;
+      resetRoute(); cursorPad = null; drawRoutes();
+      statusEl.textContent = 'Track committed (' + t.segs.length + ' segs' + (nvias ? ', ' + nvias + ' via' + (nvias > 1 ? 's' : '') : '') + ')'
+                           + note + ' — ' + committed.length + ' placed.';
+    }
+  }
+
+  document.getElementById('btn-route').addEventListener('click', function () {
+    routeOn = !routeOn;
+    this.textContent = routeOn ? '⚡ Route: ON' : '⚡ Route: OFF';
+    this.style.background = routeOn ? '#2a6fb0' : '';
+    svg.style.cursor = routeOn ? 'crosshair' : 'default';
+    if (!routeOn) { resetRoute(); drawRoutes(); }
+    statusEl.textContent = routeOn ? 'Route mode ON — click a pad (or open space) to start. Parts + placed tracks are obstacles.' : 'Route mode off.';
+  });
+
+  function setLayer(l) {   // keep curLayer + the layer button in sync
+    curLayer = l;
+    const b = document.getElementById('btn-layer');
+    if (b) { b.textContent = '▦ ' + LAYER_NAME[curLayer]; b.style.color = LAYER_COLOR[curLayer]; }
+  }
+  document.getElementById('btn-layer').addEventListener('click', function () {
+    if (routing) { statusEl.textContent = 'Mid-route: press V to drop a via and switch layers instead.'; return; }
+    setLayer(curLayer === 0 ? 1 : 0);
+    statusEl.textContent = 'Next track on ' + LAYER_NAME[curLayer]
+                         + (curLayer === 1 ? ' — B.Cu ignores F.Cu parts/tracks (route on the other side).' : '.');
+  });
+
+  document.getElementById('btn-wire').addEventListener('click', function () {
+    wireOn = !wireOn;
+    this.textContent = wireOn ? '🔌 Wire: ON' : '🔌 Wire: OFF';
+    this.style.background = wireOn ? '#2a7a4a' : '';
+    svg.style.cursor = wireOn ? 'crosshair' : 'default';
+    if (!wireOn) { wireA = null; wireCursor = null; drawWirePreview(); }
+    statusEl.textContent = wireOn ? 'Wire mode ON — click a pin, then another pin, to connect them into a net.' : 'Wire mode off.';
+  });
+
+  // KiCad's F8: pull the latest parts + nets from the shared schematic and rebuild the ratsnest.
+  document.getElementById('btn-sync').addEventListener('click', function () {
+    statusEl.textContent = 'Updating PCB from schematic…';
+    refresh().then(function () { fitView(); statusEl.textContent = 'Updated from schematic — ' + compData.length + ' parts, ' + ratsnestLines().length + ' unrouted connection(s).'; });
+  });
+
+  // Pour a ground plane on F.Cu over the board (GND net). KiCad fills it at export/DRC.
+  document.getElementById('btn-plane').addEventListener('click', function () {
+    const hasGnd = Object.keys(netlist).some(function (n) { return n === 'GND'; });
+    statusEl.textContent = hasGnd ? 'Pouring ground plane…' : 'Pouring ground plane (no GND net yet — wire pins to a GND flag to fill it)…';
+    post('add_zone', { layer: 0, net: 'GND' }).then(function (r) {
+      if (r && r.components) { renderSchematic(r); clearDrc();
+        statusEl.textContent = 'Ground plane poured on F.Cu' + (hasGnd ? ' — GND pads flood-connected. Run ✓ DRC / Fabricate to fill it.' : '. Wire pins to a GND flag so it has something to connect.'); }
+      else statusEl.textContent = 'Ground plane failed: ' + ((r && r.error) || '?');
+    });
+  });
+
+  // Net-class editor: per-class trace width; live-updates future routing.
+  function netsOfClass(cls) {
+    return Object.keys(netClassMap).filter(function (n) { return (netClassMap[n] || 'Default') === cls; });
+  }
+  function renderNcPanel() {
+    const panel = document.getElementById('sch-nc-panel');
+    let h = '<h3><span>Net classes</span><span class="nc-close" title="Close">✕</span></h3>';
+    Object.keys(netclasses).forEach(function (cls) {
+      const nets = netsOfClass(cls);
+      h += '<div class="nc-row"><span class="nc-name">' + cls + '</span>'
+         + '<input type="number" step="0.05" min="0.1" value="' + (netclasses[cls].track_width || 0.25) + '" data-cls="' + cls + '">'
+         + '<span class="nc-unit">mm wide</span></div>'
+         + '<div class="nc-nets">' + (nets.length ? nets.join(', ') : (cls === 'Power' ? 'GND / VCC / 3V3 / VBUS' : 'all other nets')) + '</div>';
+    });
+    panel.innerHTML = h;
+    panel.style.display = '';
+    panel.querySelector('.nc-close').addEventListener('click', function () { panel.style.display = 'none'; });
+    panel.querySelectorAll('input[data-cls]').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        const w = parseFloat(inp.value); if (!(w > 0)) return;
+        post('set_netclass', { name: inp.dataset.cls, track_width: w }).then(function (r) {
+          if (r && r.netclasses) { netclasses = r.netclasses; netClassMap = r.net_class || {};
+            statusEl.textContent = inp.dataset.cls + ' class → ' + w + ' mm traces (applies to new routes).'; }
+        });
+      });
+    });
+  }
+  document.getElementById('btn-nets').addEventListener('click', function () {
+    const panel = document.getElementById('sch-nc-panel');
+    if (panel.style.display === 'none' || !panel.style.display) renderNcPanel(); else panel.style.display = 'none';
+  });
+
+  // Auto-arrange the footprints into a tidy grid on the board (PCB positions only).
+  document.getElementById('btn-arrange').addEventListener('click', function () {
+    statusEl.textContent = 'Arranging parts on the board…';
+    post('auto_place_pcb', {}).then(function (r) {
+      if (r && r.components) { renderSchematic(r); fitView(); clearDrc();
+        statusEl.textContent = 'Arranged ' + (r.placed || compData.length) + ' part(s) — drag to fine-tune, then route.'; }
+      else statusEl.textContent = 'Arrange failed: ' + ((r && r.error) || '?');
+    });
+  });
+
+  // --- DRC: run KiCad's real design-rule check, list violations, mark them on the canvas ---
+  const DRC_COL = { error: '#dd5647', warning: '#e2b23c' };
+  function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function prettyType(t) {
+    return ({ clearance: 'Clearance', shorting_items: 'Short (nets bridged)', unconnected_items: 'Unconnected net',
+      track_width: 'Track too thin', via_diameter: 'Via too small', annular_width: 'Annular ring',
+      drill_out_of_range: 'Hole size', track_dangling: 'Dangling track', via_dangling: 'Dangling via',
+      copper_edge_clearance: 'Copper to edge', hole_clearance: 'Hole clearance' })[t] || String(t || 'Issue').replace(/_/g, ' ');
+  }
+  function drawDrc(findings) {
+    drcEl.innerHTML = '';
+    (findings || []).forEach(function (f) {
+      const col = DRC_COL[f.severity] || DRC_COL.error;
+      const pts = (f.items || []).map(function (it) { return { x: mm2w(it.x), y: mm2w(it.y) }; });
+      if (pts.length >= 2) { const ln = polyEl(pts, col, 1.4, '3,3'); ln.setAttribute('opacity', '0.8'); drcEl.appendChild(ln); }
+      pts.forEach(function (p) {
+        const ring = document.createElementNS(SVGNS, 'circle');
+        ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y); ring.setAttribute('r', '9');
+        ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', col); ring.setAttribute('stroke-width', '1.6'); ring.setAttribute('opacity', '0.9');
+        drcEl.appendChild(ring);
+        drcEl.appendChild(dotEl(p, col, 2.5));
+      });
+    });
+  }
+  function focusWorld(p) {                     // center + zoom the canvas on a violation
+    const vw = svg.clientWidth || 600, vh = svg.clientHeight || 400;
+    zoom = Math.max(zoom, 1.6);
+    panX = vw / 2 - p.x * zoom; panY = vh / 2 - p.y * zoom; applyTransform();
+  }
+  function renderDrcPanel(drc) {
+    const panel = document.getElementById('sch-drc-panel');
+    const findings = drc.findings || [];
+    let h = '<h3><span>DRC — <span class="drc-ok" style="color:' + (findings.length ? '#dd5647' : '#3fb783') + '">'
+          + drc.errors + ' err · ' + drc.warnings + ' warn</span></span><span class="drc-close" title="Close">✕</span></h3>';
+    if (!findings.length) h += '<div class="drc-note drc-ok">No violations or unconnected items ✓ — board passes DRC.</div>';
+    findings.forEach(function (f, i) {
+      const sev = f.severity === 'error' ? 'error' : 'warning';
+      h += '<div class="drc-item ' + sev + '" data-i="' + i + '"><div class="dt">' + escHtml(prettyType(f.type))
+         + (f.kind === 'unconnected' ? ' <span style="opacity:.5">(route it)</span>' : '')
+         + '</div><div class="dd">' + escHtml(f.description || '') + '</div></div>';
+    });
+    if (drc.libIssues) h += '<div class="drc-note">+ ' + drc.libIssues + ' footprint-library note(s) hidden — JAC\'s toy “jac:” lib isn\'t registered; not a board defect.</div>';
+    panel.innerHTML = h;
+    panel.style.display = '';
+    panel.querySelector('.drc-close').addEventListener('click', function () { panel.style.display = 'none'; drcEl.innerHTML = ''; });
+    panel.querySelectorAll('.drc-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        const f = findings[+el.dataset.i];
+        if (f && f.items && f.items[0]) focusWorld({ x: mm2w(f.items[0].x), y: mm2w(f.items[0].y) });
+      });
+    });
+  }
+  document.getElementById('btn-drc').addEventListener('click', async function () {
+    statusEl.textContent = 'Running DRC — KiCad design-rule check…';
+    const ex = await post('export_pcb', {});                 // materialize the current board
+    if (!ex || !ex.ok) { statusEl.textContent = 'Board export failed: ' + (ex && ex.error || '?'); return; }
+    const drc = await window.parent.jac.kicadDrc(ex.path);
+    if (!drc || !drc.ok) { statusEl.textContent = 'DRC failed: ' + (drc && drc.error || '?'); return; }
+    drawDrc(drc.findings); renderDrcPanel(drc);
+    statusEl.textContent = drc.findings.length === 0
+      ? 'DRC clean ✓ — 0 violations, 0 unconnected' + (drc.libIssues ? ' (' + drc.libIssues + ' lib notes hidden)' : '') + '.'
+      : 'DRC: ' + drc.errors + ' error(s), ' + drc.warnings + ' warning(s) — click a row to zoom to it.';
+  });
+
+  // ── ERC: schematic electrical rules check (reuses the DRC overlay + panel) ──
+  function prettyErc(t) {
+    return ({ unconnected_pin: 'Unconnected pin', single_pin_net: 'Dangling net',
+      duplicate_ref: 'Duplicate reference', no_ground: 'No ground net',
+      output_conflict: 'Outputs conflict', power_unpowered: 'Power pin unpowered' })[t] || String(t || 'Issue').replace(/_/g, ' ');
+  }
+  function padAt(cid, pin) { return allPads().find(function (p) { return p.compId === cid && String(p.pin) === String(pin); }); }
+  function renderErcPanel(erc) {
+    const panel = document.getElementById('sch-drc-panel');
+    const issues = erc.issues || [];
+    let h = '<h3><span>ERC — <span class="drc-ok" style="color:' + (issues.length ? '#e2b23c' : '#3fb783') + '">'
+          + erc.errors + ' err · ' + erc.warnings + ' warn</span></span><span class="drc-close" title="Close">✕</span></h3>';
+    if (!issues.length) h += '<div class="drc-note drc-ok">No electrical issues ✓ — schematic passes ERC.</div>';
+    issues.forEach(function (iss, i) {
+      const sev = iss.severity === 'error' ? 'error' : 'warning';
+      h += '<div class="drc-item ' + sev + '" data-i="' + i + '"><div class="dt">' + escHtml(prettyErc(iss.type))
+         + '</div><div class="dd">' + escHtml(iss.message) + '</div></div>';
+    });
+    panel.innerHTML = h; panel.style.display = '';
+    panel.querySelector('.drc-close').addEventListener('click', function () { panel.style.display = 'none'; drcEl.innerHTML = ''; });
+    panel.querySelectorAll('.drc-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        const iss = issues[+el.dataset.i];
+        if (iss && iss.comp_id && iss.pin) { const p = padAt(iss.comp_id, iss.pin); if (p) focusWorld(p); }
+      });
+    });
+  }
+  document.getElementById('btn-erc').addEventListener('click', async function () {
+    statusEl.textContent = 'Running ERC — schematic electrical rules…';
+    const erc = await post('run_erc', {});
+    if (!erc || !erc.ok) { statusEl.textContent = 'ERC failed: ' + (erc && erc.error || '?'); return; }
+    drcEl.innerHTML = '';                                     // reuse the DRC overlay for issue markers
+    (erc.issues || []).forEach(function (iss) {
+      if (!iss.comp_id || !iss.pin) return;
+      const p = padAt(iss.comp_id, iss.pin); if (!p) return;
+      const col = iss.severity === 'error' ? '#dd5647' : '#e2b23c';
+      const ring = document.createElementNS(SVGNS, 'circle');
+      ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y); ring.setAttribute('r', '8');
+      ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', col); ring.setAttribute('stroke-width', '1.6'); ring.setAttribute('opacity', '0.9');
+      drcEl.appendChild(ring);
+    });
+    renderErcPanel(erc);
+    statusEl.textContent = (erc.issues || []).length === 0
+      ? 'ERC clean ✓ — no electrical issues.'
+      : 'ERC: ' + erc.errors + ' error(s), ' + erc.warnings + ' warning(s) — click a row to zoom to it.';
+  });
+
+  // Editable properties for the selected part (value / footprint / LCSC #). Editing value or
+  // footprint re-fills the LCSC from the parts table so the BOM stays orderable.
+  function renderPropsPanel() {
+    const panel = document.getElementById('sch-props-panel');
+    if (selectedIdx < 0 || !compData[selectedIdx]) { panel.style.display = 'none'; return; }
+    const c = compData[selectedIdx], p = c.properties || {};
+    function row(label, key, val) {
+      return '<div class="pp-row"><label>' + label + '</label><input data-key="' + key + '" value="' + escHtml(val || '') + '"></div>';
+    }
+    panel.innerHTML = '<h3>' + escHtml(c.ref || '?') + ' — ' + escHtml((library[c.type] || {}).name || c.type) + '</h3>'
+      + row('Value', 'value', p.value) + row('Footprint', 'footprint', p.footprint) + row('LCSC #', 'lcsc', p.lcsc)
+      + '<div class="pp-lcsc-auto">' + (p.lcsc ? 'orderable ✓' : 'no LCSC — set one to make the BOM orderable') + '</div>';
+    panel.style.display = '';
+    panel.querySelectorAll('input[data-key]').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        post('set_component_property', { id: c.id, key: inp.dataset.key, value: inp.value })
+          .then(function (r) { if (r && r.components) renderSchematic(r); });
+      });
+    });
+  }
+
+  // Show only the tools that belong to this view; the two iframes are one system, two editors.
+  function applyView() {
+    const show = function (id, on) { const el = document.getElementById(id); if (el) el.style.display = on ? '' : 'none'; };
+    const sch = VIEW === 'sch';
+    document.getElementById('tool-title').textContent = sch ? 'Schematic' : 'PCB';
+    show('btn-wire', sch); show('btn-kicad', sch);                                   // schematic-only
+    show('btn-sync', !sch); show('btn-arrange', !sch); show('btn-plane', !sch); show('btn-nets', !sch); show('btn-pcb', !sch); show('btn-fab', !sch);   // PCB-only
+    show('btn-route', !sch); show('btn-layer', !sch); show('btn-drc', !sch);
+    document.getElementById('sch-palette').style.display = sch ? '' : 'none';         // add parts in the schematic only
+    if (sch) { const dp = document.getElementById('sch-drc-panel'); if (dp) dp.style.display = 'none'; }   // DRC panel is PCB-only
+    document.getElementById('hint').textContent = sch
+      ? 'click a part to place · 🔌 Wire, then click two pins to connect them into a net · drag to move · Del removes'
+      : '⬇ Update from Schematic (F8) · ⌗ Arrange · ⚡ Route to draw copper (V drops a via to switch layers) · gold dashes = unrouted ratsnest';
+  }
+
+  // Chat mutated the schematic out-of-band — pull the fresh state in and frame it.
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'pcb_refresh') { refresh().then(fitView); }
+  });
+
+  applyView();
   applyTransform();
   refreshLibrary();
   refresh();
-  // poll health so the status reflects the backend coming up
-  setInterval(function () { getJSON('/health').then(function (h) { if (h && !dragging && !isPanning) { /* keep status from render */ } }); }, 4000);
+  // Idle cross-tab sync: when the shared model changes elsewhere (wiring in the Schematic
+  // tab, chat edits), pull it in — but never yank the canvas out from under an active action.
+  function syncIfChanged() {
+    if (dragging || isPanning || wireOn || routing) return;
+    getJSON('/schematic').then(function (d) { if (d && schemSig(d) !== lastSig) renderSchematic(d); });
+  }
+  setInterval(syncIfChanged, 2500);                                   // steady poll (throttled while the tab is hidden)
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) syncIfChanged(); });  // instant on tab focus
 })();
 </script>
 </body>

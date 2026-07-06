@@ -1,0 +1,414 @@
+- generic [active] [ref=f31e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f31e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f31e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f31e8]:
+    - search [ref=f31e9]:
+      - generic [ref=f31e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f31e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f31e14]'
+        - generic [ref=f31e15]:
+          - generic [ref=f31e16]:
+            - combobox "Search" [ref=f31e19]: realtek rtl8761 bluetooth sniff mode force active HCI write_link_policy switch pro controller realtek rtl8761 bluetooth sniff mode force active HCI write_link_policy switch pro controller
+            - generic [ref=f31e20]:
+              - button "Clear" [ref=f31e22] [cursor=pointer]:
+                - img [ref=f31e24]
+              - generic [ref=f31e27]:
+                - button "Search by voice" [ref=f31e28] [cursor=pointer]:
+                  - img [ref=f31e29]
+                - button "Search by image" [ref=f31e31] [cursor=pointer]:
+                  - img [ref=f31e32]
+          - button "Search" [ref=f31e34] [cursor=pointer]:
+            - img [ref=f31e37]
+    - generic [ref=f31e39]:
+      - button "Settings" [ref=f31e41] [cursor=pointer]:
+        - img [ref=f31e44]
+      - button "Share" [ref=f31e47] [cursor=pointer]:
+        - img [ref=f31e51]
+      - generic [ref=f31e53]:
+        - button "Google apps" [ref=f31e55] [cursor=pointer]:
+          - img [ref=f31e56]
+        - link "Sign in" [ref=f31e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Drealtek%2Brtl8761%2Bbluetooth%2Bsniff%2Bmode%2Bforce%2Bactive%2BHCI%2Bwrite_link_policy%2Bswitch%2Bpro%2Bcontroller&ec=futura_srp_og_si_72236_p
+  - generic [ref=f31e62]:
+    - navigation [ref=f31e68]:
+      - generic [ref=f31e74]:
+        - list [ref=f31e75]:
+          - listitem [ref=f31e76]:
+            - link "AI Mode" [ref=f31e79] [cursor=pointer]:
+              - /url: /search?q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&aep=1&ntc=1&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ2J8OegQICxAD
+              - generic [ref=f31e82]: AI Mode
+          - listitem [ref=f31e83]:
+            - link "All" [disabled] [ref=f31e84]:
+              - generic [ref=f31e86]: All
+          - listitem [ref=f31e87]:
+            - link "Shopping" [ref=f31e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&ved=1t:220175&ictx=111
+              - generic [ref=f31e90]: Shopping
+          - listitem [ref=f31e91]:
+            - link "Short videos" [ref=f31e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQs6gLegQIEBAB
+              - generic [ref=f31e94]: Short videos
+          - listitem [ref=f31e95]:
+            - link "Videos" [ref=f31e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQtKgLegQIERAB
+              - generic [ref=f31e98]: Videos
+          - listitem [ref=f31e99]:
+            - link "Images" [ref=f31e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQtKgLegQIEhAB
+              - generic [ref=f31e102]: Images
+          - listitem [ref=f31e103]:
+            - link "Forums" [ref=f31e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5biSOxE8oEpeIrm3MXx-GrUU9qorLtnOXqyH_5n0JUuHt7or9fb4rtbNYo0y9vSmcbcpeV2eGQOjzfuo-rZpCOwf0oL1bS3SEJkJwwJIlFwDDTUOi_tpBHwZYHz_UIwhbaSKIqUKRAogNqNv6gwFPysktHOH_zrpi-zzmY1Fs844e6giyw&q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQs6gLegQIExAB
+              - generic [ref=f31e106]: Forums
+          - listitem [ref=f31e107]:
+            - button "More filters" [ref=f31e108] [cursor=pointer]:
+              - generic "More filters" [ref=f31e109]:
+                - generic [ref=f31e110]:
+                  - generic [ref=f31e111]: More
+                  - img [ref=f31e113]
+        - button "Tools" [ref=f31e116] [cursor=pointer]:
+          - generic [ref=f31e118]:
+            - generic [ref=f31e119]: Tools
+            - img [ref=f31e121]
+    - heading "Search Results" [level=1] [ref=f31e123]
+    - generic [ref=f31e128]:
+      - generic [ref=f31e147]:
+        - heading "Searching Thinking a little longer" [level=2] [ref=f31e151]:
+          - generic [ref=f31e152]:
+            - generic [ref=f31e154]: Searching
+            - generic [ref=f31e164]: Thinking a little longer
+        - progressbar "Generating" [ref=f31e166]
+      - main [ref=f31e217]:
+        - generic [ref=f31e221]:
+          - generic [ref=f31e224]:
+            - heading "Web results" [level=2] [ref=f31e225]
+            - generic [ref=f31e226]:
+              - generic [ref=f31e229]:
+                - link "[FIX] Switch Pro Controller not detected by Windows, a fix ... Reddit · r/NintendoSwitch 30+ comments · 3 years ago" [ref=f31e231] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/NintendoSwitch/comments/13i57my/fix_switch_pro_controller_not_detected_by_windows/
+                  - heading "[FIX] Switch Pro Controller not detected by Windows, a fix ..." [level=3] [ref=f31e232]
+                  - generic [ref=f31e238]:
+                    - generic [ref=f31e240]: Reddit · r/NintendoSwitch
+                    - generic [ref=f31e242]: 30+ comments · 3 years ago
+                - button "About this result" [ref=f31e245] [cursor=pointer]:
+                  - img [ref=f31e248]
+              - generic [ref=f31e251]:
+                - generic [ref=f31e252]:
+                  - text: I bought my first
+                  - emphasis [ref=f31e253]: Switch Pro Controller
+                  - text: and plugged it into my PC and nothing happened. No USB connected sound, no lights, no charging LED, nudda.
+                - link "Read more" [ref=f31e254] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/NintendoSwitch/comments/13i57my/fix_switch_pro_controller_not_detected_by_windows/#:~:text=I%20bought%20my%20first%20Switch,lights%2C%20no%20charging%20LED%2C%20nudda.
+              - generic [ref=f31e257]:
+                - generic [ref=f31e258]:
+                  - link "Nintendo Pro Controller doesn't reconnect via Bluetooth ..." [ref=f31e261] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/SteamController/comments/pti27n/nintendo_pro_controller_doesnt_reconnect_via/
+                    - generic [ref=f31e262]:
+                      - text: Nintendo
+                      - emphasis [ref=f31e263]: Pro Controller
+                      - text: doesn't reconnect via
+                      - emphasis [ref=f31e264]: Bluetooth
+                      - text: ...
+                  - generic [ref=f31e266]: 14 posts
+                  - generic [ref=f31e268]: Sep 22, 2021
+                - generic [ref=f31e269]:
+                  - link "Anyone know how to use Bluetooth to connect a Pro ..." [ref=f31e272] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/NintendoSwitch2/comments/1r7bgo8/anyone_know_how_to_use_bluetooth_to_connect_a_pro/
+                    - generic [ref=f31e273]:
+                      - text: Anyone know how to use
+                      - emphasis [ref=f31e274]: Bluetooth
+                      - text: to connect a
+                      - emphasis [ref=f31e275]: Pro
+                      - text: ...
+                  - generic [ref=f31e277]: 26 posts
+                  - generic [ref=f31e279]: Feb 17, 2026
+                - link "More results from www.reddit.com" [ref=f31e283] [cursor=pointer]:
+                  - /url: /search?q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller+site:www.reddit.com&sca_esv=ddfd6cfe34cb7336&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQrQIoAnoECB4QAw
+              - generic [ref=f31e285]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎write_link_policy"
+          - generic [ref=f31e290]:
+            - heading "People also ask" [level=2] [ref=f31e292]
+            - generic [ref=f31e293]:
+              - button "Is there a way to connect Switch Pro controller to PC without wire?" [ref=f31e299] [cursor=pointer]:
+                - generic [ref=f31e301]: Is there a way to connect Switch Pro controller to PC without wire?
+                - img [ref=f31e304]
+              - button "What are the benefits of using Switch controller on PC?" [ref=f31e313] [cursor=pointer]:
+                - generic [ref=f31e315]: What are the benefits of using Switch controller on PC?
+                - img [ref=f31e318]
+              - button "Can I connect a Switch Pro controller to a PC via Bluetooth?" [ref=f31e327] [cursor=pointer]:
+                - generic [ref=f31e329]: Can I connect a Switch Pro controller to a PC via Bluetooth?
+                - img [ref=f31e332]
+              - button "What PC adapters work with Pro Controller?" [ref=f31e341] [cursor=pointer]:
+                - generic [ref=f31e343]: What PC adapters work with Pro Controller?
+                - img [ref=f31e346]
+          - generic [ref=f31e351]:
+            - heading "Web results" [level=2] [ref=f31e352]
+            - generic [ref=f31e353]:
+              - generic [ref=f31e356]:
+                - link "Switch Pro Controller won't reconnect through bluetooth ... Steam Community https://steamcommunity.com › app › discussions" [ref=f31e358] [cursor=pointer]:
+                  - /url: https://steamcommunity.com/app/353370/discussions/2/1815422173049294380/?l=schinese
+                  - heading "Switch Pro Controller won't reconnect through bluetooth ..." [level=3] [ref=f31e359]
+                  - generic [ref=f31e365]:
+                    - generic [ref=f31e367]: Steam Community
+                    - generic [ref=f31e369]: https://steamcommunity.com › app › discussions
+                - button "About this result" [ref=f31e372] [cursor=pointer]:
+                  - img [ref=f31e375]
+              - generic [ref=f31e378]:
+                - generic [ref=f31e379]: Aug 22, 2021 —
+                - generic [ref=f31e380]:
+                  - text: We would like to help resolve the issue you've encountered with the
+                  - emphasis [ref=f31e381]: Bluetooth
+                  - text: connectivity with your
+                  - emphasis [ref=f31e382]: Switch Pro Controller
+                  - text: .
+                - link "Read more" [ref=f31e383] [cursor=pointer]:
+                  - /url: https://steamcommunity.com/app/353370/discussions/2/1815422173049294380/?l=schinese#:~:text=We%20would%20like%20to%20help,with%20your%20Switch%20Pro%20Controller.
+              - generic [ref=f31e386]:
+                - generic [ref=f31e387]:
+                  - link "Switch Pro Controller won't reconnect through bluetooth" [ref=f31e390] [cursor=pointer]:
+                    - /url: https://steamcommunity.com/app/353370/discussions/2/1815422173049294380/?l=tchinese&ctp=9
+                    - generic [ref=f31e391]:
+                      - emphasis [ref=f31e392]: Switch Pro Controller
+                      - text: won't reconnect through
+                      - emphasis [ref=f31e393]: bluetooth
+                  - generic [ref=f31e395]: 15 posts
+                  - generic [ref=f31e397]: Nov 2, 2024
+                - generic [ref=f31e398]:
+                  - link "Getting a Switch Pro controller working over Bluetooth ..." [ref=f31e401] [cursor=pointer]:
+                    - /url: https://steamcommunity.com/app/221410/discussions/0/4630359652384705130/?l=italian
+                    - generic [ref=f31e402]:
+                      - text: Getting a
+                      - emphasis [ref=f31e403]: Switch Pro controller
+                      - text: working over
+                      - emphasis [ref=f31e404]: Bluetooth
+                      - text: ...
+                  - generic [ref=f31e406]: 8 posts
+                  - generic [ref=f31e408]: Mar 7, 2025
+                - link "More results from steamcommunity.com" [ref=f31e412] [cursor=pointer]:
+                  - /url: /search?q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller+site:steamcommunity.com&sca_esv=ddfd6cfe34cb7336&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQrQIoAnoECBsQAw
+              - generic [ref=f31e414]: "Missing: rtl8761 ‎sniff ‎force ‎active ‎HCI ‎write_link_policy"
+          - generic [ref=f31e418]:
+            - generic [ref=f31e421]:
+              - link "Nintendo Switch game controller failing to connect to ... openSUSE Forums https://forums.opensuse.org › English › Hardware" [ref=f31e423] [cursor=pointer]:
+                - /url: https://forums.opensuse.org/t/nintendo-switch-game-controller-failing-to-connect-to-bluetooth/178196
+                - heading "Nintendo Switch game controller failing to connect to ..." [level=3] [ref=f31e424]
+                - generic [ref=f31e430]:
+                  - generic [ref=f31e432]: openSUSE Forums
+                  - generic [ref=f31e434]: https://forums.opensuse.org › English › Hardware
+              - button "About this result" [ref=f31e437] [cursor=pointer]:
+                - img [ref=f31e440]
+            - generic [ref=f31e443]:
+              - generic [ref=f31e444]: Aug 29, 2024 —
+              - generic [ref=f31e445]:
+                - text: I am trying to find out why the Nintendo
+                - emphasis [ref=f31e446]: Switch controller
+                - text: fails to connect as a
+                - emphasis [ref=f31e447]: bluetooth
+                - text: device. The device is discovered during the scan, ...
+            - generic [ref=f31e449]: "Missing: realtek ‎rtl8761 ‎sniff ‎HCI ‎write_link_policy"
+          - generic [ref=f31e453]:
+            - generic [ref=f31e456]:
+              - link "Switch Pro Controller Connects via Bluetooth but not Wired Fedora Discussion https://discussion.fedoraproject.org › switch-pro-control..." [ref=f31e458] [cursor=pointer]:
+                - /url: https://discussion.fedoraproject.org/t/switch-pro-controller-connects-via-bluetooth-but-not-wired/192662
+                - heading "Switch Pro Controller Connects via Bluetooth but not Wired" [level=3] [ref=f31e459]
+                - generic [ref=f31e465]:
+                  - generic [ref=f31e467]: Fedora Discussion
+                  - generic [ref=f31e469]: https://discussion.fedoraproject.org › switch-pro-control...
+              - button "About this result" [ref=f31e472] [cursor=pointer]:
+                - img [ref=f31e475]
+            - generic [ref=f31e478]:
+              - generic [ref=f31e479]: May 30, 2026 —
+              - generic [ref=f31e480]:
+                - text: As the title states, it connects without issue through
+                - emphasis [ref=f31e481]: Bluetooth
+                - text: ", but the input delay is an issue so I would like to use it with the USB port."
+              - link "Read more" [ref=f31e482] [cursor=pointer]:
+                - /url: https://discussion.fedoraproject.org/t/switch-pro-controller-connects-via-bluetooth-but-not-wired/192662#:~:text=As%20the%20title%20states%2C%20it,it%20with%20the%20USB%20port.
+            - generic [ref=f31e484]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎active ‎HCI ‎write_link_policy"
+          - generic [ref=f31e491]:
+            - generic [ref=f31e494]:
+              - link "How to Connect a Nintendo Pro Controller to Windows 11 PC ... YouTube · Chupacabra Tutorials 2.5K+ views · 5 months ago" [ref=f31e496] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=bsf6O0_3-Ig&vl=en
+                - heading "How to Connect a Nintendo Pro Controller to Windows 11 PC ..." [level=3] [ref=f31e497]
+                - generic [ref=f31e503]:
+                  - generic [ref=f31e505]: YouTube · Chupacabra Tutorials
+                  - generic [ref=f31e507]: 2.5K+ views · 5 months ago
+              - button "About this result" [ref=f31e510] [cursor=pointer]:
+                - img [ref=f31e513]
+            - generic [ref=f31e515]:
+              - button "How to Connect a Nintendo Pro Controller to Windows 11 PC ... by Chupacabra Tutorials on YouTube. Play on Google. 2:44" [ref=f31e516] [cursor=pointer]:
+                - generic [ref=f31e518]:
+                  - img [ref=f31e524]
+                  - generic [ref=f31e527]:
+                    - generic [ref=f31e528]: 2:44
+                    - img [ref=f31e531]
+              - generic [ref=f31e534]: In this 2026 tutorial, I'll show you how to connect a Nintendo Switch Pro Controller (Pro Controller 1) to a Windows 11 PC using Bluetooth.
+            - generic [ref=f31e536]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎active ‎HCI ‎write_link_policy"
+          - generic [ref=f31e540]:
+            - generic [ref=f31e543]:
+              - link "Reverse Engineering the Switch Pro Controller Wired mode GBAtemp.net https://gbatemp.net › ... › Nintendo Switch" [ref=f31e545] [cursor=pointer]:
+                - /url: https://gbatemp.net/threads/reverse-engineering-the-switch-pro-controller-wired-mode.475226/
+                - heading "Reverse Engineering the Switch Pro Controller Wired mode" [level=3] [ref=f31e546]
+                - generic [ref=f31e552]:
+                  - generic [ref=f31e554]: GBAtemp.net
+                  - generic [ref=f31e556]: https://gbatemp.net › ... › Nintendo Switch
+              - button "About this result" [ref=f31e559] [cursor=pointer]:
+                - img [ref=f31e562]
+            - generic [ref=f31e565]:
+              - generic [ref=f31e566]: Jun 23, 2017 —
+              - generic [ref=f31e567]:
+                - text: With the new wired
+                - emphasis [ref=f31e568]: mode
+                - text: on the
+                - emphasis [ref=f31e569]: Switch
+                - text: for
+                - emphasis [ref=f31e570]: Pro controllers
+                - text: ", I finally dug up my old BeagleBone Black and managed to coax it into getting a USB traffic dump."
+              - link "Read more" [ref=f31e571] [cursor=pointer]:
+                - /url: https://gbatemp.net/threads/reverse-engineering-the-switch-pro-controller-wired-mode.475226/#:~:text=With%20the%20new%20wired%20mode,controller%20wired%20to%20the%20Switch.
+            - generic [ref=f31e573]: "Missing: realtek ‎rtl8761 ‎force ‎HCI ‎write_link_policy"
+          - generic [ref=f31e580]:
+            - generic [ref=f31e583]:
+              - link "How To Use A Switch Pro Controller Over Bluetooth! YouTube · ChrisPro 235.8K+ views · 6 years ago" [ref=f31e585] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=6RxH6LE4Kzc
+                - heading "How To Use A Switch Pro Controller Over Bluetooth!" [level=3] [ref=f31e586]
+                - generic [ref=f31e592]:
+                  - generic [ref=f31e594]: YouTube · ChrisPro
+                  - generic [ref=f31e596]: 235.8K+ views · 6 years ago
+              - button "About this result" [ref=f31e599] [cursor=pointer]:
+                - img [ref=f31e602]
+            - generic [ref=f31e604]:
+              - button "How To Use A Switch Pro Controller Over Bluetooth! by ChrisPro on YouTube. Play on Google. 2:02" [ref=f31e605] [cursor=pointer]:
+                - generic [ref=f31e607]:
+                  - img [ref=f31e613]
+                  - generic [ref=f31e616]:
+                    - generic [ref=f31e617]: 2:02
+                    - img [ref=f31e620]
+              - generic [ref=f31e623]: Just a quick tutorial on how to use a Nintendo Switch Pro Controller with a Bluetooth or USB device.
+            - button "3 key moments in this video" [ref=f31e628] [cursor=pointer]:
+              - generic [ref=f31e637]:
+                - generic [ref=f31e640]: 3 key moments in this video
+                - img [ref=f31e642]
+            - generic [ref=f31e645]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎HCI ‎write_link_policy"
+          - generic [ref=f31e652]:
+            - generic [ref=f31e655]:
+              - link "How to Connect a Pro Controller to PC via Bluetooth | 2025 ... YouTube · Chupacabra Tutorials 6.6K+ views · 1 year ago" [ref=f31e657] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=8ajw5RSsCmw
+                - heading "How to Connect a Pro Controller to PC via Bluetooth | 2025 ..." [level=3] [ref=f31e658]
+                - generic [ref=f31e664]:
+                  - generic [ref=f31e666]: YouTube · Chupacabra Tutorials
+                  - generic [ref=f31e668]: 6.6K+ views · 1 year ago
+              - button "About this result" [ref=f31e671] [cursor=pointer]:
+                - img [ref=f31e674]
+            - generic [ref=f31e676]:
+              - button "How to Connect a Pro Controller to PC via Bluetooth | 2025 ... by Chupacabra Tutorials on YouTube. Play on Google. 2:57" [ref=f31e677] [cursor=pointer]:
+                - generic [ref=f31e679]:
+                  - img [ref=f31e685]
+                  - generic [ref=f31e688]:
+                    - generic [ref=f31e689]: 2:57
+                    - img [ref=f31e692]
+              - generic [ref=f31e695]: Want to use your Pro Controller wirelessly on your PC? 🕹️ This tutorial from Chupacabra Tutorials will guide you through the process of ...
+            - generic [ref=f31e697]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎active ‎HCI ‎write_link_policy"
+          - generic [ref=f31e704]:
+            - generic [ref=f31e707]:
+              - link "How to Connect a Switch Pro Controller to Windows 11 via ... YouTube · Chupacabra Tutorials 3.9K+ views · 9 months ago" [ref=f31e709] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=LzoAYwXgfSE&vl=en
+                - heading "How to Connect a Switch Pro Controller to Windows 11 via ..." [level=3] [ref=f31e710]
+                - generic [ref=f31e716]:
+                  - generic [ref=f31e718]: YouTube · Chupacabra Tutorials
+                  - generic [ref=f31e720]: 3.9K+ views · 9 months ago
+              - button "About this result" [ref=f31e723] [cursor=pointer]:
+                - img [ref=f31e726]
+            - generic [ref=f31e728]:
+              - button "How to Connect a Switch Pro Controller to Windows 11 via ... by Chupacabra Tutorials on YouTube. Play on Google. 2:43" [ref=f31e729] [cursor=pointer]:
+                - generic [ref=f31e731]:
+                  - img [ref=f31e737]
+                  - generic [ref=f31e740]:
+                    - generic [ref=f31e741]: 2:43
+                    - img [ref=f31e744]
+              - generic [ref=f31e747]: Want to use your Nintendo Switch Pro Controller on PC? In this tutorial, I'll walk you through how to connect a Pro Controller to Windows ...
+            - generic [ref=f31e749]: "Missing: realtek ‎rtl8761 ‎sniff ‎force ‎HCI ‎write_link_policy"
+        - generic [ref=f31e751]:
+          - generic [ref=f31e756]:
+            - heading "People also search for" [level=2] [ref=f31e758]
+            - generic [ref=f31e760]:
+              - generic [ref=f31e761]:
+                - link "How to connect Switch Pro Controller to PC Bluetooth" [ref=f31e765] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=How+to+connect+Switch+Pro+Controller+to+PC+Bluetooth&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhBEAE
+                  - generic [ref=f31e766]:
+                    - generic [ref=f31e771]: How to connect Switch Pro Controller to PC Bluetooth
+                    - img [ref=f31e775]
+                - link "How to connect Switch Pro controller to PC with USB" [ref=f31e780] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=How+to+connect+Switch+Pro+controller+to+PC+with+USB&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhKEAE
+                  - generic [ref=f31e781]:
+                    - generic [ref=f31e786]: How to connect Switch Pro controller to PC with USB
+                    - img [ref=f31e790]
+                - link "How to connect switch pro controller to pc after pairing" [ref=f31e795] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=How+to+connect+switch+pro+controller+to+pc+after+pairing&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhIEAE
+                  - generic [ref=f31e796]:
+                    - generic [ref=f31e801]: How to connect switch pro controller to pc after pairing
+                    - img [ref=f31e805]
+                - link "Switch Pro controller not detected Windows 11" [ref=f31e810] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+Pro+controller+not+detected+Windows+11&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhJEAE
+                  - generic [ref=f31e811]:
+                    - generic [ref=f31e816]: Switch Pro controller not detected Windows 11
+                    - img [ref=f31e820]
+              - generic [ref=f31e822]:
+                - link "Windows 11 not detecting Switch Pro controller wired" [ref=f31e826] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Windows+11+not+detecting+Switch+Pro+controller+wired&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhHEAE
+                  - generic [ref=f31e827]:
+                    - generic [ref=f31e832]: Windows 11 not detecting Switch Pro controller wired
+                    - img [ref=f31e836]
+                - link "Switch Pro Controller not connecting to PC" [ref=f31e841] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+Pro+Controller+not+connecting+to+PC&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhCEAE
+                  - generic [ref=f31e842]:
+                    - generic [ref=f31e847]: Switch Pro Controller not connecting to PC
+                    - img [ref=f31e851]
+                - link "Switch Pro Controller not connecting to PC wired" [ref=f31e856] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+Pro+Controller+not+connecting+to+PC+wired&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAhAEAE
+                  - generic [ref=f31e857]:
+                    - generic [ref=f31e862]: Switch Pro Controller not connecting to PC wired
+                    - img [ref=f31e866]
+                - link "Switch Pro controller Windows 11 drivers" [ref=f31e871] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Switch+Pro+controller+Windows+11+drivers&sa=X&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ1QJ6BAg_EAE
+                  - generic [ref=f31e872]:
+                    - generic [ref=f31e877]: Switch Pro controller Windows 11 drivers
+                    - img [ref=f31e881]
+          - navigation [ref=f31e883]:
+            - heading "Page Navigation" [level=1] [ref=f31e884]
+            - text: "1"
+            - link "Page 2" [ref=f31e887] [cursor=pointer]:
+              - /url: /search?q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sca_esv=ddfd6cfe34cb7336&ei=0OFKarb6F4TIkPIP3d30wAw&start=10&sa=N&sstk=AU9db-AJbCL0iDGDiWmnwAOgOIoZqNdWGWRdtYBotipflMrpVZK8QbwQQOlWq-EuSmJcezoaXBxoIFicW7IE4nlDefVwwaDJjszbOA&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ8tMDegQIPBAE
+              - text: "2"
+            - heading "Next" [level=2] [ref=f31e889]:
+              - link "Next" [ref=f31e890] [cursor=pointer]:
+                - /url: /search?q=realtek+rtl8761+bluetooth+sniff+mode+force+active+HCI+write_link_policy+switch+pro+controller&sca_esv=ddfd6cfe34cb7336&ei=0OFKarb6F4TIkPIP3d30wAw&start=10&sa=N&sstk=AU9db-AJbCL0iDGDiWmnwAOgOIoZqNdWGWRdtYBotipflMrpVZK8QbwQQOlWq-EuSmJcezoaXBxoIFicW7IE4nlDefVwwaDJjszbOA&ved=2ahUKEwi2opjh0byVAxUEJEQIHd0uHcgQ8NMDegQIPBAG
+                - generic [ref=f31e892]: Next
+        - navigation
+    - contentinfo [ref=f31e893]:
+      - heading "Footer Links" [level=1] [ref=f31e894]
+      - generic [ref=f31e898]:
+        - generic [ref=f31e902]:
+          - button "90062, Los Angeles, CA - Based on your past activity" [ref=f31e904] [cursor=pointer]:
+            - generic [ref=f31e905]: 90062, Los Angeles, CA
+            - generic [ref=f31e907]:
+              - text: "-"
+              - generic [ref=f31e908]: Based on your past activity
+          - text: "-"
+          - button "Update location" [ref=f31e910] [cursor=pointer]: Update location
+        - generic [ref=f31e913]:
+          - link "Help" [ref=f31e914] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f31e915] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f31e916] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f31e917] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

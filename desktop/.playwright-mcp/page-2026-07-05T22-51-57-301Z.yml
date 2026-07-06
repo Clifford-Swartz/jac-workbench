@@ -1,0 +1,1388 @@
+- generic [active] [ref=f16e1]:
+  - generic [ref=f16e2]:
+    - generic [ref=f16e3]:
+      - link "Skip to content" [ref=f16e4] [cursor=pointer]:
+        - /url: "#start-of-content"
+      - banner [ref=f16e6]:
+        - heading "Navigation Menu" [level=2] [ref=f16e7]
+        - generic [ref=f16e8]:
+          - link "Homepage" [ref=f16e10] [cursor=pointer]:
+            - /url: /
+            - img [ref=f16e11]
+          - generic [ref=f16e13]:
+            - navigation "Global" [ref=f16e16]:
+              - list [ref=f16e17]:
+                - listitem [ref=f16e18]:
+                  - button "Platform" [ref=f16e20] [cursor=pointer]:
+                    - text: Platform
+                    - img [ref=f16e21]
+                - listitem [ref=f16e23]:
+                  - button "Solutions" [ref=f16e25] [cursor=pointer]:
+                    - text: Solutions
+                    - img [ref=f16e26]
+                - listitem [ref=f16e28]:
+                  - button "Resources" [ref=f16e30] [cursor=pointer]:
+                    - text: Resources
+                    - img [ref=f16e31]
+                - listitem [ref=f16e33]:
+                  - button "Open Source" [ref=f16e35] [cursor=pointer]:
+                    - text: Open Source
+                    - img [ref=f16e36]
+                - listitem [ref=f16e38]:
+                  - button "Enterprise" [ref=f16e40] [cursor=pointer]:
+                    - text: Enterprise
+                    - img [ref=f16e41]
+                - listitem [ref=f16e43]:
+                  - link "Pricing" [ref=f16e44] [cursor=pointer]:
+                    - /url: https://github.com/pricing
+                    - generic [ref=f16e45]: Pricing
+            - generic [ref=f16e46]:
+              - button "Search or jump to…" [ref=f16e49] [cursor=pointer]:
+                - img [ref=f16e51]
+                - generic [ref=f16e53]: Search or jump to...
+                - img [ref=f16e55]
+              - link "Sign in" [ref=f16e59] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering%2Fblob%2Fmaster%2Fbluetooth_hid_subcommands_notes.md
+              - link "Sign up" [ref=f16e60] [cursor=pointer]:
+                - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fblob%2Fshow&source=header-repo&source_repo=dekuNukem%2FNintendo_Switch_Reverse_Engineering
+              - button "Appearance settings" [ref=f16e63] [cursor=pointer]:
+                - img
+    - main [ref=f16e67]:
+      - generic [ref=f16e68]:
+        - generic [ref=f16e69]:
+          - generic [ref=f16e71]:
+            - img [ref=f16e72]
+            - link "dekuNukem" [ref=f16e75] [cursor=pointer]:
+              - /url: /dekuNukem
+            - generic [ref=f16e76]: /
+            - strong [ref=f16e77]:
+              - link "Nintendo_Switch_Reverse_Engineering" [ref=f16e78] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering
+            - generic [ref=f16e79]: Public
+          - generic [ref=f16e80]:
+            - list:
+              - listitem [ref=f16e81]:
+                - link "You must be signed in to change notification settings" [ref=f16e82] [cursor=pointer]:
+                  - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                  - img [ref=f16e83]
+                  - text: Notifications
+              - listitem [ref=f16e85]:
+                - link "Fork 206" [ref=f16e86] [cursor=pointer]:
+                  - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                  - img [ref=f16e87]
+                  - text: Fork
+                  - generic "206" [ref=f16e89]
+              - listitem [ref=f16e90]:
+                - link "You must be signed in to star a repository" [ref=f16e92] [cursor=pointer]:
+                  - /url: /login?return_to=%2FdekuNukem%2FNintendo_Switch_Reverse_Engineering
+                  - img [ref=f16e93]
+                  - text: Star
+                  - generic "3752 users starred this repository" [ref=f16e95]: 3.8k
+        - navigation "Repository" [ref=f16e96]:
+          - list [ref=f16e97]:
+            - listitem [ref=f16e98]:
+              - link "Code" [ref=f16e99] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering
+                - img [ref=f16e100]
+                - generic [ref=f16e102]: Code
+            - listitem [ref=f16e103]:
+              - link "Issues 90" [ref=f16e104] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/issues
+                - img [ref=f16e105]
+                - generic [ref=f16e108]: Issues
+                - generic "90" [ref=f16e109]
+            - listitem [ref=f16e110]:
+              - link "Pull requests 2" [ref=f16e111] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/pulls
+                - img [ref=f16e112]
+                - generic [ref=f16e114]: Pull requests
+                - generic "2" [ref=f16e115]
+            - listitem [ref=f16e116]:
+              - link "Actions" [ref=f16e117] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/actions
+                - img [ref=f16e118]
+                - generic [ref=f16e120]: Actions
+            - listitem [ref=f16e121]:
+              - link "Projects" [ref=f16e122] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/projects
+                - img [ref=f16e123]
+                - generic [ref=f16e125]: Projects
+            - listitem [ref=f16e126]:
+              - link "Security and quality" [ref=f16e127] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/security
+                - img [ref=f16e128]
+                - generic [ref=f16e130]: Security and quality
+            - listitem [ref=f16e131]:
+              - link "Insights" [ref=f16e132] [cursor=pointer]:
+                - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/pulse
+                - img [ref=f16e133]
+                - generic [ref=f16e135]: Insights
+      - generic [ref=f16e143]:
+        - generic [ref=f16e145]:
+          - generic [ref=f16e148]:
+            - generic [ref=f16e149]:
+              - generic [ref=f16e150]:
+                - heading "Collapse file tree" [level=2] [ref=f16e151]:
+                  - button "Collapse file tree" [expanded] [ref=f16e152] [cursor=pointer]:
+                    - img [ref=f16e153]
+                - heading "Files" [level=2] [ref=f16e156]
+              - generic [ref=f16e157]:
+                - button "master branch" [ref=f16e159] [cursor=pointer]:
+                  - generic [ref=f16e160]:
+                    - generic [ref=f16e162]:
+                      - img [ref=f16e164]
+                      - generic [ref=f16e167]: master
+                    - generic:
+                      - img
+                - button "Search this repository (forward slash)" [ref=f16e169] [cursor=pointer]:
+                  - img [ref=f16e170]
+            - generic [ref=f16e173]:
+              - img [ref=f16e175]
+              - combobox "Go to file" [ref=f16e177]
+            - navigation "File Tree Navigation" [ref=f16e183]:
+              - tree "Files" [ref=f16e185]:
+                - treeitem "datasheets" [level=1] [ref=f16e186]:
+                  - generic [ref=f16e187] [cursor=pointer]:
+                    - img [ref=f16e189]
+                    - generic [ref=f16e191]:
+                      - img [ref=f16e195]
+                      - generic [ref=f16e197]: datasheets
+                - treeitem "joycon_reader" [level=1] [ref=f16e198]:
+                  - generic [ref=f16e199] [cursor=pointer]:
+                    - img [ref=f16e201]
+                    - generic [ref=f16e203]:
+                      - img [ref=f16e207]
+                      - generic [ref=f16e209]: joycon_reader
+                - treeitem "joycon_spoofer" [level=1] [ref=f16e210]:
+                  - generic [ref=f16e211] [cursor=pointer]:
+                    - img [ref=f16e213]
+                    - generic [ref=f16e215]:
+                      - img [ref=f16e219]
+                      - generic [ref=f16e221]: joycon_spoofer
+                - treeitem "logic_captures" [level=1] [ref=f16e222]:
+                  - generic [ref=f16e223] [cursor=pointer]:
+                    - img [ref=f16e225]
+                    - generic [ref=f16e227]:
+                      - img [ref=f16e231]
+                      - generic [ref=f16e233]: logic_captures
+                - treeitem "packet_parse" [level=1] [ref=f16e234]:
+                  - generic [ref=f16e235] [cursor=pointer]:
+                    - img [ref=f16e237]
+                    - generic [ref=f16e239]:
+                      - img [ref=f16e243]
+                      - generic [ref=f16e245]: packet_parse
+                - treeitem "peripheral device" [level=1] [ref=f16e246]:
+                  - generic [ref=f16e247] [cursor=pointer]:
+                    - img [ref=f16e249]
+                    - generic [ref=f16e251]:
+                      - img [ref=f16e255]
+                      - generic [ref=f16e257]: peripheral device
+                - treeitem "README.md" [level=1] [ref=f16e258]:
+                  - generic [ref=f16e260] [cursor=pointer]:
+                    - img [ref=f16e263]
+                    - generic [ref=f16e265]: README.md
+                - treeitem "USB-HID-Notes.md" [level=1] [ref=f16e266]:
+                  - generic [ref=f16e268] [cursor=pointer]:
+                    - img [ref=f16e271]
+                    - generic [ref=f16e273]: USB-HID-Notes.md
+                - treeitem "bluetooth_hid_notes.md" [level=1] [ref=f16e274]:
+                  - generic [ref=f16e276] [cursor=pointer]:
+                    - img [ref=f16e279]
+                    - generic [ref=f16e281]: bluetooth_hid_notes.md
+                - treeitem "bluetooth_hid_subcommands_notes.md" [level=1] [ref=f16e282]:
+                  - generic [ref=f16e284] [cursor=pointer]:
+                    - img [ref=f16e287]
+                    - generic [ref=f16e289]: bluetooth_hid_subcommands_notes.md
+                - treeitem "imu_sensor_notes.md" [level=1] [ref=f16e290]:
+                  - generic [ref=f16e292] [cursor=pointer]:
+                    - img [ref=f16e295]
+                    - generic [ref=f16e297]: imu_sensor_notes.md
+                - treeitem "joycon_pcb.pdf" [level=1] [ref=f16e298]:
+                  - generic [ref=f16e300] [cursor=pointer]:
+                    - img [ref=f16e303]
+                    - generic [ref=f16e305]: joycon_pcb.pdf
+                - treeitem "push.sh" [level=1] [ref=f16e306]:
+                  - generic [ref=f16e308] [cursor=pointer]:
+                    - img [ref=f16e311]
+                    - generic [ref=f16e313]: push.sh
+                - treeitem "rumble_data_table.md" [level=1] [ref=f16e314]:
+                  - generic [ref=f16e316] [cursor=pointer]:
+                    - img [ref=f16e319]
+                    - generic [ref=f16e321]: rumble_data_table.md
+                - treeitem "spi_flash_notes.md" [level=1] [ref=f16e322]:
+                  - generic [ref=f16e324] [cursor=pointer]:
+                    - img [ref=f16e327]
+                    - generic [ref=f16e329]: spi_flash_notes.md
+          - slider "Draggable pane splitter" [ref=f16e331]
+        - generic [ref=f16e334]:
+          - generic [ref=f16e338]:
+            - generic [ref=f16e340]:
+              - navigation "Breadcrumbs" [ref=f16e341]:
+                - heading "Breadcrumbs" [level=2] [ref=f16e342]
+                - list [ref=f16e343]:
+                  - listitem [ref=f16e344]:
+                    - link "Nintendo_Switch_Reverse_Engineering" [ref=f16e345] [cursor=pointer]:
+                      - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/tree/master
+              - generic [ref=f16e346]:
+                - text: /
+                - heading "bluetooth_hid_subcommands_notes.md" [level=1] [ref=f16e347]
+              - button "Copy path" [ref=f16e348] [cursor=pointer]:
+                - img [ref=f16e349]
+            - button "More file actions" [ref=f16e355] [cursor=pointer]:
+              - img [ref=f16e356]
+          - generic [ref=f16e358]:
+            - generic [ref=f16e360]:
+              - heading "Latest commit" [level=2] [ref=f16e361]
+              - generic [ref=f16e364]:
+                - heading "History" [level=2] [ref=f16e365]
+                - link "History" [ref=f16e366] [cursor=pointer]:
+                  - /url: /dekuNukem/Nintendo_Switch_Reverse_Engineering/commits/master/bluetooth_hid_subcommands_notes.md
+                  - generic [ref=f16e367]:
+                    - generic:
+                      - img
+                    - generic [ref=f16e368]: History
+            - generic [ref=f16e370]:
+              - generic [ref=f16e372]:
+                - heading "File metadata and controls" [level=2] [ref=f16e373]
+                - generic [ref=f16e374]:
+                  - list "File view" [ref=f16e375]:
+                    - listitem [ref=f16e376]:
+                      - button "Preview" [ref=f16e377] [cursor=pointer]:
+                        - generic [ref=f16e379]: Preview
+                    - listitem [ref=f16e380]:
+                      - button "Code" [ref=f16e381] [cursor=pointer]:
+                        - generic [ref=f16e383]: Code
+                    - listitem [ref=f16e384]:
+                      - button "Blame" [ref=f16e385] [cursor=pointer]:
+                        - generic [ref=f16e387]: Blame
+                  - generic "18.5 KB" [ref=f16e390]: 440 lines (289 loc) · 18.5 KB
+                - generic [ref=f16e391]:
+                  - generic [ref=f16e392]:
+                    - generic [ref=f16e393]:
+                      - link "Raw" [ref=f16e395] [cursor=pointer]:
+                        - /url: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/raw/refs/heads/master/bluetooth_hid_subcommands_notes.md
+                        - generic [ref=f16e397]: Raw
+                      - button "Copy raw file" [ref=f16e399] [cursor=pointer]:
+                        - img [ref=f16e400]
+                      - button "Download raw file" [ref=f16e404] [cursor=pointer]:
+                        - img [ref=f16e405]
+                    - generic [ref=f16e408]:
+                      - button "You must be signed in to make or propose changes" [disabled] [ref=f16e410]:
+                        - img [ref=f16e411]
+                      - button "More edit options" [ref=f16e414] [cursor=pointer]:
+                        - img [ref=f16e415]
+                  - button "Outline" [ref=f16e417] [cursor=pointer]:
+                    - img [ref=f16e418]
+              - region "bluetooth_hid_subcommands_notes.md" [ref=f16e421]:
+                - article [ref=f16e423]:
+                  - generic [ref=f16e424]:
+                    - heading "Subcommands" [level=1] [ref=f16e425]
+                    - 'link "Permalink: Subcommands" [ref=f16e426] [cursor=pointer]':
+                      - /url: "#subcommands"
+                      - img [ref=f16e427]
+                  - generic [ref=f16e429]:
+                    - 'heading "Subcommand 0x##: All unused subcommands" [level=3] [ref=f16e430]'
+                    - 'link "Permalink: Subcommand 0x##: All unused subcommands" [ref=f16e431] [cursor=pointer]':
+                      - /url: "#subcommand-0x-all-unused-subcommands"
+                      - img [ref=f16e432]
+                  - paragraph [ref=f16e434]:
+                    - text: All subcommands that do nothing, reply back with ACK
+                    - code [ref=f16e435]: x80##
+                    - text: and
+                    - code [ref=f16e436]: x03
+                  - generic [ref=f16e437]:
+                    - 'heading "Subcommand 0x00: Get Only Controller State" [level=3] [ref=f16e438]'
+                    - 'link "Permalink: Subcommand 0x00: Get Only Controller State" [ref=f16e439] [cursor=pointer]':
+                      - /url: "#subcommand-0x00-get-only-controller-state"
+                      - img [ref=f16e440]
+                  - paragraph [ref=f16e442]:
+                    - text: Replies with
+                    - code [ref=f16e443]: x8000
+                    - code [ref=f16e444]: x03
+                  - paragraph [ref=f16e445]: Does nothing actually, but can be used to get Controller state only (w/o 6-Axis sensor data), like any subcommand that does nothing.
+                  - generic [ref=f16e446]:
+                    - 'heading "Subcommand 0x01: Bluetooth manual pairing" [level=3] [ref=f16e447]'
+                    - 'link "Permalink: Subcommand 0x01: Bluetooth manual pairing" [ref=f16e448] [cursor=pointer]':
+                      - /url: "#subcommand-0x01-bluetooth-manual-pairing"
+                      - img [ref=f16e449]
+                  - paragraph [ref=f16e451]: Takes max 2 arguments. A Pair request type uint8 and Host BD_ADDR 6 bytes in LE.
+                  - paragraph [ref=f16e452]: When used with cmd x01 it handles pairing. It is especially useful to change on the fly the pairing info for the next session, or to bluetooth pair through wired (rail/usb) connection.
+                  - paragraph [ref=f16e453]: "The procedure must be done sequentially:"
+                  - list [ref=f16e454]:
+                    - listitem [ref=f16e455]: "1: x01 x01 [{BD_ADDR_LE}] (Send host MAC and acquire Joy-Con MAC)"
+                    - listitem [ref=f16e456]: "2: x01 x02 (Acquire the XORed LTK hash)"
+                    - listitem [ref=f16e457]: "3: x01 x03 (saves pairing info in Joy-Con)"
+                  - paragraph [ref=f16e458]: "Host Pair request x01 (send HOST BT MAC and request Joy-Con BT MAC):"
+                  - table [ref=f16e460]:
+                    - rowgroup [ref=f16e461]:
+                      - 'row "Byte # Sample Remarks" [ref=f16e462]':
+                        - 'columnheader "Byte #" [ref=f16e463]'
+                        - columnheader "Sample" [ref=f16e464]
+                        - columnheader "Remarks" [ref=f16e465]
+                    - rowgroup [ref=f16e466]:
+                      - row "0 x01 subcmd" [ref=f16e467]:
+                        - cell "0" [ref=f16e468]
+                        - cell "x01" [ref=f16e469]:
+                          - code [ref=f16e470]: x01
+                        - cell "subcmd" [ref=f16e471]
+                      - row "1 x01 Pair request type" [ref=f16e472]:
+                        - cell "1" [ref=f16e473]
+                        - cell "x01" [ref=f16e474]:
+                          - code [ref=f16e475]: x01
+                        - cell "Pair request type" [ref=f16e476]
+                      - row "2-7 x16 30 AA 82 BB 98 Host Bluetooth address in Little-Endian" [ref=f16e477]:
+                        - cell "2-7" [ref=f16e478]
+                        - cell "x16 30 AA 82 BB 98" [ref=f16e479]:
+                          - code [ref=f16e480]: x16 30 AA 82 BB 98
+                        - cell "Host Bluetooth address in Little-Endian" [ref=f16e481]
+                  - paragraph [ref=f16e482]: "Joy-Con Pair request x01 reply:"
+                  - table [ref=f16e484]:
+                    - rowgroup [ref=f16e485]:
+                      - 'row "Byte # Sample Remarks" [ref=f16e486]':
+                        - 'columnheader "Byte #" [ref=f16e487]'
+                        - columnheader "Sample" [ref=f16e488]
+                        - columnheader "Remarks" [ref=f16e489]
+                    - rowgroup [ref=f16e490]:
+                      - row "0 x01 Pair request type" [ref=f16e491]:
+                        - cell "0" [ref=f16e492]
+                        - cell "x01" [ref=f16e493]:
+                          - code [ref=f16e494]: x01
+                        - cell "Pair request type" [ref=f16e495]
+                      - row "1-6 x57 30 EA 8A BB 7C Joy-Con BT MAC in Little-Endian" [ref=f16e496]:
+                        - cell "1-6" [ref=f16e497]
+                        - cell "x57 30 EA 8A BB 7C" [ref=f16e498]:
+                          - code [ref=f16e499]: x57 30 EA 8A BB 7C
+                        - cell "Joy-Con BT MAC in Little-Endian" [ref=f16e500]
+                      - row "7-31 Descriptor?" [ref=f16e501]:
+                        - cell "7-31" [ref=f16e502]
+                        - cell [ref=f16e503]
+                        - cell "Descriptor?" [ref=f16e504]
+                  - paragraph [ref=f16e505]: "Host Pair request x03 (request LTK):"
+                  - paragraph [ref=f16e506]: "Joy-Con Pair request x02 reply:"
+                  - paragraph [ref=f16e507]: Long Term Key (LTK) in Little-Endian. Each byte is XORed with 0xAA.
+                  - paragraph [ref=f16e508]: "Host Pair request x03:"
+                  - paragraph [ref=f16e509]: Joy-Con saves pairing info in x2000 SPI region.
+                  - paragraph [ref=f16e510]:
+                    - text: If the command is
+                    - code [ref=f16e511]: x11
+                    - text: ", it polls the MCU State? Used with IR Camera or NFC?"
+                  - generic [ref=f16e512]:
+                    - 'heading "Subcommand 0x02: Request device info" [level=3] [ref=f16e513]'
+                    - 'link "Permalink: Subcommand 0x02: Request device info" [ref=f16e514] [cursor=pointer]':
+                      - /url: "#subcommand-0x02-request-device-info"
+                      - img [ref=f16e515]
+                  - paragraph [ref=f16e517]: "Response data after 02 command byte:"
+                  - table [ref=f16e519]:
+                    - rowgroup [ref=f16e520]:
+                      - 'row "Byte # Sample Remarks" [ref=f16e521]':
+                        - 'columnheader "Byte #" [ref=f16e522]'
+                        - columnheader "Sample" [ref=f16e523]
+                        - columnheader "Remarks" [ref=f16e524]
+                    - rowgroup [ref=f16e525]:
+                      - row "0-1 x03 48 Firmware Version. Latest is 3.89 (from 5.0.0 and up)." [ref=f16e526]:
+                        - cell "0-1" [ref=f16e527]
+                        - cell "x03 48" [ref=f16e528]:
+                          - code [ref=f16e529]: x03 48
+                        - cell "Firmware Version. Latest is 3.89 (from 5.0.0 and up)." [ref=f16e530]
+                      - row "2 x01 1=Left Joy-Con, 2=Right Joy-Con, 3=Pro Controller." [ref=f16e531]:
+                        - cell "2" [ref=f16e532]
+                        - cell "x01" [ref=f16e533]:
+                          - code [ref=f16e534]: x01
+                        - cell "1=Left Joy-Con, 2=Right Joy-Con, 3=Pro Controller." [ref=f16e535]
+                      - row "3 x02 Unknown. Seems to be always 02" [ref=f16e536]:
+                        - cell "3" [ref=f16e537]
+                        - cell "x02" [ref=f16e538]:
+                          - code [ref=f16e539]: x02
+                        - cell "Unknown. Seems to be always 02" [ref=f16e540]:
+                          - text: Unknown. Seems to be always
+                          - code [ref=f16e541]: "02"
+                      - row "4-9 x7C BB 8A EA 30 57 Joy-Con MAC address in Big Endian" [ref=f16e542]:
+                        - cell "4-9" [ref=f16e543]
+                        - cell "x7C BB 8A EA 30 57" [ref=f16e544]:
+                          - code [ref=f16e545]: x7C BB 8A EA 30 57
+                        - cell "Joy-Con MAC address in Big Endian" [ref=f16e546]
+                      - row "10 x01 Unknown. Seems to be always 01" [ref=f16e547]:
+                        - cell "10" [ref=f16e548]
+                        - cell "x01" [ref=f16e549]:
+                          - code [ref=f16e550]: x01
+                        - cell "Unknown. Seems to be always 01" [ref=f16e551]:
+                          - text: Unknown. Seems to be always
+                          - code [ref=f16e552]: "01"
+                      - row "11 x01 If 01, colors in SPI are used. Otherwise default ones." [ref=f16e553]:
+                        - cell "11" [ref=f16e554]
+                        - cell "x01" [ref=f16e555]:
+                          - code [ref=f16e556]: x01
+                        - cell "If 01, colors in SPI are used. Otherwise default ones." [ref=f16e557]:
+                          - text: If
+                          - code [ref=f16e558]: "01"
+                          - text: ", colors in SPI are used. Otherwise default ones."
+                  - generic [ref=f16e559]:
+                    - 'heading "Subcommand 0x03: Set input report mode" [level=3] [ref=f16e560]'
+                    - 'link "Permalink: Subcommand 0x03: Set input report mode" [ref=f16e561] [cursor=pointer]':
+                      - /url: "#subcommand-0x03-set-input-report-mode"
+                      - img [ref=f16e562]
+                  - paragraph [ref=f16e564]: "One argument:"
+                  - table [ref=f16e566]:
+                    - rowgroup [ref=f16e567]:
+                      - 'row "Arg # Remarks" [ref=f16e568]':
+                        - 'columnheader "Arg #" [ref=f16e569]'
+                        - columnheader "Remarks" [ref=f16e570]
+                    - rowgroup [ref=f16e571]:
+                      - row "x00 Used with cmd x11. Active polling for NFC/IR camera data. 0x31 data format must be set first." [ref=f16e572]:
+                        - cell "x00" [ref=f16e573]:
+                          - code [ref=f16e574]: x00
+                        - cell "Used with cmd x11. Active polling for NFC/IR camera data. 0x31 data format must be set first." [ref=f16e575]:
+                          - text: Used with cmd
+                          - code [ref=f16e576]: x11
+                          - text: . Active polling for NFC/IR camera data. 0x31 data format must be set first.
+                      - row "x01 Same as 00. Active polling mode for NFC/IR MCU configuration data." [ref=f16e577]:
+                        - cell "x01" [ref=f16e578]:
+                          - code [ref=f16e579]: x01
+                        - cell "Same as 00. Active polling mode for NFC/IR MCU configuration data." [ref=f16e580]:
+                          - text: Same as
+                          - code [ref=f16e581]: "00"
+                          - text: . Active polling mode for NFC/IR MCU configuration data.
+                      - row "x02 Same as 00. Active polling mode for NFC/IR data and configuration. For specific NFC/IR modes" [ref=f16e582]:
+                        - cell "x02" [ref=f16e583]:
+                          - code [ref=f16e584]: x02
+                        - cell "Same as 00. Active polling mode for NFC/IR data and configuration. For specific NFC/IR modes" [ref=f16e585]:
+                          - text: Same as
+                          - code [ref=f16e586]: "00"
+                          - text: . Active polling mode for NFC/IR data and configuration. For specific NFC/IR modes
+                      - row "x03 Same as 00. Active polling mode for IR camera data. For specific IR modes" [ref=f16e587]:
+                        - cell "x03" [ref=f16e588]:
+                          - code [ref=f16e589]: x03
+                        - cell "Same as 00. Active polling mode for IR camera data. For specific IR modes" [ref=f16e590]:
+                          - text: Same as
+                          - code [ref=f16e591]: "00"
+                          - text: . Active polling mode for IR camera data. For specific IR modes
+                      - row "x23 MCU update state report?" [ref=f16e592]:
+                        - cell "x23" [ref=f16e593]:
+                          - code [ref=f16e594]: x23
+                        - cell "MCU update state report?" [ref=f16e595]
+                      - row "x30 Standard full mode. Pushes current state @60Hz" [ref=f16e596]:
+                        - cell "x30" [ref=f16e597]:
+                          - code [ref=f16e598]: x30
+                        - cell "Standard full mode. Pushes current state @60Hz" [ref=f16e599]
+                      - row "x31 NFC/IR mode. Pushes large packets @60Hz" [ref=f16e600]:
+                        - cell "x31" [ref=f16e601]:
+                          - code [ref=f16e602]: x31
+                        - cell "NFC/IR mode. Pushes large packets @60Hz" [ref=f16e603]
+                      - row "x33 Unknown mode." [ref=f16e604]:
+                        - cell "x33" [ref=f16e605]:
+                          - code [ref=f16e606]: x33
+                        - cell "Unknown mode." [ref=f16e607]
+                      - row "x35 Unknown mode." [ref=f16e608]:
+                        - cell "x35" [ref=f16e609]:
+                          - code [ref=f16e610]: x35
+                        - cell "Unknown mode." [ref=f16e611]
+                      - row "x3F Simple HID mode. Pushes updates with every button press" [ref=f16e612]:
+                        - cell "x3F" [ref=f16e613]:
+                          - code [ref=f16e614]: x3F
+                        - cell "Simple HID mode. Pushes updates with every button press" [ref=f16e615]
+                  - paragraph [ref=f16e616]:
+                    - code [ref=f16e617]: x31
+                    - text: input report has all zeroes for IR/NFC data if a
+                    - code [ref=f16e618]: "11"
+                    - text: ouput report with subcmd
+                    - code [ref=f16e619]: 03 00/01/02/03
+                    - text: was not sent before.
+                  - generic [ref=f16e620]:
+                    - 'heading "Subcommand 0x04: Trigger buttons elapsed time" [level=3] [ref=f16e621]'
+                    - 'link "Permalink: Subcommand 0x04: Trigger buttons elapsed time" [ref=f16e622] [cursor=pointer]':
+                      - /url: "#subcommand-0x04-trigger-buttons-elapsed-time"
+                      - img [ref=f16e623]
+                  - paragraph [ref=f16e625]: Replies with 7 little-endian uint16. The values are in 10ms. They reset by turning off the controller.
+                  - generic [ref=f16e626]:
+                    - code [ref=f16e628]: Left_trigger_ms = ((byte[1] << 8) | byte[0]) * 10;
+                    - button "Copy code to clipboard" [ref=f16e630] [cursor=pointer]:
+                      - img [ref=f16e631]
+                  - table [ref=f16e635]:
+                    - rowgroup [ref=f16e636]:
+                      - 'row "Bytes # Remarks" [ref=f16e637]':
+                        - 'columnheader "Bytes #" [ref=f16e638]'
+                        - columnheader "Remarks" [ref=f16e639]
+                    - rowgroup [ref=f16e640]:
+                      - row "1-0 L" [ref=f16e641]:
+                        - cell "1-0" [ref=f16e642]
+                        - cell "L" [ref=f16e643]
+                      - row "3-2 R" [ref=f16e644]:
+                        - cell "3-2" [ref=f16e645]
+                        - cell "R" [ref=f16e646]
+                      - row "5-4 ZL" [ref=f16e647]:
+                        - cell "5-4" [ref=f16e648]
+                        - cell "ZL" [ref=f16e649]
+                      - row "7-6 ZR" [ref=f16e650]:
+                        - cell "7-6" [ref=f16e651]
+                        - cell "ZR" [ref=f16e652]
+                      - row "9-8 SL" [ref=f16e653]:
+                        - cell "9-8" [ref=f16e654]
+                        - cell "SL" [ref=f16e655]
+                      - row "10-9 SR" [ref=f16e656]:
+                        - cell "10-9" [ref=f16e657]
+                        - cell "SR" [ref=f16e658]
+                      - row "12-11 HOME" [ref=f16e659]:
+                        - cell "12-11" [ref=f16e660]
+                        - cell "HOME" [ref=f16e661]
+                  - generic [ref=f16e662]:
+                    - 'heading "Subcommand 0x05: Get page list state" [level=3] [ref=f16e663]'
+                    - 'link "Permalink: Subcommand 0x05: Get page list state" [ref=f16e664] [cursor=pointer]':
+                      - /url: "#subcommand-0x05-get-page-list-state"
+                      - img [ref=f16e665]
+                  - paragraph [ref=f16e667]:
+                    - text: Replies a uint8 with a value of
+                    - code [ref=f16e668]: x01
+                    - text: if there's a Host list with BD addresses/link keys in memory.
+                  - generic [ref=f16e669]:
+                    - 'heading "Subcommand 0x06: Set HCI state (disconnect/page/pair/turn off)" [level=3] [ref=f16e670]'
+                    - 'link "Permalink: Subcommand 0x06: Set HCI state (disconnect/page/pair/turn off)" [ref=f16e671] [cursor=pointer]':
+                      - /url: "#subcommand-0x06-set-hci-state-disconnectpagepairturn-off"
+                      - img [ref=f16e672]
+                  - paragraph [ref=f16e674]: Causes the controller to change power state.
+                  - paragraph [ref=f16e675]: "Takes as argument a uint8_t:"
+                  - table [ref=f16e677]:
+                    - rowgroup [ref=f16e678]:
+                      - 'row "Arg value # Remarks" [ref=f16e679]':
+                        - 'columnheader "Arg value #" [ref=f16e680]'
+                        - columnheader "Remarks" [ref=f16e681]
+                    - rowgroup [ref=f16e682]:
+                      - row "x00 Disconnect (sleep mode / page scan mode)" [ref=f16e683]:
+                        - cell "x00" [ref=f16e684]:
+                          - code [ref=f16e685]: x00
+                        - cell "Disconnect (sleep mode / page scan mode)" [ref=f16e686]
+                      - row "x01 Reboot and Reconnect (page mode)" [ref=f16e687]:
+                        - cell "x01" [ref=f16e688]:
+                          - code [ref=f16e689]: x01
+                        - cell "Reboot and Reconnect (page mode)" [ref=f16e690]
+                      - row "x02 Reboot and enter Pair mode (discoverable)" [ref=f16e691]:
+                        - cell "x02" [ref=f16e692]:
+                          - code [ref=f16e693]: x02
+                        - cell "Reboot and enter Pair mode (discoverable)" [ref=f16e694]
+                      - row "x04 Reboot and Reconnect (page mode / HOME mode?)" [ref=f16e695]:
+                        - cell "x04" [ref=f16e696]:
+                          - code [ref=f16e697]: x04
+                        - cell "Reboot and Reconnect (page mode / HOME mode?)" [ref=f16e698]
+                  - paragraph [ref=f16e699]:
+                    - text: Option
+                    - code [ref=f16e700]: x01
+                    - text: ": It does a reboot and tries to reconnect. If no host is found, it goes into sleep."
+                  - paragraph [ref=f16e701]:
+                    - text: Option
+                    - code [ref=f16e702]: x02
+                    - text: ": If some time passes without a pairing, or pressing a button, the controller connects to the last active BD_ADDR."
+                  - paragraph [ref=f16e703]:
+                    - text: Option
+                    - code [ref=f16e704]: x04
+                    - text: ": It does a reboot and tries to reconnect. If no host is found, it goes into sleep. It probably does more, as this mode is calle HOME mode."
+                  - paragraph [ref=f16e705]: Page mode (x01, x04) is not to be confused with page scan mode. It's like pressing a button to reconnect, but it does it automatically.
+                  - paragraph [ref=f16e706]: All extra modes default to sleep mode if nothing happens. This is a R1 page scan mode which can accept a request from host (as seen with the "Search for Controllers" option).
+                  - generic [ref=f16e707]:
+                    - 'heading "Subcommand 0x07: Reset pairing info" [level=3] [ref=f16e708]'
+                    - 'link "Permalink: Subcommand 0x07: Reset pairing info" [ref=f16e709] [cursor=pointer]':
+                      - /url: "#subcommand-0x07-reset-pairing-info"
+                      - img [ref=f16e710]
+                  - paragraph [ref=f16e712]: Initializes the 0x2000 SPI section.
+                  - generic [ref=f16e713]:
+                    - 'heading "Subcommand 0x08: Set shipment low power state" [level=3] [ref=f16e714]'
+                    - 'link "Permalink: Subcommand 0x08: Set shipment low power state" [ref=f16e715] [cursor=pointer]':
+                      - /url: "#subcommand-0x08-set-shipment-low-power-state"
+                      - img [ref=f16e716]
+                  - paragraph [ref=f16e718]:
+                    - text: Takes as argument
+                    - code [ref=f16e719]: x00
+                    - text: or
+                    - code [ref=f16e720]: x01
+                    - text: .
+                  - paragraph [ref=f16e721]:
+                    - text: If
+                    - code [ref=f16e722]: x01
+                    - text: it writes
+                    - code [ref=f16e723]: x01
+                    - text: "@"
+                    - code [ref=f16e724]: x5000
+                    - text: of SPI flash. With
+                    - code [ref=f16e725]: x00
+                    - text: ", it resets to"
+                    - code [ref=f16e726]: xFF
+                    - text: "@"
+                    - code [ref=f16e727]: x5000
+                    - text: .
+                  - paragraph [ref=f16e728]:
+                    - text: If
+                    - code [ref=f16e729]: x01
+                    - text: is set, the feature Triggered Broadcom Fast Connect scans when in suspened or disconnected state is disabled. Additionally, it sets the low power mode, when disconnected, to HID OFF.
+                  - paragraph [ref=f16e730]:
+                    - text: This is useful when the controllers ship, because the controller cannot wake up from button presses. It does not disable all buttons when it has pairing data, only the easy pressable. A long press from the others can wake up the controller,
+                    - strong [ref=f16e731]: if it has pairing data
+                    - text: .
+                  - paragraph [ref=f16e732]:
+                    - text: Switch always sends
+                    - code [ref=f16e733]: x08 00
+                    - text: subcmd after every connection, and thus enabling Triggered Broadcom Fast Connect and LPM mode to SLEEP.
+                  - generic [ref=f16e734]:
+                    - 'heading "Subcommand 0x10: SPI flash read" [level=3] [ref=f16e735]'
+                    - 'link "Permalink: Subcommand 0x10: SPI flash read" [ref=f16e736] [cursor=pointer]':
+                      - /url: "#subcommand-0x10-spi-flash-read"
+                      - img [ref=f16e737]
+                  - paragraph [ref=f16e739]:
+                    - text: Little-endian int32 address, int8 size, max size is
+                    - code [ref=f16e740]: x1D
+                    - text: . Replies with
+                    - code [ref=f16e741]: x9010
+                    - text: ack and echoes the request info, followed by
+                    - code [ref=f16e742]: size
+                    - text: bytes of data.
+                  - generic [ref=f16e743]:
+                    - code [ref=f16e745]: "Request: [01 .. .. .. .. .. .. .. .. .. 10 80 60 00 00 18] ^ subcommand ^~~~~~~~~~~ address x6080 ^ length = 0x18 bytes Response: INPUT 21 [21 .. .. .. .. .. .. .. .. .. .. .. .. 90 10 80 60 00 00 18 .. .. .. ....] ^ subcommand reply ^~~~~~~~~~~ address ^ length = 0x18 bytes ^~~~~ data"
+                    - button "Copy code to clipboard" [ref=f16e747] [cursor=pointer]:
+                      - img [ref=f16e748]
+                  - generic [ref=f16e751]:
+                    - 'heading "Subcommand 0x11: SPI flash Write" [level=3] [ref=f16e752]'
+                    - 'link "Permalink: Subcommand 0x11: SPI flash Write" [ref=f16e753] [cursor=pointer]':
+                      - /url: "#subcommand-0x11-spi-flash-write"
+                      - img [ref=f16e754]
+                  - paragraph [ref=f16e756]:
+                    - text: Little-endian int32 address, int8 size. Max size
+                    - code [ref=f16e757]: x1D
+                    - text: data to write. Replies with
+                    - code [ref=f16e758]: x8011
+                    - text: ack and a uint8 status.
+                    - code [ref=f16e759]: x00
+                    - text: = success,
+                    - code [ref=f16e760]: x01
+                    - text: = write protected.
+                  - generic [ref=f16e761]:
+                    - 'heading "Subcommand 0x12: SPI sector erase" [level=3] [ref=f16e762]'
+                    - 'link "Permalink: Subcommand 0x12: SPI sector erase" [ref=f16e763] [cursor=pointer]':
+                      - /url: "#subcommand-0x12-spi-sector-erase"
+                      - img [ref=f16e764]
+                  - paragraph [ref=f16e766]:
+                    - text: Takes a Little-endian uint32. Erases the whole 4KB in the specified address to 0xFF. Replies with
+                    - code [ref=f16e767]: x8012
+                    - text: ack and a uint8 status.
+                    - code [ref=f16e768]: x00
+                    - text: = success,
+                    - code [ref=f16e769]: x01
+                    - text: = write protected.
+                  - generic [ref=f16e770]:
+                    - 'heading "Subcommand 0x20: Reset NFC/IR MCU" [level=3] [ref=f16e771]'
+                    - 'link "Permalink: Subcommand 0x20: Reset NFC/IR MCU" [ref=f16e772] [cursor=pointer]':
+                      - /url: "#subcommand-0x20-reset-nfcir-mcu"
+                      - img [ref=f16e773]
+                  - generic [ref=f16e775]:
+                    - 'heading "Subcommand 0x21: Set NFC/IR MCU configuration" [level=3] [ref=f16e776]'
+                    - 'link "Permalink: Subcommand 0x21: Set NFC/IR MCU configuration" [ref=f16e777] [cursor=pointer]':
+                      - /url: "#subcommand-0x21-set-nfcir-mcu-configuration"
+                      - img [ref=f16e778]
+                  - paragraph [ref=f16e780]: Write configuration data to MCU. This data can be IR configuration, NFC configuration or data for the 512KB MCU firmware update.
+                  - paragraph [ref=f16e781]: Takes 38 or 37 bytes long argument data.
+                  - paragraph [ref=f16e782]:
+                    - text: Replies with ACK
+                    - code [ref=f16e783]: xA0
+                    - code [ref=f16e784]: x20
+                    - text: and 34 bytes of data.
+                  - generic [ref=f16e785]:
+                    - 'heading "Subcommand 0x22: Set NFC/IR MCU state" [level=3] [ref=f16e786]'
+                    - 'link "Permalink: Subcommand 0x22: Set NFC/IR MCU state" [ref=f16e787] [cursor=pointer]':
+                      - /url: "#subcommand-0x22-set-nfcir-mcu-state"
+                      - img [ref=f16e788]
+                  - paragraph [ref=f16e790]: "Takes one argument:"
+                  - table [ref=f16e792]:
+                    - rowgroup [ref=f16e793]:
+                      - 'row "Argument # Remarks" [ref=f16e794]':
+                        - 'columnheader "Argument #" [ref=f16e795]'
+                        - columnheader "Remarks" [ref=f16e796]
+                    - rowgroup [ref=f16e797]:
+                      - row "00 Suspend" [ref=f16e798]:
+                        - cell "00" [ref=f16e799]:
+                          - code [ref=f16e800]: "00"
+                        - cell "Suspend" [ref=f16e801]
+                      - row "01 Resume" [ref=f16e802]:
+                        - cell "01" [ref=f16e803]:
+                          - code [ref=f16e804]: "01"
+                        - cell "Resume" [ref=f16e805]
+                      - row "02 Resume for update" [ref=f16e806]:
+                        - cell "02" [ref=f16e807]:
+                          - code [ref=f16e808]: "02"
+                        - cell "Resume for update" [ref=f16e809]
+                  - generic [ref=f16e810]:
+                    - 'heading "Subcommand 0x24: Set unknown data (fw 3.86 and up)" [level=3] [ref=f16e811]'
+                    - 'link "Permalink: Subcommand 0x24: Set unknown data (fw 3.86 and up)" [ref=f16e812] [cursor=pointer]':
+                      - /url: "#subcommand-0x24-set-unknown-data-fw-386-and-up"
+                      - img [ref=f16e813]
+                  - paragraph [ref=f16e815]: Takes a 38 byte long argument.
+                  - paragraph [ref=f16e816]:
+                    - text: Sets a byte to
+                    - code [ref=f16e817]: x01
+                    - text: (enable something?) and sets also an unknown data (configuration? for NFC/IR MCU?) to the bt device struct that copies it from given argument.
+                  - paragraph [ref=f16e818]:
+                    - text: Replies with
+                    - code [ref=f16e819]: x80 24 00
+                    - text: always.
+                  - generic [ref=f16e820]:
+                    - 'heading "Subcommand 0x25: Reset 0x24 unknown data (fw 3.86 and up)" [level=3] [ref=f16e821]'
+                    - 'link "Permalink: Subcommand 0x25: Reset 0x24 unknown data (fw 3.86 and up)" [ref=f16e822] [cursor=pointer]':
+                      - /url: "#subcommand-0x25-reset-0x24-unknown-data-fw-386-and-up"
+                      - img [ref=f16e823]
+                  - paragraph [ref=f16e825]:
+                    - text: Sets the above byte to
+                    - code [ref=f16e826]: x00
+                    - text: (disable something?) and resets the previous 38 byte data to all zeroes.
+                  - paragraph [ref=f16e827]:
+                    - text: Replies with
+                    - code [ref=f16e828]: x80 25 00
+                    - text: always.
+                  - generic [ref=f16e829]:
+                    - 'heading "Subcommand 0x28: Set unknown NFC/IR MCU data" [level=3] [ref=f16e830]'
+                    - 'link "Permalink: Subcommand 0x28: Set unknown NFC/IR MCU data" [ref=f16e831] [cursor=pointer]':
+                      - /url: "#subcommand-0x28-set-unknown-nfcir-mcu-data"
+                      - img [ref=f16e832]
+                  - paragraph [ref=f16e834]: Takes a 38 byte long argument and copies it to unknown array_222640[96] at &array_222640[3].
+                  - paragraph [ref=f16e835]: Does the same job with OUTPUT report 0x12.
+                  - paragraph [ref=f16e836]:
+                    - text: Replies with ACK
+                    - code [ref=f16e837]: x80
+                    - code [ref=f16e838]: x28
+                    - text: .
+                  - generic [ref=f16e839]:
+                    - 'heading "Subcommand 0x29: Get x28 NFC/IR MCU data" [level=3] [ref=f16e840]':
+                      - text: "Subcommand 0x29: Get"
+                      - code [ref=f16e841]: x28
+                      - text: NFC/IR MCU data
+                    - 'link "Permalink: Subcommand 0x29: Get x28 NFC/IR MCU data" [ref=f16e842] [cursor=pointer]':
+                      - /url: "#subcommand-0x29-get-x28-nfcir-mcu-data"
+                      - img [ref=f16e843]
+                  - paragraph [ref=f16e845]:
+                    - text: Replies with ACK
+                    - code [ref=f16e846]: xA8
+                    - code [ref=f16e847]: x29
+                    - text: and 34 bytes data, from a different buffer than the one the x28 writes.
+                  - generic [ref=f16e848]:
+                    - 'heading "Subcommand 0x2A: Set GPIO Pin Output value (2 @Port 2)" [level=3] [ref=f16e849]'
+                    - 'link "Permalink: Subcommand 0x2A: Set GPIO Pin Output value (2 @Port 2)" [ref=f16e850] [cursor=pointer]':
+                      - /url: "#subcommand-0x2a-set-gpio-pin-output-value-2-port-2"
+                      - img [ref=f16e851]
+                  - paragraph [ref=f16e853]:
+                    - text: Takes a uint8_t and sets unknown GPIO Pin 2 at Port 2 to
+                    - code [ref=f16e854]: "0"
+                    - text: = GPIO_PIN_OUTPUT_LOW
+                    - code [ref=f16e855]: or
+                    - text: "1"
+                    - code [ref=f16e856]: = GPIO_PIN_OUTPUT_HIGH
+                    - text: .
+                  - paragraph [ref=f16e857]:
+                    - text: This normally enables a function. For example, subcmd
+                    - code [ref=f16e858]: x48
+                    - text: sets GPIO Pin 7 @Port 2 output value, which disables or enables IMU.
+                  - paragraph [ref=f16e859]:
+                    - text: Replies always with ACK
+                    - code [ref=f16e860]: x00
+                    - code [ref=f16e861]: x2A
+                    - text: .
+                  - paragraph [ref=f16e862]:
+                    - code [ref=f16e863]: x00
+                    - text: as an ACK here is a bug. Devs forgot to add an ACK reply.
+                  - generic [ref=f16e864]:
+                    - 'heading "Subcommand 0x2B: Get x29 NFC/IR MCU data" [level=3] [ref=f16e865]':
+                      - text: "Subcommand 0x2B: Get"
+                      - code [ref=f16e866]: x29
+                      - text: NFC/IR MCU data
+                    - 'link "Permalink: Subcommand 0x2B: Get x29 NFC/IR MCU data" [ref=f16e867] [cursor=pointer]':
+                      - /url: "#subcommand-0x2b-get-x29-nfcir-mcu-data"
+                      - img [ref=f16e868]
+                  - paragraph [ref=f16e870]:
+                    - text: Replies with ACK
+                    - code [ref=f16e871]: xA9
+                    - code [ref=f16e872]: x2B
+                    - text: and 20 bytes long data (which has also a part from x24 subcmd).
+                  - generic [ref=f16e873]:
+                    - 'heading "Subcommand 0x30: Set player lights" [level=3] [ref=f16e874]'
+                    - 'link "Permalink: Subcommand 0x30: Set player lights" [ref=f16e875] [cursor=pointer]':
+                      - /url: "#subcommand-0x30-set-player-lights"
+                      - img [ref=f16e876]
+                  - paragraph [ref=f16e878]: "First argument byte is a bitfield:"
+                  - generic [ref=f16e879]:
+                    - code [ref=f16e881]: aaaa bbbb 3210 - keep player light on 3210 - flash player light
+                    - button "Copy code to clipboard" [ref=f16e883] [cursor=pointer]:
+                      - img [ref=f16e884]
+                  - paragraph [ref=f16e887]: On overrides flashing. When on USB, flashing bits work like always on bits.
+                  - generic [ref=f16e888]:
+                    - 'heading "Subcommand 0x31: Get player lights" [level=3] [ref=f16e889]'
+                    - 'link "Permalink: Subcommand 0x31: Get player lights" [ref=f16e890] [cursor=pointer]':
+                      - /url: "#subcommand-0x31-get-player-lights"
+                      - img [ref=f16e891]
+                  - paragraph [ref=f16e893]:
+                    - text: Replies with ACK
+                    - code [ref=f16e894]: xB0
+                    - code [ref=f16e895]: x31
+                    - text: and one byte that uses the same bitfield with
+                    - code [ref=f16e896]: x30
+                    - text: subcommand
+                  - paragraph [ref=f16e897]:
+                    - code [ref=f16e898]: xB1
+                    - text: is the 4 leds trail effect. But it can't be set via
+                    - code [ref=f16e899]: x30
+                    - text: .
+                  - generic [ref=f16e900]:
+                    - 'heading "Subcommand 0x38: Set HOME Light" [level=3] [ref=f16e901]'
+                    - 'link "Permalink: Subcommand 0x38: Set HOME Light" [ref=f16e902] [cursor=pointer]':
+                      - /url: "#subcommand-0x38-set-home-light"
+                      - img [ref=f16e903]
+                  - paragraph [ref=f16e905]: 25 bytes argument that control 49 elements.
+                  - table [ref=f16e907]:
+                    - rowgroup [ref=f16e908]:
+                      - 'row "Byte #, Nibble Remarks" [ref=f16e909]':
+                        - 'columnheader "Byte #, Nibble" [ref=f16e910]'
+                        - columnheader "Remarks" [ref=f16e911]
+                    - rowgroup [ref=f16e912]:
+                      - row "x00, High Number of Mini Cycles. 1-15. If number of cycles is > 0 then x0 = x1" [ref=f16e913]:
+                        - cell "x00, High" [ref=f16e914]:
+                          - code [ref=f16e915]: x00
+                          - text: ", High"
+                        - cell "Number of Mini Cycles. 1-15. If number of cycles is > 0 then x0 = x1" [ref=f16e916]:
+                          - text: Number of Mini Cycles. 1-15. If number of cycles is > 0 then
+                          - code [ref=f16e917]: x0
+                          - text: =
+                          - code [ref=f16e918]: x1
+                      - row "x00, Low Global Mini Cycle Duration. 8ms - 175ms. Value x0 = 0ms/OFF" [ref=f16e919]:
+                        - cell "x00, Low" [ref=f16e920]:
+                          - code [ref=f16e921]: x00
+                          - text: ", Low"
+                        - cell "Global Mini Cycle Duration. 8ms - 175ms. Value x0 = 0ms/OFF" [ref=f16e922]:
+                          - text: Global Mini Cycle Duration. 8ms - 175ms. Value
+                          - code [ref=f16e923]: x0
+                          - text: = 0ms/OFF
+                      - row "x01, High LED Start Intensity. Value x0=0% - xF=100%" [ref=f16e924]:
+                        - cell "x01, High" [ref=f16e925]:
+                          - code [ref=f16e926]: x01
+                          - text: ", High"
+                        - cell "LED Start Intensity. Value x0=0% - xF=100%" [ref=f16e927]:
+                          - text: LED Start Intensity. Value
+                          - code [ref=f16e928]: x0
+                          - text: =0% -
+                          - code [ref=f16e929]: xF
+                          - text: =100%
+                      - row "x01, Low Number of Full Cycles. 1-15. Value x0 is repeat forever, but if also Byte x00 High nibble is set to x0, it does the 1st Mini Cycle and then the LED stays on with LED Start Intensity." [ref=f16e930]:
+                        - cell "x01, Low" [ref=f16e931]:
+                          - code [ref=f16e932]: x01
+                          - text: ", Low"
+                        - cell "Number of Full Cycles. 1-15. Value x0 is repeat forever, but if also Byte x00 High nibble is set to x0, it does the 1st Mini Cycle and then the LED stays on with LED Start Intensity." [ref=f16e933]:
+                          - text: Number of Full Cycles. 1-15. Value
+                          - code [ref=f16e934]: x0
+                          - text: is repeat forever, but if also Byte
+                          - code [ref=f16e935]: x00
+                          - text: High nibble is set to
+                          - code [ref=f16e936]: x0
+                          - text: ", it does the 1st Mini Cycle and then the LED stays on with LED Start Intensity."
+                  - paragraph [ref=f16e937]: When all selected Mini Cycles play and then end, this is a full cycle.
+                  - paragraph [ref=f16e938]: "The Mini Cycle configurations are grouped in two (except the 15th):"
+                  - table [ref=f16e940]:
+                    - rowgroup [ref=f16e941]:
+                      - 'row "Byte #, Nibble Remarks" [ref=f16e942]':
+                        - 'columnheader "Byte #, Nibble" [ref=f16e943]'
+                        - columnheader "Remarks" [ref=f16e944]
+                    - rowgroup [ref=f16e945]:
+                      - row "x02, High Mini Cycle 1 LED Intensity" [ref=f16e946]:
+                        - cell "x02, High" [ref=f16e947]:
+                          - code [ref=f16e948]: x02
+                          - text: ", High"
+                        - cell "Mini Cycle 1 LED Intensity" [ref=f16e949]
+                      - row "x02, Low Mini Cycle 2 LED Intensity" [ref=f16e950]:
+                        - cell "x02, Low" [ref=f16e951]:
+                          - code [ref=f16e952]: x02
+                          - text: ", Low"
+                        - cell "Mini Cycle 2 LED Intensity" [ref=f16e953]
+                      - row "x03, High Fading Transition Duration to Mini Cycle 1 (Uses PWM). Value is a Multiplier of Global Mini Cycle Duration" [ref=f16e954]:
+                        - cell "x03, High" [ref=f16e955]:
+                          - code [ref=f16e956]: x03
+                          - text: ", High"
+                        - cell "Fading Transition Duration to Mini Cycle 1 (Uses PWM). Value is a Multiplier of Global Mini Cycle Duration" [ref=f16e957]
+                      - row "x03, Low LED Duration Multiplier of Mini Cycle 1. x0 = x1 = x1" [ref=f16e958]:
+                        - cell "x03, Low" [ref=f16e959]:
+                          - code [ref=f16e960]: x03
+                          - text: ", Low"
+                        - cell "LED Duration Multiplier of Mini Cycle 1. x0 = x1 = x1" [ref=f16e961]:
+                          - text: LED Duration Multiplier of Mini Cycle 1.
+                          - code [ref=f16e962]: x0
+                          - text: =
+                          - code [ref=f16e963]: x1
+                          - text: = x1
+                      - row "x04, High Fading Transition Duration to Mini Cycle 2 (Uses PWM). Value is a Multiplier of Global Mini Cycle Duration" [ref=f16e964]:
+                        - cell "x04, High" [ref=f16e965]:
+                          - code [ref=f16e966]: x04
+                          - text: ", High"
+                        - cell "Fading Transition Duration to Mini Cycle 2 (Uses PWM). Value is a Multiplier of Global Mini Cycle Duration" [ref=f16e967]
+                      - row "x04, Low LED Duration Multiplier of Mini Cycle 1. x0 = x1 = x1" [ref=f16e968]:
+                        - cell "x04, Low" [ref=f16e969]:
+                          - code [ref=f16e970]: x04
+                          - text: ", Low"
+                        - cell "LED Duration Multiplier of Mini Cycle 1. x0 = x1 = x1" [ref=f16e971]:
+                          - text: LED Duration Multiplier of Mini Cycle 1.
+                          - code [ref=f16e972]: x0
+                          - text: =
+                          - code [ref=f16e973]: x1
+                          - text: = x1
+                  - paragraph [ref=f16e974]: The Fading Transition uses a PWM to increment the transition to the Mini Cycle.
+                  - paragraph [ref=f16e975]: "The LED Duration Multiplier and the Fading Multiplier use the same algorithm: Global Mini Cycle Duration ms * Multiplier value."
+                  - paragraph [ref=f16e976]:
+                    - text: "Example: GMCD is set to"
+                    - code [ref=f16e977]: xF
+                    - text: = 175ms and LED Duration Multiplier is set to
+                    - code [ref=f16e978]: x4
+                    - text: . The Duration that the LED will stay on it's configured intensity is then 175 * 4 = 700ms.
+                  - paragraph [ref=f16e979]: Unused Mini Cycles can be skipped from the output packet.
+                  - paragraph [ref=f16e980]: "Table of Mini Cycle configuration:"
+                  - table [ref=f16e982]:
+                    - rowgroup [ref=f16e983]:
+                      - 'row "Byte #, Nibble Remarks" [ref=f16e984]':
+                        - 'columnheader "Byte #, Nibble" [ref=f16e985]'
+                        - columnheader "Remarks" [ref=f16e986]
+                    - rowgroup [ref=f16e987]:
+                      - row "x02, High Mini Cycle 1 LED Intensity" [ref=f16e988]:
+                        - cell "x02, High" [ref=f16e989]:
+                          - code [ref=f16e990]: x02
+                          - text: ", High"
+                        - cell "Mini Cycle 1 LED Intensity" [ref=f16e991]
+                      - row "x02, Low Mini Cycle 2 LED Intensity" [ref=f16e992]:
+                        - cell "x02, Low" [ref=f16e993]:
+                          - code [ref=f16e994]: x02
+                          - text: ", Low"
+                        - cell "Mini Cycle 2 LED Intensity" [ref=f16e995]
+                      - row "x03 High/Low Fading/LED Duration Multipliers for MC 1" [ref=f16e996]:
+                        - cell "x03 High/Low" [ref=f16e997]:
+                          - code [ref=f16e998]: x03
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 1" [ref=f16e999]
+                      - row "x04 High/Low Fading/LED Duration Multipliers for MC 2" [ref=f16e1000]:
+                        - cell "x04 High/Low" [ref=f16e1001]:
+                          - code [ref=f16e1002]: x04
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 2" [ref=f16e1003]
+                      - row "x05, High Mini Cycle 3 LED Intensity" [ref=f16e1004]:
+                        - cell "x05, High" [ref=f16e1005]:
+                          - code [ref=f16e1006]: x05
+                          - text: ", High"
+                        - cell "Mini Cycle 3 LED Intensity" [ref=f16e1007]
+                      - row "x05, Low Mini Cycle 4 LED Intensity" [ref=f16e1008]:
+                        - cell "x05, Low" [ref=f16e1009]:
+                          - code [ref=f16e1010]: x05
+                          - text: ", Low"
+                        - cell "Mini Cycle 4 LED Intensity" [ref=f16e1011]
+                      - row "x06 High/Low Fading/LED Duration Multipliers for MC 3" [ref=f16e1012]:
+                        - cell "x06 High/Low" [ref=f16e1013]:
+                          - code [ref=f16e1014]: x06
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 3" [ref=f16e1015]
+                      - row "x06 High/Low Fading/LED Duration Multipliers for MC 4" [ref=f16e1016]:
+                        - cell "x06 High/Low" [ref=f16e1017]:
+                          - code [ref=f16e1018]: x06
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 4" [ref=f16e1019]
+                      - row "... ..." [ref=f16e1020]:
+                        - cell "..." [ref=f16e1021]
+                        - cell "..." [ref=f16e1022]
+                      - row "x20, High Mini Cycle 13 LED Intensity" [ref=f16e1023]:
+                        - cell "x20, High" [ref=f16e1024]:
+                          - code [ref=f16e1025]: x20
+                          - text: ", High"
+                        - cell "Mini Cycle 13 LED Intensity" [ref=f16e1026]
+                      - row "x20, Low Mini Cycle 14 LED Intensity" [ref=f16e1027]:
+                        - cell "x20, Low" [ref=f16e1028]:
+                          - code [ref=f16e1029]: x20
+                          - text: ", Low"
+                        - cell "Mini Cycle 14 LED Intensity" [ref=f16e1030]
+                      - row "x21 High/Low Fading/LED Duration Multipliers for MC 13" [ref=f16e1031]:
+                        - cell "x21 High/Low" [ref=f16e1032]:
+                          - code [ref=f16e1033]: x21
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 13" [ref=f16e1034]
+                      - row "x22 High/Low Fading/LED Duration Multipliers for MC 14" [ref=f16e1035]:
+                        - cell "x22 High/Low" [ref=f16e1036]:
+                          - code [ref=f16e1037]: x22
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 14" [ref=f16e1038]
+                      - row "x23, High Mini Cycle 15 LED Intensity" [ref=f16e1039]:
+                        - cell "x23, High" [ref=f16e1040]:
+                          - code [ref=f16e1041]: x23
+                          - text: ", High"
+                        - cell "Mini Cycle 15 LED Intensity" [ref=f16e1042]
+                      - row "x23, Low Unused" [ref=f16e1043]:
+                        - cell "x23, Low" [ref=f16e1044]:
+                          - code [ref=f16e1045]: x23
+                          - text: ", Low"
+                        - cell "Unused" [ref=f16e1046]
+                      - row "x24 High/Low Fading/LED Duration Multipliers for MC 15" [ref=f16e1047]:
+                        - cell "x24 High/Low" [ref=f16e1048]:
+                          - code [ref=f16e1049]: x24
+                          - text: High/Low
+                        - cell "Fading/LED Duration Multipliers for MC 15" [ref=f16e1050]
+                  - generic [ref=f16e1051]:
+                    - 'heading "Subcommand 0x40: Enable IMU (6-Axis sensor)" [level=3] [ref=f16e1052]'
+                    - 'link "Permalink: Subcommand 0x40: Enable IMU (6-Axis sensor)" [ref=f16e1053] [cursor=pointer]':
+                      - /url: "#subcommand-0x40-enable-imu-6-axis-sensor"
+                      - img [ref=f16e1054]
+                  - paragraph [ref=f16e1056]:
+                    - text: One argument of
+                    - code [ref=f16e1057]: x00
+                    - text: Disable or
+                    - code [ref=f16e1058]: x01
+                    - text: Enable.
+                  - generic [ref=f16e1059]:
+                    - 'heading "Subcommand 0x41: Set IMU sensitivity" [level=3] [ref=f16e1060]'
+                    - 'link "Permalink: Subcommand 0x41: Set IMU sensitivity" [ref=f16e1061] [cursor=pointer]':
+                      - /url: "#subcommand-0x41-set-imu-sensitivity"
+                      - img [ref=f16e1062]
+                  - paragraph [ref=f16e1064]: Sets the 6-axis sensor sensitivity for accelerometer and gyroscope. 4 uint8_t.
+                  - paragraph [ref=f16e1065]: "Sending x40 x01 (IMU enable), if it was previously disabled, resets your configuration to Acc: 1.66 kHz (high perf), ±8G, 100 Hz Anti-aliasing filter bandwidth and Gyro: 208 Hz (high performance), ±2000dps.."
+                  - paragraph [ref=f16e1066]: "Gyroscope sensitivity (Byte 0):"
+                  - table [ref=f16e1068]:
+                    - rowgroup [ref=f16e1069]:
+                      - 'row "Arg # Remarks" [ref=f16e1070]':
+                        - 'columnheader "Arg #" [ref=f16e1071]'
+                        - columnheader "Remarks" [ref=f16e1072]
+                    - rowgroup [ref=f16e1073]:
+                      - row "00 ±250dps" [ref=f16e1074]:
+                        - cell "00" [ref=f16e1075]:
+                          - code [ref=f16e1076]: "00"
+                        - cell "±250dps" [ref=f16e1077]
+                      - row "01 ±500dps" [ref=f16e1078]:
+                        - cell "01" [ref=f16e1079]:
+                          - code [ref=f16e1080]: "01"
+                        - cell "±500dps" [ref=f16e1081]
+                      - row "02 ±1000dps" [ref=f16e1082]:
+                        - cell "02" [ref=f16e1083]:
+                          - code [ref=f16e1084]: "02"
+                        - cell "±1000dps" [ref=f16e1085]
+                      - row "03 ±2000dps (default)" [ref=f16e1086]:
+                        - cell "03" [ref=f16e1087]:
+                          - code [ref=f16e1088]: "03"
+                        - cell "±2000dps (default)" [ref=f16e1089]
+                  - paragraph [ref=f16e1090]: "Accelerometer sensitivity (Byte 1):"
+                  - table [ref=f16e1092]:
+                    - rowgroup [ref=f16e1093]:
+                      - 'row "Arg # Remarks" [ref=f16e1094]':
+                        - 'columnheader "Arg #" [ref=f16e1095]'
+                        - columnheader "Remarks" [ref=f16e1096]
+                    - rowgroup [ref=f16e1097]:
+                      - row "00 ±8G (default)" [ref=f16e1098]:
+                        - cell "00" [ref=f16e1099]:
+                          - code [ref=f16e1100]: "00"
+                        - cell "±8G (default)" [ref=f16e1101]
+                      - row "01 ±4G" [ref=f16e1102]:
+                        - cell "01" [ref=f16e1103]:
+                          - code [ref=f16e1104]: "01"
+                        - cell "±4G" [ref=f16e1105]
+                      - row "02 ±2G" [ref=f16e1106]:
+                        - cell "02" [ref=f16e1107]:
+                          - code [ref=f16e1108]: "02"
+                        - cell "±2G" [ref=f16e1109]
+                      - row "03 ±16G" [ref=f16e1110]:
+                        - cell "03" [ref=f16e1111]:
+                          - code [ref=f16e1112]: "03"
+                        - cell "±16G" [ref=f16e1113]
+                  - paragraph [ref=f16e1114]: "Gyroscope performance rate (Byte 2):"
+                  - table [ref=f16e1116]:
+                    - rowgroup [ref=f16e1117]:
+                      - 'row "Arg # Remarks" [ref=f16e1118]':
+                        - 'columnheader "Arg #" [ref=f16e1119]'
+                        - columnheader "Remarks" [ref=f16e1120]
+                    - rowgroup [ref=f16e1121]:
+                      - row "00 833Hz (high perf)" [ref=f16e1122]:
+                        - cell "00" [ref=f16e1123]:
+                          - code [ref=f16e1124]: "00"
+                        - cell "833Hz (high perf)" [ref=f16e1125]
+                      - row "01 208Hz (high perf, default)" [ref=f16e1126]:
+                        - cell "01" [ref=f16e1127]:
+                          - code [ref=f16e1128]: "01"
+                        - cell "208Hz (high perf, default)" [ref=f16e1129]
+                  - paragraph [ref=f16e1130]: "Accelerometer Anti-aliasing filter bandwidth (Byte 3):"
+                  - table [ref=f16e1132]:
+                    - rowgroup [ref=f16e1133]:
+                      - 'row "Arg # Remarks" [ref=f16e1134]':
+                        - 'columnheader "Arg #" [ref=f16e1135]'
+                        - columnheader "Remarks" [ref=f16e1136]
+                    - rowgroup [ref=f16e1137]:
+                      - row "00 200Hz" [ref=f16e1138]:
+                        - cell "00" [ref=f16e1139]:
+                          - code [ref=f16e1140]: "00"
+                        - cell "200Hz" [ref=f16e1141]
+                      - row "01 100Hz (default)" [ref=f16e1142]:
+                        - cell "01" [ref=f16e1143]:
+                          - code [ref=f16e1144]: "01"
+                        - cell "100Hz (default)" [ref=f16e1145]
+                  - generic [ref=f16e1146]:
+                    - 'heading "Subcommand 0x42: Write to IMU registers" [level=3] [ref=f16e1147]'
+                    - 'link "Permalink: Subcommand 0x42: Write to IMU registers" [ref=f16e1148] [cursor=pointer]':
+                      - /url: "#subcommand-0x42-write-to-imu-registers"
+                      - img [ref=f16e1149]
+                  - paragraph [ref=f16e1151]: It takes 3 uint8_t arguments and writes to the selected register. You can write only writable registers (r/w).
+                  - paragraph [ref=f16e1152]: Consult LSM6DS3.pdf for all registers and their meaning. The registers addresses are mapped 1:1 in the subcmd.
+                  - paragraph [ref=f16e1153]: With this subcmd you can completely control the IMU.
+                  - table [ref=f16e1155]:
+                    - rowgroup [ref=f16e1156]:
+                      - 'row "Byte # Remarks" [ref=f16e1157]':
+                        - 'columnheader "Byte #" [ref=f16e1158]'
+                        - columnheader "Remarks" [ref=f16e1159]
+                    - rowgroup [ref=f16e1160]:
+                      - row "00 Register address" [ref=f16e1161]:
+                        - cell "00" [ref=f16e1162]:
+                          - code [ref=f16e1163]: "00"
+                        - cell "Register address" [ref=f16e1164]
+                      - row "01 Always x01 for writing" [ref=f16e1165]:
+                        - cell "01" [ref=f16e1166]:
+                          - code [ref=f16e1167]: "01"
+                        - cell "Always x01 for writing" [ref=f16e1168]:
+                          - text: Always
+                          - code [ref=f16e1169]: x01
+                          - text: for writing
+                      - row "02 Value to write" [ref=f16e1170]:
+                        - cell "02" [ref=f16e1171]:
+                          - code [ref=f16e1172]: "02"
+                        - cell "Value to write" [ref=f16e1173]
+                  - generic [ref=f16e1174]:
+                    - 'heading "Subcommand 0x43: Read IMU registers" [level=3] [ref=f16e1175]'
+                    - 'link "Permalink: Subcommand 0x43: Read IMU registers" [ref=f16e1176] [cursor=pointer]':
+                      - /url: "#subcommand-0x43-read-imu-registers"
+                      - img [ref=f16e1177]
+                  - paragraph [ref=f16e1179]: It takes 2 uint8t_t.
+                  - table [ref=f16e1181]:
+                    - rowgroup [ref=f16e1182]:
+                      - 'row "Byte # Remarks" [ref=f16e1183]':
+                        - 'columnheader "Byte #" [ref=f16e1184]'
+                        - columnheader "Remarks" [ref=f16e1185]
+                    - rowgroup [ref=f16e1186]:
+                      - row "00 Register start address" [ref=f16e1187]:
+                        - cell "00" [ref=f16e1188]:
+                          - code [ref=f16e1189]: "00"
+                        - cell "Register start address" [ref=f16e1190]
+                      - row "01 Registers to show. Max x20" [ref=f16e1191]:
+                        - cell "01" [ref=f16e1192]:
+                          - code [ref=f16e1193]: "01"
+                        - cell "Registers to show. Max x20" [ref=f16e1194]
+                  - paragraph [ref=f16e1195]:
+                    - text: It replies with
+                    - code [ref=f16e1196]: xC043##$$
+                    - text: ", where ## is the first register address to show and $$ is how many registers to show. After these the data follows."
+                  - paragraph [ref=f16e1197]:
+                    - text: For example, by sending
+                    - code [ref=f16e1198]: x0020
+                    - text: you can view registers
+                    - code [ref=f16e1199]: x00
+                    - text: "-"
+                    - code [ref=f16e1200]: x1F
+                    - text: ","
+                    - code [ref=f16e1201]: x2020
+                    - text: ":"
+                    - code [ref=f16e1202]: x20
+                    - text: "-"
+                    - code [ref=f16e1203]: x2F
+                    - text: ", etc."
+                  - paragraph [ref=f16e1204]:
+                    - text: To quickly get the register you need, send
+                    - code [ref=f16e1205]: x##01
+                    - text: (## is the register address) and parse the 1st byte after the subcmd + args reply (
+                    - code [ref=f16e1206]: xC043##$$
+                    - text: ).
+                  - paragraph [ref=f16e1207]: Consult LSM6DS3.pdf for all registers and their meaning. The registers addresses are mapped 1:1 in the subcmd.
+                  - generic [ref=f16e1208]:
+                    - 'heading "Subcommand 0x48: Enable vibration" [level=3] [ref=f16e1209]'
+                    - 'link "Permalink: Subcommand 0x48: Enable vibration" [ref=f16e1210] [cursor=pointer]':
+                      - /url: "#subcommand-0x48-enable-vibration"
+                      - img [ref=f16e1211]
+                  - paragraph [ref=f16e1213]:
+                    - text: One argument of
+                    - code [ref=f16e1214]: x00
+                    - text: Disable or
+                    - code [ref=f16e1215]: x01
+                    - text: Enable.
+                  - generic [ref=f16e1216]:
+                    - 'heading "Subcommand 0x50: Get regulated voltage" [level=3] [ref=f16e1217]'
+                    - 'link "Permalink: Subcommand 0x50: Get regulated voltage" [ref=f16e1218] [cursor=pointer]':
+                      - /url: "#subcommand-0x50-get-regulated-voltage"
+                      - img [ref=f16e1219]
+                  - paragraph [ref=f16e1221]:
+                    - text: Replies with ACK
+                    - code [ref=f16e1222]: xD0
+                    - code [ref=f16e1223]: x50
+                    - text: and a little-endian uint16. Raises when charging a Joy-Con.
+                  - paragraph [ref=f16e1224]: Internally, the values come from 1000mV - 1800mV regulated voltage samples, that are translated to 1320-1680 values.
+                  - paragraph [ref=f16e1225]: These follow a curve between 3.3V and 4.2V (tested with multimeter). So a 2.5x multiplier can get us the real battery voltage in mV.
+                  - paragraph [ref=f16e1226]: "Based on this info, we have the following table:"
+                  - table [ref=f16e1228]:
+                    - rowgroup [ref=f16e1229]:
+                      - 'row "Range # Range Range in mV Reported battery" [ref=f16e1230]':
+                        - 'columnheader "Range #" [ref=f16e1231]'
+                        - columnheader "Range" [ref=f16e1232]
+                        - columnheader "Range in mV" [ref=f16e1233]
+                        - columnheader "Reported battery" [ref=f16e1234]
+                    - rowgroup [ref=f16e1235]:
+                      - row "x0528 - x059F 1320 - 1439 3300 - 3599 2 - Critical" [ref=f16e1236]:
+                        - cell "x0528 - x059F" [ref=f16e1237]:
+                          - code [ref=f16e1238]: x0528
+                          - text: "-"
+                          - code [ref=f16e1239]: x059F
+                        - cell "1320 - 1439" [ref=f16e1240]
+                        - cell "3300 - 3599" [ref=f16e1241]
+                        - cell "2 - Critical" [ref=f16e1242]
+                      - row "x05A0 - x05DF 1440 - 1503 3600 - 3759 4 - Low" [ref=f16e1243]:
+                        - cell "x05A0 - x05DF" [ref=f16e1244]:
+                          - code [ref=f16e1245]: x05A0
+                          - text: "-"
+                          - code [ref=f16e1246]: x05DF
+                        - cell "1440 - 1503" [ref=f16e1247]
+                        - cell "3600 - 3759" [ref=f16e1248]
+                        - cell "4 - Low" [ref=f16e1249]
+                      - row "x05E0 - x0617 1504 - 1559 3760 - 3899 6 - Medium" [ref=f16e1250]:
+                        - cell "x05E0 - x0617" [ref=f16e1251]:
+                          - code [ref=f16e1252]: x05E0
+                          - text: "-"
+                          - code [ref=f16e1253]: x0617
+                        - cell "1504 - 1559" [ref=f16e1254]
+                        - cell "3760 - 3899" [ref=f16e1255]
+                        - cell "6 - Medium" [ref=f16e1256]
+                      - row "x0618 - x0690 1560 - 1680 3900 - 4200 8 - Full" [ref=f16e1257]:
+                        - cell "x0618 - x0690" [ref=f16e1258]:
+                          - code [ref=f16e1259]: x0618
+                          - text: "-"
+                          - code [ref=f16e1260]: x0690
+                        - cell "1560 - 1680" [ref=f16e1261]
+                        - cell "3900 - 4200" [ref=f16e1262]
+                        - cell "8 - Full" [ref=f16e1263]
+                  - paragraph [ref=f16e1264]: Tests showed charging stops at 1680 and the controller turns off at 1320.
+                  - generic [ref=f16e1265]:
+                    - 'heading "Subcommand 0x51: Set GPIO Pin Output value (7 & 15 @Port 1)" [level=3] [ref=f16e1266]'
+                    - 'link "Permalink: Subcommand 0x51: Set GPIO Pin Output value (7 & 15 @Port 1)" [ref=f16e1267] [cursor=pointer]':
+                      - /url: "#subcommand-0x51-set-gpio-pin-output-value-7--15-port-1"
+                      - img [ref=f16e1268]
+                  - paragraph [ref=f16e1270]:
+                    - text: This sets the output value for
+                    - code [ref=f16e1271]: Pin 7
+                    - text: and
+                    - code [ref=f16e1272]: Pin 15
+                    - text: at
+                    - code [ref=f16e1273]: Port 1
+                    - text: . It's currently unknown what they do..
+                  - paragraph [ref=f16e1274]: It takes a uint8. Valid values are 0x00, 0x04, 0x10, 0x14. Other values result to these bitwise.
+                  - paragraph [ref=f16e1275]:
+                    - text: The end result values are translated to
+                    - code [ref=f16e1276]: GPIO_PIN_OUTPUT_LOW = 0
+                    - text: and
+                    - code [ref=f16e1277]: GPIO_PIN_OUTPUT_HIGH = 0
+                    - text: .
+                  - table [ref=f16e1279]:
+                    - rowgroup [ref=f16e1280]:
+                      - 'row "Value # PIN @Port 1 GPIO Output Value" [ref=f16e1281]':
+                        - 'columnheader "Value #" [ref=f16e1282]'
+                        - columnheader "PIN @Port 1" [ref=f16e1283]
+                        - columnheader "GPIO Output Value" [ref=f16e1284]
+                    - rowgroup [ref=f16e1285]:
+                      - row "x00 7 GPIO_PIN_OUTPUT_HIGH" [ref=f16e1286]:
+                        - cell "x00" [ref=f16e1287]:
+                          - code [ref=f16e1288]: x00
+                        - cell "7" [ref=f16e1289]:
+                          - code [ref=f16e1290]: "7"
+                        - cell "GPIO_PIN_OUTPUT_HIGH" [ref=f16e1291]
+                      - row "15 GPIO_PIN_OUTPUT_LOW" [ref=f16e1292]:
+                        - cell [ref=f16e1293]
+                        - cell "15" [ref=f16e1294]:
+                          - code [ref=f16e1295]: "15"
+                        - cell "GPIO_PIN_OUTPUT_LOW" [ref=f16e1296]
+                      - row "x04 7 GPIO_PIN_OUTPUT_LOW" [ref=f16e1297]:
+                        - cell "x04" [ref=f16e1298]:
+                          - code [ref=f16e1299]: x04
+                        - cell "7" [ref=f16e1300]:
+                          - code [ref=f16e1301]: "7"
+                        - cell "GPIO_PIN_OUTPUT_LOW" [ref=f16e1302]
+                      - row "15 GPIO_PIN_OUTPUT_LOW" [ref=f16e1303]:
+                        - cell [ref=f16e1304]
+                        - cell "15" [ref=f16e1305]:
+                          - code [ref=f16e1306]: "15"
+                        - cell "GPIO_PIN_OUTPUT_LOW" [ref=f16e1307]
+                      - row "x10 7 GPIO_PIN_OUTPUT_HIGH" [ref=f16e1308]:
+                        - cell "x10" [ref=f16e1309]:
+                          - code [ref=f16e1310]: x10
+                        - cell "7" [ref=f16e1311]:
+                          - code [ref=f16e1312]: "7"
+                        - cell "GPIO_PIN_OUTPUT_HIGH" [ref=f16e1313]
+                      - row "15 GPIO_PIN_OUTPUT_HIGH" [ref=f16e1314]:
+                        - cell [ref=f16e1315]
+                        - cell "15" [ref=f16e1316]:
+                          - code [ref=f16e1317]: "15"
+                        - cell "GPIO_PIN_OUTPUT_HIGH" [ref=f16e1318]
+                      - row "x14 7 GPIO_PIN_OUTPUT_LOW" [ref=f16e1319]:
+                        - cell "x14" [ref=f16e1320]:
+                          - code [ref=f16e1321]: x14
+                        - cell "7" [ref=f16e1322]:
+                          - code [ref=f16e1323]: "7"
+                        - cell "GPIO_PIN_OUTPUT_LOW" [ref=f16e1324]
+                      - row "15 GPIO_PIN_OUTPUT_HIGH" [ref=f16e1325]:
+                        - cell [ref=f16e1326]
+                        - cell "15" [ref=f16e1327]:
+                          - code [ref=f16e1328]: "15"
+                        - cell "GPIO_PIN_OUTPUT_HIGH" [ref=f16e1329]
+                  - paragraph [ref=f16e1330]:
+                    - text: Replies with ACK
+                    - code [ref=f16e1331]: x80
+                    - code [ref=f16e1332]: x51
+                    - text: .
+                  - generic [ref=f16e1333]:
+                    - 'heading "Subcommand 0x52: Get GPIO Pin Input/Output value" [level=3] [ref=f16e1334]'
+                    - 'link "Permalink: Subcommand 0x52: Get GPIO Pin Input/Output value" [ref=f16e1335] [cursor=pointer]':
+                      - /url: "#subcommand-0x52-get-gpio-pin-inputoutput-value"
+                      - img [ref=f16e1336]
+                  - paragraph [ref=f16e1338]:
+                    - text: Replies with ACK
+                    - code [ref=f16e1339]: xD1
+                    - code [ref=f16e1340]: x52
+                    - text: and a uint8. The uint8 value is actually 4bit (b0000WXYZ).
+                  - paragraph [ref=f16e1341]:
+                    - text: Each bit translates to GPIO_PIN_OUTPUT_LOW or GPIO_PIN_OUTPUT_HIGH. The first 3 bits (ZYX) are
+                    - strong [ref=f16e1342]: inverted
+                    - text: .
+                  - paragraph [ref=f16e1343]: "Example with 0x12:"
+                  - table [ref=f16e1345]:
+                    - rowgroup [ref=f16e1346]:
+                      - 'row "bit LSB o # PIN @Port Example Value" [ref=f16e1347]':
+                        - 'columnheader "bit LSB o #" [ref=f16e1348]'
+                        - columnheader "PIN @Port" [ref=f16e1349]
+                        - columnheader "Example Value" [ref=f16e1350]
+                    - rowgroup [ref=f16e1351]:
+                      - 'row "bit 0 (Z) 4 @0 0: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1352]':
+                        - cell "bit 0 (Z)" [ref=f16e1353]:
+                          - code [ref=f16e1354]: bit 0
+                          - text: (Z)
+                        - cell "4 @0" [ref=f16e1355]:
+                          - code [ref=f16e1356]: 4 @0
+                        - 'cell "0: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1357]'
+                      - 'row "bit 1 (Y) 2 @3 1: GPIO_PIN_OUTPUT_LOW" [ref=f16e1358]':
+                        - cell "bit 1 (Y)" [ref=f16e1359]:
+                          - code [ref=f16e1360]: bit 1
+                          - text: (Y)
+                        - cell "2 @3" [ref=f16e1361]:
+                          - code [ref=f16e1362]: 2 @3
+                        - 'cell "1: GPIO_PIN_OUTPUT_LOW" [ref=f16e1363]'
+                      - 'row "bit 2 (X) 7 @1 0: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1364]':
+                        - cell "bit 2 (X)" [ref=f16e1365]:
+                          - code [ref=f16e1366]: bit 2
+                          - text: (X)
+                        - cell "7 @1" [ref=f16e1367]:
+                          - code [ref=f16e1368]: 7 @1
+                        - 'cell "0: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1369]'
+                      - 'row "bit 3 (W) 15 @1 1: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1370]':
+                        - cell "bit 3 (W)" [ref=f16e1371]:
+                          - code [ref=f16e1372]: bit 3
+                          - text: (W)
+                        - cell "15 @1" [ref=f16e1373]:
+                          - code [ref=f16e1374]: 15 @1
+                        - 'cell "1: GPIO_PIN_OUTPUT_HIGH" [ref=f16e1375]'
+                  - paragraph [ref=f16e1376]:
+                    - text: If the joy-cons are connected to a charging grip, the reply is
+                    - code [ref=f16e1377]: x17
+                    - text: (L, L, L, H). If you remove it from it, changes to
+                    - code [ref=f16e1378]: x14
+                    - text: (H, H, L, H).
+                  - paragraph [ref=f16e1379]:
+                    - text: If you only connect or pair it from sleep mode, the reply is
+                    - code [ref=f16e1380]: x04
+                    - text: (H, H, L, L).
+  - alert [ref=f16e1384]

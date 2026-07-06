@@ -1,0 +1,379 @@
+- generic [active] [ref=f26e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f26e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f26e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f26e8]:
+    - search [ref=f26e9]:
+      - generic [ref=f26e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f26e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f26e14]'
+        - generic [ref=f26e15]:
+          - generic [ref=f26e16]:
+            - combobox "Search" [ref=f26e19]: windows bluetooth socket setsockopt sniff mode force active power windows bluetooth socket setsockopt sniff mode force active power
+            - generic [ref=f26e20]:
+              - button "Clear" [ref=f26e22] [cursor=pointer]:
+                - img [ref=f26e24]
+              - generic [ref=f26e27]:
+                - button "Search by voice" [ref=f26e28] [cursor=pointer]:
+                  - img [ref=f26e29]
+                - button "Search by image" [ref=f26e31] [cursor=pointer]:
+                  - img [ref=f26e32]
+          - button "Search" [ref=f26e34] [cursor=pointer]:
+            - img [ref=f26e37]
+    - generic [ref=f26e39]:
+      - button "Settings" [ref=f26e41] [cursor=pointer]:
+        - img [ref=f26e44]
+      - button "Share" [ref=f26e47] [cursor=pointer]:
+        - img [ref=f26e51]
+      - generic [ref=f26e53]:
+        - button "Google apps" [ref=f26e55] [cursor=pointer]:
+          - img [ref=f26e56]
+        - link "Sign in" [ref=f26e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dwindows%2Bbluetooth%2Bsocket%2Bsetsockopt%2Bsniff%2Bmode%2Bforce%2Bactive%2Bpower&ec=futura_srp_og_si_72236_p
+  - generic [ref=f26e62]:
+    - navigation [ref=f26e68]:
+      - generic [ref=f26e74]:
+        - list [ref=f26e75]:
+          - listitem [ref=f26e76]:
+            - link "AI Mode" [ref=f26e79] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&aep=1&ntc=1&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ2J8OegQIDRAD
+              - generic [ref=f26e82]: AI Mode
+          - listitem [ref=f26e83]:
+            - link "All" [disabled] [ref=f26e84]:
+              - generic [ref=f26e86]: All
+          - listitem [ref=f26e87]:
+            - link "Shopping" [ref=f26e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&ved=1t:220175&ictx=111
+              - generic [ref=f26e90]: Shopping
+          - listitem [ref=f26e91]:
+            - link "Videos" [ref=f26e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQtKgLegQIERAB
+              - generic [ref=f26e94]: Videos
+          - listitem [ref=f26e95]:
+            - link "Images" [ref=f26e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQtKgLegQIEhAB
+              - generic [ref=f26e98]: Images
+          - listitem [ref=f26e99]:
+            - link "Forums" [ref=f26e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQs6gLegQIFBAB
+              - generic [ref=f26e102]: Forums
+          - listitem [ref=f26e103]:
+            - link "Short videos" [ref=f26e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=39&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5XwGupRbMA_EXpw_ID0OLGCtl4-rh8UQS87m8xlWTEswKjU1-eIhcWnTa5FOBiNHALBjWyfaEyypTxidFaMRp67cZWud3se2amNvp4dEoihN99KgJX-1tRgexTVOv7gtB2_XJuFnU4XqfI_0ChloCk3mRP5U_bi4n5Z8CyDx_xTf43j5YA&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQs6gLegQIFRAB
+              - generic [ref=f26e106]: Short videos
+          - listitem [ref=f26e107]:
+            - button "More filters" [ref=f26e108] [cursor=pointer]:
+              - generic "More filters" [ref=f26e109]:
+                - generic [ref=f26e110]:
+                  - generic [ref=f26e111]: More
+                  - img [ref=f26e113]
+        - button "Tools" [ref=f26e116] [cursor=pointer]:
+          - generic [ref=f26e118]:
+            - generic [ref=f26e119]: Tools
+            - img [ref=f26e121]
+    - heading "Search Results" [level=1] [ref=f26e123]
+    - generic [ref=f26e128]:
+      - generic [ref=f26e147]:
+        - heading "Thinking" [level=2] [ref=f26e151]:
+          - generic [ref=f26e153]: Thinking
+        - progressbar "Generating" [ref=f26e154]
+      - main [ref=f26e156]:
+        - generic [ref=f26e160]:
+          - generic [ref=f26e163]:
+            - heading "Web results" [level=2] [ref=f26e164]
+            - generic [ref=f26e165]:
+              - generic [ref=f26e168]:
+                - link "Bluetooth and Socket Options - Win32 apps Microsoft Learn https://learn.microsoft.com › ... › Bluetooth" [ref=f26e170] [cursor=pointer]:
+                  - /url: https://learn.microsoft.com/en-us/windows/win32/bluetooth/bluetooth-and-socket-options
+                  - heading "Bluetooth and Socket Options - Win32 apps" [level=3] [ref=f26e171]
+                  - generic [ref=f26e177]:
+                    - generic [ref=f26e179]: Microsoft Learn
+                    - generic [ref=f26e181]: https://learn.microsoft.com › ... › Bluetooth
+                - button "About this result" [ref=f26e184] [cursor=pointer]:
+                  - img [ref=f26e187]
+              - generic [ref=f26e190]:
+                - generic [ref=f26e191]: Aug 19, 2020 —
+                - generic [ref=f26e192]:
+                  - emphasis [ref=f26e193]: Bluetooth
+                  - text: for
+                  - emphasis [ref=f26e194]: Windows
+                  - text: supports the following
+                  - emphasis [ref=f26e195]: socket
+                  - text: options.
+                  - emphasis [ref=f26e196]: Socket
+                  - text: options are set and queried using the
+                  - emphasis [ref=f26e197]: setsockopt
+                  - text: and
+                  - emphasis [ref=f26e198]: getsockopt
+                  - text: functions, respectively.
+                - link "Read more" [ref=f26e199] [cursor=pointer]:
+                  - /url: https://learn.microsoft.com/en-us/windows/win32/bluetooth/bluetooth-and-socket-options#:~:text=Bluetooth%20for%20Windows%20supports%20the,setsockopt%20and%20getsockopt%20functions%2C%20respectively.
+              - generic [ref=f26e201]: "Missing: sniff ‎active"
+          - generic [ref=f26e205]:
+            - generic [ref=f26e208]:
+              - 'link "connection dropped as soon as pair screen has been left #26 GitHub https://github.com › joycontrol › issues" [ref=f26e210] [cursor=pointer]':
+                - /url: https://github.com/mart1nro/joycontrol/issues/26
+                - 'heading "connection dropped as soon as pair screen has been left #26" [level=3] [ref=f26e211]'
+                - generic [ref=f26e217]:
+                  - generic [ref=f26e219]: GitHub
+                  - generic [ref=f26e221]: https://github.com › joycontrol › issues
+              - button "About this result" [ref=f26e224] [cursor=pointer]:
+                - img [ref=f26e227]
+            - generic [ref=f26e230]:
+              - generic [ref=f26e231]: Apr 17, 2020 —
+              - generic [ref=f26e232]:
+                - text: The sniff mode is getting canceled because
+                - emphasis [ref=f26e233]: Bluetooth sockets default to force-active mode
+                - text: ", which will cancel sniff mode every time a packet ..."
+              - link "Read more" [ref=f26e234] [cursor=pointer]:
+                - /url: https://github.com/mart1nro/joycontrol/issues/26#:~:text=The%20sniff%20mode%20is%20getting,time%20a%20packet%20is%20sent.
+          - generic [ref=f26e238]:
+            - generic [ref=f26e241]:
+              - link "setsockopt (Bluetooth) (Windows CE 5.0) Microsoft Learn https://learn.microsoft.com › en-us › windows › embedded" [ref=f26e243] [cursor=pointer]:
+                - /url: https://learn.microsoft.com/en-us/previous-versions/windows/embedded/aa450933(v=msdn.10)
+                - heading "setsockopt (Bluetooth) (Windows CE 5.0)" [level=3] [ref=f26e244]
+                - generic [ref=f26e250]:
+                  - generic [ref=f26e252]: Microsoft Learn
+                  - generic [ref=f26e254]: https://learn.microsoft.com › en-us › windows › embedded
+              - button "About this result" [ref=f26e257] [cursor=pointer]:
+                - img [ref=f26e260]
+            - generic [ref=f26e263]:
+              - generic [ref=f26e264]: Sep 13, 2012 —
+              - generic [ref=f26e265]:
+                - emphasis [ref=f26e266]: Forces the ACL connection to the peer device to leave SNIFF mode
+                - text: . SO_BTH_ENTER_PARK_MODE, Places the ACL connection to the peer device in ...
+              - link "Read more" [ref=f26e267] [cursor=pointer]:
+                - /url: https://learn.microsoft.com/en-us/previous-versions/windows/embedded/aa450933(v=msdn.10)#:~:text=Forces%20the%20ACL%20connection%20to,peer%20device%20in%20PARK%20mode.
+            - generic [ref=f26e269]:
+              - text: "Missing: active ‎| Show results with:"
+              - link "active" [ref=f26e270] [cursor=pointer]:
+                - /url: /search?sca_esv=ddfd6cfe34cb7336&q=windows+bluetooth+socket+setsockopt+sniff+mode+force+%22active%22+power&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ5t4CegQINhAB
+          - generic [ref=f26e274]:
+            - generic [ref=f26e277]:
+              - link "Modes of Connection Bluetooth GeeksforGeeks https://www.geeksforgeeks.org › computer-networks" [ref=f26e279] [cursor=pointer]:
+                - /url: https://www.geeksforgeeks.org/computer-networks/modes-of-connection-bluetooth/
+                - heading "Modes of Connection Bluetooth" [level=3] [ref=f26e280]
+                - generic [ref=f26e286]:
+                  - generic [ref=f26e288]: GeeksforGeeks
+                  - generic [ref=f26e290]: https://www.geeksforgeeks.org › computer-networks
+              - button "About this result" [ref=f26e293] [cursor=pointer]:
+                - img [ref=f26e296]
+            - generic [ref=f26e299]:
+              - generic [ref=f26e300]: Apr 26, 2023 —
+              - generic [ref=f26e301]:
+                - text: A
+                - emphasis [ref=f26e302]: Bluetooth
+                - text: "-enabled device in the connection state is synchronized to a piconet. Such a device can be in one of the following four"
+                - emphasis [ref=f26e303]: modes
+                - text: .
+              - link "Read more" [ref=f26e304] [cursor=pointer]:
+                - /url: https://www.geeksforgeeks.org/computer-networks/modes-of-connection-bluetooth/#:~:text=A%20Bluetooth%2Denabled%20device%20in%20the,of%20the%20following%20four%20modes%3A
+            - generic [ref=f26e306]: "Missing: setsockopt ‎force"
+          - generic [ref=f26e310]:
+            - generic [ref=f26e313]:
+              - link "Pairing, bonding and connecting Microsoft Learn https://learn.microsoft.com › Learn › Windows" [ref=f26e315] [cursor=pointer]:
+                - /url: https://learn.microsoft.com/en-us/windows-hardware/design/accessory-guidelines/bluetooth-accessory-guidelines/bluetooth-accessory-guidelines-pairing-bonding-connecting
+                - heading "Pairing, bonding and connecting" [level=3] [ref=f26e316]
+                - generic [ref=f26e322]:
+                  - generic [ref=f26e324]: Microsoft Learn
+                  - generic [ref=f26e326]: https://learn.microsoft.com › Learn › Windows
+              - button "About this result" [ref=f26e329] [cursor=pointer]:
+                - img [ref=f26e332]
+            - generic [ref=f26e335]:
+              - generic [ref=f26e336]: Mar 4, 2025 —
+              - generic [ref=f26e337]:
+                - text: Sni
+                - emphasis [ref=f26e338]: ff mode
+                - text: is an important mechanism for accessories to reduce their power consumption. However, Sniff mode is not always appropriate, and ...
+              - link "Read more" [ref=f26e339] [cursor=pointer]:
+                - /url: https://learn.microsoft.com/en-us/windows-hardware/design/accessory-guidelines/bluetooth-accessory-guidelines/bluetooth-accessory-guidelines-pairing-bonding-connecting#:~:text=Sniff%20mode%20is%20an%20important,function%20properly%20in%20other%20modes.
+            - generic [ref=f26e341]: "Missing: setsockopt ‎force"
+          - generic [ref=f26e345]:
+            - generic [ref=f26e348]:
+              - link "How does bluetooth sniff mode work? Electrical Engineering Stack Exchange https://electronics.stackexchange.com › questions › how..." [ref=f26e350] [cursor=pointer]:
+                - /url: https://electronics.stackexchange.com/questions/220936/how-does-bluetooth-sniff-mode-work
+                - heading "How does bluetooth sniff mode work?" [level=3] [ref=f26e351]
+                - generic [ref=f26e357]:
+                  - generic [ref=f26e359]: Electrical Engineering Stack Exchange
+                  - generic [ref=f26e361]: https://electronics.stackexchange.com › questions › how...
+              - button "About this result" [ref=f26e364] [cursor=pointer]:
+                - img [ref=f26e367]
+            - generic [ref=f26e370]:
+              - generic [ref=f26e371]: Mar 5, 2016 —
+              - text: I wanted to know exactly how does bluetooth sniff mode work. Is this special mode going to affect data rates? Is it used in active transmissions or ...
+            - generic [ref=f26e376]:
+              - link "1 answer" [ref=f26e377] [cursor=pointer]:
+                - /url: https://electronics.stackexchange.com/a/220946
+              - generic [ref=f26e378]: ·
+              - generic [ref=f26e379]: "Top answer:"
+              - generic [ref=f26e380]: To know all the details you might want to read the this document. Beware that that documentation is extremely technical as it is intended for communications ...
+            - generic [ref=f26e382]: "Missing: socket ‎setsockopt ‎force ‎power"
+          - generic [ref=f26e386]:
+            - generic [ref=f26e389]:
+              - link "Changing Bluetooth Power Management Settings Swiftpoint https://support.swiftpoint.com › portal › articles › changi..." [ref=f26e391] [cursor=pointer]:
+                - /url: https://support.swiftpoint.com/portal/en/kb/articles/changing-bluetooth-power-management-settings
+                - heading "Changing Bluetooth Power Management Settings" [level=3] [ref=f26e392]
+                - generic [ref=f26e398]:
+                  - generic [ref=f26e400]: Swiftpoint
+                  - generic [ref=f26e402]: https://support.swiftpoint.com › portal › articles › changi...
+              - button "About this result" [ref=f26e405] [cursor=pointer]:
+                - img [ref=f26e408]
+            - generic [ref=f26e411]:
+              - generic [ref=f26e412]:
+                - text: Open the
+                - emphasis [ref=f26e413]: Windows Bluetooth
+                - text: settings menu where you normally pair with your mouse. Under the related settings select select ' More
+                - emphasis [ref=f26e414]: Bluetooth
+                - text: options'.
+              - link "Read more" [ref=f26e415] [cursor=pointer]:
+                - /url: https://support.swiftpoint.com/portal/en/kb/articles/changing-bluetooth-power-management-settings#:~:text=Open%20the%20Windows%20Bluetooth%20settings,select%20'%20More%20Bluetooth%20options'
+            - generic [ref=f26e417]: "Missing: socket ‎setsockopt ‎sniff ‎force ‎active"
+          - generic [ref=f26e421]:
+            - generic [ref=f26e424]:
+              - 'link "Traffic Signaling: Socket Filters, Sub-technique T1205.002 MITRE ATT&CK® https://attack.mitre.org › techniques" [ref=f26e426] [cursor=pointer]':
+                - /url: https://attack.mitre.org/techniques/T1205/002/
+                - 'heading "Traffic Signaling: Socket Filters, Sub-technique T1205.002" [level=3] [ref=f26e427]'
+                - generic [ref=f26e433]:
+                  - generic [ref=f26e435]: MITRE ATT&CK®
+                  - generic [ref=f26e437]: https://attack.mitre.org › techniques
+              - button "About this result" [ref=f26e440] [cursor=pointer]:
+                - img [ref=f26e443]
+            - generic [ref=f26e446]:
+              - generic [ref=f26e447]: Sep 30, 2022 —
+              - generic [ref=f26e448]:
+                - text: Adversaries may attach filters to a network
+                - emphasis [ref=f26e449]: socket
+                - text: to monitor then activate backdoors used for persistence or command and control.
+              - link "Read more" [ref=f26e450] [cursor=pointer]:
+                - /url: https://attack.mitre.org/techniques/T1205/002/#:~:text=Adversaries%20may%20attach%20filters%20to,persistence%20or%20command%20and%20control.
+          - generic [ref=f26e455]:
+            - heading "People also ask" [level=2] [ref=f26e457]
+            - generic [ref=f26e458]:
+              - button "How do I force Bluetooth to turn on?" [ref=f26e464] [cursor=pointer]:
+                - generic [ref=f26e466]: How do I force Bluetooth to turn on?
+                - img [ref=f26e469]
+              - button "What is Microsoft Bluetooth Enumerator used for?" [ref=f26e478] [cursor=pointer]:
+                - generic [ref=f26e480]: What is Microsoft Bluetooth Enumerator used for?
+                - img [ref=f26e483]
+              - button "How to fix a corrupted Bluetooth driver in Windows 10?" [ref=f26e492] [cursor=pointer]:
+                - generic [ref=f26e494]: How to fix a corrupted Bluetooth driver in Windows 10?
+                - img [ref=f26e497]
+              - button "How to remove an unremovable Bluetooth device?" [ref=f26e506] [cursor=pointer]:
+                - generic [ref=f26e508]: How to remove an unremovable Bluetooth device?
+                - img [ref=f26e511]
+          - generic [ref=f26e516]:
+            - heading "Web results" [level=2] [ref=f26e517]
+            - generic [ref=f26e518]:
+              - generic [ref=f26e521]:
+                - link "Turn on/off Bluetooth radio/adapter from cmd/powershell in ... Super User https://superuser.com › questions › turn-on-off-bluetoot..." [ref=f26e523] [cursor=pointer]:
+                  - /url: https://superuser.com/questions/1168551/turn-on-off-bluetooth-radio-adapter-from-cmd-powershell-in-windows-10
+                  - heading "Turn on/off Bluetooth radio/adapter from cmd/powershell in ..." [level=3] [ref=f26e524]
+                  - generic [ref=f26e530]:
+                    - generic [ref=f26e532]: Super User
+                    - generic [ref=f26e534]: https://superuser.com › questions › turn-on-off-bluetoot...
+                - button "About this result" [ref=f26e537] [cursor=pointer]:
+                  - img [ref=f26e540]
+              - generic [ref=f26e543]:
+                - generic [ref=f26e544]: Jan 17, 2017 —
+                - generic [ref=f26e545]:
+                  - text: When I run it in an admin cmd
+                  - emphasis [ref=f26e546]: window
+                  - text: ", it asks me to press Y to forcibly break all"
+                  - emphasis [ref=f26e547]: active bluetooth
+                  - text: connections (and you can automate it with /Y ) ...
+                - link "Read more" [ref=f26e548] [cursor=pointer]:
+                  - /url: https://superuser.com/questions/1168551/turn-on-off-bluetooth-radio-adapter-from-cmd-powershell-in-windows-10#:~:text=When%20I%20run%20it%20in,automate%20it%20with%20%2FY%20).
+              - generic [ref=f26e550]: "Missing: setsockopt ‎sniff"
+        - generic [ref=f26e552]:
+          - generic [ref=f26e557]:
+            - heading "People also search for" [level=2] [ref=f26e559]
+            - generic [ref=f26e561]:
+              - generic [ref=f26e562]:
+                - link "Bthprops" [ref=f26e566] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Bthprops&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ1QJ6BAhAEAE
+                  - generic [ref=f26e567]:
+                    - generic [ref=f26e572]: Bthprops
+                    - img [ref=f26e576]
+                - link "BluetoothFindFirstDevice" [ref=f26e581] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=BluetoothFindFirstDevice&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ1QJ6BAhEEAE
+                  - generic [ref=f26e582]:
+                    - generic [ref=f26e587]: BluetoothFindFirstDevice
+                    - img [ref=f26e591]
+                - link "Windows Sockets" [ref=f26e596] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Windows+Sockets&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ1QJ6BAhBEAE
+                  - generic [ref=f26e597]:
+                    - generic [ref=f26e602]: Windows Sockets
+                    - img [ref=f26e606]
+              - generic [ref=f26e608]:
+                - link "Win32 bluetooth" [ref=f26e612] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Win32+bluetooth&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ1QJ6BAhDEAE
+                  - generic [ref=f26e613]:
+                    - generic [ref=f26e618]: Win32 bluetooth
+                    - img [ref=f26e622]
+                - link "Winsock2 api" [ref=f26e627] [cursor=pointer]:
+                  - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Winsock2+api&sa=X&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ1QJ6BAhCEAE
+                  - generic [ref=f26e628]:
+                    - generic [ref=f26e633]: Winsock2 api
+                    - img [ref=f26e637]
+          - navigation [ref=f26e639]:
+            - heading "Page Navigation" [level=1] [ref=f26e640]
+            - text: "1"
+            - link "Page 2" [ref=f26e643] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=10&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAE
+              - text: "2"
+            - link "Page 3" [ref=f26e645] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=20&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAG
+              - text: "3"
+            - link "Page 4" [ref=f26e647] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=30&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAI
+              - text: "4"
+            - link "Page 5" [ref=f26e649] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=40&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAK
+              - text: "5"
+            - link "Page 6" [ref=f26e651] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=50&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAM
+              - text: "6"
+            - link "Page 7" [ref=f26e653] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=60&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAO
+              - text: "7"
+            - link "Page 8" [ref=f26e655] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=70&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAQ
+              - text: "8"
+            - link "Page 9" [ref=f26e657] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=80&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAS
+              - text: "9"
+            - link "Page 10" [ref=f26e659] [cursor=pointer]:
+              - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=90&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8tMDegQIOxAU
+              - text: "10"
+            - heading "Next" [level=2] [ref=f26e661]:
+              - link "Next" [ref=f26e662] [cursor=pointer]:
+                - /url: /search?q=windows+bluetooth+socket+setsockopt+sniff+mode+force+active+power&sca_esv=ddfd6cfe34cb7336&ei=h-BKatj3Gp3KkPIPzca7uA8&start=10&sa=N&sstk=AU9db-AlQf0DIDvdVT7cybYl1-SSJRVNcmLRkGI9hpohrDAQ2ewHn7WwHGrsNrCHAJ2FAgQFkj93bbBdMLfBv1R-iuc3wU0h7RFMyA&ved=2ahUKEwiY16rE0LyVAxUdJUQIHU3jDvcQ8NMDegQIOxAW
+                - generic [ref=f26e664]: Next
+        - navigation
+    - contentinfo [ref=f26e665]:
+      - heading "Footer Links" [level=1] [ref=f26e666]
+      - generic [ref=f26e670]:
+        - generic [ref=f26e674]:
+          - button "90062, Los Angeles, CA - Based on your past activity" [ref=f26e676] [cursor=pointer]:
+            - generic [ref=f26e677]: 90062, Los Angeles, CA
+            - generic [ref=f26e679]:
+              - text: "-"
+              - generic [ref=f26e680]: Based on your past activity
+          - text: "-"
+          - button "Update location" [ref=f26e682] [cursor=pointer]: Update location
+        - generic [ref=f26e685]:
+          - link "Help" [ref=f26e686] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f26e687] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f26e688] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f26e689] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1

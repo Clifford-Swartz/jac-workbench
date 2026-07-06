@@ -1,0 +1,429 @@
+- generic [active] [ref=f30e1]:
+  - banner [ref=f30e2]:
+    - generic [ref=f30e3]:
+      - link "Skip to main content" [ref=f30e4] [cursor=pointer]:
+        - /url: "#main"
+      - link "Skip to Ask Learn chat experience" [ref=f30e5] [cursor=pointer]:
+        - /url: "#"
+      - generic [ref=f30e6]:
+        - text: Ｏ Ｐ 
+        - generic [ref=f30e7]:
+          - link "Microsoft" [ref=f30e8] [cursor=pointer]:
+            - /url: https://www.microsoft.com
+            - img [ref=f30e9]
+          - link "Learn" [ref=f30e15] [cursor=pointer]:
+            - /url: /en-us/
+            - generic [ref=f30e16]: Learn
+          - generic [ref=f30e17]:
+            - navigation "Global" [ref=f30e19]:
+              - text: Ｒ
+              - list [ref=f30e20]:
+                - listitem [ref=f30e21]:
+                  - button "Documentation" [ref=f30e23] [cursor=pointer]:
+                    - generic [ref=f30e24]: Documentation
+                    - generic [ref=f30e26]: Ｓ
+                - listitem [ref=f30e27]:
+                  - button "Training & Labs" [ref=f30e29] [cursor=pointer]:
+                    - generic [ref=f30e30]: Training & Labs
+                    - generic [ref=f30e32]: Ｓ
+                - listitem [ref=f30e33]:
+                  - button "Q&A" [ref=f30e35] [cursor=pointer]:
+                    - generic [ref=f30e36]: Q&A
+                    - generic [ref=f30e38]: Ｓ
+                - listitem [ref=f30e39]:
+                  - button "Topics" [ref=f30e41] [cursor=pointer]:
+                    - generic [ref=f30e42]: Topics
+                    - generic [ref=f30e44]: Ｓ
+              - text: Ｔ
+            - generic [ref=f30e45]:
+              - text: Ｐ
+              - button "Open search" [ref=f30e46] [cursor=pointer]:
+                - generic [ref=f30e48]: 
+          - link "Sign in" [ref=f30e49] [cursor=pointer]:
+            - /url: "#"
+        - generic [ref=f30e51]:
+          - link "Windows App Development" [ref=f30e52] [cursor=pointer]:
+            - /url: /en-us/windows/apps
+            - generic [ref=f30e53]: Windows App Development
+          - navigation "Site" [ref=f30e54]:
+            - list [ref=f30e55]:
+              - listitem [ref=f30e56]:
+                - button "Essentials" [ref=f30e57] [cursor=pointer]:
+                  - generic [ref=f30e58]: Essentials
+                  - generic [ref=f30e60]: Ｓ
+              - listitem [ref=f30e61]:
+                - button "Design" [ref=f30e62] [cursor=pointer]:
+                  - generic [ref=f30e63]: Design
+                  - generic [ref=f30e65]: Ｓ
+              - listitem [ref=f30e66]:
+                - button "Develop" [ref=f30e67] [cursor=pointer]:
+                  - generic [ref=f30e68]: Develop
+                  - generic [ref=f30e70]: Ｓ
+              - listitem [ref=f30e71]:
+                - button "Package and deploy" [ref=f30e72] [cursor=pointer]:
+                  - generic [ref=f30e73]: Package and deploy
+                  - generic [ref=f30e75]: Ｓ
+              - listitem [ref=f30e76]:
+                - button "Publish" [ref=f30e77] [cursor=pointer]:
+                  - generic [ref=f30e78]: Publish
+                  - generic [ref=f30e80]: Ｓ
+              - text: Ｓ Ｔ Ｔ Ｔ Ｔ Ｔ
+          - generic [ref=f30e81]:
+            - link "What's new" [ref=f30e82] [cursor=pointer]:
+              - /url: /windows/apps/whats-new/whats-new-for-developers
+            - link "Dashboard" [ref=f30e83] [cursor=pointer]:
+              - /url: https://partner.microsoft.com/dashboard
+  - navigation "Primary" [ref=f30e87]:
+    - button "Collapse" [expanded] [ref=f30e89] [cursor=pointer]:
+      - generic [ref=f30e90]:
+        - generic [ref=f30e91]: ﾝ
+        - text: ﾜ
+  - main [ref=f30e92]:
+    - generic: Ｏ ，
+    - generic [ref=f30e93]:
+      - generic [ref=f30e94]:
+        - generic [ref=f30e96]:
+          - text: 
+          - group "Breadcrumbs"
+          - generic [ref=f30e97]:
+            - text: 󿄐 󿄐
+            - button "Ask Learn" [ref=f30e98] [cursor=pointer]:
+              - generic [ref=f30e100]: 󿄐
+              - generic [ref=f30e101]: Ask Learn
+            - group [ref=f30e102]:
+              - generic "More actions" [ref=f30e103] [cursor=pointer]:
+                - generic [ref=f30e105]: 
+        - text: ﾁ
+        - heading "Bluetooth and Socket Options" [level=1] [ref=f30e107]
+        - generic: 
+        - generic [ref=f30e109]:
+          - generic [ref=f30e111]: ﾃ
+          - button "Summarize this article for me" [ref=f30e112] [cursor=pointer]:
+            - generic [ref=f30e113]: Summarize this article for me
+        - generic [ref=f30e114]:
+          - paragraph [ref=f30e115]:
+            - text: Bluetooth for Windows supports the following socket options. Socket options are set and queried using the
+            - link "setsockopt" [ref=f30e116] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock/nf-winsock-setsockopt
+              - strong [ref=f30e117]: setsockopt
+            - text: and
+            - link "getsockopt" [ref=f30e118] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock/nf-winsock-getsockopt
+              - strong [ref=f30e119]: getsockopt
+            - text: functions, respectively. All of the following options can be used with the
+            - strong [ref=f30e120]: setsockopt
+            - text: function, but only the
+            - strong [ref=f30e121]: SO_BTH_MTU
+            - text: option is available for use with the
+            - strong [ref=f30e122]: getsockopt
+            - text: function.
+          - paragraph [ref=f30e123]: "The following settings are required for working with Bluetooth socket options:"
+          - list [ref=f30e124]:
+            - listitem [ref=f30e125]:
+              - text: The
+              - emphasis [ref=f30e126]: s
+              - text: parameter must be a Bluetooth socket.
+            - listitem [ref=f30e127]:
+              - text: The
+              - emphasis [ref=f30e128]: level
+              - text: parameter must be
+              - strong [ref=f30e129]: SOL_RFCOMM
+              - text: .
+          - generic [ref=f30e130]:
+            - 'link "Section titled: SO_BTH_AUTHENTICATE" [ref=f30e131] [cursor=pointer]':
+              - /url: "#so_bth_authenticate"
+              - text: 
+            - heading "SO_BTH_AUTHENTICATE" [level=2] [ref=f30e132]
+          - paragraph [ref=f30e133]:
+            - text: For disconnected sockets, the
+            - strong [ref=f30e134]: SO_BTH_AUTHENTICATE
+            - text: specifies that authentication is required for a
+            - link "connect" [ref=f30e135] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+              - strong [ref=f30e136]: connect
+            - text: or
+            - link "accept" [ref=f30e137] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-accept
+              - strong [ref=f30e138]: accept
+            - text: operation to complete successfully. Setting this socket option actively initiates authentication during connection establishment, if the two Bluetooth devices were not previously authenticated. The user interface for passkey exchange, if necessary, is provided by the operating system outside the application context.
+          - paragraph [ref=f30e139]:
+            - text: For outgoing connections that require authentication, the
+            - link "connect" [ref=f30e140] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+              - strong [ref=f30e141]: connect
+            - text: operation fails with
+            - strong [ref=f30e142]: WSAEACCES
+            - text: if authentication is not successful. In response, the application may prompt the user to authenticate the two Bluetooth devices before connection.
+          - paragraph [ref=f30e143]:
+            - text: For incoming connections, the connection is rejected if authentication cannot be established and returns a
+            - strong [ref=f30e144]: WSAEHOSTDOWN
+            - text: error. For more information about authenticating Bluetooth devices, see
+            - link "BluetoothAuthenticateDevice" [ref=f30e145] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/BluetoothAPIs/nf-bluetoothapis-bluetoothauthenticatedevice
+              - strong [ref=f30e146]: BluetoothAuthenticateDevice
+            - text: .
+          - paragraph [ref=f30e147]:
+            - text: For the
+            - strong [ref=f30e148]: SO_BTH_AUTHENTICATE
+            - text: socket option,
+            - emphasis [ref=f30e149]: optval
+            - text: is a pointer to ULONG bAuthenticate and must be
+            - strong [ref=f30e150]: "TRUE"
+            - text: ;
+            - emphasis [ref=f30e151]: optlen
+            - text: is equivalent to "sizeof(ULONG)".
+          - paragraph [ref=f30e152]:
+            - strong [ref=f30e153]: "Windows XP with SP2: SO_BTH_AUTHENTICATE"
+            - text: starts authentication for connected sockets, and forces authentication upon connection for unconnected sockets. For incoming connections, the connection is rejected if authentication cannot be performed.
+          - generic [ref=f30e154]:
+            - 'link "Section titled: SO_BTH_ENCRYPT" [ref=f30e155] [cursor=pointer]':
+              - /url: "#so_bth_encrypt"
+              - text: 
+            - heading "SO_BTH_ENCRYPT" [level=2] [ref=f30e156]
+          - paragraph [ref=f30e157]:
+            - text: On unconnected sockets, the
+            - strong [ref=f30e158]: SO_BTH_ENCRYPT
+            - text: socket option enforces encryption to establish a connection. Encryption is only available for authenticated connections. For incoming connections, a connection for which encryption cannot be established is automatically rejected and returns
+            - strong [ref=f30e159]: WSAEHOSTDOWN
+            - text: as the error. For outgoing connections, the
+            - link "connect" [ref=f30e160] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+              - strong [ref=f30e161]: connect
+            - text: function fails with
+            - strong [ref=f30e162]: WSAEACCES
+            - text: if encryption cannot be established. In response, the application may prompt the user to authenticate the two Bluetooth devices before connection. For more information about authenticating Bluetooth devices, see
+            - link "BluetoothAuthenticateDevice" [ref=f30e163] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/BluetoothAPIs/nf-bluetoothapis-bluetoothauthenticatedevice
+              - strong [ref=f30e164]: BluetoothAuthenticateDevice
+            - text: .
+          - paragraph [ref=f30e165]:
+            - text: For the SO_BTH_ENCRYPT socket option,
+            - emphasis [ref=f30e166]: optval
+            - text: is a pointer to ULONG
+            - strong [ref=f30e167]: bEncrypt
+            - text: and must be
+            - strong [ref=f30e168]: "TRUE"
+            - text: ;
+            - emphasis [ref=f30e169]: optlen
+            - text: is equivalent to sizeof(ULONG).
+          - paragraph [ref=f30e170]:
+            - strong [ref=f30e171]: "Windows XP with SP2:"
+            - text: For a socket that is connected and authenticated,
+            - strong [ref=f30e172]: SO_BTH_ENCRYPT
+            - text: starts encryption.
+          - generic [ref=f30e173]:
+            - 'link "Section titled: SO_BTH_MTU" [ref=f30e174] [cursor=pointer]':
+              - /url: "#so_bth_mtu"
+              - text: 
+            - heading "SO_BTH_MTU" [level=2] [ref=f30e175]
+          - paragraph [ref=f30e176]:
+            - text: The
+            - strong [ref=f30e177]: SO_BTH_MTU
+            - text: socket option is an advanced option used primarily for validation. The
+            - strong [ref=f30e178]: SO_BTH_MTU
+            - text: option obtains or sets default RFCOMM MTU (maximum transmission unit) for connection negotiation to a value different than the RFCOMM protocol-default value.
+          - paragraph [ref=f30e179]:
+            - text: Because RFCOMM MTU is affected by the underlying L2CAP MTU, and protocol and application minimums and maximums, the default value for
+            - strong [ref=f30e180]: SO_BTH_MTU
+            - text: is only a starting point for negotiation with the remote peer, and the final negotiated MTU is likely to vary from the default. Setting the
+            - strong [ref=f30e181]: SO_BTH_MTU
+            - text: value may negatively affect throughput, and as such, any modification should be performed with knowledge of the underlying Bluetooth protocol.
+          - paragraph [ref=f30e182]:
+            - text: The
+            - strong [ref=f30e183]: SO_BTH_MTU
+            - text: socket option can be performed on connected sockets, but has no effect if the negotiation has already completed. Setting it on the listening (server) socket has no effect.
+          - paragraph [ref=f30e184]:
+            - text: The amount of data that an application can send or receive in a single socket call is not affected by the MTU; MTU only affects how the underlying Windows Sockets service provider segments packets for transport. Both the proposed MTU and the MTU ultimately negotiated must be between
+            - strong [ref=f30e185]: RFCOMM_MIN_MTU
+            - text: and
+            - strong [ref=f30e186]: RFCOMM_MAX_MTU
+            - text: ", as defined in the Ws2bth.h header file."
+          - paragraph [ref=f30e187]:
+            - text: For the
+            - strong [ref=f30e188]: SO_BTH_MTU
+            - text: socket option,
+            - emphasis [ref=f30e189]: optval
+            - text: is a pointer to ULONG mtu;
+            - emphasis [ref=f30e190]: optlen
+            - text: is equivalent to "sizeof(ULONG)".
+          - generic [ref=f30e191]:
+            - 'link "Section titled: SO_BTH_MTU_MAX" [ref=f30e192] [cursor=pointer]':
+              - /url: "#so_bth_mtu_max"
+              - text: 
+            - heading "SO_BTH_MTU_MAX" [level=2] [ref=f30e193]
+          - paragraph [ref=f30e194]:
+            - text: The
+            - strong [ref=f30e195]: SO_BTH_MTU_MAX
+            - text: socket option is an advanced option used primarily for validation. The
+            - strong [ref=f30e196]: SO_BTH_MTU_MAX
+            - text: socket option sets the maximum RFCOMM MTU (maximum transmission unit) for connection negotiation. Connections with an RFCOMM MTU equal to or greater than this value fail during the
+            - link "connect" [ref=f30e197] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+              - strong [ref=f30e198]: connect
+            - text: /
+            - link "accept" [ref=f30e199] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-accept
+              - strong [ref=f30e200]: accept
+            - text: process. While setting this socket option is allowed for a connected socket, it has no effect if the negotiation has completed. Setting this socket option on a listening socket propagates the value for all incoming connections. The MAX MTU value must be between
+            - strong [ref=f30e201]: RFCOMM_MIN_MTU
+            - text: and
+            - strong [ref=f30e202]: RFCOMM_MAX_MTU
+            - text: ", as defined in the Ws2bth.h header file."
+          - paragraph [ref=f30e203]:
+            - text: For the
+            - strong [ref=f30e204]: SO_BTH_MTU_MAX
+            - text: socket option,
+            - emphasis [ref=f30e205]: optval
+            - text: is a pointer to ULONG max_mtu;
+            - emphasis [ref=f30e206]: optlen
+            - text: is equivalent to "sizeof(ULONG)".
+          - generic [ref=f30e207]:
+            - 'link "Section titled: SO_BTH_MTU_MIN" [ref=f30e208] [cursor=pointer]':
+              - /url: "#so_bth_mtu_min"
+              - text: 
+            - heading "SO_BTH_MTU_MIN" [level=2] [ref=f30e209]
+          - paragraph [ref=f30e210]:
+            - text: The
+            - strong [ref=f30e211]: SO_BTH_MTU_MIN
+            - text: socket option is an advanced option used primarily for validation. The
+            - strong [ref=f30e212]: SO_BTH_MTU_MIN
+            - text: socket option sets the minimum RFCOMM MTU (maximum transmission unit) for connection negotiation. Connections with an RFCOMM MTU smaller than this value fail during the
+            - link "connect" [ref=f30e213] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+              - strong [ref=f30e214]: connect
+            - text: /
+            - link "accept" [ref=f30e215] [cursor=pointer]:
+              - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-accept
+              - strong [ref=f30e216]: accept
+            - text: process. While setting this socket option is allowed for a connected socket, it has no effect if the negotiation has completed. Setting this socket option on a listening socket propagates the value for all incoming connections.
+          - paragraph [ref=f30e217]:
+            - text: Only a listening socket can revise the MTU downward, therefore if the value proposed by the connecting socket is less than the value set for
+            - strong [ref=f30e218]: SO_BTH_MTU_MIN
+            - text: on the listening socket, the connection is refused. The minimum MTU must be between
+            - strong [ref=f30e219]: RFCOMM_MIN_MTU
+            - text: and
+            - strong [ref=f30e220]: RFCOMM_MAX_MTU
+            - text: ", as defined in the Ws2bth.h header file."
+          - paragraph [ref=f30e221]:
+            - text: For the SO_BTH_MTU_MIN socket option,
+            - emphasis [ref=f30e222]: optval
+            - text: is a pointer to ULONG min_mtu;
+            - emphasis [ref=f30e223]: optlen
+            - text: is equivalent to "sizeof(ULONG)".
+          - generic [ref=f30e224]:
+            - 'link "Section titled: Related topics" [ref=f30e225] [cursor=pointer]':
+              - /url: "#related-topics"
+              - text: 
+            - heading "Related topics" [level=2] [ref=f30e226]
+          - generic [ref=f30e227]:
+            - term [ref=f30e228]:
+              - paragraph [ref=f30e229]:
+                - link "Windows Sockets" [ref=f30e230] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/WinSock/windows-sockets-start-page-2
+            - term [ref=f30e231]:
+              - paragraph [ref=f30e232]:
+                - link "getsockopt" [ref=f30e233] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/api/winsock/nf-winsock-getsockopt
+                  - strong [ref=f30e234]: getsockopt
+            - term [ref=f30e235]:
+              - paragraph [ref=f30e236]:
+                - link "setsockopt" [ref=f30e237] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/api/winsock/nf-winsock-setsockopt
+                  - strong [ref=f30e238]: setsockopt
+            - term [ref=f30e239]:
+              - paragraph [ref=f30e240]:
+                - link "BluetoothAuthenticateDevice" [ref=f30e241] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/api/BluetoothAPIs/nf-bluetoothapis-bluetoothauthenticatedevice
+                  - strong [ref=f30e242]: BluetoothAuthenticateDevice
+            - term [ref=f30e243]:
+              - paragraph [ref=f30e244]:
+                - link "connect" [ref=f30e245] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-connect
+                  - strong [ref=f30e246]: connect
+            - term [ref=f30e247]:
+              - paragraph [ref=f30e248]:
+                - link "accept" [ref=f30e249] [cursor=pointer]:
+                  - /url: /en-us/windows/desktop/api/winsock2/nf-winsock2-accept
+                  - strong [ref=f30e250]: accept
+          - paragraph [ref=f30e251]
+          - paragraph [ref=f30e252]
+        - alert [ref=f30e253]: Reading mode disabled
+        - status [ref=f30e254]
+        - text:   
+      - generic [ref=f30e255]:
+        - separator [ref=f30e256]
+        - list [ref=f30e257]:
+          - listitem [ref=f30e258]:
+            - generic [ref=f30e260]: Last updated on 08/19/2020
+  - complementary "Additional resources" [ref=f30e261]:
+    - generic [ref=f30e263]:
+      - navigation "In this article" [ref=f30e264]:
+        - heading "In this article" [level=2] [ref=f30e265]
+        - list [ref=f30e266]:
+          - listitem [ref=f30e267]:
+            - link "SO_BTH_AUTHENTICATE" [ref=f30e268] [cursor=pointer]:
+              - /url: "#so_bth_authenticate"
+          - listitem [ref=f30e269]:
+            - link "SO_BTH_ENCRYPT" [ref=f30e270] [cursor=pointer]:
+              - /url: "#so_bth_encrypt"
+          - listitem [ref=f30e271]:
+            - link "SO_BTH_MTU" [ref=f30e272] [cursor=pointer]:
+              - /url: "#so_bth_mtu"
+          - listitem [ref=f30e273]:
+            - link "SO_BTH_MTU_MAX" [ref=f30e274] [cursor=pointer]:
+              - /url: "#so_bth_mtu_max"
+          - listitem [ref=f30e275]:
+            - link "SO_BTH_MTU_MIN" [ref=f30e276] [cursor=pointer]:
+              - /url: "#so_bth_mtu_min"
+          - listitem [ref=f30e277]:
+            - link "Related topics" [ref=f30e278] [cursor=pointer]:
+              - /url: "#related-topics"
+      - generic [ref=f30e280]:
+        - paragraph [ref=f30e281]: Was this page helpful?
+        - generic [ref=f30e282]:
+          - button "This article is helpful" [ref=f30e283] [cursor=pointer]:
+            - generic [ref=f30e285]: 
+          - button "This article is not helpful" [ref=f30e286] [cursor=pointer]:
+            - generic [ref=f30e288]: 
+          - text: 
+  - text: 󿄐 Ｐ
+  - contentinfo [ref=f30e290]:
+    - generic [ref=f30e291]:
+      - link "Content language selector. Currently set to English (United States)." [ref=f30e292] [cursor=pointer]:
+        - /url: /en-us/locale?target=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Fwindows%2Fwin32%2Fbluetooth%2Fbluetooth-and-socket-options
+        - generic [ref=f30e294]: 
+        - generic [ref=f30e295]: English (United States)
+      - link "Your Privacy Choices" [ref=f30e297] [cursor=pointer]:
+        - /url: https://aka.ms/yourcaliforniaprivacychoices
+        - img [ref=f30e298]
+        - generic [ref=f30e303]: Your Privacy Choices
+      - button "Theme" [ref=f30e306] [cursor=pointer]:
+        - generic [ref=f30e308]: ０
+        - generic [ref=f30e309]: Theme
+        - generic [ref=f30e311]: Ｓ
+    - list [ref=f30e312]:
+      - listitem [ref=f30e313]:
+        - link "AI Disclaimer" [ref=f30e314] [cursor=pointer]:
+          - /url: https://learn.microsoft.com/en-us/principles-for-ai-generated-content
+      - listitem [ref=f30e315]:
+        - link "Previous Versions" [ref=f30e316] [cursor=pointer]:
+          - /url: https://learn.microsoft.com/en-us/previous-versions/
+      - listitem [ref=f30e317]:
+        - link "Blog" [ref=f30e318] [cursor=pointer]:
+          - /url: https://techcommunity.microsoft.com/t5/microsoft-learn-blog/bg-p/MicrosoftLearnBlog
+      - listitem [ref=f30e319]:
+        - link "Contribute" [ref=f30e320] [cursor=pointer]:
+          - /url: https://learn.microsoft.com/en-us/contribute
+      - listitem [ref=f30e321]:
+        - link "Privacy" [ref=f30e322] [cursor=pointer]:
+          - /url: https://go.microsoft.com/fwlink/?LinkId=521839
+      - listitem [ref=f30e323]:
+        - link "Consumer Health Privacy" [ref=f30e324] [cursor=pointer]:
+          - /url: https://go.microsoft.com/fwlink/?linkid=2259814
+      - listitem [ref=f30e325]:
+        - link "Terms of Use" [ref=f30e326] [cursor=pointer]:
+          - /url: https://learn.microsoft.com/en-us/legal/termsofuse
+      - listitem [ref=f30e327]:
+        - link "Trademarks" [ref=f30e328] [cursor=pointer]:
+          - /url: https://www.microsoft.com/legal/intellectualproperty/Trademarks/
+      - listitem [ref=f30e329]: © Microsoft 2026

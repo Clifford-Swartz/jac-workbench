@@ -1,0 +1,346 @@
+- generic [active] [ref=f22e1]:
+  - generic:
+    - generic:
+      - link "Skip to main content" [ref=f22e2] [cursor=pointer]
+      - link "Accessibility help" [ref=f22e3] [cursor=pointer]:
+        - /url: https://support.google.com/websearch/answer/181196?hl=en
+  - generic [ref=f22e8]:
+    - search [ref=f22e9]:
+      - generic [ref=f22e11]:
+        - generic:
+          - generic:
+            - generic:
+              - img
+        - 'link "World Cup 2026: The Art of the Curler" [ref=f22e13] [cursor=pointer]':
+          - /url: https://www.google.com/webhp?hl=en&ictx=2&sa=X&ved=0ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4QPQgK
+          - 'img "World Cup 2026: The Art of the Curler" [ref=f22e14]'
+        - generic [ref=f22e15]:
+          - generic [ref=f22e16]:
+            - combobox "Search" [ref=f22e19]: site:github.com joycontrol OR "MissionControl" "change grip" OR "sniff" disconnect switch controller site:github.com joycontrol OR "MissionControl" "change grip" OR "sniff" disconnect switch controller
+            - generic [ref=f22e20]:
+              - button "Clear" [ref=f22e22] [cursor=pointer]:
+                - img [ref=f22e24]
+              - generic [ref=f22e27]:
+                - button "Search by voice" [ref=f22e28] [cursor=pointer]:
+                  - img [ref=f22e29]
+                - button "Search by image" [ref=f22e31] [cursor=pointer]:
+                  - img [ref=f22e32]
+          - button "Search" [ref=f22e34] [cursor=pointer]:
+            - img [ref=f22e37]
+    - generic [ref=f22e39]:
+      - button "Settings" [ref=f22e41] [cursor=pointer]:
+        - img [ref=f22e44]
+      - button "Share" [ref=f22e47] [cursor=pointer]:
+        - img [ref=f22e51]
+      - generic [ref=f22e53]:
+        - button "Google apps" [ref=f22e55] [cursor=pointer]:
+          - img [ref=f22e56]
+        - link "Sign in" [ref=f22e60] [cursor=pointer]:
+          - /url: https://accounts.google.com/ServiceLogin?hl=en&passive=true&continue=https://www.google.com/search%3Fq%3Dsite:github.com%2Bjoycontrol%2BOR%2B%2522MissionControl%2522%2B%2522change%2Bgrip%2522%2BOR%2B%2522sniff%2522%2Bdisconnect%2Bswitch%2Bcontroller&ec=futura_srp_og_si_72236_p
+  - generic [ref=f22e62]:
+    - navigation [ref=f22e68]:
+      - generic [ref=f22e74]:
+        - list [ref=f22e75]:
+          - listitem [ref=f22e76]:
+            - link "AI Mode" [ref=f22e79] [cursor=pointer]:
+              - /url: /search?q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sca_esv=ddfd6cfe34cb7336&udm=50&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&aep=1&ntc=1&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q2J8OegQIChAD
+              - generic [ref=f22e82]: AI Mode
+          - listitem [ref=f22e83]:
+            - link "All" [disabled] [ref=f22e84]:
+              - generic [ref=f22e86]: All
+          - listitem [ref=f22e87]:
+            - link "Shopping" [ref=f22e88] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=28&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&ved=1t:220175&ictx=111
+              - generic [ref=f22e90]: Shopping
+          - listitem [ref=f22e91]:
+            - link "Images" [ref=f22e92] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=2&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4QtKgLegQIDhAB
+              - generic [ref=f22e94]: Images
+          - listitem [ref=f22e95]:
+            - link "Videos" [ref=f22e96] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=7&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4QtKgLegQIERAB
+              - generic [ref=f22e98]: Videos
+          - listitem [ref=f22e99]:
+            - link "Forums" [ref=f22e100] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&udm=18&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Qs6gLegQIEhAB
+              - generic [ref=f22e102]: Forums
+          - listitem [ref=f22e103]:
+            - link "News" [ref=f22e104] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&tbm=nws&source=lnms&fbs=ABfTbFVyMZGZf1hfvX9uKjN_-G8cqCQj_06QnZs315LoFmPf5bBLHMJ0vMQmTbuI72DM7jn1PTmby9t4tumVo2l1imA7zXzUtWBynCWWtqkX5F_1Sa3ahzGropv4-sQ_DAn7xVtQ3XKSN_jtyc3_MUR7BuaU_yHi96vqqMRTeZbf2qwLu3bYekvCkkE6ObqK26ya3g_sWb7gU-juNDNIeAGfoIDtYTEhFw&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q0pQJegQIEBAB
+              - generic [ref=f22e106]: News
+          - listitem [ref=f22e107]:
+            - button "More filters" [ref=f22e108] [cursor=pointer]:
+              - generic "More filters" [ref=f22e109]:
+                - generic [ref=f22e110]:
+                  - generic [ref=f22e111]: More
+                  - img [ref=f22e113]
+        - button "Tools" [ref=f22e116] [cursor=pointer]:
+          - generic [ref=f22e118]:
+            - generic [ref=f22e119]: Tools
+            - img [ref=f22e121]
+    - heading "Search Results" [level=1] [ref=f22e123]
+    - main [ref=f22e129]:
+      - generic [ref=f22e133]:
+        - generic [ref=f22e136]:
+          - heading "Web results" [level=2] [ref=f22e137]
+          - generic [ref=f22e138]:
+            - generic [ref=f22e141]:
+              - 'link "Controller disconnect issue #136 GitHub https://github.com › ndeadly › MissionControl › issues" [ref=f22e143] [cursor=pointer]':
+                - /url: https://github.com/ndeadly/MissionControl/issues/136
+                - 'heading "Controller disconnect issue #136" [level=3] [ref=f22e144]'
+                - generic [ref=f22e150]:
+                  - generic [ref=f22e152]: GitHub
+                  - generic [ref=f22e154]: https://github.com › ndeadly › MissionControl › issues
+              - button "About this result" [ref=f22e157] [cursor=pointer]:
+                - img [ref=f22e160]
+            - generic [ref=f22e163]:
+              - generic [ref=f22e164]: Nov 11, 2020 —
+              - generic [ref=f22e165]:
+                - text: "Case 1: After reboot go to"
+                - emphasis [ref=f22e166]: Controllers
+                - text: ">"
+                - emphasis [ref=f22e167]: change grip
+                - text: ", turn on"
+                - emphasis [ref=f22e168]: controller
+                - text: ...
+                - emphasis [ref=f22e169]: MissionControl
+                - text: "-0.4.1-settsi-mitm.zip. Sure! I did usual testing ..."
+              - link "Read more" [ref=f22e170] [cursor=pointer]:
+                - /url: https://github.com/ndeadly/MissionControl/issues/136#:~:text=Case%201%3A%20After%20reboot%20go,itself%20off%20in%201%20minute.&text=MissionControl%2D0.4.1%2Dsettsi%2Dmitm.zip,database%2C%20rebooting%20couple%20of%20times.
+        - generic [ref=f22e174]:
+          - generic [ref=f22e177]:
+            - link "Mission Control GitHub https://github.com › ndeadly › MissionControl" [ref=f22e179] [cursor=pointer]:
+              - /url: https://github.com/ndeadly/MissionControl
+              - heading "Mission Control" [level=3] [ref=f22e180]
+              - generic [ref=f22e186]:
+                - generic [ref=f22e188]: GitHub
+                - generic [ref=f22e190]: https://github.com › ndeadly › MissionControl
+            - button "About this result" [ref=f22e193] [cursor=pointer]:
+              - img [ref=f22e196]
+          - generic [ref=f22e199]:
+            - generic [ref=f22e200]:
+              - emphasis [ref=f22e201]: Controllers
+              - text: are paired from the system menu under
+              - emphasis [ref=f22e202]: Controllers
+              - text: "->"
+              - emphasis [ref=f22e203]: Change Grip
+              - text: ... Try deleting the
+              - emphasis [ref=f22e204]: controller's
+              - text: config entry ( /config/
+              - emphasis [ref=f22e205]: MissionControl
+              - text: /
+              - emphasis [ref=f22e206]: controllers
+              - text: ...
+            - link "Read more" [ref=f22e207] [cursor=pointer]:
+              - /url: https://github.com/ndeadly/MissionControl#:~:text=Controllers%20are%20paired%20from%20the,system%20menu%20under%20Controllers%2D%3EChange%20Grip&text=Try%20deleting%20the%20controller's%20config,entry%20(%20%2Fconfig%2FMissionControl%2Fcontrollers
+        - generic [ref=f22e211]:
+          - generic [ref=f22e214]:
+            - 'link "connection dropped as soon as pair screen has been left #26 GitHub https://github.com › joycontrol › issues" [ref=f22e216] [cursor=pointer]':
+              - /url: https://github.com/mart1nro/joycontrol/issues/26
+              - 'heading "connection dropped as soon as pair screen has been left #26" [level=3] [ref=f22e217]'
+              - generic [ref=f22e223]:
+                - generic [ref=f22e225]: GitHub
+                - generic [ref=f22e227]: https://github.com › joycontrol › issues
+            - button "About this result" [ref=f22e230] [cursor=pointer]:
+              - img [ref=f22e233]
+          - generic [ref=f22e236]:
+            - generic [ref=f22e237]: Apr 17, 2020 —
+            - generic [ref=f22e238]:
+              - text: Haven't checked how long it stays connected with
+              - emphasis [ref=f22e239]: Sniff
+              - text: Mode, other than verifying that the initial
+              - emphasis [ref=f22e240]: disconnect
+              - text: doesn't occur.
+            - link "Read more" [ref=f22e241] [cursor=pointer]:
+              - /url: https://github.com/mart1nro/joycontrol/issues/26#:~:text=Haven't%20checked%20how%20long%20it,the%20initial%20disconnect%20doesn't%20occur.
+        - generic [ref=f22e245]:
+          - generic [ref=f22e248]:
+            - 'link "Unable to connect with Switch update 12.0.0 · Issue #104 GitHub https://github.com › joycontrol › issues" [ref=f22e250] [cursor=pointer]':
+              - /url: https://github.com/mart1nro/joycontrol/issues/104
+              - 'heading "Unable to connect with Switch update 12.0.0 · Issue #104" [level=3] [ref=f22e251]'
+              - generic [ref=f22e257]:
+                - generic [ref=f22e259]: GitHub
+                - generic [ref=f22e261]: https://github.com › joycontrol › issues
+            - button "About this result" [ref=f22e264] [cursor=pointer]:
+              - img [ref=f22e267]
+          - generic [ref=f22e270]:
+            - generic [ref=f22e271]: Apr 6, 2021 —
+            - generic [ref=f22e272]:
+              - text: From the new computer, however, I've noticed that if you let the
+              - emphasis [ref=f22e273]: Switch
+              - text: sit on the
+              - emphasis [ref=f22e274]: Change Grip
+              - text: ...
+              - emphasis [ref=f22e275]: Joycontrol
+              - text: unable to
+              - emphasis [ref=f22e276]: connect
+              - text: with
+              - emphasis [ref=f22e277]: Switch
+              - text: update ...
+            - link "Read more" [ref=f22e278] [cursor=pointer]:
+              - /url: https://github.com/mart1nro/joycontrol/issues/104#:~:text=From%20the%20new%20computer%2C%20however%2C,error%20and%20needs%20to%20restart.&text=Joycontrol%20unable%20to%20connect%20with,Switch%20update%2012.0.0
+        - generic [ref=f22e282]:
+          - generic [ref=f22e285]:
+            - 'link "[Bug Report]: PS4 controller not pairing after update #490 GitHub https://github.com › ndeadly › MissionControl › issues" [ref=f22e287] [cursor=pointer]':
+              - /url: https://github.com/ndeadly/MissionControl/issues/490
+              - 'heading "[Bug Report]: PS4 controller not pairing after update #490" [level=3] [ref=f22e288]'
+              - generic [ref=f22e294]:
+                - generic [ref=f22e296]: GitHub
+                - generic [ref=f22e298]: https://github.com › ndeadly › MissionControl › issues
+            - button "About this result" [ref=f22e301] [cursor=pointer]:
+              - img [ref=f22e304]
+          - generic [ref=f22e307]:
+            - generic [ref=f22e308]: Jun 29, 2022 —
+            - generic [ref=f22e309]:
+              - text: And you're holding PS+SHARE until the LED flashes in a heartbeat pattern while on the
+              - emphasis [ref=f22e310]: Change Grip
+              - text: /Order screen? Yes. (And like I mentioned in ...
+            - link "Read more" [ref=f22e311] [cursor=pointer]:
+              - /url: https://github.com/ndeadly/MissionControl/issues/490#:~:text=And%20you're%20holding%20PS%2BSHARE%20until,was%20working%20with%20MissionControl%20before.
+        - generic [ref=f22e315]:
+          - generic [ref=f22e318]:
+            - 'link "Switch FW 15.0.1 breaks compatibility · Issue #129 GitHub https://github.com › joycontrol › issues" [ref=f22e320] [cursor=pointer]':
+              - /url: https://github.com/mart1nro/joycontrol/issues/129
+              - 'heading "Switch FW 15.0.1 breaks compatibility · Issue #129" [level=3] [ref=f22e321]'
+              - generic [ref=f22e327]:
+                - generic [ref=f22e329]: GitHub
+                - generic [ref=f22e331]: https://github.com › joycontrol › issues
+            - button "About this result" [ref=f22e334] [cursor=pointer]:
+              - img [ref=f22e337]
+          - generic [ref=f22e341]:
+            - text: "[17:29:36]"
+            - emphasis [ref=f22e342]: joycontrol
+            - text: .server create_hid_server::96 INFO - Waiting for
+            - emphasis [ref=f22e343]: Switch
+            - text: to
+            - emphasis [ref=f22e344]: connect
+            - text: ... Please open the "
+            - emphasis [ref=f22e345]: Change Grip
+            - text: /Order" menu.
+        - generic [ref=f22e349]:
+          - generic [ref=f22e352]:
+            - link "Unstable Connection in Different Titles with Xbox One ... GitHub https://github.com › ndeadly › MissionControl › issues" [ref=f22e354] [cursor=pointer]:
+              - /url: https://github.com/ndeadly/MissionControl/issues/1107
+              - heading "Unstable Connection in Different Titles with Xbox One ..." [level=3] [ref=f22e355]
+              - generic [ref=f22e361]:
+                - generic [ref=f22e363]: GitHub
+                - generic [ref=f22e365]: https://github.com › ndeadly › MissionControl › issues
+            - button "About this result" [ref=f22e368] [cursor=pointer]:
+              - img [ref=f22e371]
+          - generic [ref=f22e374]:
+            - generic [ref=f22e375]: May 8, 2026 —
+            - generic [ref=f22e376]:
+              - text: ndeadly /
+              - emphasis [ref=f22e377]: MissionControl
+              - text: Public. Sponsor. Sponsor ndeadly ... Press the Home button, go to
+              - emphasis [ref=f22e378]: Change Grip
+              - text: /Order, and reconnect both
+              - emphasis [ref=f22e379]: controllers
+              - text: .
+            - link "Read more" [ref=f22e380] [cursor=pointer]:
+              - /url: https://github.com/ndeadly/MissionControl/issues/1107#:~:text=ndeadly%20%2F%20MissionControl%20Public&text=Press%20the%20Home%20button%2C%20go,Grip%2FOrder%2C%20and%20reconnect%20both%20controllers.
+        - generic [ref=f22e384]:
+          - generic [ref=f22e387]:
+            - 'link "input commands lag periodically · Issue #31 · mart1nro/joycontrol GitHub https://github.com › joycontrol › issues" [ref=f22e389] [cursor=pointer]':
+              - /url: https://github.com/mart1nro/joycontrol/issues/31
+              - 'heading "input commands lag periodically · Issue #31 · mart1nro/joycontrol" [level=3] [ref=f22e390]'
+              - generic [ref=f22e396]:
+                - generic [ref=f22e398]: GitHub
+                - generic [ref=f22e400]: https://github.com › joycontrol › issues
+            - button "About this result" [ref=f22e403] [cursor=pointer]:
+              - img [ref=f22e406]
+          - generic [ref=f22e410]:
+            - text: The delay problem you are describing is also noticeable while pairing a
+            - emphasis [ref=f22e411]: controller
+            - text: in the "
+            - emphasis [ref=f22e412]: Change Grip
+            - text: /Order" menu. I didn't know that it also happens when ...
+        - generic [ref=f22e416]:
+          - generic [ref=f22e419]:
+            - 'link "DS4 controller never pairs · Issue #133 · ndeadly ... GitHub https://github.com › ndeadly › MissionControl › issues" [ref=f22e421] [cursor=pointer]':
+              - /url: https://github.com/ndeadly/MissionControl/issues/133
+              - 'heading "DS4 controller never pairs · Issue #133 · ndeadly ..." [level=3] [ref=f22e422]'
+              - generic [ref=f22e428]:
+                - generic [ref=f22e430]: GitHub
+                - generic [ref=f22e432]: https://github.com › ndeadly › MissionControl › issues
+            - button "About this result" [ref=f22e435] [cursor=pointer]:
+              - img [ref=f22e438]
+          - generic [ref=f22e441]:
+            - generic [ref=f22e442]: Nov 7, 2020 —
+            - generic [ref=f22e443]:
+              - text: I cant for the life of me
+              - emphasis [ref=f22e444]: connect
+              - text: my ds4 to my
+              - emphasis [ref=f22e445]: switch
+              - text: . I am on atmosphere 0.14.4 and firmware 10.2.0 using
+              - emphasis [ref=f22e446]: missioncontrol
+              - text: 0.3.0.
+        - generic [ref=f22e450]:
+          - generic [ref=f22e453]:
+            - 'link "GitHub - joeyj/joycontrol-macos: Experimental macOS Port ... GitHub https://github.com › joeyj › joycontrol-macos" [ref=f22e455] [cursor=pointer]':
+              - /url: https://github.com/joeyj/joycontrol-macos
+              - 'heading "GitHub - joeyj/joycontrol-macos: Experimental macOS Port ..." [level=3] [ref=f22e456]'
+              - generic [ref=f22e462]:
+                - generic [ref=f22e464]: GitHub
+                - generic [ref=f22e466]: https://github.com › joeyj › joycontrol-macos
+            - button "About this result" [ref=f22e469] [cursor=pointer]:
+              - img [ref=f22e472]
+          - generic [ref=f22e475]:
+            - generic [ref=f22e476]:
+              - text: If the
+              - emphasis [ref=f22e477]: Switch
+              - text: stops attempting to
+              - emphasis [ref=f22e478]: connect
+              - text: in the
+              - emphasis [ref=f22e479]: Change Grip
+              - text: "/Order screen, try: Resetting the bluetooth service in macOS: sudo launchctl stop com.apple."
+            - link "Read more" [ref=f22e480] [cursor=pointer]:
+              - /url: https://github.com/joeyj/joycontrol-macos#:~:text=If%20the%20Switch%20stops%20attempting,com.apple.bluetoothd%20%26%26%20launchctl%20start%20com.apple.bluetoothd
+      - generic [ref=f22e482]:
+        - generic [ref=f22e487]:
+          - heading "People also search for" [level=2] [ref=f22e489]
+          - generic [ref=f22e491]:
+            - link "Joycontrol missioncontrol change grip sniff disconnect switch controller not working" [ref=f22e496] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joycontrol+missioncontrol+change+grip+sniff+disconnect+switch+controller+not+working&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q1QJ6BAg0EAE
+              - generic [ref=f22e497]:
+                - generic [ref=f22e502]: Joycontrol missioncontrol change grip sniff disconnect switch controller not working
+                - img [ref=f22e506]
+            - link "Joycontrol missioncontrol change grip sniff disconnect switch controller not" [ref=f22e512] [cursor=pointer]:
+              - /url: /search?sca_esv=ddfd6cfe34cb7336&q=Joycontrol+missioncontrol+change+grip+sniff+disconnect+switch+controller+not&sa=X&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q1QJ6BAgzEAE
+              - generic [ref=f22e513]:
+                - generic [ref=f22e518]: Joycontrol missioncontrol change grip sniff disconnect switch controller not
+                - img [ref=f22e522]
+        - navigation [ref=f22e524]:
+          - heading "Page Navigation" [level=1] [ref=f22e525]
+          - text: "1"
+          - link "Page 2" [ref=f22e528] [cursor=pointer]:
+            - /url: /search?q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sca_esv=ddfd6cfe34cb7336&ei=LuBKasHxPPWSur8P7snS8Qs&start=10&sa=N&sstk=AU9db-A_S7iuNLvjpeR2XMy86hc0Tc7guzq2GIKMyhMADKkX0UG_U-wwhLYfhZhdPXqaGD0jxLMFZTxCiyM6P5zHsPzGNhs8svwbCw&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q8tMDegQIMRAE
+            - text: "2"
+          - link "Page 3" [ref=f22e530] [cursor=pointer]:
+            - /url: /search?q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sca_esv=ddfd6cfe34cb7336&ei=LuBKasHxPPWSur8P7snS8Qs&start=20&sa=N&sstk=AU9db-A_S7iuNLvjpeR2XMy86hc0Tc7guzq2GIKMyhMADKkX0UG_U-wwhLYfhZhdPXqaGD0jxLMFZTxCiyM6P5zHsPzGNhs8svwbCw&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q8tMDegQIMRAG
+            - text: "3"
+          - heading "Next" [level=2] [ref=f22e532]:
+            - link "Next" [ref=f22e533] [cursor=pointer]:
+              - /url: /search?q=site:github.com+joycontrol+OR+%22MissionControl%22+%22change+grip%22+OR+%22sniff%22+disconnect+switch+controller&sca_esv=ddfd6cfe34cb7336&ei=LuBKasHxPPWSur8P7snS8Qs&start=10&sa=N&sstk=AU9db-A_S7iuNLvjpeR2XMy86hc0Tc7guzq2GIKMyhMADKkX0UG_U-wwhLYfhZhdPXqaGD0jxLMFZTxCiyM6P5zHsPzGNhs8svwbCw&ved=2ahUKEwjBwJSa0LyVAxV1ie4BHe6kNL4Q8NMDegQIMRAI
+              - generic [ref=f22e535]: Next
+      - navigation
+    - contentinfo [ref=f22e536]:
+      - heading "Footer Links" [level=1] [ref=f22e537]
+      - generic [ref=f22e541]:
+        - generic [ref=f22e545]:
+          - button "90062, Los Angeles, CA - From your IP address" [ref=f22e547] [cursor=pointer]:
+            - generic [ref=f22e548]: 90062, Los Angeles, CA
+            - generic [ref=f22e550]:
+              - text: "-"
+              - generic [ref=f22e551]: From your IP address
+          - text: "-"
+          - button "Update location" [ref=f22e553] [cursor=pointer]: Update location
+        - generic [ref=f22e556]:
+          - link "Help" [ref=f22e557] [cursor=pointer]:
+            - /url: https://support.google.com/websearch/?p=ws_results_help&hl=en&fg=1
+          - link "Send feedback" [ref=f22e558] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=f22e559] [cursor=pointer]:
+            - /url: https://policies.google.com/privacy?hl=en&fg=1
+          - link "Terms" [ref=f22e560] [cursor=pointer]:
+            - /url: https://policies.google.com/terms?hl=en&fg=1
