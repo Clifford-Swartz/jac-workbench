@@ -506,6 +506,51 @@
                         <button id="pair-btn" style="display:none" aria-hidden="true"></button>
                     </div>
                 </div>
+                <div id="nokey-banner" style="display:none;padding:16px 18px;margin:14px;border:1px solid var(--app-border,#3a3a3c);background:var(--app-panel,#252526);border-radius:12px">
+                    <div style="font-weight:600;font-size:15px;margin-bottom:4px;color:var(--app-fg,#e6e6e6)">No API key detected</div>
+                    <div style="font-size:13px;color:var(--app-dim,#999);margin-bottom:12px">Paste your OpenRouter API key to start chatting. You can change it anytime in Settings.</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <input id="nokey-input" type="password" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false" style="flex:1;min-width:200px;padding:9px 11px;border:1px solid var(--app-border,#3a3a3c);border-radius:8px;background:var(--app-bg,#1a1a1a);color:var(--app-fg,#e6e6e6);font-family:ui-monospace,monospace;font-size:13px;outline:none">
+                        <button id="nokey-save" style="padding:9px 18px;border:0;border-radius:8px;background:var(--app-accent,#d97757);color:#fff;font-size:13px;cursor:pointer">Save key</button>
+                    </div>
+                    <div id="nokey-msg" style="font-size:12px;margin-top:8px;color:var(--app-dim,#999)"></div>
+                    <div style="font-size:12px;margin-top:10px;color:var(--app-dim,#888)">Don't have one? Ask whoever shared JAC with you, or get your own at openrouter.ai/keys.</div>
+                </div>
+                <script>
+                (function(){
+                    async function checkKey(){
+                        var banner = document.getElementById('nokey-banner');
+                        if (!banner || !window.jac || !window.jac.getConfig) return;
+                        try {
+                            var cfg = await window.jac.getConfig();
+                            var has = cfg && cfg.openrouterApiKey && String(cfg.openrouterApiKey).trim();
+                            banner.style.display = has ? 'none' : 'block';
+                        } catch(e){}
+                    }
+                    function wire(){
+                        var save = document.getElementById('nokey-save');
+                        var input = document.getElementById('nokey-input');
+                        var msg = document.getElementById('nokey-msg');
+                        if (!save || !input) return;
+                        async function doSave(){
+                            var key = (input.value || '').trim();
+                            if (!key){ msg.textContent = 'Paste a key first.'; return; }
+                            save.disabled = true; msg.textContent = 'Saving…';
+                            try {
+                                await window.jac.saveConfig({ openrouterApiKey: key });
+                                msg.textContent = 'Saved — you can chat now (change it later in Settings).';
+                                input.value = '';
+                                setTimeout(function(){ var b=document.getElementById('nokey-banner'); if(b) b.style.display='none'; }, 900);
+                            } catch(e){ msg.textContent = 'Could not save: ' + e; save.disabled = false; }
+                        }
+                        save.onclick = doSave;
+                        input.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); doSave(); } });
+                    }
+                    // window.jac (preload) is ready before page scripts; the banner nodes are parsed above this script.
+                    wire(); checkKey();
+                    window.jacRecheckApiKey = checkKey;   // let Settings-save re-hide it live
+                })();
+                </script>
                 <div id="messages"></div>
                 <div id="input-area">
                     <div id="streaming-indicator">
