@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src http://127.0.0.1:5055;">
+<title>Neural Surgery</title>
+<style>
+:root {
+  /* JAC palette (overridden live by neuro.html); --exc/--inh are semantic, kept fixed */
+  --bg:#1e1e1e; --bg2:#191919; --bg3:#252526; --fg:#d4d4d4; --dim:#888; --border:#2b2b2b;
+  --accent:#d97757; --ok:#4caf50; --err:#f44336; --exc:#4ec9b0; --inh:#e0655a;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+::-webkit-scrollbar { width:11px; height:11px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background-color:color-mix(in srgb, var(--accent) 45%, #4a4a4a);
+  border-radius:10px; border:3px solid transparent; background-clip:content-box; transition:background-color .15s; }
+::-webkit-scrollbar-thumb:hover { background-color:var(--accent); }
+::-webkit-scrollbar-corner { background:transparent; }
+body { background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,sans-serif;
+       font-size:13px; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+#status { display:flex; align-items:center; gap:10px; padding:6px 12px; border-bottom:1px solid var(--border);
+          background:var(--bg2); font-size:11px; flex-shrink:0; }
+.dot { width:8px; height:8px; border-radius:50%; background:#555; }
+.dot.on { background:var(--ok); } .dot.off { background:var(--err); }
+.seg2 { display:inline-flex; border:1px solid var(--border); border-radius:5px; overflow:hidden; }
+.seg2 button { background:none; border:none; color:var(--dim); padding:3px 10px; font-size:11px; cursor:pointer;
+               font-family:inherit; }
+.seg2 button:not(:first-child) { border-left:1px solid var(--border); }
+.seg2 button.on { background:var(--accent); color:#fff; }
+#sae-info { color:var(--dim); font-size:10px; }
+#train-panel { display:none; padding:10px 12px; background:var(--bg2); border-bottom:1px solid var(--border);
+               font-size:11px; align-items:center; gap:8px; flex-wrap:wrap; flex-shrink:0; }
+#train-panel.open { display:flex; }
+#train-panel input { width:60px; background:var(--bg3); border:1px solid #444; color:var(--fg); border-radius:3px;
+                     padding:2px 5px; font-size:11px; outline:none; }
+#train-panel select { background:var(--bg3); border:1px solid #444; color:var(--fg); border-radius:3px;
+                      padding:2px 5px; font-size:11px; outline:none; min-width:190px; }
+#train-panel label { color:var(--dim); }
+#train-prog { color:var(--accent); font-variant-numeric:tabular-nums; }
+.feat-label { color:var(--fg); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+.feat-toks { color:var(--dim); }
+#bake-row { display:flex; align-items:center; gap:6px; padding:6px 12px; border-top:1px solid var(--border); flex-shrink:0; }
+#bake-row input { flex:1; min-width:0; background:var(--bg3); border:1px solid #444; color:var(--fg); border-radius:3px;
+                  padding:3px 6px; font-size:11px; outline:none; }
+#bake-status { font-size:10px; color:var(--accent); white-space:nowrap; }
+#status b { color:var(--fg); }
+
+#top { padding:10px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.row { display:flex; gap:8px; align-items:center; }
+#prompt { flex:1; background:var(--bg3); border:1px solid #444; color:var(--fg); padding:6px 9px;
+          border-radius:4px; font-size:13px; outline:none; font-family:inherit; }
+#prompt:focus { border-color:var(--accent); }
+.ntok-wrap { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--dim); white-space:nowrap; }
+.ntok-wrap input { width:56px; background:var(--bg3); border:1px solid #444; color:var(--fg); padding:5px 6px;
+                   border-radius:4px; font-size:12px; outline:none; font-family:inherit; }
+.ntok-wrap input:focus { border-color:var(--accent); }
+.btn { background:none; border:1px solid var(--accent); color:var(--accent); padding:6px 14px;
+       border-radius:4px; cursor:pointer; font-size:12px; white-space:nowrap; }
+.btn:hover { background:rgba(78,201,176,.1); }
+.btn:disabled { opacity:.4; cursor:default; }
+.btn.sm { padding:3px 8px; font-size:11px; border-color:#555; color:var(--dim); }
+.btn.sm:hover { color:var(--fg); }
+.btn.danger { border-color:#5a3a3a; color:#c98; } .btn.danger:hover { background:rgba(224,122,95,.1); }
+.btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+.btn.primary:hover { background:var(--accent); filter:brightness(1.12); }
+.hint.sm { padding:6px 2px 2px; font-size:10px; line-height:1.45; }
+
+#out-wrap { margin-top:10px; line-height:2; }
+#out-wrap .lbl { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.tok { display:inline-block; padding:1px 3px; border-radius:3px; cursor:default; white-space:pre; }
+.tok.prompt { color:#666; }
+.tok.gen { color:var(--fg); cursor:pointer; border-bottom:1px dotted #555; }
+.tok.gen:hover { background:#2a2a2a; }
+.tok.sel { background:var(--accent); color:#0d1f1c; }
+
+#main { flex:1; display:flex; min-height:0; }
+#contrib { width:44%; border-right:1px solid var(--border); display:flex; flex-direction:column; }
+#edit { flex:1; display:flex; flex-direction:column; }
+.pane-h { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--accent);
+          padding:8px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
+#contrib-tools { display:flex; align-items:center; gap:6px; padding:5px 12px; border-bottom:1px solid var(--border);
+                 font-size:11px; flex-shrink:0; }
+#contrib-tools input { width:46px; background:var(--bg3); border:1px solid #444; color:var(--fg);
+                       border-radius:3px; padding:2px 4px; font-size:11px; outline:none; }
+#sel-count { color:var(--accent); font-variant-numeric:tabular-nums; }
+.c-check { width:13px; flex-shrink:0; color:#555; font-size:12px; }
+.c-row.sel .c-check { color:var(--accent); }
+#contrib-list { flex:1; overflow-y:auto; }
+.c-row { display:flex; align-items:center; gap:8px; padding:5px 12px; border-bottom:1px solid #222;
+         cursor:pointer; font-size:12px; }
+.c-row:hover { background:#242424; } .c-row.sel { background:#2a2a2a; }
+.c-loc { width:96px; color:var(--dim); font-variant-numeric:tabular-nums; }
+.c-bar { height:9px; border-radius:2px; flex-shrink:0; }
+.c-score { width:52px; text-align:right; font-variant-numeric:tabular-nums; }
+.pos { color:var(--exc); } .neg { color:var(--inh); }
+.hint { font-size:11px; color:var(--dim); padding:12px; line-height:1.5; }
+
+#edit-body { padding:12px; }
+.ed-title { font-size:14px; font-weight:600; margin-bottom:8px; }
+.ed-stat { font-size:12px; color:var(--dim); margin-bottom:3px; }
+.ed-stat b { color:var(--fg); }
+#scale-row { display:flex; align-items:center; gap:8px; margin:12px 0 6px; }
+#scale-row input[type=range] { flex:1; -webkit-appearance:none; appearance:none; height:16px; background:transparent; cursor:pointer; }
+#scale-row input[type=range]::-webkit-slider-runnable-track { height:5px; border-radius:3px; background:var(--sfill, var(--border)); }
+#scale-row input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:13px; height:13px; border-radius:50%;
+  background:var(--accent); margin-top:-4px; border:2px solid var(--bg2); box-shadow:0 1px 4px rgba(0,0,0,.5); transition:transform .1s; }
+#scale-row input[type=range]:hover::-webkit-slider-thumb { transform:scale(1.18); }
+#scale-val { width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+.scale-lbls { display:flex; justify-content:space-between; font-size:9px; color:#666; }
+.ed-btns { display:flex; gap:6px; margin-top:12px; }
+
+#bottom { border-top:1px solid var(--border); display:flex; flex-shrink:0; max-height:34%; }
+#stack { width:44%; border-right:1px solid var(--border); overflow-y:auto; }
+#diff { flex:1; overflow-y:auto; }
+.s-row { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:4px 12px;
+         border-bottom:1px solid #222; font-size:11px; }
+.s-row .loc { color:var(--fg); } .s-row .sc { color:var(--dim); }
+#stack-empty,#diff-empty { padding:12px; color:#555; font-size:11px; }
+.diff-block { padding:8px 12px; font-size:12px; line-height:1.5; }
+.diff-block .k { font-size:10px; color:var(--dim); text-transform:uppercase; }
+.diff-before { color:#888; } .diff-after { color:var(--fg); }
+#banner { display:none; padding:10px 12px; background:rgba(224,122,95,.1); border-bottom:1px solid var(--inh);
+          color:var(--inh); font-size:12px; }
+.spin { display:inline-block; width:10px; height:10px; border:2px solid #444; border-top-color:var(--accent);
+        border-radius:50%; animation:sp .7s linear infinite; vertical-align:middle; }
+@keyframes sp { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="status">
+  <span class="dot" id="dot"></span><span>Surgery <b id="s-model">connecting…</b></span>
+  <span class="seg2" style="margin-left:12px">
+    <button id="mode-neurons" class="on" onclick="setMode('neurons')">Neurons</button>
+    <button id="mode-features" onclick="setMode('features')">Features</button>
+  </span>
+  <span id="sae-info"></span>
+  <button class="btn sm" onclick="toggleTrain()">⚙ Train SAE</button>
+  <span style="margin-left:auto;color:var(--dim)" id="s-dev"></span>
+</div>
+<div id="train-panel"></div>
+<div id="banner"></div>
+
+<div id="top">
+  <div class="row">
+    <input id="prompt" type="text" value="The capital of France is" spellcheck="false">
+    <span class="ntok-wrap" title="max tokens to generate (stops early at end-of-text)">len <input id="ntok" type="number" value="200" min="1" max="2048"></span>
+    <button class="btn" id="btn-gen" onclick="doGenerate()">Generate</button>
+  </div>
+  <div id="out-wrap">
+    <div class="lbl">Output — click a token to dissect it</div>
+    <div id="out"><span class="hint" style="padding:0">Generate to begin.</span></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="contrib">
+    <div class="pane-h">Contributors <span id="contrib-tgt" style="color:var(--dim);text-transform:none;font-weight:400"></span></div>
+    <div id="contrib-tools">
+      <span style="color:var(--dim)">select top</span>
+      <input id="topn" type="number" value="20" min="1" max="900">
+      <button class="btn sm" onclick="selectTop()">Go</button>
+      <button class="btn sm" onclick="clearSel()">Clear</button>
+      <span id="sel-count" style="margin-left:auto"></span>
+    </div>
+    <div id="contrib-list"><div class="hint">Select an output token.</div></div>
+  </div>
+  <div id="edit">
+    <div class="pane-h">Edit neuron</div>
+    <div id="edit-body"><div class="hint">Select a contributor to edit it.</div></div>
+  </div>
+</div>
+
+<div id="bottom">
+  <div id="stack">
+    <div class="pane-h">Edit stack <button class="btn sm danger" style="float:right;margin-top:-3px" onclick="revertAll()">Revert all</button></div>
+    <div id="stack-list"><div id="stack-empty">No edits yet.</div></div>
+    <div id="bake-row">
+      <input id="bake-name" type="text" value="surgery-baked" title="output model name" spellcheck="false">
+      <button class="btn" id="bake-btn" onclick="doBake()">🔥 Bake → GGUF</button>
+      <button class="btn sm" onclick="resetBase()" title="Restore the live model to pristine base weights (clears all edits)">↩ Reset to base</button>
+      <span id="bake-status"></span>
+    </div>
+  </div>
+  <div id="diff">
+    <div class="pane-h">Output diff</div>
+    <div id="diff-body"><div id="diff-empty">Edit a neuron to compare before/after.</div></div>
+  </div>
+</div>
+
+<script>
+const API = "http://127.0.0.1:5055";
+let gen = null;        // last /generate result
+let selPos = null;     // selected output token position
+let info = null;
+let beforeText = null; // for diff
+let mode = 'neurons';  // 'neurons' | 'features'
+let sae = null;        // loaded SAE meta or null
+
+async function api(path, body) {
+  const opt = body ? { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) } : {};
+  const r = await fetch(API + path, opt);
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+async function checkEngine() {
+  try {
+    info = await api("/info");
+    document.getElementById("dot").className = "dot on";
+    document.getElementById("s-model").textContent = info.model.split(/[\\/]/).pop();
+    document.getElementById("s-dev").textContent = info.device.toUpperCase();
+    document.getElementById("banner").style.display = "none";
+    try {
+      const ss = await api("/sae-status");
+      sae = ss.loaded ? ss.meta : null;
+      document.getElementById("sae-info").textContent = sae ? ("SAE L" + sae.layer + " · " + ss.labels + " feats") : "no SAE — train one →";
+      document.getElementById("mode-features").style.opacity = sae ? "1" : "0.45";
+      if (ss.train && ss.train.running) pollTrain();
+    } catch {}
+  } catch (e) {
+    document.getElementById("dot").className = "dot off";
+    document.getElementById("s-model").textContent = "offline";
+    const b = document.getElementById("banner");
+    b.style.display = "block";
+    b.textContent = "⚠ Surgery engine not reachable on :5055. It loads a full model into memory and may take ~30s to start.";
+  }
+}
+
+function nTok() {
+  const v = parseInt(document.getElementById("ntok").value, 10);
+  return (isNaN(v) || v < 1) ? 200 : Math.min(v, 2048);
+}
+
+async function doGenerate() {
+  const btn = document.getElementById("btn-gen");
+  const out = document.getElementById("out");
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  out.innerHTML = '<span class="hint" style="padding:0"><span class="spin"></span> generating on ' +
+    (info ? info.device.toUpperCase() : 'CPU') + '… (a few seconds)</span>';
+  try {
+    gen = await api("/generate", { prompt: document.getElementById("prompt").value, max_tokens: nTok() });
+    selPos = null; renderTokens();
+    document.getElementById("contrib-list").innerHTML = '<div class="hint">Select an output token.</div>';
+    document.getElementById("contrib-tgt").textContent = "";
+  } catch (e) {
+    out.innerHTML = '<span class="hint" style="padding:0;color:var(--err)">Generate failed: ' + e.message + '</span>';
+  }
+  finally { btn.disabled = false; btn.textContent = "Generate"; }
+}
+
+function renderTokens() {
+  const el = document.getElementById("out");
+  el.innerHTML = gen.tokens.map(t => {
+    const isGen = t.pos >= gen.prompt_len;
+    const cls = "tok " + (isGen ? "gen" : "prompt") + (t.pos === selPos ? " sel" : "");
+    const txt = t.text.replace(/</g,"&lt;").replace(/>/g,"&gt;") || "·";
+    return `<span class="${cls}" ${isGen ? `onclick="selectToken(${t.pos})"` : ""}>${txt}</span>`;
+  }).join("");
+}
+
+async function selectToken(pos) {
+  selPos = pos; sel.clear(); renderTokens();
+  const list = document.getElementById("contrib-list");
+  list.innerHTML = '<div class="hint"><span class="spin"></span> ' + (mode === 'features' ? 'reading features' : 'attributing') + '…</div>';
+  document.getElementById("contrib-tgt").textContent = "→ '" + gen.tokens[pos].text + "'";
+  try {
+    let items;
+    if (mode === 'features') {
+      const r = await api("/sae-features", { token_ids: gen.token_ids, pos, top_k: 25 });
+      items = r.features || [];
+    } else {
+      const a = await api("/attribute", { token_ids: gen.token_ids, pos, top_k: 25 });
+      items = a.contributors;
+    }
+    renderContributors(items);
+  } catch (e) { list.innerHTML = '<div class="hint">failed: ' + e.message + '</div>'; }
+}
+
+function setMode(m) {
+  if (m === 'features' && !sae) { document.getElementById("sae-info").textContent = "train an SAE first →"; return; }
+  mode = m;
+  document.getElementById("mode-neurons").classList.toggle("on", m === 'neurons');
+  document.getElementById("mode-features").classList.toggle("on", m === 'features');
+  document.querySelector("#contrib .pane-h").childNodes[0].textContent = m === 'features' ? 'Features ' : 'Contributors ';
+  document.querySelector("#edit .pane-h").textContent = m === 'features' ? 'Clamp feature' : 'Edit neuron';
+  sel.clear();
+  if (selPos != null && gen) selectToken(selPos);
+  else { document.getElementById("contrib-list").innerHTML = '<div class="hint">Select an output token.</div>'; renderEditPane(); }
+  refreshStack();
+}
+
+// ── SAE trainer ──
+function tv(id) { return document.getElementById(id).value; }
+function toggleTrain() {
+  const p = document.getElementById("train-panel");
+  p.classList.toggle("open");
+  if (p.classList.contains("open")) {
+    p.innerHTML = `<label>Saved SAE</label><select id="sae-pick"></select>
+      <button class="btn sm" onclick="loadPickedSae()">Load</button>
+      <span style="width:10px;display:inline-block"></span>
+      <label style="opacity:.7">or train new —</label>
+      <label>layer</label><input id="t-layer" type="number" value="16" min="1" max="35">
+      <label>feats</label><input id="t-dsae" type="number" value="16384">
+      <label>k</label><input id="t-k" type="number" value="32">
+      <label>tokens</label><input id="t-tok" type="number" value="150000">
+      <label>steps</label><input id="t-steps" type="number" value="1500">
+      <button class="btn" id="t-go" onclick="startTrain()">Train from scratch</button>
+      <span id="train-prog"></span>`;
+    refreshSaeList();
+  }
+}
+async function refreshSaeList() {
+  const sel = document.getElementById("sae-pick");
+  if (!sel) return;
+  try {
+    const r = await api("/sae-list");
+    sel.innerHTML = (r.saes || []).map(s =>
+      `<option value="${s.path}"${sae && sae.path === s.path ? ' selected' : ''}>${s.name} · L${s.layer} · ${s.d_sae}×${s.k}</option>`
+    ).join('') || '<option value="">— none trained yet —</option>';
+  } catch { sel.innerHTML = '<option value="">— engine offline —</option>'; }
+}
+async function loadPickedSae() {
+  const sel = document.getElementById("sae-pick");
+  if (!sel || !sel.value) return;
+  const prog = document.getElementById("train-prog");
+  prog.innerHTML = '<span class="spin"></span> loading SAE…';
+  try {
+    await api("/sae-load", { path: sel.value });
+    await checkEngine();
+    prog.textContent = "loaded ✓ — no retraining needed";
+  } catch (e) { prog.textContent = "load failed: " + e.message; }
+}
+async function startTrain() {
+  document.getElementById("t-go").disabled = true;
+  document.getElementById("train-prog").innerHTML = '<span class="spin"></span> starting…';
+  try {
+    await api("/sae-train", { layer:+tv('t-layer'), d_sae:+tv('t-dsae'), k:+tv('t-k'), max_tokens:+tv('t-tok'), steps:+tv('t-steps') });
+    pollTrain();
+  } catch (e) { document.getElementById("train-prog").textContent = "failed: " + e.message; document.getElementById("t-go").disabled = false; }
+}
+async function pollTrain() {
+  let s; try { s = await api("/sae-status"); } catch { return; }
+  const t = s.train || {};
+  const prog = document.getElementById("train-prog");
+  if (prog) prog.innerHTML = t.running
+    ? '<span class="spin"></span> ' + t.msg + ' — step ' + t.step + '/' + t.total + (t.fvu != null ? ' · FVU ' + t.fvu : '')
+    : (t.msg || '');
+  if (t.running) setTimeout(pollTrain, 1500);
+  else { const go = document.getElementById("t-go"); if (go) go.disabled = false; checkEngine(); }
+}
+
+let contribs = [];        // current attribution list
+let sel = new Map();      // "L:n" -> contributor (multi-select)
+const keyOf = c => c.feature !== undefined ? ("f:" + c.feature) : (c.layer + ":" + c.neuron);
+
+function renderContributors(cs) {
+  contribs = cs;
+  const isFeat = cs.length && cs[0].feature !== undefined;
+  const max = Math.max(...cs.map(c => isFeat ? c.act : Math.abs(c.score)), 1e-6);
+  document.getElementById("contrib-list").innerHTML = cs.map((c,i) => {
+    const on = sel.has(keyOf(c));
+    if (isFeat) {
+      const lbl = (c.label || []).map(t => t.trim()).filter(Boolean).slice(0,4).join(' · ') || '—';
+      return `<div class="c-row${on?' sel':''}" data-i="${i}" onclick="toggleNeuron(${i})" title="${lbl.replace(/"/g,'')}">
+        <span class="c-check">${on?'☑':'☐'}</span>
+        <span class="c-loc">#${c.feature}</span>
+        <span class="feat-label">${lbl}</span>
+        <span class="c-score pos">${c.act.toFixed(1)}</span>
+      </div>`;
+    }
+    const w = Math.round(Math.abs(c.score) / max * 84);
+    const col = c.score >= 0 ? "var(--exc)" : "var(--inh)";
+    const scls = c.score >= 0 ? "pos" : "neg";
+    return `<div class="c-row${on?' sel':''}" data-i="${i}" onclick="toggleNeuron(${i})">
+      <span class="c-check">${on?'☑':'☐'}</span>
+      <span class="c-loc">L${c.layer} n${c.neuron}</span>
+      <span class="c-bar" style="width:${w}px;background:${col}"></span>
+      <span class="c-score ${scls}">${c.score>=0?'+':''}${c.score.toFixed(2)}</span>
+    </div>`;
+  }).join("");
+  updateSelUI();
+}
+
+function toggleNeuron(i) {
+  const c = contribs[i], k = keyOf(c);
+  if (sel.has(k)) sel.delete(k); else sel.set(k, c);
+  const row = document.querySelector(`.c-row[data-i="${i}"]`);
+  if (row) { row.classList.toggle("sel", sel.has(k)); row.querySelector(".c-check").textContent = sel.has(k) ? '☑' : '☐'; }
+  updateSelUI();
+}
+function selectTop() {
+  const n = Math.max(1, parseInt(document.getElementById("topn").value) || 20);
+  contribs.slice(0, n).forEach(c => sel.set(keyOf(c), c));
+  renderContributors(contribs);
+}
+function clearSel() { sel.clear(); renderContributors(contribs); }
+function updateSelUI() {
+  document.getElementById("sel-count").textContent = sel.size ? sel.size + " selected" : "";
+  renderEditPane();
+}
+
+function renderEditPane() {
+  const body = document.getElementById("edit-body");
+  if (!sel.size) {
+    body.innerHTML = '<div class="hint">Click rows to select (or “select top N”), then edit them together.</div>';
+    return;
+  }
+  const arr = [...sel.values()];
+  const feat = mode === 'features';
+  const allTxt = arr.length === 1 ? '' : ' all';
+  let title, detail, mx, def, lbls;
+  if (feat) {
+    const baseAct = arr[0].act || 4;
+    title = arr.length === 1 ? `feature #${arr[0].feature}` : `${arr.length} features selected`;
+    detail = `<div class="ed-stat">${arr.slice(0,4).map(c=>'#'+c.feature+' '+((c.label||[]).slice(0,2).map(t=>t.trim()).join('/'))).join(' · ')}${arr.length>4?' +'+(arr.length-4):''}</div>`;
+    mx = Math.max(48, Math.ceil(baseAct * 6));                       // room to inject hard
+    def = Math.min(mx, Math.max(24, Math.round(baseAct * 4)));       // default = strong inject
+    lbls = `<span>0 ablate</span><span>~${(+baseAct).toFixed(0)} baseline</span><span>${mx} inject →</span>`;
+  } else {
+    title = arr.length === 1 ? `L${arr[0].layer} · neuron ${arr[0].neuron}` : `${arr.length} neurons selected`;
+    detail = arr.length === 1
+      ? `<div class="ed-stat">contribution <b class="${arr[0].score>=0?'pos':'neg'}">${arr[0].score>=0?'+':''}${arr[0].score.toFixed(3)}</b> · activation <b>${arr[0].activation.toFixed(3)}</b></div>`
+      : `<div class="ed-stat">${arr.slice(0,8).map(c=>'L'+c.layer+'n'+c.neuron).join(', ')}${arr.length>8?' +'+(arr.length-8)+' more':''}</div>`;
+    mx = 3; def = 1; lbls = '<span>0 ablate</span><span>1 baseline</span><span>3 amplify</span>';
+  }
+  const btns = feat ? `
+      <button class="btn primary" onclick="applyEdit()">⚡ Inject${allTxt}</button>
+      <button class="btn sm" onclick="applyEdit(0)">Ablate 0${allTxt}</button>
+      <button class="btn sm danger" onclick="revertSel()">Revert${allTxt}</button>`
+    : `
+      <button class="btn sm" onclick="applyEdit(0)">Zero${allTxt}</button>
+      <button class="btn" onclick="applyEdit()">Apply α${allTxt}</button>
+      <button class="btn sm danger" onclick="revertSel()">Revert${allTxt}</button>`;
+  body.innerHTML = `
+    <div class="ed-title">${title}</div>
+    ${detail}
+    <div id="scale-row"><input type="range" min="0" max="${mx}" step="0.1" value="${def}" id="scale"><span id="scale-val">${def.toFixed(1)}</span></div>
+    <div class="scale-lbls">${lbls}</div>
+    <div class="ed-btns">${btns}</div>
+    ${feat ? '<div class="hint sm">Inject (force-on) is the strong lever — it visibly steers output. Ablate→0 barely moves a distributed concept.</div>' : ''}`;
+  const sc = document.getElementById("scale");
+  const sfill = el => el.style.setProperty("--sfill", `linear-gradient(90deg, var(--accent) ${(+el.value)/mx*100}%, var(--border) ${(+el.value)/mx*100}%)`);
+  sfill(sc);
+  sc.addEventListener("input", e => { document.getElementById("scale-val").textContent = (+e.target.value).toFixed(1); sfill(e.target); });
+}
+
+async function applyEdit(forceScale) {
+  if (!sel.size) return;
+  const val = forceScale !== undefined ? forceScale : parseFloat(document.getElementById("scale").value);
+  beforeText = gen ? gen.text : null;
+  for (const c of sel.values()) {
+    if (c.feature !== undefined) await api("/edit-feature", { feature: c.feature, value: val });
+    else await api("/edit", { layer: c.layer, neuron: c.neuron, scale: val });
+  }
+  await refreshStack();
+  await regenForDiff();
+}
+
+async function revertSel() {
+  if (!sel.size) return;
+  beforeText = gen ? gen.text : null;
+  for (const c of sel.values()) {
+    if (c.feature !== undefined) await api("/revert-feature", { feature: c.feature });
+    else await api("/revert", { layer: c.layer, neuron: c.neuron });
+  }
+  await refreshStack();
+  await regenForDiff();
+}
+
+async function revertAll() {
+  beforeText = gen ? gen.text : null;
+  await api(mode === 'features' ? "/revert-features" : "/revert_all");
+  await refreshStack();
+  await regenForDiff();
+}
+
+async function refreshStack() {
+  const el = document.getElementById("stack-list");
+  if (mode === 'features') {
+    const s = await api("/sae-status");
+    const fe = s.featureEdits || [];
+    el.innerHTML = fe.length ? fe.map(e => `<div class="s-row">
+      <span class="loc">#${e.feature}</span>
+      <span><span class="sc">→${e.value}</span> <button class="btn sm danger" onclick='api("/revert-feature",{feature:${e.feature}}).then(()=>{beforeText=gen?gen.text:null;refreshStack().then(regenForDiff)})'>✕</button></span>
+    </div>`).join("") : '<div id="stack-empty">No feature edits.</div>';
+    return;
+  }
+  const s = await api("/edits");
+  el.innerHTML = s.edits.length ? s.edits.map(e => `<div class="s-row">
+    <span class="loc">L${e.layer} n${e.neuron}</span>
+    <span><span class="sc">α${e.scale}</span> <button class="btn sm danger" onclick='api("/revert",{layer:${e.layer},neuron:${e.neuron}}).then(()=>{beforeText=gen?gen.text:null;refreshStack().then(regenForDiff)})'>✕</button></span>
+  </div>`).join("") : '<div id="stack-empty">No edits yet.</div>';
+}
+
+async function regenForDiff() {
+  if (!gen) return;
+  const prompt = document.getElementById("prompt").value;
+  gen = await api("/generate", { prompt, max_tokens: nTok() });
+  renderTokens();
+  const el = document.getElementById("diff-body");
+  el.innerHTML = `<div class="diff-block"><div class="k">before</div><div class="diff-before">${(beforeText||'').replace(/</g,'&lt;')}</div></div>
+    <div class="diff-block"><div class="k">after</div><div class="diff-after">${(gen.text||'').replace(/</g,'&lt;')}</div></div>`;
+}
+
+async function resetBase() {
+  if (!confirm("Restore the model to pristine base weights? This clears all live neuron + feature edits.")) return;
+  document.getElementById("bake-status").innerHTML = '<span class="spin"></span> restoring base…';
+  beforeText = gen ? gen.text : null;
+  try {
+    await api("/reset-base");
+    sel.clear();
+    await refreshStack();
+    if (gen) await regenForDiff();
+    if (selPos != null && gen) selectToken(selPos);
+    document.getElementById("bake-status").textContent = "↩ restored to pristine base";
+  } catch (e) { document.getElementById("bake-status").textContent = "reset failed: " + e.message; }
+}
+
+async function doBake() {
+  const btn = document.getElementById("bake-btn");
+  const name = (document.getElementById("bake-name").value.trim() || "surgery-baked").replace(/[^A-Za-z0-9._-]/g, "-");
+  btn.disabled = true;
+  document.getElementById("bake-status").innerHTML = '<span class="spin"></span> starting…';
+  try { await api("/bake", { name, quant: "Q4_K_M" }); pollBake(); }
+  catch (e) { document.getElementById("bake-status").textContent = "failed: " + e.message; btn.disabled = false; }
+}
+async function pollBake() {
+  let s; try { s = await api("/bake-status"); } catch { return; }
+  const el = document.getElementById("bake-status");
+  if (s.running) { el.innerHTML = '<span class="spin"></span> ' + s.msg; setTimeout(pollBake, 1500); }
+  else {
+    document.getElementById("bake-btn").disabled = false;
+    if (s.out) el.innerHTML = '✓ baked → ' + s.out.split(/[\\/]/).pop() + ' (select it in Steering)';
+    else el.textContent = s.msg;
+  }
+}
+
+document.getElementById("prompt").addEventListener("keydown", e => { if (e.key === "Enter") doGenerate(); });
+checkEngine();
+setInterval(checkEngine, 6000);
+</script>
+</body>
+</html>

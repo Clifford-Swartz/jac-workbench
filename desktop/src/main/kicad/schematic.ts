@@ -59,11 +59,49 @@ export class Schematic {
         const sym = extractSymbol(c.lib, c.name);
         return sym ? symbolPins(sym) : [];
     }
-    pinWorld(idOrRef: string, pinNumber: string): { x: number; y: number } | null {
+    // Common functional aliases so agents can say "IN"/"OUT" instead of "VIN"/"VOUT"/"VO"/"VI".
+    private static PIN_ALIASES: Record<string, string[]> = {
+        IN:  ['VIN', 'VI', 'INPUT', 'VINPUT', 'VIN1'],
+        OUT: ['VOUT', 'VO', 'OUTPUT', 'VOUT1'],
+        GND: ['GND', 'VSS', 'AGND', 'PGND', 'SGND'],
+        VCC: ['VCC', 'VDD', 'AVDD', 'PVDD', 'DVDD', '3V3', '5V', 'VSUP'],
+    };
+
+    resolvePin(idOrRef: string, query: string): Pin | null {
         const c = this.find(idOrRef);
         if (!c) return null;
-        const p = this.pinsOf(c).find((pp) => pp.number === pinNumber || pp.name === pinNumber);
+        const pins = this.pinsOf(c);
+        const q = query.trim();
+        const qu = q.toUpperCase();
+        // 1. Exact match on number or name
+        let p = pins.find(pp => pp.number === q || pp.name === q);
+        if (p) return p;
+        // 2. Case-insensitive
+        p = pins.find(pp => pp.number.toUpperCase() === qu || pp.name.toUpperCase() === qu);
+        if (p) return p;
+        // 3. Alias table (e.g. "IN" → try "VIN", "VI", ...)
+        const aliases = Schematic.PIN_ALIASES[qu];
+        if (aliases) { p = pins.find(pp => aliases.includes(pp.name.toUpperCase())); if (p) return p; }
+        // 4. Reverse alias: strip leading V/A from stored name and compare (e.g. "VIN" stored, "IN" asked)
+        p = pins.find(pp => pp.name.toUpperCase().replace(/^[VA]/, '') === qu.replace(/^[VA]/, ''));
+        if (p) return p;
+        // 5. Suffix match: stored "VIN" ends with asked "IN"
+        p = pins.find(pp => pp.name.toUpperCase().endsWith(qu) && qu.length >= 2);
+        if (p) return p;
+        return null;
+    }
+
+    pinWorld(idOrRef: string, pinQuery: string): { x: number; y: number } | null {
+        const c = this.find(idOrRef);
+        if (!c) return null;
+        const p = this.resolvePin(idOrRef, pinQuery);
         return p ? this.pinPos(c, p) : null;
+    }
+
+    pinNames(idOrRef: string): string {
+        const c = this.find(idOrRef);
+        if (!c) return '(component not found)';
+        return this.pinsOf(c).map(p => `${p.name}(${p.number})`).join(', ') || '(no pins)';
     }
 
     addWire(x1: number, y1: number, x2: number, y2: number): Wire {
@@ -153,11 +191,14 @@ ${instances}
 `;
     }
 
-    /** Compact context for the chat. */
+    /** Compact context for the chat — includes pin names so the agent can wire without guessing. */
     context(): string {
         if (!this.components.length) return 'Empty schematic.';
         const lines = [`Schematic: ${this.components.length} components, ${this.wires.length} wires, ${this.labels.length} labels`];
-        for (const c of this.components) lines.push(`  ${c.ref} (${c.libId}) at (${c.x},${c.y}) = ${c.value}`);
+        for (const c of this.components) {
+            const pins = this.pinsOf(c).map(p => `${p.name}(${p.number})`).join(', ');
+            lines.push(`  ${c.ref} (${c.libId}) = ${c.value}  pins: ${pins}`);
+        }
         return lines.join('\n');
     }
     /** Render-ready payload for the native canvas: components with symbol graphics + world pins. */

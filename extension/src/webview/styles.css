@@ -56,6 +56,22 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes welcomeRise {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 0.5; transform: translateY(0); }
+}
+
+@keyframes iconGlow {
+    0%   { opacity: 0; transform: scale(0.8); }
+    65%  { opacity: 1; transform: scale(1.06); box-shadow: 0 0 22px rgba(26, 92, 224, 0.7), 0 0 6px rgba(26, 92, 224, 0.4); }
+    100% { opacity: 1; transform: scale(1); box-shadow: none; }
+}
+
+@keyframes subtitleReveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
@@ -267,6 +283,18 @@ body {
     50% { box-shadow: 0 0 12px rgba(212, 168, 67, 0.6), 0 0 24px rgba(212, 168, 67, 0.25); }
 }
 
+#or-credits {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: inherit;
+    margin: 0 2px;
+    white-space: nowrap;
+}
+
 #model-btn {
     background: var(--input-bg);
     border: 1px solid var(--border);
@@ -461,10 +489,10 @@ body {
     justify-content: center;
     height: 100%;
     gap: 16px;
-    opacity: 0.5;
     padding: 40px 20px;
     text-align: center;
-    animation: fadeIn 0.5s ease;
+    opacity: 0;
+    animation: welcomeRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
 }
 
 .welcome-icon {
@@ -481,6 +509,8 @@ body {
     color: var(--accent);
     font-weight: 700;
     font-family: 'Georgia', serif;
+    opacity: 0;
+    animation: iconGlow 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
 }
 
 .welcome-title {
@@ -491,9 +521,10 @@ body {
 
 .welcome-subtitle {
     font-size: 13px;
-    opacity: 0.6;
     max-width: 280px;
     line-height: 1.5;
+    opacity: 0;
+    animation: subtitleReveal 0.4s ease 0.6s forwards;
 }
 
 /* ── Message layout ────────────────────────────────────────────────────────── */
@@ -1044,6 +1075,70 @@ body {
     position: relative;
 }
 
+#input-area.floating {
+    position: fixed;
+    z-index: 999;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    padding: 0 12px 10px 12px;
+    min-width: 280px;
+    overflow: visible;
+}
+
+#input-drag-handle {
+    height: 18px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+    user-select: none;
+    margin: 0 -12px;
+    border-radius: 12px 12px 0 0;
+}
+#input-drag-handle::after {
+    content: '⠿⠿⠿';
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 3px;
+}
+#input-area:hover #input-drag-handle,
+#input-area.floating #input-drag-handle {
+    opacity: 1;
+}
+#input-area.floating #input-drag-handle {
+    cursor: grab;
+    background: var(--tool-bg);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+}
+
+#input-resize-handle {
+    display: none;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    cursor: se-resize;
+    opacity: 0.4;
+}
+#input-area.floating #input-resize-handle {
+    display: block;
+}
+#input-resize-handle::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--dim);
+    border-bottom: 2px solid var(--dim);
+}
+
 #input-container {
     background: var(--input-secondary-bg);
     border: 1px solid var(--input-border);
@@ -1190,9 +1285,8 @@ body {
     image-rendering: auto;
 }
 @keyframes clippy-idle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(3deg); }
-    75% { transform: rotate(-3deg); }
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%       { transform: translateY(-5px) rotate(6deg); }
 }
 @keyframes clippy-bounce-anim {
     0% { transform: translateY(0); }
@@ -1270,24 +1364,61 @@ body {
 .diff-view {
     font-family: var(--vscode-editor-font-family, 'Menlo', 'Monaco', 'Courier New', monospace);
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.6;
     overflow-x: auto;
     border-radius: 4px;
+    border: 1px solid var(--border);
 }
 
 .diff-line {
+    display: flex;
     white-space: pre;
+    min-width: 0;
+}
+
+.diff-num {
+    flex-shrink: 0;
+    width: 3em;
+    padding: 0 6px;
+    text-align: right;
+    opacity: 0.35;
+    user-select: none;
+    border-right: 1px solid var(--border);
+}
+
+.diff-prefix {
+    flex-shrink: 0;
+    width: 1.4em;
+    padding: 0 3px 0 5px;
+    user-select: none;
+}
+
+.diff-text {
+    flex: 1;
     padding: 0 8px;
 }
 
 .diff-removed {
-    background: var(--vscode-diffEditor-removedLineBackground, rgba(255, 0, 0, 0.15));
-    color: var(--vscode-gitDecoration-deletedResourceForeground, #f44747);
+    background: rgba(255, 60, 60, 0.13);
+    color: var(--vscode-gitDecoration-deletedResourceForeground, #f47474);
 }
 
 .diff-added {
-    background: var(--vscode-diffEditor-insertedLineBackground, rgba(0, 255, 0, 0.1));
+    background: rgba(0, 210, 100, 0.1);
     color: var(--vscode-gitDecoration-addedResourceForeground, #4ec944);
+}
+
+.diff-context {
+    opacity: 0.4;
+}
+
+.diff-hunk {
+    padding: 2px 8px;
+    font-size: 11px;
+    opacity: 0.3;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    user-select: none;
 }
 
 /* ── Permission mode button ────────────────────────────────────────────────── */
@@ -1339,6 +1470,43 @@ body {
     66%  { color: #0088ff; }
     83%  { color: #8800ff; }
     100% { color: #ff0000; }
+}
+
+/* ── Bloodline theme — bypass mode override ───────────────────────────────── */
+
+@keyframes bloodline-flow {
+    from { background-position: 0% 50%; }
+    to   { background-position: 100% 50%; }
+}
+
+:root[data-jac-theme="Bloodline"] #mode-btn.mode-bypassPermissions,
+:root[data-jac-theme="Bloodline"] #mode-btn.mode-bypassPermissions:hover {
+    background: var(--input-bg);
+    border: 1px solid #800020;
+    animation: bloodline-border 4s ease infinite;
+    color: var(--fg);
+    font-weight: 600;
+}
+
+:root[data-jac-theme="Bloodline"] #send-btn.mode-bypassPermissions {
+    background: var(--input-bg);
+    border: 1px solid #800020;
+    animation: bloodline-border 4s ease infinite;
+    color: var(--fg);
+}
+
+:root[data-jac-theme="Bloodline"] #input-container.mode-bypassPermissions {
+    border-image: none;
+    background: none;
+    animation: none;
+    border-color: #800020;
+    transition: border-color 2s ease;
+    animation: bloodline-border 4s ease infinite;
+}
+
+@keyframes bloodline-border {
+    0%, 100% { border-color: #800020; }
+    50%       { border-color: #1a5ce0; }
 }
 
 /* ── Permission request blocks ────────────────────────────────────────────── */

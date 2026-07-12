@@ -13,7 +13,8 @@
     "assets/**/*"
   ],
   "extraResources": [
-    { "from": "resources/llama-server", "to": "llama-server" }
+    { "from": "resources/llama-server", "to": "llama-server" },
+    { "from": "resources/steer", "to": "steer" }
   ],
   "afterPack": "scripts/fix-asar-hash.js",
   "mac": {

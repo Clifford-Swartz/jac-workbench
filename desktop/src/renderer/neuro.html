@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; frame-src 'self'; child-src 'self';">
+<title>Steering &amp; Surgery</title>
+<style>
+:root { --app-bg:#1e1e1e; --app-panel:#191919; --app-fg:#d4d4d4; --app-dim:#888; --app-border:#2b2b2b; --app-accent:#d97757; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; }
+body { background:var(--app-bg); color:var(--app-fg); font-family:system-ui,-apple-system,sans-serif;
+       display:flex; flex-direction:column; overflow:hidden; }
+
+/* ── cockpit mode bar ── */
+#modebar { display:flex; align-items:center; gap:12px; padding:8px 12px; flex-shrink:0;
+           background:var(--app-panel); border-bottom:1px solid var(--app-border); }
+.seg { display:inline-flex; border:1px solid var(--app-border); border-radius:7px; overflow:hidden; background:var(--app-bg); }
+.seg button { background:none; border:none; color:var(--app-dim); padding:6px 16px; font-size:12px; font-weight:600;
+              cursor:pointer; font-family:inherit; transition:all .12s; display:flex; align-items:center; gap:6px; }
+.seg button:not(:first-child) { border-left:1px solid var(--app-border); }
+.seg button:hover { color:var(--app-fg); }
+.seg button.on { background:var(--app-accent); color:#fff; }
+#mode-status { font-size:11px; color:var(--app-dim); display:flex; align-items:center; gap:6px; }
+.spin { display:inline-block; width:11px; height:11px; border:2px solid var(--app-border); border-top-color:var(--app-accent);
+        border-radius:50%; animation:sp .7s linear infinite; }
+@keyframes sp { to { transform:rotate(360deg); } }
+.hint-r { margin-left:auto; font-size:10px; color:#666; }
+
+#stage { position:relative; flex:1; min-height:0; }
+iframe { position:absolute; inset:0; width:100%; height:100%; border:none; background:var(--app-bg); display:none; }
+iframe.active { display:block; }
+
+::-webkit-scrollbar { width:11px; height:11px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background-color:color-mix(in srgb, var(--app-accent) 45%, #4a4a4a);
+  border-radius:10px; border:3px solid transparent; background-clip:content-box; }
+::-webkit-scrollbar-thumb:hover { background-color:var(--app-accent); }
+</style>
+</head>
+<body>
+  <div id="modebar">
+    <div class="seg">
+      <button id="m-steer" class="on" onclick="switchMode('steering')">🎚 Steering</button>
+      <button id="m-surg" onclick="switchMode('surgery')">🔬 Surgery</button>
+    </div>
+    <span id="mode-status"></span>
+    <span class="hint-r">one engine at a time — each gets the full GPU</span>
+  </div>
+  <div id="stage">
+    <iframe id="f-steer" class="active" src="steer.html"></iframe>
+    <iframe id="f-surgery" src="surgery.html"></iframe>
+  </div>
+
+<script>
+const jac = window.parent.jac || (window.top && window.top.jac);
+let mode = 'steering';
+let switching = false;
+
+function setStatus(txt, spin) {
+  document.getElementById('mode-status').innerHTML = (spin ? '<span class="spin"></span> ' : '') + (txt || '');
+}
+function reflectButtons() {
+  document.getElementById('m-steer').classList.toggle('on', mode === 'steering');
+  document.getElementById('m-surg').classList.toggle('on', mode === 'surgery');
+}
+function showFrame(which) {
+  document.getElementById('f-steer').classList.toggle('active', which === 'steering');
+  document.getElementById('f-surgery').classList.toggle('active', which === 'surgery');
+}
+
+async function switchMode(target) {
+  if (switching || target === mode) return;
+  if (!jac) { setStatus('bridge unavailable'); return; }
+  switching = true;
+  mode = target; reflectButtons();
+  const label = target === 'surgery' ? 'Surgery' : 'Steering';
+  setStatus('switching to ' + label + ' — loading model' + (target === 'surgery' ? ' (~30s)' : '') + '…', true);
+  try {
+    await jac.engineSetMode(target);
+    // poll until the target engine answers
+    const deadline = Date.now() + 90000;
+    while (Date.now() < deadline) {
+      const s = await jac.engineStatus();
+      if ((target === 'surgery' && s.surgeryUp) || (target === 'steering' && s.steeringUp)) break;
+      await new Promise(r => setTimeout(r, 1500));
+    }
+    // reveal the active panel and force it to re-check its engine
+    showFrame(target);
+    const f = document.getElementById(target === 'surgery' ? 'f-surgery' : 'f-steer');
+    try { f.contentWindow.location.reload(); } catch {}
+    setTimeout(() => themeChild(f), 400);
+    setStatus(label + ' active ✓');
+    setTimeout(() => { if (!switching) setStatus(''); }, 2500);
+  } catch (e) {
+    setStatus('switch failed: ' + (e && e.message || e));
+  } finally { switching = false; }
+}
+
+// ── theme propagation to child iframes (match app theme, react to switches) ──
+const KEYS = ['bg','panel','fg','dim','border','accent'];
+function readPalette() {
+  const cs = getComputedStyle(document.documentElement); const p = {};
+  for (const k of KEYS) { const a = cs.getPropertyValue('--app-'+k).trim(), b = cs.getPropertyValue('--'+k).trim();
+    const v = a || b; if (v) { p['--app-'+k] = v; p['--'+k] = v; } }
+  return p;
+}
+function themeChild(f) { try { const d = f.contentDocument; if (!d) return; const p = readPalette();
+  for (const k in p) if (p[k]) d.documentElement.style.setProperty(k, p[k]); } catch {} }
+function themeAll() { document.querySelectorAll('iframe').forEach(themeChild); }
+document.querySelectorAll('iframe').forEach(f => f.addEventListener('load', () => themeChild(f)));
+new MutationObserver(themeAll).observe(document.documentElement, { attributes:true, attributeFilter:['style','data-jac-theme'] });
+themeAll(); setTimeout(themeAll, 150); setTimeout(themeAll, 600); setTimeout(themeAll, 1500);
+
+// Sync initial mode with whatever's actually running.
+(async () => {
+  if (!jac) return;
+  try { const s = await jac.engineStatus(); mode = s.mode || 'steering'; reflectButtons(); showFrame(mode); } catch {}
+})();
+</script>
+</body>
+</html>

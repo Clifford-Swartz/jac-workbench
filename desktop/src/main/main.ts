@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell, Notification } from 'electron';
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell, Notification, net } from 'electron';
 import type { BrowserWindow as BrowserWindowType, Tray as TrayType } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -36,6 +36,14 @@ const DEFAULT_CONFIG = {
     mcpToolPermissions: {} as Record<string, 'allow' | 'ask' | 'deny'>,
     editorTheme: 'One Dark',   // CodeMirror theme for the file editor
     lastCwd: '',               // last project folder — restores the history scope across restarts
+    // Behavior steering — control vectors applied to the local llama-server at launch.
+    // steerVectors: named directions the user has generated; steerScales: active scale per vector id
+    // (0 = off). At spawn we append one --control-vector-scaled flag per non-zero scale.
+    steerVectors: [] as Array<{ id: string; name: string; path: string }>,
+    steerScales: {} as Record<string, number>,
+    steerPresets: [] as Array<{ name: string; scales: Record<string, number> }>,  // named personality slider combos
+    steerHfModelPath: '',   // HF-format weights repeng reads to generate vectors (empty = not set up)
+    localNgl: 999,          // GPU layers to offload for the local model (0 = CPU-only; some laptop GPUs OOM at 999)
 };
 
 function loadConfig(): typeof DEFAULT_CONFIG {
@@ -375,6 +383,49 @@ const MCP_BUILTINS: McpTool[] = [
         description: 'Run KiCad\'s real Electrical Rule Check on the current schematic and return the report.',
         inputSchema: { type: 'object', properties: {} },
     },
+    // ── PCB physical layout: arrange footprints, route traces, add copper pours ──
+    {
+        server: 'jac', name: 'pcb_auto_arrange', qualifiedName: 'jac__pcb_auto_arrange',
+        description: 'Auto-arrange all component footprints into a tidy grid on the PCB board. Call this before routing. Moves pcb_x/pcb_y positions; does not affect schematic positions.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'sch_arrange', qualifiedName: 'jac__sch_arrange',
+        description: 'Tidy the SCHEMATIC: spread parts on the sheet with proper spacing (connected parts kept close, decoupling caps by their IC) so symbols do not overlap, then re-route every wire so nets flow around parts instead of through them. ALWAYS call this after building or editing a schematic (adding parts + wiring) so it is readable — a freshly built schematic is packed too tightly otherwise. Moves schematic x/y only; PCB layout is untouched.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'pcb_auto_route', qualifiedName: 'jac__pcb_auto_route',
+        description: 'Auto-route ALL unconnected nets on the PCB using A* pathfinding. Auto-arranges footprints first if not already placed. Returns number of routes added and any nets that failed. Call pcb_ground_plane after to add a GND pour.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'pcb_ground_plane', qualifiedName: 'jac__pcb_ground_plane',
+        description: 'Add a GND copper pour (ground plane) on F.Cu covering the entire board. Best called after routing.',
+        inputSchema: { type: 'object', properties: { net: { type: 'string', description: 'Net name for the pour. Default: GND.' } } },
+    },
+    {
+        server: 'jac', name: 'pcb_export_board', qualifiedName: 'jac__pcb_export_board',
+        description: 'Export the fully routed board to a .kicad_pcb file ready for Gerber generation.',
+        inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Optional output path.' } } },
+    },
+    {
+        server: 'jac', name: 'pcb_board_state', qualifiedName: 'jac__pcb_board_state',
+        description: 'Get current PCB layout state: placed footprint positions, routed track count, unrouted net count, zones. Read-only.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'ui_open_panel', qualifiedName: 'jac__ui_open_panel',
+        description: 'Open or split a JAC panel. Use to show the user relevant views — open schematic after placing components, PCB after routing, CAD after modeling, stocks for market data, etc. ALWAYS include direction="right" to split the panel alongside chat unless the user says otherwise. Panel names: chat, schematic, pcb, cad, music, capture, mcp, models, workflow, stocks, zeldovich, settings.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                panel: { type: 'string', description: 'Panel to open: chat | schematic | pcb | cad | music | capture | mcp | models | workflow | stocks | zeldovich | settings' },
+                direction: { type: 'string', description: 'Split direction: right | left | above | below | tab. Default: right (splits panel alongside chat). Use tab only if the user explicitly asks for a new tab.' },
+            },
+            required: ['panel'],
+        },
+    },
 ];
 
 // CAD kernel bridge (:5050). The chat mutates geometry here; the viewer is told to refresh + focus.
@@ -568,6 +619,36 @@ async function callPcbBuiltin(qualifiedName: string, args: Record<string, unknow
         } else if (qualifiedName === 'jac__pcb_export_kicad') {
             res = await pcbPost('export_kicad', { ...(args.path ? { path: args.path } : {}) });
             if (res.ok) return { text: `Exported KiCad schematic → ${res.path}`, isError: false };
+        } else if (qualifiedName === 'jac__pcb_auto_arrange') {
+            res = await pcbPost('auto_place_pcb', {});
+            notifyPcbActivity();
+            if (!res.ok) return { text: `PCB arrange error: ${res.error}`, isError: true };
+            return { text: `Arranged ${(res as Record<string, unknown>).placed ?? '?'} footprints on the board. Open the PCB panel to see the layout.`, isError: false };
+        } else if (qualifiedName === 'jac__sch_arrange') {
+            res = await pcbPost('auto_place_sch', {});
+            notifyPcbActivity();
+            if (!res.ok) return { text: `Schematic arrange error: ${res.error}`, isError: true };
+            return { text: `Tidied the schematic: spread ${(res as Record<string, unknown>).placed ?? '?'} parts and re-routed the wires. Open the schematic panel to see it.`, isError: false };
+        } else if (qualifiedName === 'jac__pcb_auto_route') {
+            res = await pcbPost('auto_route_all', {});
+            notifyPcbActivity();
+            if (!res.ok) return { text: `Routing error: ${res.error}`, isError: true };
+            const routed = (res as Record<string, unknown>).routed ?? 0;
+            const failed = (res as Record<string, unknown>).failed as string[] ?? [];
+            const failMsg = failed.length ? ` (${failed.length} nets failed: ${failed.slice(0, 5).join(', ')})` : '';
+            return { text: `Routed ${routed} net connections.${failMsg} Open the PCB panel to see traces. Call pcb_ground_plane next to add a GND pour.`, isError: false };
+        } else if (qualifiedName === 'jac__pcb_ground_plane') {
+            const net = String(args.net || 'GND');
+            res = await pcbPost('add_zone', { layer: 0, net });
+            notifyPcbActivity();
+            if (!res.ok) return { text: `Zone error: ${res.error}`, isError: true };
+            return { text: `Added ${net} copper pour on F.Cu.`, isError: false };
+        } else if (qualifiedName === 'jac__pcb_export_board') {
+            res = await pcbPost('export_pcb', { ...(args.path ? { path: args.path } : {}) });
+            if (res.ok) return { text: `Exported board → ${res.path}`, isError: false };
+        } else if (qualifiedName === 'jac__pcb_board_state') {
+            const ctx = await pcbContext();
+            return { text: ctx || 'Empty board.', isError: false };
         } else {
             return { text: `Unknown PCB tool: ${qualifiedName}`, isError: true };
         }
@@ -626,13 +707,14 @@ async function callSchBuiltin(qualifiedName: string, args: Record<string, unknow
             const y = args.y != null ? Number(args.y) : 60 + Math.floor(n / 6) * 25.4;
             const c = schematic.add(libId, e.lib, e.name, value, x, y, Number(args.rotation ?? 0), prefix);
             pushSchematic();
-            return { text: `Added ${c.ref} (${libId}) = ${value}.\n${schematic.context()}`, isError: false };
+            const pins = schematic.pinNames(c.ref);
+            return { text: `Added ${c.ref} (${libId}) = ${value}  pins: ${pins}\n${schematic.context()}`, isError: false };
         }
         if (qualifiedName === 'jac__sch_add_wire') {
             const a = schematic.pinWorld(String(args.from), String(args.from_pin));
             const b = schematic.pinWorld(String(args.to), String(args.to_pin));
-            if (!a) return { text: `Could not resolve pin ${args.from}.${args.from_pin}.`, isError: true };
-            if (!b) return { text: `Could not resolve pin ${args.to}.${args.to_pin}.`, isError: true };
+            if (!a) return { text: `Could not resolve pin ${args.from}.${args.from_pin}. Available pins: ${schematic.pinNames(String(args.from))}`, isError: true };
+            if (!b) return { text: `Could not resolve pin ${args.to}.${args.to_pin}. Available pins: ${schematic.pinNames(String(args.to))}`, isError: true };
             schematic.addWire(a.x, a.y, b.x, b.y);
             if (args.net) schematic.addLabel(String(args.net), a.x, a.y);
             pushSchematic();
@@ -705,6 +787,16 @@ async function callBuiltin(qualifiedName: string, args: Record<string, unknown>)
             await mcpManager.reload(config.mcpServers);
             return { text: `Removed server "${name}".`, isError: false };
         }
+        if (qualifiedName === 'jac__ui_open_panel') {
+            const valid = ['chat','schematic','pcb','cad','music','capture','mcp','models','workflow','stocks','neuro','settings'];
+            const validDirs = ['right','left','above','below','tab'];
+            const panel = String(args.panel ?? '').trim().toLowerCase();
+            const direction = args.direction ? String(args.direction).trim().toLowerCase() : 'right';
+            if (!valid.includes(panel)) return { text: `Unknown panel "${panel}". Valid: ${valid.join(', ')}`, isError: true };
+            if (!validDirs.includes(direction)) return { text: `Unknown direction "${direction}". Valid: ${validDirs.join(', ')}`, isError: true };
+            mainWindow?.webContents.send('relay-message', { type: 'ui_open_panel', panel, direction });
+            return { text: `Opened panel: ${panel}${direction !== 'tab' ? ` (split ${direction})` : ''}`, isError: false };
+        }
         return { text: `Unknown built-in tool: ${qualifiedName}`, isError: true };
     } catch (e) {
         return { text: `Built-in error: ${String((e as Error).message ?? e)}`, isError: true };
@@ -724,6 +816,20 @@ let orAbort: AbortController | null = null;
 const CLAUDE_FALLBACK_IDS = new Set(['sonnet', 'opus', 'haiku']);
 
 function isORModel(id: string): boolean { return id.startsWith('or:'); }
+
+function buildSystemMessage(cwd: string): string {
+    return (
+        `You are JAC, an AI assistant inside a full-featured hardware + software IDE.\n` +
+        (cwd ? `Working directory: ${cwd}\nResolve relative paths against it; begin file searches there.\n` : '') +
+        `\nJAC capabilities:\n` +
+        `- Software: read/write/edit files, run shell commands, search code, debug, refactor.\n` +
+        `- Schematic capture (tools: pcb_*, sch_*): place components, wire nets, run ERC, export .kicad_sch. Use sch_* tools for real KiCad parts.\n` +
+        `- PCB layout (interactive UI in the PCB panel — NOT via AI tools): drag-and-drop footprint placement, interactive trace routing (KiCad WASM router, multi-layer, vias), copper pours/ground planes, DRC with violations on canvas, Gerber/BOM export for JLCPCB/PCBWay. After you build the schematic, tell the user to switch to the PCB panel for physical layout.\n` +
+        `- 3D CAD (tools: cad_*): parametric solid modeling via build123d.\n` +
+        `- To open a panel: use the ui_open_panel tool with direction="right" to split alongside chat (panels: chat, schematic, pcb, cad, music, capture, stocks, mcp, models, workflow, settings).\n` +
+        `IMPORTANT: Do NOT say PCB layout is unavailable — it is fully supported in JAC's PCB panel; you just can't drive it through tools. Direct the user there.`
+    );
+}
 
 // Ollama state
 let ollamaModels: ORModel[] = [];
@@ -746,6 +852,13 @@ function localServerDir(): string {
     return app.isPackaged
         ? path.join(process.resourcesPath, 'llama-server')
         : path.join(__dirname, '../../resources/llama-server');
+}
+// Behavior-steering control vectors live here; the generator runs in a dedicated venv
+// (the global Python's torch/safetensors are unusable on this setup).
+const STEER_DIR = path.join(os.homedir(), '.jac', 'steer');
+function steerPython(): string {
+    const venv = path.join(os.homedir(), '.jac', 'steer-venv', 'Scripts', 'python.exe');
+    return fs.existsSync(venv) ? venv : pythonExe();
 }
 function resolveLocalModel(): string {
     if (config.localModelPath && fs.existsSync(config.localModelPath)) return config.localModelPath;
@@ -793,7 +906,7 @@ async function startLocalServer(): Promise<void> {
     const model = resolveLocalModel();
     if (!fs.existsSync(exe) || !model) return; // no binary or no model → nothing to start yet
     try {
-        const args = ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', '999', '-c', '4096'];
+        const args = ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', String(config.localNgl ?? 999), '-c', '4096'];
         // Speculative decoding only pays off when the main is slow-per-token, i.e. big enough to PAGE off
         // NVMe (measured ~2× there). On a model that FITS VRAM it's a wash — the draft's own passes cancel
         // the gain — so don't add the overhead. Honor an explicit draft always; auto-detect only for paged mains.
@@ -807,7 +920,18 @@ async function startLocalServer(): Promise<void> {
             // for DSpark's trained confidence head).
             args.push('-md', draft, '-ngld', '999', '--draft-max', '16', '--draft-min', '1', '--draft-p-min', '0.75');
         }
-        localServerChild = spawn(exe, args, { cwd: localServerDir(), windowsHide: true, stdio: 'ignore' });
+        // Behavior steering: apply active control vectors. llama.cpp's --control-vector-scaled
+        // takes ONE arg "FNAME:SCALE,..." and splits on the first ':', which collides with the
+        // Windows drive-colon — so we run from STEER_DIR and reference vectors by basename.
+        let spawnCwd = localServerDir();
+        const activeVecs = (config.steerVectors || [])
+            .filter(v => (config.steerScales?.[v.id] ?? 0) && v.path && fs.existsSync(v.path));
+        if (activeVecs.length) {
+            const spec = activeVecs.map(v => `${path.basename(v.path)}:${config.steerScales[v.id]}`).join(',');
+            args.push('--control-vector-scaled', spec);
+            spawnCwd = STEER_DIR;   // exe-dir DLLs still load regardless of cwd
+        }
+        localServerChild = spawn(exe, args, { cwd: spawnCwd, windowsHide: true, stdio: 'ignore' });
         localServerChild.on('exit', () => { localServerChild = null; });
     } catch { /* spawn failed */ }
 }
@@ -827,8 +951,13 @@ function setupAutoUpdate(): void {
         mainWindow?.webContents.send('relay-message', { type: 'update_downloaded', version: info.version });
     });
     autoUpdater.on('error', () => { /* offline or no release yet — ignore */ });
-    autoUpdater.checkForUpdates().catch(() => {});
-    setInterval(() => { autoUpdater.checkForUpdates().catch(() => {}); }, 6 * 60 * 60 * 1000); // re-check every 6h
+    let lastCheck = 0;
+    const check = () => { lastCheck = Date.now(); autoUpdater.checkForUpdates().catch(() => {}); };
+    check();                                            // on launch
+    setInterval(check, 15 * 60 * 1000);                 // …then every 15 min
+    app.on('browser-window-focus', () => {              // …and whenever JAC regains focus (throttled to 5 min)
+        if (Date.now() - lastCheck > 5 * 60 * 1000) check();
+    });
 }
 function checkForUpdatesNow(): void {
     if (!app.isPackaged) { try { new Notification({ title: 'JAC', body: 'Updates only work in the installed app.' }).show(); } catch { /* ignore */ } return; }
@@ -933,7 +1062,7 @@ async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
     const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
-        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
+        { role: 'system', content: buildSystemMessage(cwd) },
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -1006,7 +1135,7 @@ async function handleLocalServerQuery(msg: Record<string, unknown>, modelId: str
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
     const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
-        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
+        { role: 'system', content: buildSystemMessage(cwd) },
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -1082,7 +1211,7 @@ async function handleORQuery(msg: Record<string, unknown>, modelId: string): Pro
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
     const cwd = (msg.cwd as string) || activeCwd;
     const messages = [
-        ...(cwd ? [{ role: 'system', content: `The user's current working directory is: ${cwd}\nResolve relative paths against it and begin file searches there — do not scan whole drives.\nEarlier chat sessions for this folder are saved on disk under ~/.claude/projects/ (a subdirectory named after this path); search them with your file tools if the user asks about previous work.` }] : []),
+        { role: 'system', content: buildSystemMessage(cwd) },
         ...rawHistory.map(h => ({ role: h.role, content: h.text })),
         { role: 'user', content: prompt },
     ];
@@ -1425,6 +1554,29 @@ function setupRelay(): void {
 let pcbServerChild: ReturnType<typeof spawn> | null = null;
 const PCB_SERVER_URL = 'http://127.0.0.1:5051';
 
+// Remember the last opened/saved board so Save re-targets the SAME file instead of
+// suggesting a generic name (which would overwrite). For a fresh board we suggest a
+// name derived from its main IC, uniquified so nothing clobbers an existing project.
+let currentPcbProject: string | null = null;
+function slugName(s: string): string {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'board';
+}
+async function suggestPcbProjectPath(dir: string): Promise<string> {
+    let base = 'board';
+    try {
+        const r = await fetch(`${PCB_SERVER_URL}/schematic`, { signal: AbortSignal.timeout(1500) });
+        if (r.ok) {
+            const d = await r.json() as { components?: Array<{ type: string }>; library?: Record<string, { name?: string; category?: string }> };
+            const lib = d.library || {};
+            const ic = (d.components || []).find((c) => (lib[c.type] || {}).category === 'ic');
+            if (ic) base = slugName(lib[ic.type]?.name || ic.type);
+        }
+    } catch { /* server down / empty board — fall back to 'board' */ }
+    let name = `${base}.jac`;
+    for (let i = 2; fs.existsSync(path.join(dir, name)); i++) name = `${base}-${i}.jac`;
+    return path.join(dir, name);
+}
+
 /** Resolve a real Python interpreter (the PATH `python` is often the MS Store stub). */
 function pythonExe(): string {
     const home = os.homedir();
@@ -1465,6 +1617,24 @@ function stopPcbServer(): void {
     pcbServerChild = null;
 }
 
+// ZELDOVICH research server (:5056) — provenance-tiered ledger + solver bridge.
+let zeldovichServerChild: ReturnType<typeof spawn> | null = null;
+const ZELDOVICH_SERVER_URL = 'http://127.0.0.1:5056';
+const ZELDOVICH_DIR = path.join(os.homedir(), 'Desktop', 'Projects', 'research');
+async function startZeldovichServer(): Promise<void> {
+    try {
+        const r = await fetch(`${ZELDOVICH_SERVER_URL}/health`, { signal: AbortSignal.timeout(1000) });
+        if (r.ok) return;   // already running (reuse)
+    } catch { /* not up yet */ }
+    const script = path.join(ZELDOVICH_DIR, 'zeldovich_server.py');
+    if (!fs.existsSync(script)) { console.log(`[zeldovich] server script not found: ${script}`); return; }
+    try {
+        zeldovichServerChild = spawn(pythonExe(), [script, '5056'], { cwd: ZELDOVICH_DIR, stdio: 'ignore' });
+        zeldovichServerChild.on('exit', () => { zeldovichServerChild = null; });
+        console.log('[zeldovich] server starting on :5056');
+    } catch (e) { console.log(`[zeldovich] spawn failed: ${e}`); }
+}
+
 let cadServerChild: ReturnType<typeof spawn> | null = null;
 const CAD_SERVER_URL = 'http://127.0.0.1:5050';
 
@@ -1485,6 +1655,29 @@ async function startCadServer(): Promise<void> {
 function stopCadServer(): void {
     try { cadServerChild?.kill(); } catch { /* */ }
     cadServerChild = null;
+}
+
+// ── Neural-surgery server (:5055) — HF model resident for neuron attribution + live edits ──
+let surgeryServerChild: ReturnType<typeof spawn> | null = null;
+async function startSurgeryServer(): Promise<void> {
+    try {
+        const r = await fetch('http://127.0.0.1:5055/info', { signal: AbortSignal.timeout(1000) });
+        if (r.ok) return;
+    } catch { /* not up yet */ }
+    const script = app.isPackaged
+        ? path.join(process.resourcesPath, 'steer', 'surgery_server.py')
+        : path.join(__dirname, '..', '..', 'resources', 'steer', 'surgery_server.py');
+    const hf = config.steerHfModelPath;
+    if (!fs.existsSync(script) || !hf || !fs.existsSync(hf)) { console.log('[surgery] script or HF model missing; not starting'); return; }
+    try {
+        surgeryServerChild = spawn(steerPython(), [script, '5055', hf], { windowsHide: true, stdio: 'ignore' });
+        surgeryServerChild.on('exit', () => { surgeryServerChild = null; });
+        console.log('[surgery] server starting on :5055');
+    } catch (e) { console.log(`[surgery] spawn failed: ${e}`); }
+}
+function stopSurgeryServer(): void {
+    try { surgeryServerChild?.kill(); } catch { /* */ }
+    surgeryServerChild = null;
 }
 
 // ── 3D-gen server (:5052) — runs INSIDE WSL where the ROCm/torch env lives ────
@@ -1829,6 +2022,21 @@ app.whenReady().then(() => {
             if (cwd) {                       // starting a conversation here makes this the active project
                 activeCwd = cwd;
                 if (cwd !== lastProject) { lastProject = cwd; config.lastCwd = cwd; saveConfig(config); }
+                // Restart (or auto-create) the filesystem MCP server pointed at the new CWD.
+                const fsCfg = config.mcpServers['filesystem'];
+                if (fsCfg?.command) {
+                    // Keep everything up to and including the package name, replace directory args.
+                    const args = fsCfg.args ?? [];
+                    const pkgIdx = args.findIndex(a => a.includes('server-filesystem'));
+                    const newArgs = pkgIdx >= 0 ? [...args.slice(0, pkgIdx + 1), cwd] : [...args, cwd];
+                    mcpManager.restartServer('filesystem', { ...fsCfg, args: newArgs });
+                } else {
+                    // No filesystem server configured — spin one up automatically.
+                    mcpManager.restartServer('filesystem', {
+                        command: 'npx',
+                        args: ['-y', '@modelcontextprotocol/server-filesystem', cwd],
+                    });
+                }
             }
         }
         wsClient?.sendRaw(m as Record<string, unknown>);
@@ -1990,23 +2198,34 @@ app.whenReady().then(() => {
         return result.canceled ? null : result.filePaths[0];
     });
     // JAC project (.jac) save/open dialogs — the backend does the actual read/write to the chosen path.
+    // PCB projects get a dedicated home under ~/.jac/pcb so boards don't scatter / overwrite each other.
+    const PCB_PROJECT_DIR = path.join(os.homedir(), '.jac', 'pcb');
     ipcMain.handle('project-save-dialog', async () => {
         const { dialog } = require('electron');
+        fs.mkdirSync(PCB_PROJECT_DIR, { recursive: true });
+        // re-target the current project if we have one, else auto-suggest a unique name from the board
+        const suggested = currentPcbProject || await suggestPcbProjectPath(PCB_PROJECT_DIR);
         const r = await dialog.showSaveDialog(mainWindow!, {
             title: 'Save JAC project',
-            defaultPath: 'board.jac',
+            defaultPath: suggested,
             filters: [{ name: 'JAC project', extensions: ['jac'] }, { name: 'All files', extensions: ['*'] }],
         });
-        return r.canceled ? null : r.filePath;
+        if (r.canceled || !r.filePath) return null;
+        currentPcbProject = r.filePath;
+        return r.filePath;
     });
     ipcMain.handle('project-open-dialog', async () => {
         const { dialog } = require('electron');
+        fs.mkdirSync(PCB_PROJECT_DIR, { recursive: true });
         const r = await dialog.showOpenDialog(mainWindow!, {
             title: 'Open JAC project',
+            defaultPath: currentPcbProject || PCB_PROJECT_DIR,
             filters: [{ name: 'JAC project', extensions: ['jac', 'json'] }, { name: 'All files', extensions: ['*'] }],
             properties: ['openFile'],
         });
-        return (r.canceled || !r.filePaths[0]) ? null : r.filePaths[0];
+        if (r.canceled || !r.filePaths[0]) return null;
+        currentPcbProject = r.filePaths[0];
+        return r.filePaths[0];
     });
 
     ipcMain.handle('fs-mkdir', (_e, dir: string, name: string) => {
@@ -2103,6 +2322,241 @@ app.whenReady().then(() => {
         catch { return null; }
     });
 
+    // Banana Slug — system audio capture IPC
+    const CAPTURE_DIR = path.join(os.homedir(), '.jac', 'captures');
+    ipcMain.handle('capture-setup-loopback', () => {
+        const { desktopCapturer, session } = require('electron');
+        mainWindow?.webContents.session.setDisplayMediaRequestHandler((_request, callback) => {
+            desktopCapturer.getSources({ types: ['screen'] }).then((sources: Array<{ id: string }>) => {
+                callback({ video: sources[0] as any, audio: 'loopback' as any });
+            });
+        });
+        return true;
+    });
+    ipcMain.handle('capture-save', (_e, filename: string, data: Uint8Array) => {
+        fs.mkdirSync(CAPTURE_DIR, { recursive: true });
+        const outPath = path.join(CAPTURE_DIR, filename);
+        fs.writeFileSync(outPath, Buffer.from(data));
+        return outPath;
+    });
+    ipcMain.handle('capture-reveal', (_e, filePath: string) => shell.showItemInFolder(filePath));
+
+    // ── Behavior steering (control vectors) ──────────────────────────────────
+    // Apply side: llama-server --control-vector-scaled (C++). Generate side: a mean-difference
+    // extractor in Python (Windows llama.cpp has no cvector-generator), driven by steer_gen.py.
+    function steerScriptPath(): string {
+        return app.isPackaged
+            ? path.join(process.resourcesPath, 'steer', 'steer_gen.py')
+            : path.join(__dirname, '..', '..', 'resources', 'steer', 'steer_gen.py');
+    }
+    // Cockpit: steering and surgery share the GPU — only one engine runs at a time.
+    let engineMode = 'steering';
+    const portUp = async (url: string) => {
+        try { return (await net.fetch(url, { signal: AbortSignal.timeout(1000) })).ok; } catch { return false; }
+    };
+    ipcMain.handle('engine-status', async () => ({
+        mode: engineMode,
+        steeringUp: await portUp(`${LOCAL_SERVER_URL}/v1/models`),
+        surgeryUp: await portUp('http://127.0.0.1:5055/info'),
+    }));
+    ipcMain.handle('engine-set-mode', async (_e, mode: string) => {
+        if (mode === 'surgery') {
+            engineMode = 'surgery';
+            stopLocalServer();                                   // free the GPU
+            await new Promise(r => setTimeout(r, 500));
+            startSurgeryServer();
+        } else {
+            engineMode = 'steering';
+            stopSurgeryServer();                                 // free the GPU
+            await new Promise(r => setTimeout(r, 500));
+            startLocalServer();
+        }
+        return { mode: engineMode };
+    });
+    ipcMain.handle('steer-status', async () => {
+        const exe = path.join(localServerDir(), process.platform === 'win32' ? 'llama-server.exe' : 'llama-server');
+        const model = resolveLocalModel();
+        let serverUp = false;
+        try { serverUp = (await net.fetch(`${LOCAL_SERVER_URL}/v1/models`, { signal: AbortSignal.timeout(1200) })).ok; } catch { /* down */ }
+        return {
+            enginePresent: fs.existsSync(exe),
+            generatorPresent: !!(config.steerHfModelPath && fs.existsSync(config.steerHfModelPath) && fs.existsSync(steerScriptPath())),
+            model: model ? path.basename(model) : '',
+            modelPath: model,
+            vectors: config.steerVectors || [],
+            scales: config.steerScales || {},
+            presets: config.steerPresets || [],
+            serverUp,
+        };
+    });
+    ipcMain.handle('steer-save-preset', (_e, name: string, scales: Record<string, number>) => {
+        const presets = (config.steerPresets || []).filter(p => p.name !== name);
+        presets.push({ name, scales });
+        config.steerPresets = presets;
+        saveConfig(config);
+        return config.steerPresets;
+    });
+    ipcMain.handle('steer-delete-preset', (_e, name: string) => {
+        config.steerPresets = (config.steerPresets || []).filter(p => p.name !== name);
+        saveConfig(config);
+        return config.steerPresets;
+    });
+    ipcMain.handle('steer-set-scale', (_e, id: string, scale: number) => {
+        config.steerScales = { ...(config.steerScales || {}), [id]: scale };
+        saveConfig(config);
+        restartLocalServer();
+        return true;
+    });
+    ipcMain.handle('steer-generate', async (e, opts: { name: string; positive: string[]; negative: string[] }) => {
+        const script = steerScriptPath();
+        const hf = config.steerHfModelPath;
+        if (!fs.existsSync(script)) throw new Error('steer_gen.py not found');
+        if (!hf || !fs.existsSync(hf)) throw new Error('HF model not set up — run steering setup first');
+        fs.mkdirSync(STEER_DIR, { recursive: true });
+        const id = 'v' + Date.now().toString(36);
+        const posFile = path.join(STEER_DIR, `${id}.positive.txt`);
+        const negFile = path.join(STEER_DIR, `${id}.negative.txt`);
+        const outFile = path.join(STEER_DIR, `${id}.gguf`);
+        fs.writeFileSync(posFile, opts.positive.join('\n'), 'utf-8');
+        fs.writeFileSync(negFile, opts.negative.join('\n'), 'utf-8');
+        const args = [script, '--model', hf, '--out', outFile, '--positive', posFile, '--negative', negFile];
+        const send = (line: string) => e.sender.send('steer-generate-progress', line);
+        return await new Promise<{ id: string; name: string; path: string }>((resolve, reject) => {
+            const p = spawn(steerPython(), args, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+            p.stdout?.on('data', (d: Buffer) => send(d.toString()));
+            p.stderr?.on('data', (d: Buffer) => send(d.toString()));
+            p.on('error', reject);
+            p.on('close', (code) => {
+                if (code === 0 && fs.existsSync(outFile)) {
+                    const vec = { id, name: opts.name, path: outFile };
+                    config.steerVectors = [...(config.steerVectors || []), vec];
+                    config.steerScales = { ...(config.steerScales || {}), [id]: 0 };
+                    saveConfig(config);
+                    resolve(vec);
+                } else {
+                    reject(new Error(`generator exited ${code}`));
+                }
+            });
+        });
+    });
+    ipcMain.handle('steer-delete', (_e, id: string) => {
+        const v = (config.steerVectors || []).find(x => x.id === id);
+        if (v) { try { fs.unlinkSync(v.path); } catch { /* ignore */ } }
+        config.steerVectors = (config.steerVectors || []).filter(x => x.id !== id);
+        const s = { ...(config.steerScales || {}) }; delete s[id]; config.steerScales = s;
+        saveConfig(config);
+        restartLocalServer();
+        return true;
+    });
+    ipcMain.handle('steer-test', async (_e, prompt: string, system: string) => {
+        const body = {
+            messages: [
+                ...(system ? [{ role: 'system', content: system }] : []),
+                { role: 'user', content: prompt },
+            ],
+            temperature: 0.7, max_tokens: 300, stream: false,
+        };
+        const r = await net.fetch(`${LOCAL_SERVER_URL}/v1/chat/completions`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+            signal: AbortSignal.timeout(60000),
+        });
+        if (!r.ok) throw new Error(`local server HTTP ${r.status}`);
+        const j = await r.json();
+        return j?.choices?.[0]?.message?.content ?? '';
+    });
+
+    let yfCrumb = '';
+    ipcMain.handle('stocks-fetch', async (_e, url: string) => {
+        if (!url.startsWith('https://query1.finance.yahoo.com/') && !url.startsWith('https://query2.finance.yahoo.com/'))
+            throw new Error('URL not allowed');
+        // net.fetch uses Chromium's networking stack — handles Yahoo Finance cookies automatically
+        const withCrumb = (u: string) => yfCrumb ? u + (u.includes('?') ? '&' : '?') + `crumb=${encodeURIComponent(yfCrumb)}` : u;
+        let res = await net.fetch(withCrumb(url));
+        if (res.status === 401 || res.status === 403) {
+            try {
+                const cr = await net.fetch('https://query2.finance.yahoo.com/v1/test/getcrumb');
+                if (cr.ok) yfCrumb = (await cr.text()).trim();
+            } catch { yfCrumb = ''; }
+            res = await net.fetch(withCrumb(url));
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    });
+    ipcMain.handle('capture-delete', (_e, filename: string) => {
+        const base = path.join(CAPTURE_DIR, path.basename(filename));
+        for (const f of [base, base.replace(/\.wav$/, '.meta.json')]) {
+            try { if (fs.existsSync(f)) fs.unlinkSync(f); } catch { /* ignore */ }
+        }
+    });
+    ipcMain.handle('capture-list', () => {
+        try {
+            if (!fs.existsSync(CAPTURE_DIR)) return [];
+            return fs.readdirSync(CAPTURE_DIR)
+                .filter((f: string) => f.endsWith('.wav'))
+                .map((f: string) => {
+                    const filePath = path.join(CAPTURE_DIR, f);
+                    const stat = fs.statSync(filePath);
+                    const metaPath = path.join(CAPTURE_DIR, f.replace('.wav', '.meta.json'));
+                    let meta: Record<string, unknown> = {};
+                    try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch {}
+                    return { name: f, path: filePath, size: stat.size, mtime: stat.mtimeMs, ...meta };
+                })
+                .sort((a: any, b: any) => b.mtime - a.mtime);
+        } catch { return []; }
+    });
+    ipcMain.handle('capture-read-file', (_e, filePath: string) => {
+        const buf = fs.readFileSync(filePath);
+        return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+    });
+    ipcMain.handle('capture-save-meta', (_e, filename: string, meta: unknown) => {
+        fs.mkdirSync(CAPTURE_DIR, { recursive: true });
+        const metaPath = path.join(CAPTURE_DIR, filename.replace('.wav', '.meta.json'));
+        fs.writeFileSync(metaPath, JSON.stringify(meta));
+    });
+
+    // Lossless capture — ffmpeg WASAPI loopback, bypasses Chromium entirely
+    let losslessProc: ReturnType<typeof spawn> | null = null;
+    let losslessOutPath: string | null = null;
+    ipcMain.handle('capture-check-lossless', () => new Promise<boolean>(resolve => {
+        // Test actual WASAPI loopback support, not just ffmpeg existence
+        const p = spawn('ffmpeg', ['-f', 'wasapi', '-list_devices', 'true', '-i', 'dummy'],
+            { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+        let stderr = '';
+        (p.stderr as NodeJS.ReadableStream | null)?.on('data', (d: Buffer) => stderr += d.toString());
+        p.on('error', () => resolve(false));
+        p.on('close', () => resolve(stderr.includes('wasapi') && !stderr.includes('Unknown input format')));
+    }));
+    ipcMain.handle('capture-start-lossless', (_e, filename: string) => {
+        if (losslessProc) return { error: 'Already recording' };
+        fs.mkdirSync(CAPTURE_DIR, { recursive: true });
+        const outPath = path.join(CAPTURE_DIR, filename);
+        losslessOutPath = outPath;
+        losslessProc = spawn('ffmpeg', [
+            '-y', '-f', 'wasapi', '-loopback', '1', '-i', '',
+            // Viz pipe: 8kHz mono s16le to stdout for live waveform
+            '-map', '0:a', '-c:a', 'pcm_s16le', '-ar', '8000', '-ac', '1', '-f', 's16le', 'pipe:1',
+            // File: full quality 32-bit float PCM
+            '-map', '0:a', '-c:a', 'pcm_f32le', '-ar', '48000', outPath,
+        ], { windowsHide: true, stdio: ['pipe', 'pipe', 'ignore'] });
+        losslessProc.stdout?.on('data', (chunk: Buffer) => {
+            mainWindow?.webContents.send('capture-viz-chunk', new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength));
+        });
+        losslessProc.on('error', (err: Error) => {
+            mainWindow?.webContents.send('capture-lossless-error', err.message);
+            losslessProc = null;
+        });
+        return { path: outPath };
+    });
+    ipcMain.handle('capture-stop-lossless', () => new Promise<string | null>(resolve => {
+        if (!losslessProc) { resolve(null); return; }
+        const proc = losslessProc;
+        const outPath = losslessOutPath;
+        proc.on('close', () => { losslessProc = null; losslessOutPath = null; resolve(outPath); });
+        try { proc.stdin?.write('q'); proc.stdin?.end(); } catch {}
+        setTimeout(() => { try { proc.kill(); } catch {} }, 5000);
+    }));
+    app.on('before-quit', () => { try { losslessProc?.kill(); } catch {} });
+
     mainWindow = createWindow();
 
     // Auto-start the bundled jac-llm-server (serves the configured model), then poll for it.
@@ -2115,10 +2569,14 @@ app.whenReady().then(() => {
     // Start the PCB/schematic tool server (Python stdlib, :5051) + CAD server (build123d, :5050).
     startPcbServer();
     startCadServer();
+    startZeldovichServer();   // ZELDOVICH research ledger + solver (:5056)
     startGen3dServer();
+    // Surgery is NOT auto-started — it's a cockpit mode that shares the GPU with steering,
+    // started on demand via engine-set-mode. Default mode = steering (llama-server).
     app.on('before-quit', stopPcbServer);
     app.on('before-quit', stopCadServer);
     app.on('before-quit', stopGen3dServer);
+    app.on('before-quit', stopSurgeryServer);
     pollOllamaModels();
     pollLocalServerModels();
 

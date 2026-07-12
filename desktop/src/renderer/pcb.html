@@ -61,6 +61,7 @@
     <button id="btn-erc" title="Electrical Rules Check — flags schematic problems (unconnected pins, dangling nets, duplicate references, no ground) before you route.">✔ ERC</button>
     <button id="btn-wire" title="Wire tool — click a pin, then another pin, to connect them into a net. The wires ARE the schematic's electrical connections; they flow into the PCB as the ratsnest.">🔌 Wire: OFF</button>
     <button id="btn-kicad">Export Schematic</button>
+    <button id="btn-sch-arrange" title="Auto-arrange the schematic: spread parts with proper spacing so symbols don't overlap, then re-route the wires around them. Makes an auto-built schematic readable. (Schematic x/y only — the board layout is untouched.)">⌗ Arrange</button>
     <button id="btn-sync" title="Update PCB from Schematic (F8) — pull the latest parts + nets from the schematic and rebuild the ratsnest, just like KiCad's schematic → board sync.">⬇ Update from Schematic</button>
     <button id="btn-arrange" title="Auto-arrange the parts into a tidy grid on the board — sets their PCB positions (the schematic layout is left untouched). Drag parts to fine-tune.">⌗ Arrange</button>
     <button id="btn-plane" title="Pour a ground plane on F.Cu over the board — floods copper on the GND net, connecting every GND pad. KiCad fills it (thermal reliefs + clearances) at export/DRC.">▚ Ground Plane</button>
@@ -99,19 +100,30 @@
   // One backend, two views: 'sch' = draw + wire (define nets), 'pcb' = place + route + fabricate.
   // Both iframes share the :5051 session, so the schematic flows into the PCB (KiCad's model).
   const VIEW = new URLSearchParams(location.search).get('mode') === 'schematic' ? 'sch' : 'pcb';
+  const SCH = VIEW === 'sch';
   const statusEl = document.getElementById('status');
   const svg = document.getElementById('sch-canvas');
   const compsEl = document.getElementById('sch-components');
   const wiresEl = document.getElementById('sch-wires');
   const SCH_COLORS = ['#4daafc','#4ec990','#f0a030','#e06060','#a070d0','#60c0c0'];
+  // KiCad-style schematic palette (light sheet). PCB view keeps the dark board look.
+  const SCH_SHEET = '#f7f7f2', SCH_SYMBOL = '#840000', SCH_PIN = '#8a0000',
+        SCH_WIRE = '#008000', SCH_REF = '#111111', SCH_VAL = '#444444';
   const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // Turn the shared canvas into a KiCad "paper" sheet with a faint dot grid — schematic only.
+  if (SCH) {
+    svg.style.background = SCH_SHEET;
+    const gp = document.getElementById('grid');
+    if (gp) { gp.innerHTML = '<circle cx="10" cy="10" r="0.9" fill="#b6b6c6"></circle>'; }
+  }
 
   let library = {};           // full component library (with svg symbols)
   let compData = [];          // current components
   let selectedIdx = -1;
   let panX = 0, panY = 0, zoom = 1;
   let isPanning = false, panStartX = 0, panStartY = 0;
-  let dragging = false, dragX = 0, dragY = 0;
+  let dragging = false, dragX = 0, dragY = 0, dragOff = [0, 0];
   let lastSig = '';           // signature of the last rendered schematic, for idle cross-tab sync
 
   // Position of a part in the CURRENT view: PCB view uses the board layout (pcb_x/pcb_y),
@@ -166,11 +178,12 @@
       const d = 'M ' + w.points.map(function (p) { return p[0] + ' ' + p[1]; }).join(' L ');
       const path = document.createElementNS(SVGNS, 'path');
       path.setAttribute('d', d); path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', '#4ec990'); path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke', SCH_WIRE); path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke-linejoin', 'round'); path.setAttribute('stroke-linecap', 'round');
       wiresEl.appendChild(path);
       (w.junctions || []).forEach(function (j) {
         const dot = document.createElementNS(SVGNS, 'circle');
-        dot.setAttribute('cx', j[0]); dot.setAttribute('cy', j[1]); dot.setAttribute('r', '4'); dot.setAttribute('fill', '#4ec990');
+        dot.setAttribute('cx', j[0]); dot.setAttribute('cy', j[1]); dot.setAttribute('r', '4'); dot.setAttribute('fill', SCH_WIRE);
         wiresEl.appendChild(dot);
       });
     });
@@ -179,7 +192,8 @@
       const lib = library[comp.type] || {};
       const g = document.createElementNS(SVGNS, 'g');
       g.setAttribute('transform', 'translate(' + px(comp) + ',' + py(comp) + ') rotate(' + (comp.rotation || 0) + ')');
-      g.style.color = SCH_COLORS[idx % SCH_COLORS.length];
+      // KiCad: symbols are a uniform dark red. PCB view keeps the per-part neon colors.
+      g.style.color = SCH ? SCH_SYMBOL : SCH_COLORS[idx % SCH_COLORS.length];
       g.style.cursor = 'pointer';
 
       const fpg = (VIEW === 'pcb') ? (lib.footprint || null) : null;   // real land pattern in PCB view
@@ -193,20 +207,27 @@
       }
       if (!fpg) Object.values(lib.pins || {}).forEach(function (pin) {   // schematic pins (footprint draws its own pads)
         const dot = document.createElementNS(SVGNS, 'circle');
-        dot.setAttribute('cx', pin.x); dot.setAttribute('cy', pin.y); dot.setAttribute('r','3'); dot.setAttribute('fill','#4daafc');
+        dot.setAttribute('cx', pin.x); dot.setAttribute('cy', pin.y); dot.setAttribute('r','3'); dot.setAttribute('fill', SCH ? SCH_PIN : '#4daafc');
         g.appendChild(dot);
       });
       const ref = document.createElementNS(SVGNS, 'text');
-      ref.setAttribute('x','0'); ref.setAttribute('y','-20'); ref.setAttribute('text-anchor','middle'); ref.setAttribute('font-size','10'); ref.setAttribute('fill','#aaa');
+      ref.setAttribute('x','0'); ref.setAttribute('y','-20'); ref.setAttribute('text-anchor','middle'); ref.setAttribute('font-size','10'); ref.setAttribute('fill', SCH ? SCH_REF : '#aaa');
       ref.textContent = comp.ref || ''; g.appendChild(ref);
       const val = document.createElementNS(SVGNS, 'text');
-      val.setAttribute('x','0'); val.setAttribute('y','25'); val.setAttribute('text-anchor','middle'); val.setAttribute('font-size','9'); val.setAttribute('fill','#888');
+      val.setAttribute('x','0'); val.setAttribute('y','25'); val.setAttribute('text-anchor','middle'); val.setAttribute('font-size','9'); val.setAttribute('fill', SCH ? SCH_VAL : '#888');
       val.textContent = (comp.properties || {}).value || ''; g.appendChild(val);
 
+      let hw = (lib.w || 40)/2 + 6, hh = (lib.h || 30)/2 + 6;
+      if (fpg && fpg.bbox) { const b = fpg.bbox;
+        hw = mm2w(Math.max(Math.abs(b[0]), Math.abs(b[2]))) + 4; hh = mm2w(Math.max(Math.abs(b[1]), Math.abs(b[3]))) + 4; }
+      // Transparent grab area over the whole symbol so you can click/drag the part ANYWHERE,
+      // not just on a thin stroke (otherwise clicks fall through to the canvas and pan it).
+      // Sits below the pins (inserted first) so pin clicks still land in wire mode.
+      const hit = document.createElementNS(SVGNS, 'rect');
+      hit.setAttribute('x', String(-hw)); hit.setAttribute('y', String(-hh)); hit.setAttribute('width', String(hw*2)); hit.setAttribute('height', String(hh*2));
+      hit.setAttribute('fill', 'transparent'); hit.setAttribute('pointer-events', 'all'); hit.style.cursor = 'move';
+      g.insertBefore(hit, g.firstChild);
       if (idx === selectedIdx) {
-        let hw = (lib.w || 40)/2 + 6, hh = (lib.h || 30)/2 + 6;
-        if (fpg && fpg.bbox) { const b = fpg.bbox;
-          hw = mm2w(Math.max(Math.abs(b[0]), Math.abs(b[2]))) + 4; hh = mm2w(Math.max(Math.abs(b[1]), Math.abs(b[3]))) + 4; }
         const sel = document.createElementNS(SVGNS, 'rect');
         sel.setAttribute('x', String(-hw)); sel.setAttribute('y', String(-hh)); sel.setAttribute('width', String(hw*2)); sel.setAttribute('height', String(hh*2));
         sel.setAttribute('fill','none'); sel.setAttribute('stroke','#4daafc'); sel.setAttribute('stroke-width','2'); sel.setAttribute('stroke-dasharray','4,2'); sel.setAttribute('rx','3');
@@ -219,8 +240,10 @@
         if (routeOn) { onRouteClick(e); return; }   // in route mode, a click routes (parts are obstacles)
         selectedIdx = capturedIdx; dragging = true; isPanning = false;
         const rect = svg.getBoundingClientRect();
-        dragX = (e.clientX - rect.left - panX) / zoom;
-        dragY = (e.clientY - rect.top - panY) / zoom;
+        const cwx = (e.clientX - rect.left - panX) / zoom, cwy = (e.clientY - rect.top - panY) / zoom;
+        const cc = compData[capturedIdx];
+        dragOff = cc ? [cwx - px(cc), cwy - py(cc)] : [0, 0];   // grab where you clicked — no teleport
+        dragX = cc ? px(cc) : cwx; dragY = cc ? py(cc) : cwy;
         renderSchematic({ components: compData, wires: data.wires });
       }; })(idx));
 
@@ -330,8 +353,8 @@
     }
     if (dragging && selectedIdx >= 0) {
       const rect = svg.getBoundingClientRect();
-      dragX = (e.clientX - rect.left - panX) / zoom;
-      dragY = (e.clientY - rect.top - panY) / zoom;
+      dragX = (e.clientX - rect.left - panX) / zoom - dragOff[0];
+      dragY = (e.clientY - rect.top - panY) / zoom - dragOff[1];
       const g = compsEl.children[selectedIdx];
       if (g) { const c = compData[selectedIdx]; g.setAttribute('transform', 'translate(' + dragX + ',' + dragY + ') rotate(' + ((c && c.rotation) || 0) + ')'); }
       return;
@@ -395,6 +418,20 @@
     if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIdx >= 0) {
       const c = compData[selectedIdx];
       if (c) { selectedIdx = -1; post('remove_component', { id: c.id }).then(function (r) { if (r && r.components) renderSchematic(r); else refresh(); }); }
+    }
+    // R rotates the selected part 90° in place (wires follow)
+    if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && selectedIdx >= 0) {
+      e.preventDefault();
+      const c = compData[selectedIdx];
+      if (c) {
+        const keep = c.id;
+        post('rotate_component', { id: c.id, delta: 90 }).then(function (r) {
+          if (r && r.components) {
+            selectedIdx = r.components.findIndex(function (x) { return x.id === keep; });
+            renderSchematic(r);
+          }
+        });
+      }
     }
   });
 
@@ -919,6 +956,16 @@
     });
   });
 
+  // Tidy the schematic: spread parts (x/y) so symbols don't overlap, then re-route the wires.
+  document.getElementById('btn-sch-arrange').addEventListener('click', function () {
+    statusEl.textContent = 'Tidying schematic…';
+    post('auto_place_sch', {}).then(function (r) {
+      if (r && r.components) { renderSchematic(r); fitView();
+        statusEl.textContent = 'Arranged ' + (r.placed || compData.length) + ' part(s) & re-routed wires.'; }
+      else statusEl.textContent = 'Arrange failed: ' + ((r && r.error) || '?');
+    });
+  });
+
   // --- DRC: run KiCad's real design-rule check, list violations, mark them on the canvas ---
   const DRC_COL = { error: '#dd5647', warning: '#e2b23c' };
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
@@ -1056,13 +1103,13 @@
     const show = function (id, on) { const el = document.getElementById(id); if (el) el.style.display = on ? '' : 'none'; };
     const sch = VIEW === 'sch';
     document.getElementById('tool-title').textContent = sch ? 'Schematic' : 'PCB';
-    show('btn-wire', sch); show('btn-kicad', sch);                                   // schematic-only
+    show('btn-wire', sch); show('btn-kicad', sch); show('btn-sch-arrange', sch);      // schematic-only
     show('btn-sync', !sch); show('btn-arrange', !sch); show('btn-plane', !sch); show('btn-nets', !sch); show('btn-pcb', !sch); show('btn-fab', !sch);   // PCB-only
     show('btn-route', !sch); show('btn-layer', !sch); show('btn-drc', !sch);
     document.getElementById('sch-palette').style.display = sch ? '' : 'none';         // add parts in the schematic only
     if (sch) { const dp = document.getElementById('sch-drc-panel'); if (dp) dp.style.display = 'none'; }   // DRC panel is PCB-only
     document.getElementById('hint').textContent = sch
-      ? 'click a part to place · 🔌 Wire, then click two pins to connect them into a net · drag to move · Del removes'
+      ? 'click a part to place · 🔌 Wire, then click two pins to connect them into a net · drag to move · R rotates · Del removes'
       : '⬇ Update from Schematic (F8) · ⌗ Arrange · ⚡ Route to draw copper (V drops a via to switch layers) · gold dashes = unrouted ratsnest';
   }
 

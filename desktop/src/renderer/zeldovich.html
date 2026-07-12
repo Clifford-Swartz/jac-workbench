@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg:#12121c; --panel:#1a1a2a; --panel2:#20202e; --fg:#e6e6ee; --dim:#8a8aa0; --border:#2c2c3c;
+    --t0:#e8e8f0; --t1:#4ec990; --t2:#4daafc; --t3:#e6a935; --t4:#e0655a; --accent:#e6a935;
+  }
+  html, body { height:100%; }
+  body { background:var(--bg); color:var(--fg); font-family:-apple-system,Segoe UI,sans-serif; display:flex; flex-direction:column; user-select:none; font-size:12px; overflow:hidden; }
+  #top { padding:7px 12px; background:var(--panel); border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #top h1 { font-size:13px; font-weight:700; letter-spacing:.5px; margin-right:2px; }
+  #top .sub { color:var(--dim); font-size:10px; }
+  .spacer { flex:1; }
+  select, input { background:var(--panel2); color:var(--fg); border:1px solid var(--border); border-radius:4px; padding:3px 6px; font-size:11px; font-family:inherit; outline:none; }
+  select:focus, input:focus { border-color:var(--accent); }
+  .btn { background:none; border:1px solid var(--accent); color:var(--accent); padding:4px 11px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:600; }
+  .btn:hover { background:rgba(230,169,53,.12); }
+  .prov { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--t1); border:1px solid rgba(78,201,144,.3); background:rgba(78,201,144,.07); padding:3px 8px; border-radius:20px; }
+  #legend { display:flex; gap:12px; align-items:center; padding:5px 12px; background:var(--panel); border-bottom:1px solid var(--border); font-size:10px; flex-wrap:wrap; }
+  .lg { display:flex; align-items:center; gap:5px; cursor:pointer; opacity:.9; }
+  .lg.off { opacity:.32; }
+  .sw { width:11px; height:11px; border-radius:50%; }
+  .lg .nm { color:var(--dim); }
+  #main { flex:1; display:flex; min-height:0; }
+  #chart-wrap { flex:1.35; position:relative; min-width:0; border-right:1px solid var(--border); }
+  #chart { width:100%; height:100%; display:block; }
+  #side { flex:1; display:flex; flex-direction:column; min-width:0; }
+  #ledger { flex:1; overflow-y:auto; }
+  .row { padding:7px 11px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; align-items:baseline; gap:8px; }
+  .row:hover { background:var(--panel2); }
+  .row.sel { background:rgba(230,169,53,.1); box-shadow:inset 3px 0 0 var(--accent); }
+  .badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; flex-shrink:0; min-width:22px; text-align:center; }
+  .row .rx { font-weight:600; flex-shrink:0; }
+  .row .val { color:var(--dim); font-size:11px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #detail { border-top:1px solid var(--border); background:var(--panel); padding:10px 12px; max-height:40%; overflow-y:auto; font-size:11px; line-height:1.6; }
+  #detail .k { color:var(--dim); }
+  #detail .phrase { color:var(--fg); font-style:italic; margin:4px 0; }
+  #solve { border-top:1px solid var(--border); background:var(--panel2); padding:9px 12px; }
+  #solve h3 { font-size:10px; text-transform:uppercase; letter-spacing:.6px; color:var(--accent); margin-bottom:6px; }
+  #solve .frm { display:grid; grid-template-columns:repeat(5,1fr) auto; gap:5px; align-items:end; }
+  #solve label { display:flex; flex-direction:column; gap:2px; font-size:9px; color:var(--dim); }
+  #solve input, #solve select { width:100%; }
+  #solve-out { margin-top:7px; font-size:11px; line-height:1.5; min-height:16px; }
+  .pred { color:var(--t3); }
+  .regime-ok { color:var(--t1); } .regime-bad { color:var(--t4); }
+  ::-webkit-scrollbar { width:9px; } ::-webkit-scrollbar-thumb { background:#3a3a4c; border-radius:5px; } ::-webkit-scrollbar-track { background:transparent; }
+  .hint { color:var(--dim); font-size:10px; }
+  #status { font-size:10px; color:var(--dim); }
+</style>
+</head>
+<body>
+  <div id="top">
+    <h1>ZELDOVICH</h1><span class="sub">plasma N₂-fixation · provenance ledger</span>
+    <div class="spacer"></div>
+    <span class="hint">show ≤</span>
+    <select id="tier-filter">
+      <option value="4">T4 · everything</option>
+      <option value="3">T3 · model or better</option>
+      <option value="2">T2 · mechanism or better</option>
+      <option value="1">T1 · measured or better</option>
+      <option value="0">T0 · thermodynamic only</option>
+    </select>
+    <span class="prov" title="Every number is a Claim with a provenance tier and is formatted through render(). A T3 prediction can never be shown as a T1 fact.">🔒 provenance enforced</span>
+  </div>
+  <div id="legend"></div>
+  <div id="main">
+    <div id="chart-wrap"><svg id="chart"></svg></div>
+    <div id="side">
+      <div id="ledger"></div>
+      <div id="detail"><span class="hint">Click a point or a row to see its provenance trail.</span></div>
+      <div id="solve">
+        <h3>◇ solve-in-place — the model predicts (always T3)</h3>
+        <div class="frm">
+          <label>reactor<select id="s-reactor"><option>ns-pulsed</option><option>DBD</option><option>gliding arc</option><option>MW</option><option>spark</option></select></label>
+          <label>p (kPa)<input id="s-p" type="number" value="10"></label>
+          <label>N₂ frac<input id="s-n2" type="number" step="0.05" value="0.8"></label>
+          <label>E/N (Td)<input id="s-en" type="number" value="30"></label>
+          <label>T gas (K)<input id="s-tg" type="number" value="350"></label>
+          <button class="btn" id="s-go">Solve</button>
+        </div>
+        <div id="solve-out"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const API = 'http://127.0.0.1:5056';
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const chart = document.getElementById('chart');
+  const ledgerEl = document.getElementById('ledger');
+  const detailEl = document.getElementById('detail');
+  const legendEl = document.getElementById('legend');
+  const TIER_COL = ['--t0','--t1','--t2','--t3','--t4'].map(v => getComputedStyle(document.documentElement).getPropertyValue(v).trim());
+  const REACTORS = ['DBD','gliding arc','MW','ns-pulsed','spark'];
+  const Y_MIN = 0.15, Y_MAX = 12;   // log scale
+  let data = { experiments: [], anchors: [], tiers: {} };
+  let tierOff = {};                 // tier -> hidden
+  let selId = null;
+  let predictions = [];             // solver markers {reactor_type, value, tier, regime, run_id, rendered}
+
+  const col = t => TIER_COL[t] || '#888';
+  async function post(tool, args) { const r = await fetch(API + '/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({tool, args:args||{}}) }); return r.json(); }
+  function el(tag, attrs, parent) { const e = document.createElementNS(SVGNS, tag); for (const k in (attrs||{})) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+  // ---------- scale ----------
+  const L = 46, R = 14, T = 14, B = 34;   // margins
+  function dims() { const r = chart.getBoundingClientRect(); return { w: r.width || 600, h: r.height || 400 }; }
+  function yScale(v, h) { const lv = Math.log10(Math.max(Y_MIN, Math.min(Y_MAX, v))); const lo = Math.log10(Y_MIN), hi = Math.log10(Y_MAX); return T + (1 - (lv - lo) / (hi - lo)) * (h - T - B); }
+  function xBand(rx, w) { const i = Math.max(0, REACTORS.indexOf(rx)); const bw = (w - L - R) / REACTORS.length; return L + bw * (i + 0.5); }
+
+  // ---------- render legend ----------
+  function renderLegend() {
+    legendEl.innerHTML = '';
+    for (let t = 0; t <= 4; t++) {
+      const meta = data.tiers[t] || {};
+      const d = document.createElement('div'); d.className = 'lg' + (tierOff[t] ? ' off' : '');
+      d.innerHTML = `<span class="sw" style="background:${col(t)}"></span><b>T${t}</b> <span class="nm">${(meta.label||'')}</span>`;
+      d.title = meta.phrase || '';
+      d.onclick = () => { tierOff[t] = !tierOff[t]; renderLegend(); draw(); renderLedger(); };
+      legendEl.appendChild(d);
+    }
+    const info = document.createElement('div'); info.style.marginLeft = 'auto'; info.className = 'hint';
+    info.textContent = 'y = specific energy (MJ/mol N, log) · lower = better · click a tier to toggle';
+    legendEl.appendChild(info);
+  }
+
+  // ---------- scatter ----------
+  function draw() {
+    const { w, h } = dims();
+    chart.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    chart.innerHTML = '';
+
+    // y gridlines / ticks at nice log values
+    [0.2,0.3,0.5,1,2,3,5,10].forEach(v => {
+      const y = yScale(v, h);
+      el('line', { x1:L, y1:y, x2:w-R, y2:y, stroke:'#23232f', 'stroke-width':1 }, chart);
+      const tx = el('text', { x:L-6, y:y+3, 'text-anchor':'end', fill:'#6a6a80', 'font-size':9 }, chart); tx.textContent = v;
+    });
+    // anchor bands + lines
+    (data.anchors||[]).forEach(a => {
+      if (a.kind === 'band') {
+        const y1 = yScale(a.y1, h), y0 = yScale(a.y0, h);
+        el('rect', { x:L, y:y1, width:w-L-R, height:Math.abs(y0-y1), fill:col(a.tier), opacity:0.06 }, chart);
+        const t = el('text', { x:w-R-4, y:y1+11, 'text-anchor':'end', fill:col(a.tier), 'font-size':9, opacity:0.75 }, chart); t.textContent = a.label;
+      } else {
+        const y = yScale(a.y, h);
+        el('line', { x1:L, y1:y, x2:w-R, y2:y, stroke:col(a.tier), 'stroke-width':1.3, 'stroke-dasharray': a.tier>=4?'2 3':'6 3', opacity:0.6 }, chart);
+        const t = el('text', { x:L+4, y:y-3, fill:col(a.tier), 'font-size':9, opacity:0.8 }, chart); t.textContent = a.label + ' · ' + a.y;
+      }
+    });
+    // x labels + column separators
+    REACTORS.forEach((rx, i) => {
+      const x = xBand(rx, w);
+      const t = el('text', { x, y:h-B+20, 'text-anchor':'middle', fill:'#9a9ab0', 'font-size':10 }, chart); t.textContent = rx;
+    });
+    // axis title
+    const yt = el('text', { x:12, y:h/2, fill:'#7a7a90', 'font-size':10, transform:`rotate(-90 12 ${h/2})`, 'text-anchor':'middle' }, chart); yt.textContent = 'specific energy — MJ/mol N (log)';
+
+    // experiment dots (deterministic jitter within the reactor column)
+    const bw = (w - L - R) / REACTORS.length;
+    (data.experiments||[]).forEach((e, idx) => {
+      if (e.specific_energy == null || tierOff[e.tier]) return;
+      const jitter = (((idx * 53) % 100) / 100 - 0.5) * bw * 0.55;
+      const x = xBand(e.reactor_type, w) + jitter, y = yScale(e.specific_energy, h);
+      const isT4 = e.tier >= 4, selSel = (e.id === selId);
+      const c = el('circle', { cx:x, cy:y, r: selSel?7:5, fill: isT4?'none':col(e.tier), stroke:col(e.tier), 'stroke-width': isT4?1.6:(selSel?2:0), 'stroke-dasharray': isT4?'2 1.5':'', opacity: 0.92, cursor:'pointer' }, chart);
+      c.addEventListener('click', () => selectExp(e.id));
+      if (selSel) el('circle', { cx:x, cy:y, r:11, fill:'none', stroke:col(e.tier), 'stroke-width':1, opacity:0.5 }, chart);
+    });
+    // solver predictions — amber diamonds, always T3
+    predictions.forEach(p => {
+      if (tierOff[3]) return;
+      const x = xBand(p.reactor_type, w), y = yScale(p.value, h), s = 6;
+      el('path', { d:`M ${x} ${y-s} L ${x+s} ${y} L ${x} ${y+s} L ${x-s} ${y} Z`, fill:'none', stroke:col(3), 'stroke-width':2 }, chart);
+      const t = el('text', { x:x+9, y:y+3, fill:col(3), 'font-size':9 }, chart); t.textContent = 'solved';
+    });
+  }
+
+  // ---------- ledger ----------
+  function renderLedger() {
+    ledgerEl.innerHTML = '';
+    const rows = (data.experiments||[]).filter(e => !tierOff[e.tier]);
+    if (!rows.length) { ledgerEl.innerHTML = '<div class="row"><span class="hint">no rows at this tier filter</span></div>'; return; }
+    rows.forEach(e => {
+      const d = document.createElement('div'); d.className = 'row' + (e.id===selId ? ' sel' : '');
+      d.innerHTML = `<span class="badge" style="background:${col(e.tier)}22;color:${col(e.tier)};border:1px solid ${col(e.tier)}55">T${e.tier}</span>`
+        + `<span class="rx">${e.reactor_type}</span>`
+        + `<span class="val">${e.rendered ? e.rendered.split('—')[0].trim() : '—'}</span>`;
+      d.onclick = () => selectExp(e.id);
+      ledgerEl.appendChild(d);
+    });
+  }
+
+  function selectExp(id) {
+    selId = id;
+    const e = (data.experiments||[]).find(x => x.id === id);
+    if (e) {
+      detailEl.innerHTML = `<div><span class="badge" style="background:${col(e.tier)}22;color:${col(e.tier)};border:1px solid ${col(e.tier)}55">T${e.tier} · ${e.tier_name}</span> <b>${e.reactor_type}</b></div>`
+        + `<div class="phrase">${e.rendered || '—'}</div>`
+        + `<div><span class="k">NO conc:</span> ${e.no_concentration!=null?e.no_concentration+' %':'—'} · <span class="k">E/N:</span> ${e.e_over_n!=null?e.e_over_n+' Td':'—'} · <span class="k">p:</span> ${e.pressure_kpa!=null?e.pressure_kpa+' kPa':'—'}</div>`
+        + `<div><span class="k">source:</span> ${e.source_id}</div>`
+        + (e.notes ? `<div><span class="k">notes:</span> ${e.notes}</div>` : '');
+    }
+    renderLedger(); draw();
+  }
+
+  // ---------- solve ----------
+  document.getElementById('s-go').addEventListener('click', async () => {
+    const out = document.getElementById('solve-out');
+    out.innerHTML = '<span class="hint">solving…</span>';
+    const args = { reactor: document.getElementById('s-reactor').value, pressure_kpa: +document.getElementById('s-p').value,
+      n2_frac: +document.getElementById('s-n2').value, e_over_n: +document.getElementById('s-en').value, gas_temperature_k: +document.getElementById('s-tg').value };
+    const r = await post('solve', args);
+    if (!r.ok) { out.innerHTML = `<span class="regime-bad">solve failed: ${r.error||'?'}</span>`; return; }
+    const okReg = /cold\/uniform\/low/.test(r.regime);
+    out.innerHTML = `<span class="pred">${r.rendered_specific_energy}</span><br>`
+      + `<span class="hint">NO:</span> ${r.rendered_no}<br>`
+      + `<span class="hint">regime:</span> <span class="${okReg?'regime-ok':'regime-bad'}">${r.regime}${okReg?'':' ⚠ outside trustworthy envelope'}</span> · <span class="hint">backend:</span> ${r.backend}`;
+    predictions = predictions.filter(p => p.reactor_type !== r.reactor_type).concat([r]);
+    draw();
+  });
+
+  // ---------- load ----------
+  async function load() {
+    const mt = +document.getElementById('tier-filter').value;
+    const r = await post('list_experiments', { max_tier: mt });
+    if (r && r.ok) { data = r; renderLegend(); renderLedger(); draw();
+      if (selId != null && !data.experiments.find(e => e.id === selId)) selId = null; }
+  }
+  document.getElementById('tier-filter').addEventListener('change', load);
+  window.addEventListener('resize', draw);
+  load();
+})();
+</script>
+</body>
+</html>

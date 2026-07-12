@@ -279,7 +279,7 @@
            layout/paint for off-screen messages; `auto` remembers each one's real size to avoid scroll jumps. */
         #messages > * { content-visibility: auto; contain-intrinsic-size: auto 120px; }
 
-        #workflow-frame, #models-frame, #music-frame, #mcp-frame, #pcb-frame, #cad-frame, #settings-frame {
+        #projects-frame, #vesuvius-frame, #workflow-frame, #models-frame, #music-frame, #mcp-frame, #pcb-frame, #cad-frame, #settings-frame, #capture-frame, #stocks-frame, #neuro-frame, #zeldovich-frame {
             display: none;
             flex: 1;
             border: none;
@@ -340,6 +340,12 @@
                     <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
             </button>
+            <button class="activity-btn" id="act-projects" title="Projects — home base" data-panel="projects">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+            </button>
             <button class="activity-btn" id="act-workflow" title="Workflow" data-panel="workflow">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <circle cx="3" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/>
@@ -394,6 +400,34 @@
                     <path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/>
                 </svg>
             </button>
+            <button class="activity-btn" id="act-capture" title="Banana Slug — record system audio" data-panel="capture">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="22"/>
+                    <line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-stocks" title="Stocks" data-panel="stocks">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="18" x2="5" y2="12"/><rect x="3.5" y="12" width="3" height="6" rx=".5" fill="currentColor" stroke="none"/>
+                    <line x1="12" y1="18" x2="12" y2="8"/><rect x="10.5" y="8" width="3" height="5" rx=".5" fill="currentColor" stroke="none"/>
+                    <line x1="19" y1="18" x2="19" y2="5"/><rect x="17.5" y="10" width="3" height="8" rx=".5" fill="none"/>
+                    <line x1="3" y1="20" x2="21" y2="20"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-neuro" title="Steering & Surgery — control-vector personality mixer + neuron-level attribution/editing" data-panel="neuro">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2.2" fill="var(--app-panel)"/>
+                    <line x1="4" y1="17" x2="20" y2="17"/><circle cx="15" cy="17" r="2.2" fill="var(--app-panel)"/>
+                </svg>
+            </button>
+            <button class="activity-btn" id="act-zeldovich" title="ZELDOVICH — plasma N₂-fixation research: provenance-tiered experiment ledger + solver" data-panel="zeldovich">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 3h6"/><path d="M10 3v6l-5 8.5A2 2 0 0 0 6.7 21h10.6a2 2 0 0 0 1.7-3.5L14 9V3"/>
+                    <line x1="7.5" y1="15" x2="16.5" y2="15"/>
+                </svg>
+            </button>
             <button class="activity-btn" id="act-settings" title="Settings" data-panel="settings" style="margin-top:auto">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"/>
@@ -427,6 +461,10 @@
         <!-- View elements live here until dockview adopts them into panels -->
         <div id="view-stash"></div>
 
+        <!-- Projects home base -->
+        <iframe id="projects-frame" src="projects.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+        <iframe id="vesuvius-frame" src="vesuvius.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+
         <!-- Workflow panel -->
         <iframe id="workflow-frame" src="workflow.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
 
@@ -437,6 +475,10 @@
         <iframe id="pcb-frame" src="pcb.html?mode=pcb" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
         <iframe id="schematic-frame" src="pcb.html?mode=schematic" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
         <iframe id="cad-frame" src="cad.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+        <iframe id="capture-frame" src="capture.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+        <iframe id="stocks-frame" src="stocks.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+        <iframe id="neuro-frame" src="neuro.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
+        <iframe id="zeldovich-frame" src="zeldovich.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
         <iframe id="settings-frame" src="settings.html" onload="window.jacThemeIframe && window.jacThemeIframe(this)"></iframe>
 
         <!-- Existing JAC chat UI -->
@@ -759,7 +801,7 @@
             var cadFrame = document.getElementById('cad-frame');
             var savedWidth = 240;
             var activePanel = 'sidebar';
-            var FULL_PANELS = ['workflow', 'models', 'music', 'mcp', 'pcb', 'cad'];
+            var FULL_PANELS = ['workflow', 'models', 'music', 'mcp', 'pcb', 'cad', 'capture'];
 
             function syncActivityHeight() {
                 var header = document.getElementById('header');
@@ -777,6 +819,8 @@
             // ── dockview editor area: chat + tool views as draggable/splittable tabs ──
             var VIEWS = {
                 chat:     { el: 'chat-area',      title: 'Chat' },
+                projects: { el: 'projects-frame', title: 'Projects' },
+                vesuvius: { el: 'vesuvius-frame', title: 'Vesuvius' },
                 workflow: { el: 'workflow-frame', title: 'Workflow' },
                 models:   { el: 'models-frame',   title: 'Local Models' },
                 music:    { el: 'music-frame',    title: 'Music' },
@@ -784,6 +828,10 @@
                 pcb:      { el: 'pcb-frame',       title: 'PCB' },
                 schematic:{ el: 'schematic-frame', title: 'Schematic' },
                 cad:      { el: 'cad-frame',       title: 'CAD' },
+                capture:  { el: 'capture-frame',   title: 'Banana Slug' },
+                stocks:   { el: 'stocks-frame',    title: 'Stocks' },
+                neuro:    { el: 'neuro-frame',     title: 'Steering & Surgery' },
+                zeldovich:{ el: 'zeldovich-frame', title: 'ZELDOVICH' },
                 settings: { el: 'settings-frame',  title: 'Settings' }
             };
             var stash = document.getElementById('view-stash');
@@ -821,10 +869,18 @@
                     if (b.dataset.panel && b.dataset.panel !== 'sidebar') b.classList.toggle('active', b.dataset.panel === name);
                 });
             }
-            function openView(name) {
+            function openView(name, direction) {
+                if (!VIEWS[name]) return;
                 var existing = dvApi.getPanel(name);
-                if (existing) { existing.api.setActive(); }
-                else { dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title }); }
+                if (existing) {
+                    existing.api.setActive();
+                } else if (direction && direction !== 'tab') {
+                    var refPanel = dvApi.activePanel || dvApi.getPanel('chat');
+                    var position = refPanel ? { referencePanel: refPanel.id, direction: direction } : undefined;
+                    dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title, position: position });
+                } else {
+                    dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title });
+                }
                 setActiveBtn(name);
             }
             // Open a file from the explorer in its own editor tab.

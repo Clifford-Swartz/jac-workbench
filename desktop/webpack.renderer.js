@@ -18,6 +18,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'src/renderer/index.html', to: 'index.html' },
+        { from: 'src/renderer/projects.html', to: 'projects.html' },
+        { from: 'src/renderer/vesuvius.html', to: 'vesuvius.html' },
         { from: 'src/renderer/workflow.html', to: 'workflow.html' },
         { from: 'src/renderer/models.html', to: 'models.html' },
         { from: 'src/renderer/music.html', to: 'music.html' },
@@ -26,6 +28,12 @@ module.exports = {
         { from: 'src/renderer/schematic.html', to: 'schematic.html' },
         { from: 'src/renderer/cad.html', to: 'cad.html' },
         { from: 'src/renderer/settings.html', to: 'settings.html' },
+        { from: 'src/renderer/capture.html', to: 'capture.html' },
+        { from: 'src/renderer/stocks.html', to: 'stocks.html' },
+        { from: 'src/renderer/steer.html', to: 'steer.html' },
+        { from: 'src/renderer/surgery.html', to: 'surgery.html' },
+        { from: 'src/renderer/neuro.html', to: 'neuro.html' },
+        { from: 'src/renderer/zeldovich.html', to: 'zeldovich.html' },
         { from: 'node_modules/dockview-core/dist/dockview-core.min.noStyle.js', to: 'dockview-core.js' },
         { from: 'node_modules/dockview-core/dist/styles/dockview.css', to: 'dockview.css' },
         { from: 'assets/seti.woff', to: 'seti.woff' },

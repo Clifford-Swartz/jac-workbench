@@ -404,6 +404,10 @@ def move_component(comp_id: str, x: float, y: float, view: str = "schematic") ->
             c["pcb_x"] = x; c["pcb_y"] = y
         else:
             c["x"] = x; c["y"] = y
+            # re-route the nets touching this part so its wires follow it on the sheet
+            touching = [nn for nn, ms in session["nets"].items() if any(m["comp_id"] == c["id"] for m in ms)]
+            if touching:
+                _rewire_nets(touching)
         return {"ok": True, **get_schematic()}
     return {"ok": False, "error": f"Component not found: {comp_id}"}
 
@@ -425,34 +429,262 @@ def set_component_property(comp_id: str, key: str, value: str) -> dict:
     return {"ok": True, "lcsc": c["properties"].get("lcsc", ""), **get_schematic()}
 
 
+def _cluster_layout(parts, half_ext, set_pos, gap=22, anchor_dx=260, hug_gap=14, seed=(200, 300)):
+    """Shared connectivity-aware placer used by BOTH the board and the schematic.
+
+    ICs are anchors. Decoupling caps (on a power net + sharing a net with an IC) hug that IC.
+    Everything else is placed force-directed-style: parts bonded by shared nets (weighted
+    1/(fanout-1); power nets down-weighted so VCC/GND don't glue everything), each dropped at
+    the weighted centroid of its placed neighbours via a spiral search for a free slot.
+    `half_ext(c)->(hw,hh)` gives a part's half-size; `set_pos(c,x,y)` writes the chosen coords
+    (pcb_x/pcb_y for the board, x/y for the schematic). Returns count placed."""
+    import math
+    from collections import defaultdict
+    comp_by_id = {c["id"]: c for c in parts}
+
+    netinfo = {}; netsof = defaultdict(set); pnets = defaultdict(set)
+    for nn, pins in session.get("nets", {}).items():
+        members = [p["comp_id"] for p in pins if p["comp_id"] in comp_by_id]
+        if len(members) < 2:
+            continue
+        power = net_class_of(nn) == "Power"
+        netinfo[nn] = {"members": members, "power": power}
+        for m in members:
+            netsof[m].add(nn)
+            if power:
+                pnets[m].add(nn)
+    bond = defaultdict(float)
+    for nn, info in netinfo.items():
+        m = info["members"]; f = len(m)
+        w = (1.0 / (f - 1)) * (0.15 if info["power"] else 1.0)
+        for i in range(len(m)):
+            for j in range(i + 1, len(m)):
+                bond[tuple(sorted((m[i], m[j])))] += w
+    def bwt(a, b):
+        return bond.get(tuple(sorted((a, b))), 0.0)
+
+    placed = {}; occupied = []
+    def fits(x, y, hw, hh):
+        for (ox, oy, ohw, ohh) in occupied:
+            if abs(x - ox) < hw + ohw + gap and abs(y - oy) < hh + ohh + gap:
+                return False
+        return True
+    def commit(c, x, y):
+        hw, hh = half_ext(c); placed[c["id"]] = (x, y); occupied.append((x, y, hw, hh)); set_pos(c, x, y)
+    def place_near(c, cx, cy):
+        hw, hh = half_ext(c)
+        if fits(cx, cy, hw, hh):
+            commit(c, cx, cy); return
+        step = max(24, (hw + hh) / 2)
+        for radius in range(1, 90):
+            for ang in range(0, 360, 30):
+                x = cx + radius * step * math.cos(math.radians(ang)); y = cy + radius * step * math.sin(math.radians(ang))
+                if fits(x, y, hw, hh):
+                    commit(c, x, y); return
+        commit(c, cx, cy)
+
+    anchors = [c for c in parts if _lib_of(c["type"]).get("category") == "ic"]
+    hug = {}
+    for c in parts:
+        if _lib_of(c["type"]).get("prefix") != "C" or not pnets[c["id"]]:
+            continue
+        cand = [a for a in anchors if netsof[c["id"]] & netsof[a["id"]]]
+        if cand:
+            hug[c["id"]] = max(cand, key=lambda a: len(netsof[c["id"]] & netsof[a["id"]]))
+
+    for i, a in enumerate(anchors):
+        place_near(a, seed[0] + i * anchor_dx, seed[1])
+    if not placed:
+        s = max(parts, key=lambda c: sum(bwt(c["id"], o["id"]) for o in parts if o is not c))
+        place_near(s, seed[0], seed[1])
+    offs = [(1, 0), (0, -1), (0, 1), (-1, 0), (1, -1), (1, 1), (-1, -1), (-1, 1)]; side = defaultdict(int)
+    for cap_id, a in sorted(hug.items()):
+        c = comp_by_id[cap_id]; ax, ay = placed[a["id"]]
+        ahw, ahh = half_ext(a); chw, chh = half_ext(c)
+        ox, oy = offs[side[a["id"]] % len(offs)]; side[a["id"]] += 1
+        place_near(c, ax + ox * (ahw + chw + hug_gap), ay + oy * (ahh + chh + hug_gap))
+    remaining = [c for c in parts if c["id"] not in placed]
+    while remaining:
+        remaining.sort(key=lambda c: sum(bwt(c["id"], pid) for pid in placed), reverse=True)
+        c = remaining.pop(0); wx = wy = num = 0.0
+        for pid, (px, py) in placed.items():
+            b = bwt(c["id"], pid)
+            if b > 0:
+                wx += px * b; wy += py * b; num += b
+        if num > 0:
+            place_near(c, wx / num, wy / num)
+        else:
+            place_near(c, seed[0] + len(placed) * 40, seed[1] + 340)
+    return len(placed)
+
+
 def auto_place_pcb() -> dict:
-    """Arrange the placed parts into a tidy grid on the board (their PCB positions),
-    spaced by each real footprint's courtyard so nothing overlaps. Leaves the schematic
-    untouched. This is the 'lay out the board' step after pulling parts from the schematic."""
-    parts = [c for c in session["components"]
-             if _lib_of(c["type"]).get("category") != "power"]
+    """Connectivity-aware BOARD placement — decoupling caps hug their IC; no blind grid.
+    Uses real footprint courtyards for spacing. Schematic positions are untouched."""
+    parts = [c for c in session["components"] if _lib_of(c["type"]).get("category") != "power"]
     if not parts:
         return {"ok": True, **get_schematic()}
-    S = 0.05  # world units per mm
-    # cell size = largest footprint courtyard across all parts + a gap, in world units
-    def extent(c):
+    S = 0.05
+    def half(c):
         g = footprint_geometry(c["type"])
         if g and g.get("bbox"):
             b = g["bbox"]
-            return (max(abs(b[0]), abs(b[2])) * 2 / S, max(abs(b[1]), abs(b[3])) * 2 / S)
-        lib = _lib_of(c["type"])
-        return (lib.get("w", 40), lib.get("h", 30))
-    sizes = [extent(c) for c in parts]
-    gap = 60  # world units (~3 mm) between courtyards
-    cell_w = max(s[0] for s in sizes) + gap
-    cell_h = max(s[1] for s in sizes) + gap
-    cols = max(1, int(len(parts) ** 0.5 + 0.999))
-    x0, y0 = 120, 120
-    for i, c in enumerate(parts):
-        r, col = divmod(i, cols)
-        c["pcb_x"] = round(x0 + col * cell_w)
-        c["pcb_y"] = round(y0 + r * cell_h)
+            return (max(abs(b[0]), abs(b[2])) / S, max(abs(b[1]), abs(b[3])) / S)
+        lib = _lib_of(c["type"]); return (lib.get("w", 40) / 2, lib.get("h", 30) / 2)
+    def setp(c, x, y): c["pcb_x"] = round(x); c["pcb_y"] = round(y)
+    n = _cluster_layout(parts, half, setp, gap=22, anchor_dx=260, hug_gap=14, seed=(200, 300))
+    return {"ok": True, "placed": n, **get_schematic()}
+
+
+def auto_place_sch() -> dict:
+    """Tidy the SCHEMATIC sheet: spread parts (x/y) with generous spacing so symbols don't
+    overlap and wires have lanes, then re-route every wire so nets flow around parts instead
+    of straight through them. This is what makes an auto-built schematic readable."""
+    parts = [c for c in session["components"] if _lib_of(c["type"]).get("category") != "power"]
+    if parts:
+        def half(c):
+            cat = _lib_of(c["type"]).get("category")
+            if cat == "ic":
+                return (42, 36)
+            if cat == "connector":
+                return (34, 30)
+            return (38, 20)     # passives — wide enough that pin leads clear neighbours
+        def setp(c, x, y): c["x"] = round(x); c["y"] = round(y)
+        _cluster_layout(parts, half, setp, gap=48, anchor_dx=300, hug_gap=44, seed=(320, 320))
+        _orient_two_pin(parts)     # rotate passives to face their connections (no wire doubling-over)
+    _place_power_flags()
+    _rewire_all()
     return {"ok": True, "placed": len(parts), **get_schematic()}
+
+
+def _pin_world_sch(c, pin):
+    """World (sheet) position of a pin, honouring the component's rotation — matches the
+    renderer's `translate(x,y) rotate(rotation)` transform so wires meet the drawn pins."""
+    import math
+    lib = _lib_of(c["type"])
+    p = lib.get("pins", {}).get(str(pin)) or lib.get("pins", {}).get(pin)
+    if not p:
+        return None
+    r = math.radians(c.get("rotation", 0) or 0)
+    lx, ly = p["x"], p["y"]
+    return (c["x"] + lx * math.cos(r) - ly * math.sin(r),
+            c["y"] + lx * math.sin(r) + ly * math.cos(r))
+
+
+def _orient_two_pin(parts):
+    """Rotate 2-pin parts (R/C/L/D) so their pin axis lines up with where they connect —
+    vertical when the two ends go up/down, horizontal when they go left/right. This is what
+    stops wires from 'doubling over' to reach a pin that faces the wrong way."""
+    by_id = {c["id"]: c for c in session["components"]}
+    for c in parts:
+        if _lib_of(c["type"]).get("prefix") not in ("R", "C", "L", "D"):
+            continue
+        pins = _lib_of(c["type"]).get("pins", {})
+        if len(pins) != 2:
+            continue
+        names = list(pins.keys())
+
+        def target(pin):
+            for nn, members in session["nets"].items():
+                if any(m["comp_id"] == c["id"] and str(m["pin"]) == str(pin) for m in members):
+                    xs, ys = [], []
+                    for m in members:
+                        o = by_id.get(m["comp_id"])
+                        if o and o is not c:
+                            xs.append(o["x"]); ys.append(o["y"])
+                    if xs:
+                        return (sum(xs) / len(xs), sum(ys) / len(ys))
+            return None
+        t1, t2 = target(names[0]), target(names[1])
+        if not t1 or not t2:
+            continue
+        c["rotation"] = 90 if abs(t2[1] - t1[1]) > abs(t2[0] - t1[0]) else 0
+
+
+def _place_power_flags():
+    """Put each power flag (VCC/GND) next to the parts on its net — VCC above, GND below,
+    like a hand-drawn schematic — after the signal parts have been placed."""
+    by_id = {c["id"]: c for c in session["components"]}
+    for pc in session["components"]:
+        lib = _lib_of(pc["type"])
+        if lib.get("category") != "power":
+            continue
+        neigh = []
+        for nn, members in session["nets"].items():
+            if any(m["comp_id"] == pc["id"] for m in members):
+                for m in members:
+                    c = by_id.get(m["comp_id"])
+                    if c and c is not pc and _lib_of(c["type"]).get("category") != "power":
+                        neigh.append(c)
+        if not neigh:
+            continue
+        cx = sum(c["x"] for c in neigh) / len(neigh)
+        cy = sum(c["y"] for c in neigh) / len(neigh)
+        name = (pc.get("properties", {}).get("net") or lib.get("name", "")).upper()
+        pc["x"] = round(cx); pc["y"] = round(cy + (110 if "GND" in name else -110))
+
+
+def _build_net_wires(net_names):
+    """A*-route each named net's pins (chained) against current part positions, appending
+    the resulting wires. Rotation-aware pin positions so wires meet the drawn pins."""
+    by_id = {c["id"]: c for c in session["components"]}
+    for nn in net_names:
+        pts = []
+        for m in session["nets"].get(nn, []):
+            c = by_id.get(m["comp_id"])
+            if not c:
+                continue
+            w = _pin_world_sch(c, m["pin"])
+            if w is None:
+                continue
+            pts.append((w[0], w[1], c["id"]))
+        for i in range(len(pts) - 1):
+            ax, ay, aid = pts[i]; bx, by, bid = pts[i + 1]
+            path = _astar_route(ax, ay, bx, by, _get_obstacles(), exclude_ids={aid, bid})
+            if path and len(path) >= 2:
+                session["wires"].append({"id": _next_id(), "points": path, "net": nn, "junctions": []})
+
+
+def _recompute_junctions():
+    """Junction dots where 3+ wire endpoints coincide; parked on the first wire for drawing."""
+    from collections import defaultdict as _dd
+    tally = _dd(int)
+    for w in session["wires"]:
+        for ep in (w["points"][0], w["points"][-1]):
+            tally[(round(ep[0], 1), round(ep[1], 1))] += 1
+    dots = [[k[0], k[1]] for k, n in tally.items() if n >= 3]
+    for w in session["wires"]:
+        w["junctions"] = []
+    if session["wires"]:
+        session["wires"][0]["junctions"] = dots
+
+
+def _rewire_all():
+    """Rebuild every schematic wire from the net list against current part positions."""
+    session["wires"] = []
+    _build_net_wires(list(session["nets"].keys()))
+    _recompute_junctions()
+
+
+def _rewire_nets(net_names):
+    """Re-route just the given nets (used after rotating/moving one part) — leaves other wires be."""
+    names = set(net_names)
+    session["wires"] = [w for w in session["wires"] if w.get("net") not in names]
+    _build_net_wires([n for n in session["nets"] if n in names])
+    _recompute_junctions()
+
+
+def rotate_component(comp_id, delta=90) -> dict:
+    """Rotate one part in place by `delta` degrees and re-route the nets touching it so its
+    wires follow — the manual 'press R to rotate' action in the schematic editor."""
+    c = next((x for x in session["components"] if x["id"] == comp_id or x["ref"] == comp_id), None)
+    if not c:
+        return {"ok": False, "error": f"Component not found: {comp_id}"}
+    c["rotation"] = (int(c.get("rotation", 0)) + int(delta)) % 360
+    touching = [nn for nn, ms in session["nets"].items() if any(m["comp_id"] == c["id"] for m in ms)]
+    if touching:
+        _rewire_nets(touching)
+    return {"ok": True, "rotation": c["rotation"], **get_schematic()}
 
 
 def _get_obstacles():
@@ -586,11 +818,9 @@ def add_wire(from_comp: str, from_pin: str, to_comp: str, to_pin: str, net_name:
     if not pin_b:
         return {"ok": False, "error": f"Pin {to_pin} not found on {comp_b['ref']}. Available: {list(lib_b.get('pins', {}).keys())}"}
 
-    # Calculate absolute pin positions
-    ax = comp_a["x"] + pin_a["x"]
-    ay = comp_a["y"] + pin_a["y"]
-    bx = comp_b["x"] + pin_b["x"]
-    by = comp_b["y"] + pin_b["y"]
+    # Calculate absolute pin positions (rotation-aware, matching the renderer)
+    ax, ay = _pin_world_sch(comp_a, from_pin)
+    bx, by = _pin_world_sch(comp_b, to_pin)
 
     # Reuse the net a pin already belongs to, so wiring a 3rd pin JOINS the
     # existing net instead of forking a new one (that's how a real net grows).
@@ -736,6 +966,89 @@ def remove_track(track_id: str) -> dict:
 def clear_tracks() -> dict:
     session["tracks"] = []
     return {"ok": True, **get_schematic()}
+
+
+def _pad_world(comp, pin_name) -> tuple:
+    """World-unit coordinates for a named pin on a placed component."""
+    S = 0.05  # world units per mm
+    pcb_x = comp.get("pcb_x", comp["x"])
+    pcb_y = comp.get("pcb_y", comp["y"])
+    geo = footprint_geometry(comp["type"])
+    if geo and pin_name in geo.get("pins", {}):
+        p = geo["pins"][pin_name]
+        return pcb_x + p["x"] / S, pcb_y + p["y"] / S
+    return float(pcb_x), float(pcb_y)
+
+
+def auto_route_all() -> dict:
+    """Auto-place (if needed) then A*-route every unrouted net on F.Cu.
+    Returns the number of routes added and any nets that failed."""
+    # Auto-place if nothing has pcb positions yet
+    has_pcb = any("pcb_x" in c for c in session["components"]
+                  if _lib_of(c["type"]).get("category") != "power")
+    if not has_pcb:
+        auto_place_pcb()
+
+    # Build comp index by id
+    comp_by_id = {c["id"]: c for c in session["components"]}
+
+    # For each net build list of (wx, wy, comp_id, pin_name) for each pin
+    net_endpoints: dict = {}
+    for net_name, pins in session["nets"].items():
+        pts = []
+        for p in pins:
+            comp = comp_by_id.get(p["comp_id"])
+            if not comp or _lib_of(comp["type"]).get("category") == "power":
+                continue
+            wx, wy = _pad_world(comp, p["pin"])
+            pts.append((wx, wy, comp["id"], p["pin"]))
+        if len(pts) >= 2:
+            net_endpoints[net_name] = pts
+
+    # Build obstacle list from placed components
+    obstacles = []
+    MARGIN = 8
+    for c in session["components"]:
+        if _lib_of(c["type"]).get("category") == "power":
+            continue
+        geo = footprint_geometry(c["type"])
+        S = 0.05
+        if geo and geo.get("bbox"):
+            b = geo["bbox"]
+            hw = max(abs(b[0]), abs(b[2])) / S
+            hh = max(abs(b[1]), abs(b[3])) / S
+        else:
+            lib = _lib_of(c["type"])
+            hw = lib.get("w", 40) / 2
+            hh = lib.get("h", 30) / 2
+        pcx = c.get("pcb_x", c["x"])
+        pcy = c.get("pcb_y", c["y"])
+        obstacles.append({"id": c["id"], "x1": pcx - hw - MARGIN, "y1": pcy - hh - MARGIN,
+                           "x2": pcx + hw + MARGIN, "y2": pcy + hh + MARGIN})
+
+    routed, failed = 0, []
+    net_class_widths = {"Power": 8, "Default": 5}
+
+    for net_name, pts in net_endpoints.items():
+        nc = net_class_of(net_name)
+        width = round(net_class_widths.get(nc, 5))
+        # Chain-route: 0→1, 1→2, 2→3, …  (simple daisy-chain MST approx)
+        for i in range(len(pts) - 1):
+            ax, ay, aid, apin = pts[i]
+            bx, by, bid, bpin = pts[i + 1]
+            path = _astar_route(ax, ay, bx, by, obstacles, exclude_ids={aid, bid})
+            if not path or len(path) < 2:
+                failed.append(f"{net_name}[{i}]")
+                continue
+            segs = [{"ax": path[j][0], "ay": path[j][1],
+                     "bx": path[j+1][0], "by": path[j+1][1], "layer": 0}
+                    for j in range(len(path) - 1)]
+            add_track({"segs": segs, "net": net_name, "width": width,
+                       "a": {"compId": aid, "pin": apin},
+                       "b": {"compId": bid, "pin": bpin}})
+            routed += 1
+
+    return {"ok": True, "routed": routed, "failed": failed, **get_schematic()}
 
 
 # ── Copper zones (ground / power planes) ────────────────────────────────────
@@ -967,6 +1280,26 @@ def load_project(path: str) -> dict:
         "Power":   {"track_width": 0.6,  "clearance": 0.2, "via_dia": 0.8, "via_drill": 0.4},
     })
     return {"ok": True, "path": path, **get_schematic()}
+
+
+# ── Autosave: the working board lives only in this process's memory, so mirror it
+# to ~/.jac/pcb/_autosave.jac after every mutation and restore it on startup. A JAC
+# restart (or a crash) then never loses the board. Explicit Save/Open is unaffected. ──
+import os as _os
+_AUTOSAVE_PATH = _os.path.join(_os.path.expanduser("~"), ".jac", "pcb", "_autosave.jac")
+
+def _autosave():
+    try:
+        _os.makedirs(_os.path.dirname(_AUTOSAVE_PATH), exist_ok=True)
+        save_project(_AUTOSAVE_PATH)
+    except Exception as e:
+        log.warning("autosave failed: %s", e)
+
+def _restore_autosave():
+    if _os.path.exists(_AUTOSAVE_PATH) and not session["components"]:
+        r = load_project(_AUTOSAVE_PATH)
+        if r.get("ok"):
+            log.info("restored autosaved board (%d parts)", len(session["components"]))
 
 
 def _net_of_pad(comp_id, pin):
@@ -1512,6 +1845,9 @@ TOOL_MAP = {
     "set_component_property": lambda a: set_component_property(a["id"], a["key"], a["value"]),
     "add_symbol": lambda a: add_symbol(a["def"], a.get("x", 0), a.get("y", 0), a.get("rotation", 0)),
     "auto_place_pcb": lambda a: auto_place_pcb(),
+    "auto_place_sch": lambda a: auto_place_sch(),
+    "rotate_component": lambda a: rotate_component(a["id"], a.get("delta", 90)),
+    "auto_route_all": lambda a: auto_route_all(),
     "add_zone": lambda a: add_zone(a.get("layer", 0), a.get("net", "GND"), a.get("poly")),
     "remove_zone": lambda a: remove_zone(a["id"]),
     "clear_zones": lambda a: clear_zones(),
@@ -1536,6 +1872,10 @@ TOOL_MAP = {
 
 # ── HTTP Server ────────────────────────────────────────────────────────────
 
+# tools that don't change the board — no autosave needed
+_NO_AUTOSAVE = {"get_schematic", "get_context", "get_library", "run_erc",
+                "export_bom", "export_kicad", "export_pcb", "save_project"}
+
 class PcbHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get('Content-Length', 0))
@@ -1549,6 +1889,9 @@ class PcbHandler(BaseHTTPRequestHandler):
         try:
             result = handler(args)
             self.respond(200, result)
+            # mirror the board to disk after any mutation (skip read-only / export / explicit-save tools)
+            if tool_name not in _NO_AUTOSAVE and isinstance(result, dict) and result.get("ok", True):
+                _autosave()
         except Exception:
             self.respond(500, {"ok": False, "error": traceback.format_exc()})
 
@@ -1592,6 +1935,7 @@ def main():
     server = HTTPServer(("127.0.0.1", port), PcbHandler)
     log.info("PCB tool server on http://127.0.0.1:%d", port)
     log.info("Components: %s", list(COMPONENT_LIB.keys()))
+    _restore_autosave()
     server.serve_forever()
 
 

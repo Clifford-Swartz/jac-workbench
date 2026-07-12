@@ -282,6 +282,11 @@ function dispatchToUI(msg: unknown): void {
 window.jac.onRelayMessage((msg) => {
     (window as any).__lastRelayMsg = msg;
     (window as any).__relayMsgCount = ((window as any).__relayMsgCount || 0) + 1;
+    // AI requested a panel switch or split.
+    if (msg && (msg as any).type === 'ui_open_panel') {
+        try { (window as any).jacOpenView?.((msg as any).panel, (msg as any).direction); } catch { /* view not ready */ }
+        return;
+    }
     // Chat drove the CAD kernel: focus the CAD tab and refresh its viewer. Control message, not chat content.
     if (msg && (msg as any).type === 'cad_activity') {
         try { (window as any).jacOpenView?.('cad'); } catch { /* view not ready */ }

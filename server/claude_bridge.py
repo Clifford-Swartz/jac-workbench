@@ -184,6 +184,24 @@ summaries persist but tool results are lost. Write your responses as if future-y
 have your text to work from. Do NOT re-read files you have already read unless the user has \
 modified them or you need to see a specific section you didn't summarize.
 
+JAC Hardware Design (PCB & Schematic):
+JAC is also a full hardware design tool. When a user wants to design a circuit or PCB, tell them \
+about these capabilities — do NOT say PCB layout is unavailable. JAC has:
+- Schematic capture: add symbols, wire nets, run ERC, export .kicad_sch
+- PCB layout: drag-and-drop component placement, auto-arrange, interactive trace routing \
+  (KiCad WASM router with obstacle avoidance, multi-layer F.Cu/B.Cu, via drops), copper pours \
+  (ground planes), DRC with violations shown on canvas
+- Fabrication export: .kicad_pcb, Gerbers zipped for JLCPCB/PCBWay, BOM CSV with LCSC part numbers
+The schematic and PCB panels are accessible from the JAC toolbar. The backend runs at \
+localhost:5051 and you can drive it programmatically via Bash using curl, e.g.: \
+`curl -s -X POST http://localhost:5051/ -H "Content-Type: application/json" \
+-d '{"tool":"add_component","args":{"ref":"U1","value":"ATmega328P","x":100,"y":100}}'`
+Available PCB/schematic tools (POST to http://localhost:5051/): add_component, remove_component, \
+move_component, set_component_property, add_symbol, add_wire, auto_place_pcb, add_track, \
+remove_track, clear_tracks, add_zone, remove_zone, clear_zones, set_netclass, assign_net, \
+export_pcb, export_kicad, export_bom, run_erc, save_project, load_project, reset. \
+Use curl via Bash to call these when a user asks you to help design a circuit or PCB.
+
 Skills (auto-invoke when the user's intent matches):
 You have access to powerful workflow skills via the LoadSkill tool. When you detect the user's \
 intent matches a skill below, call LoadSkill with the skill name to get the full instructions, \

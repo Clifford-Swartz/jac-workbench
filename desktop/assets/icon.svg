@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="grad" gradientUnits="userSpaceOnUse" x1="512" y1="0" x2="512" y2="1024">
+      <stop offset="0%" stop-color="#800020"/>
+      <stop offset="100%" stop-color="#1a5ce0"/>
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#glow)">
+    <!-- Orbital ring -->
+    <circle cx="512" cy="512" r="380" fill="none" stroke="url(#grad)" stroke-width="100"/>
+    <!-- Center nucleus -->
+    <circle cx="512" cy="512" r="90" fill="url(#grad)"/>
+    <!-- Electron dot — top of the ring -->
+    <circle cx="512" cy="132" r="100" fill="url(#grad)"/>
+  </g>
+</svg>

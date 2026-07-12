@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
+<title>Stocks</title>
+<style>
+:root {
+  --bg: #1a1a1a; --bg2: #1e1e1e; --bg3: #252526;
+  --fg: #d4d4d4; --dim: #888; --border: #333;
+  --accent: #4ec9b0; --ok: #4caf50; --err: #f44336;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, sans-serif;
+       font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── Top bar ── */
+#topbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+          border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; }
+#sym-input { background: var(--bg3); border: 1px solid #444; color: var(--fg);
+              padding: 4px 8px; border-radius: 3px; font-size: 12px; outline: none;
+              width: 100px; text-transform: uppercase; letter-spacing: .5px; }
+#sym-input:focus { border-color: var(--accent); }
+#sym-input::placeholder { text-transform: none; letter-spacing: 0; color: #555; }
+.add-btn { background: none; border: 1px solid var(--accent); color: var(--accent);
+            padding: 4px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+.add-btn:hover { background: rgba(78,201,176,.1); }
+#hint { font-size: 11px; color: #555; margin-left: 4px; }
+
+/* ── Main split ── */
+#main { display: flex; flex: 1; min-height: 0; }
+
+/* ── Watchlist ── */
+#watchlist { width: 180px; border-right: 1px solid var(--border);
+             display: flex; flex-direction: column; flex-shrink: 0; }
+#ticker-list { flex: 1; overflow-y: auto; }
+.t-row { display: flex; align-items: center; justify-content: space-between;
+          padding: 8px 10px; border-bottom: 1px solid #222; cursor: pointer; }
+.t-row:hover { background: #252525; }
+.t-row.active { background: #2a2a2a; border-left: 2px solid var(--accent); padding-left: 8px; }
+.t-sym { font-weight: 600; font-size: 12px; letter-spacing: .3px; }
+.t-price { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.t-chg { font-size: 10px; margin-top: 1px; }
+.pos { color: var(--ok); } .neg { color: var(--err); }
+.t-del { background: none; border: none; color: #444; cursor: pointer; font-size: 12px;
+          padding: 2px 3px; opacity: 0; flex-shrink: 0; }
+.t-row:hover .t-del { opacity: 1; }
+.t-del:hover { color: var(--err); }
+#wl-empty { padding: 16px 12px; }
+#wl-empty h3 { font-size: 12px; font-weight: 600; color: var(--fg); margin-bottom: 8px; }
+#wl-empty p { font-size: 11px; color: var(--dim); line-height: 1.6; margin-bottom: 6px; }
+#wl-empty .example { font-size: 11px; color: #555; font-style: italic; }
+
+/* ── Right area ── */
+#chart-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── Header shared by chart + options ── */
+#chart-header { padding: 6px 12px; border-bottom: 1px solid var(--border);
+                display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: var(--bg2); }
+#ch-sym { font-weight: 700; font-size: 14px; }
+#ch-price { font-size: 13px; }
+#ch-chg { font-size: 12px; }
+#ch-delay { font-size: 10px; color: #555; margin-left: 2px; }
+
+/* view toggle */
+.vt-group { display: flex; gap: 2px; margin-left: 8px; }
+.vt-btn { background: none; border: 1px solid #3a3a3a; color: var(--dim);
+           padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+.vt-btn:hover { color: var(--fg); border-color: #555; }
+.vt-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(78,201,176,.08); }
+
+/* timeframe buttons */
+.tf-group { margin-left: auto; display: flex; gap: 3px; }
+.tf-btn { background: none; border: 1px solid #3a3a3a; color: var(--dim);
+           padding: 2px 7px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+.tf-btn:hover { color: var(--fg); border-color: #555; }
+.tf-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(78,201,176,.08); }
+
+/* ── Chart ── */
+#chart-wrap { flex: 1; position: relative; min-height: 0; display: flex; flex-direction: column; }
+#chart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+               flex: 1; gap: 10px; pointer-events: none; }
+#chart-empty .big { font-size: 32px; }
+#chart-empty .msg { font-size: 13px; color: var(--dim); }
+#chart-empty .sub { font-size: 11px; color: #555; }
+canvas#chart { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* ── Options ── */
+#options-wrap { display: none; flex: 1; flex-direction: column; min-height: 0; }
+
+#opt-controls { display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+                border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; }
+#opt-controls label { font-size: 11px; color: var(--dim); }
+#exp-select { background: var(--bg3); border: 1px solid #444; color: var(--fg);
+               padding: 3px 6px; border-radius: 3px; font-size: 12px; outline: none; cursor: pointer; }
+#opt-spot { font-size: 11px; color: var(--dim); margin-left: auto; }
+#opt-loading { font-size: 12px; color: var(--dim); padding: 20px; text-align: center; }
+
+#opt-table-wrap { flex: 1; overflow: auto; }
+table#opt-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+
+#opt-table thead tr:first-child th { padding: 4px 0; font-size: 10px; font-weight: 600;
+                                      letter-spacing: .5px; text-transform: uppercase; }
+#opt-table thead .calls-hdr { color: #26a69a; text-align: right; padding-right: 4px; }
+#opt-table thead .puts-hdr  { color: #ef5350; text-align: left;  padding-left: 4px; }
+#opt-table thead .strike-hdr { color: var(--dim); text-align: center; width: 64px; }
+
+#opt-table thead tr:last-child th { padding: 3px 6px; color: #666; font-weight: 500;
+                                     border-bottom: 1px solid #333; font-size: 10px; }
+#opt-table thead tr:last-child .call-col { text-align: right; }
+#opt-table thead tr:last-child .put-col  { text-align: left; }
+#opt-table thead tr:last-child .strike-col { text-align: center; background: #222; }
+
+#opt-table tbody tr { border-bottom: 1px solid #1f1f1f; cursor: default; }
+#opt-table tbody tr:hover { background: rgba(255,255,255,.03); }
+
+#opt-table tbody .call-col { text-align: right; padding: 3px 6px; }
+#opt-table tbody .put-col  { text-align: left;  padding: 3px 6px; }
+#opt-table tbody .strike-col { text-align: center; padding: 3px 6px; background: #222;
+                                 font-weight: 600; color: var(--fg); }
+
+/* ITM tint */
+#opt-table tbody .itm-call { background: rgba(38,166,154,.06); }
+#opt-table tbody .itm-put  { background: rgba(239,83,80,.06); }
+
+/* ATM row highlight */
+#opt-table tbody .atm-row td.strike-col { color: var(--accent); border-left: 2px solid var(--accent);
+                                            border-right: 2px solid var(--accent); }
+
+.iv-val  { color: #c4a35a; }
+.vol-val { color: #aaa; }
+.oi-val  { color: #777; }
+.bid-val { color: #aaa; }
+.ask-val { color: #aaa; }
+.last-val { color: var(--fg); }
+.dash    { color: #444; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <input id="sym-input" type="text" placeholder="AAPL, TSLA, BTC-USD…" maxlength="12" spellcheck="false">
+  <button class="add-btn" onclick="addTicker()">Add</button>
+  <span id="hint">No account needed — powered by Yahoo Finance</span>
+</div>
+
+<div id="main">
+  <!-- Watchlist -->
+  <div id="watchlist">
+    <div id="ticker-list">
+      <div id="wl-empty">
+        <h3>Your Watchlist</h3>
+        <p>Type any ticker above and hit <strong>Add</strong> or press <strong>Enter</strong>.</p>
+        <p class="example">Stocks: AAPL, TSLA, MSFT<br>Crypto: BTC-USD, ETH-USD<br>Index: ^GSPC, ^DJI</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div id="chart-area">
+    <!-- Shared header -->
+    <div id="chart-header">
+      <span id="ch-sym" style="color:var(--dim)">—</span>
+      <span id="ch-price"></span>
+      <span id="ch-chg"></span>
+      <span id="ch-delay"></span>
+      <div class="vt-group">
+        <button class="vt-btn active" data-view="chart">Chart</button>
+        <button class="vt-btn" data-view="options">Options</button>
+      </div>
+      <div class="tf-group" id="tf-group">
+        <button class="tf-btn" data-tf="D">1D</button>
+        <button class="tf-btn" data-tf="W">1W</button>
+        <button class="tf-btn active" data-tf="M">1M</button>
+        <button class="tf-btn" data-tf="3M">3M</button>
+        <button class="tf-btn" data-tf="Y">1Y</button>
+      </div>
+    </div>
+
+    <!-- Chart view -->
+    <div id="chart-wrap">
+      <div id="chart-empty">
+        <div class="big">📈</div>
+        <div class="msg">Add a ticker to get started</div>
+        <div class="sub">No signup or API key required</div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Options view -->
+    <div id="options-wrap">
+      <div id="opt-controls">
+        <label>Expiry</label>
+        <select id="exp-select"></select>
+        <span id="opt-spot"></span>
+      </div>
+      <div id="opt-table-wrap">
+        <div id="opt-loading">Select a ticker to load option chain</div>
+        <table id="opt-table" style="display:none">
+          <thead>
+            <tr>
+              <th colspan="5" class="calls-hdr">CALLS</th>
+              <th class="strike-hdr">Strike</th>
+              <th colspan="5" class="puts-hdr">PUTS</th>
+            </tr>
+            <tr>
+              <th class="call-col">Last</th>
+              <th class="call-col">Bid</th>
+              <th class="call-col">Ask</th>
+              <th class="call-col">IV%</th>
+              <th class="call-col">Vol</th>
+              <th class="strike-col"></th>
+              <th class="put-col">Vol</th>
+              <th class="put-col">IV%</th>
+              <th class="put-col">Bid</th>
+              <th class="put-col">Ask</th>
+              <th class="put-col">Last</th>
+            </tr>
+          </thead>
+          <tbody id="opt-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const jac = window.jac || window.parent.jac;
+
+let watchlist  = [];
+let prices     = {};
+let selected   = null;
+let currentTf  = 'M';
+let currentView = 'chart';
+let candles    = [];
+let pollTimer  = null;
+let crossX = -1, crossY = -1;
+
+// options state
+let optExpirations = [];
+let optCurrentExp  = null;
+
+const PAD = { t: 12, r: 68, b: 28, l: 8 };
+const TF  = {
+  D:    { interval: '5m',  range: '1d'  },
+  W:    { interval: '60m', range: '5d'  },
+  M:    { interval: '1d',  range: '1mo' },
+  '3M': { interval: '1d',  range: '3mo' },
+  Y:    { interval: '1wk', range: '1y'  },
+};
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  const cfg = await jac.getConfig();
+  watchlist = cfg.stockWatchlist || [];
+  renderList();
+  if (watchlist.length) {
+    refreshQuotes();
+    pollTimer = setInterval(refreshQuotes, 30000);
+  }
+}
+
+// ── View toggle ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.vt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    document.getElementById('tf-group').style.display = currentView === 'chart' ? '' : 'none';
+    document.getElementById('chart-wrap').style.display  = currentView === 'chart'   ? 'flex' : 'none';
+    document.getElementById('options-wrap').style.display = currentView === 'options' ? 'flex' : 'none';
+    if (currentView === 'options' && selected) loadOptions(selected, optCurrentExp);
+  });
+});
+
+// ── Watchlist ─────────────────────────────────────────────────────────────────
+async function addTicker() {
+  const input = document.getElementById('sym-input');
+  const sym = input.value.trim().toUpperCase().replace(/[^A-Z0-9.\-^]/g, '');
+  input.value = '';
+  if (!sym || watchlist.includes(sym)) return;
+  watchlist.push(sym);
+  await jac.saveConfig({ stockWatchlist: watchlist });
+  renderList();
+  fetchQuote(sym);
+  if (!pollTimer) pollTimer = setInterval(refreshQuotes, 30000);
+}
+
+async function removeTicker(sym) {
+  watchlist = watchlist.filter(s => s !== sym);
+  await jac.saveConfig({ stockWatchlist: watchlist });
+  delete prices[sym];
+  if (selected === sym) { selected = null; candles = []; showEmpty(); clearOptionsUI(); }
+  if (!watchlist.length && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('ticker-list');
+  if (!watchlist.length) {
+    list.innerHTML = `<div id="wl-empty">
+      <h3>Your Watchlist</h3>
+      <p>Type any ticker above and hit <strong>Add</strong> or press <strong>Enter</strong>.</p>
+      <p class="example">Stocks: AAPL, TSLA, MSFT<br>Crypto: BTC-USD, ETH-USD<br>Index: ^GSPC, ^DJI</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = watchlist.map(sym => {
+    const q   = prices[sym];
+    const price = q ? '$' + q.c.toFixed(2) : '…';
+    const dp    = q ? (q.dp >= 0 ? '+' : '') + q.dp.toFixed(2) + '%' : '';
+    const cls   = q ? (q.dp >= 0 ? 'pos' : 'neg') : '';
+    return `<div class="t-row${sym === selected ? ' active' : ''}" onclick="selectTicker('${sym}')">
+      <div style="min-width:0;overflow:hidden">
+        <div class="t-sym">${sym}</div>
+        <div class="t-price">${price}</div>
+        <div class="t-chg ${cls}">${dp}</div>
+      </div>
+      <button class="t-del" onclick="event.stopPropagation();removeTicker('${sym}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Yahoo Finance fetch ────────────────────────────────────────────────────────
+async function yfetch(path) {
+  return jac.stocksFetch('https://query1.finance.yahoo.com' + path);
+}
+
+async function fetchQuote(sym) {
+  try {
+    const data = await yfetch(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`);
+    const result = data?.chart?.result?.[0];
+    if (!result) return;
+    const meta = result.meta;
+    const c  = meta.regularMarketPrice ?? meta.chartPreviousClose;
+    const pc = meta.chartPreviousClose ?? meta.regularMarketPreviousClose ?? c;
+    if (!c) return;
+    prices[sym] = { c, pc, dp: pc ? ((c - pc) / pc) * 100 : 0 };
+    renderList();
+    if (sym === selected) updateHeader(sym);
+  } catch {}
+}
+
+function refreshQuotes() { watchlist.forEach(fetchQuote); }
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+async function selectTicker(sym) {
+  selected = sym;
+  optCurrentExp = null;
+  renderList();
+  if (currentView === 'chart') {
+    await loadChart(sym, currentTf);
+  } else {
+    updateHeader(sym);
+    await loadOptions(sym, null);
+  }
+}
+
+async function loadChart(sym, tf) {
+  if (!sym) return;
+  setChartMsg('Loading…');
+  const { interval, range } = TF[tf] || TF.M;
+  try {
+    const data = await yfetch(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=${interval}&range=${range}`);
+    const result = data?.chart?.result?.[0];
+    if (!result?.timestamp?.length) { setChartMsg('No data — check the symbol'); return; }
+    const ts = result.timestamp;
+    const q  = result.indicators.quote[0];
+    candles  = ts.map((t, i) => ({ t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i] }))
+                 .filter(c => c.o != null && c.h != null && c.l != null && c.c != null);
+    if (!candles.length) { setChartMsg('No candle data for this range'); return; }
+    const meta = result.meta;
+    const cv  = meta.regularMarketPrice ?? candles[candles.length - 1].c;
+    const pc  = meta.chartPreviousClose ?? cv;
+    prices[sym] = { c: cv, pc, dp: pc ? ((cv - pc) / pc) * 100 : 0 };
+    document.getElementById('chart-empty').style.display = 'none';
+    document.getElementById('chart').style.display = 'block';
+    document.getElementById('ch-delay').textContent = '(15 min delay)';
+    updateHeader(sym);
+    resizeDraw();
+  } catch { setChartMsg('Could not load chart data'); }
+}
+
+function setChartMsg(msg) {
+  const e = document.getElementById('chart-empty');
+  e.innerHTML = `<div class="msg">${msg}</div>`;
+  e.style.display = 'flex';
+  document.getElementById('chart').style.display = 'none';
+}
+
+function showEmpty() {
+  document.getElementById('chart-empty').innerHTML = `
+    <div class="big">📈</div>
+    <div class="msg">Select a ticker to view chart</div>
+    <div class="sub">Prices refresh every 30 seconds</div>`;
+  document.getElementById('chart-empty').style.display = 'flex';
+  document.getElementById('chart').style.display = 'none';
+  document.getElementById('ch-sym').textContent = '—';
+  document.getElementById('ch-sym').style.color = 'var(--dim)';
+  document.getElementById('ch-price').textContent = '';
+  document.getElementById('ch-chg').textContent = '';
+  document.getElementById('ch-delay').textContent = '';
+}
+
+function updateHeader(sym) {
+  const symEl = document.getElementById('ch-sym');
+  symEl.textContent = sym; symEl.style.color = 'var(--fg)';
+  const q = prices[sym];
+  if (!q) return;
+  document.getElementById('ch-price').textContent = '$' + q.c.toFixed(2);
+  const chgEl = document.getElementById('ch-chg');
+  chgEl.textContent = (q.dp >= 0 ? '+' : '') + q.dp.toFixed(2) + '%';
+  chgEl.style.color = q.dp >= 0 ? 'var(--ok)' : 'var(--err)';
+}
+
+// ── Options ───────────────────────────────────────────────────────────────────
+async function loadOptions(sym, expTs) {
+  document.getElementById('opt-loading').textContent = 'Loading option chain…';
+  document.getElementById('opt-loading').style.display = 'block';
+  document.getElementById('opt-table').style.display = 'none';
+
+  try {
+    const path = expTs
+      ? `/v7/finance/options/${encodeURIComponent(sym)}?date=${expTs}`
+      : `/v7/finance/options/${encodeURIComponent(sym)}`;
+    const data = await yfetch(path);
+    const result = data?.optionChain?.result?.[0];
+    if (!result) { document.getElementById('opt-loading').textContent = 'No options data for this symbol'; return; }
+
+    // populate expiration dropdown (first load only)
+    if (!expTs || !optExpirations.length) {
+      optExpirations = result.expirationDates || [];
+      const sel = document.getElementById('exp-select');
+      sel.innerHTML = optExpirations.map(ts => {
+        const d = new Date(ts * 1000);
+        const label = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+        const daysOut = Math.round((ts * 1000 - Date.now()) / 86400000);
+        const suffix = daysOut <= 0 ? ' (exp)' : daysOut <= 7 ? ` (${daysOut}d)` : '';
+        return `<option value="${ts}">${label}${suffix}</option>`;
+      }).join('');
+      sel.value = expTs || optExpirations[0];
+      optCurrentExp = Number(sel.value);
+    }
+
+    const chain  = result.options?.[0];
+    const calls  = chain?.calls  || [];
+    const puts   = chain?.puts   || [];
+    const spot   = result.quote?.regularMarketPrice || prices[sym]?.c || 0;
+
+    document.getElementById('opt-spot').textContent = spot ? `Spot: $${spot.toFixed(2)}` : '';
+    document.getElementById('ch-delay').textContent = '(15 min delay)';
+    updateHeader(sym);
+
+    renderOptionsTable(calls, puts, spot);
+    document.getElementById('opt-loading').style.display = 'none';
+    document.getElementById('opt-table').style.display = 'table';
+  } catch (e) {
+    document.getElementById('opt-loading').textContent = 'Error: ' + (e?.message || e);
+  }
+}
+
+function fmt(v, decimals = 2) {
+  if (v == null || isNaN(v)) return '<span class="dash">—</span>';
+  return v.toFixed(decimals);
+}
+function fmtVol(v) {
+  if (v == null || isNaN(v) || v === 0) return '<span class="dash">—</span>';
+  return v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(v);
+}
+function fmtIV(v) {
+  if (v == null || isNaN(v)) return '<span class="dash">—</span>';
+  return '<span class="iv-val">' + (v * 100).toFixed(1) + '%</span>';
+}
+
+function renderOptionsTable(calls, puts, spot) {
+  // build strike → row map
+  const strikeSet = new Set([...calls.map(c => c.strike), ...puts.map(p => p.strike)]);
+  const strikes = Array.from(strikeSet).sort((a, b) => a - b);
+
+  const callMap = {};
+  calls.forEach(c => { callMap[c.strike] = c; });
+  const putMap = {};
+  puts.forEach(p => { putMap[p.strike] = p; });
+
+  // find ATM strike
+  let atmStrike = strikes[0];
+  let minDist = Infinity;
+  strikes.forEach(s => { const d = Math.abs(s - spot); if (d < minDist) { minDist = d; atmStrike = s; } });
+
+  const tbody = document.getElementById('opt-body');
+  tbody.innerHTML = strikes.map(strike => {
+    const c = callMap[strike];
+    const p = putMap[strike];
+    const itmCall = spot > strike;
+    const itmPut  = spot < strike;
+    const isAtm   = strike === atmStrike;
+
+    const callCls = itmCall ? 'itm-call' : '';
+    const putCls  = itmPut  ? 'itm-put'  : '';
+    const atmCls  = isAtm   ? 'atm-row'  : '';
+
+    return `<tr class="${atmCls}">
+      <td class="call-col ${callCls}"><span class="last-val">${c ? fmt(c.lastPrice) : '<span class="dash">—</span>'}</span></td>
+      <td class="call-col ${callCls}"><span class="bid-val">${c ? fmt(c.bid) : '<span class="dash">—</span>'}</span></td>
+      <td class="call-col ${callCls}"><span class="ask-val">${c ? fmt(c.ask) : '<span class="dash">—</span>'}</span></td>
+      <td class="call-col ${callCls}">${c ? fmtIV(c.impliedVolatility) : '<span class="dash">—</span>'}</td>
+      <td class="call-col ${callCls}"><span class="vol-val">${c ? fmtVol(c.volume) : '<span class="dash">—</span>'}</span></td>
+      <td class="strike-col">$${strike % 1 === 0 ? strike : strike.toFixed(1)}</td>
+      <td class="put-col ${putCls}"><span class="vol-val">${p ? fmtVol(p.volume) : '<span class="dash">—</span>'}</span></td>
+      <td class="put-col ${putCls}">${p ? fmtIV(p.impliedVolatility) : '<span class="dash">—</span>'}</td>
+      <td class="put-col ${putCls}"><span class="bid-val">${p ? fmt(p.bid) : '<span class="dash">—</span>'}</span></td>
+      <td class="put-col ${putCls}"><span class="ask-val">${p ? fmt(p.ask) : '<span class="dash">—</span>'}</span></td>
+      <td class="put-col ${putCls}"><span class="last-val">${p ? fmt(p.lastPrice) : '<span class="dash">—</span>'}</span></td>
+    </tr>`;
+  }).join('');
+
+  // scroll ATM row into view
+  setTimeout(() => {
+    const atm = tbody.querySelector('.atm-row');
+    if (atm) atm.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }, 50);
+}
+
+function clearOptionsUI() {
+  document.getElementById('opt-loading').textContent = 'Select a ticker to load option chain';
+  document.getElementById('opt-loading').style.display = 'block';
+  document.getElementById('opt-table').style.display = 'none';
+  document.getElementById('exp-select').innerHTML = '';
+  document.getElementById('opt-spot').textContent = '';
+  optExpirations = [];
+}
+
+document.getElementById('exp-select').addEventListener('change', e => {
+  optCurrentExp = Number(e.target.value);
+  if (selected) loadOptions(selected, optCurrentExp);
+});
+
+// ── Canvas chart ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('chart');
+const ctx    = canvas.getContext('2d');
+
+function resizeDraw() {
+  const wrap = document.getElementById('chart-wrap');
+  const dpr  = window.devicePixelRatio || 1;
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  canvas.width  = W * dpr; canvas.height = H * dpr;
+  canvas.style.width  = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw(W, H);
+}
+
+function draw(W, H) {
+  if (!candles.length) return;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1a1a'; ctx.fillRect(0, 0, W, H);
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
+  const n  = candles.length, sp = pw / n;
+  const bw = Math.max(1, Math.min(Math.floor(sp * 0.72), 16));
+
+  let hi = -Infinity, lo = Infinity;
+  candles.forEach(c => { if (c.h > hi) hi = c.h; if (c.l < lo) lo = c.l; });
+  const pad5 = (hi - lo) * 0.05 || 1;
+  hi += pad5; lo -= pad5;
+  const range = hi - lo;
+  const toY = p => PAD.t + ph - ((p - lo) / range) * ph;
+  const toX = i => PAD.l + (i + 0.5) * sp;
+
+  ctx.font = '10px system-ui'; ctx.textAlign = 'left';
+  for (let i = 0; i <= 5; i++) {
+    const p = lo + range * (i / 5), y = toY(p);
+    ctx.strokeStyle = '#252525'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+    ctx.fillStyle = '#666';
+    ctx.fillText('$' + p.toFixed(2), W - PAD.r + 4, y + 3);
+  }
+  ctx.textAlign = 'center'; ctx.fillStyle = '#555';
+  const every = Math.max(1, Math.ceil(n / 6));
+  candles.forEach((c, i) => {
+    if (i % every !== 0) return;
+    const d = new Date(c.t * 1000);
+    const lbl = currentTf === 'D'
+      ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    ctx.fillText(lbl, toX(i), H - PAD.b + 12);
+  });
+  candles.forEach((c, i) => {
+    const x = toX(i), bull = c.c >= c.o, col = bull ? '#26a69a' : '#ef5350';
+    const top = toY(Math.max(c.o, c.c)), ht = Math.max(toY(Math.min(c.o, c.c)) - top, 1);
+    ctx.strokeStyle = col; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, toY(c.h)); ctx.lineTo(x, toY(c.l)); ctx.stroke();
+    if (bull) { ctx.fillStyle = col; ctx.fillRect(x - bw/2, top, bw, ht); }
+    else { ctx.fillStyle = '#1a1a1a'; ctx.fillRect(x - bw/2, top, bw, ht); ctx.strokeRect(x - bw/2, top, bw, ht); }
+  });
+  if (crossX >= PAD.l && crossX <= W - PAD.r && crossY >= PAD.t && crossY <= H - PAD.b) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(crossX, PAD.t); ctx.lineTo(crossX, H - PAD.b); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD.l, crossY); ctx.lineTo(W - PAD.r, crossY); ctx.stroke();
+    ctx.setLineDash([]);
+    const priceAtY = hi - ((crossY - PAD.t) / ph) * range;
+    ctx.fillStyle = '#2a2a2a'; ctx.fillRect(W - PAD.r + 2, crossY - 8, 63, 16);
+    ctx.fillStyle = '#ddd'; ctx.textAlign = 'left'; ctx.font = '10px system-ui';
+    ctx.fillText('$' + priceAtY.toFixed(2), W - PAD.r + 5, crossY + 3);
+    const ci = Math.min(n - 1, Math.max(0, Math.floor((crossX - PAD.l) / sp)));
+    const c  = candles[ci];
+    const tip = `O ${c.o.toFixed(2)}  H ${c.h.toFixed(2)}  L ${c.l.toFixed(2)}  C ${c.c.toFixed(2)}`;
+    ctx.fillStyle = '#1e1e1e'; ctx.fillRect(PAD.l, PAD.t, 245, 17);
+    ctx.fillStyle = '#999'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText(tip, PAD.l + 4, PAD.t + 12);
+  }
+}
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  crossX = e.clientX - r.left; crossY = e.clientY - r.top;
+  if (candles.length && canvas.style.display !== 'none') draw(canvas.clientWidth, canvas.clientHeight);
+});
+canvas.addEventListener('mouseleave', () => {
+  crossX = -1; crossY = -1;
+  if (candles.length && canvas.style.display !== 'none') draw(canvas.clientWidth, canvas.clientHeight);
+});
+new ResizeObserver(() => {
+  if (candles.length && canvas.style.display !== 'none') resizeDraw();
+}).observe(document.getElementById('chart-wrap'));
+
+// ── Timeframe buttons ─────────────────────────────────────────────────────────
+document.querySelectorAll('.tf-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTf = btn.dataset.tf;
+    if (selected) loadChart(selected, currentTf);
+  });
+});
+
+document.getElementById('sym-input').addEventListener('keydown', e => { if (e.key === 'Enter') addTicker(); });
+
+init();
+</script>
+</body>
+</html>

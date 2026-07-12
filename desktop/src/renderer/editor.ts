@@ -28,6 +28,7 @@ import { java } from '@codemirror/lang-java';
 import { php } from '@codemirror/lang-php';
 
 const THEMES: Record<string, Extension> = {
+    'Bloodline': dracula,
     'One Dark': oneDark,
     'Dracula': dracula,
     'Tokyo Night': tokyoNight,
@@ -86,8 +87,9 @@ W.jacSetEditorTheme = (name: string) => {
 };
 
 // ── App-wide theming: derive a UI palette from each editor theme's settings ──────
-interface ThemeSettings { background?: string; foreground?: string; gutterForeground?: string; caret?: string; }
+interface ThemeSettings { background?: string; foreground?: string; gutterForeground?: string; caret?: string; accent?: string; }
 const SETTINGS: Record<string, ThemeSettings> = {
+    'Bloodline': { background: '#160c10', foreground: '#e0ccd0', gutterForeground: '#7a5560', accent: '#1a5ce0' },
     'One Dark': { background: '#282c34', foreground: '#abb2bf', gutterForeground: '#7d8799', caret: '#528bff' },
     'Dracula': defaultSettingsDracula,
     'Tokyo Night': defaultSettingsTokyoNight,
@@ -135,7 +137,7 @@ function appPalette(name: string): Palette {
         panel: mix(bg, toward, light ? 0.045 : 0.06),
         border: mix(bg, toward, light ? 0.13 : 0.15),
         dim: s.gutterForeground || mix(fg, bg, 0.45),
-        accent: '#4daafc',   // brand accent reads on any background
+        accent: s.accent || '#4daafc',
     };
 }
 
@@ -195,9 +197,13 @@ W.jacPaletteFor = (name: string) => appPalette(name);   // palette for any theme
 // Apply a theme to the WHOLE app: UI palette everywhere + editor theme.
 W.jacApplyAppTheme = (name: string) => {
     currentPalette = appPalette(name);
+    document.documentElement.dataset.jacTheme = name;
     applyPaletteTo(document.documentElement, currentPalette);
     document.querySelectorAll('iframe').forEach((f) => {
-        try { const d = (f as HTMLIFrameElement).contentDocument; if (d) applyPaletteTo(d.documentElement, currentPalette); } catch { /* cross-origin */ }
+        try {
+            const d = (f as HTMLIFrameElement).contentDocument;
+            if (d) { d.documentElement.dataset.jacTheme = name; applyPaletteTo(d.documentElement, currentPalette); }
+        } catch { /* cross-origin */ }
     });
     (W.jacSetEditorTheme as (n: string) => void)(name);
     // Recolor the native window controls (min/max/close) to match.
@@ -206,7 +212,10 @@ W.jacApplyAppTheme = (name: string) => {
 };
 // Re-apply the palette to an iframe once it loads (they load asynchronously).
 W.jacThemeIframe = (f: HTMLIFrameElement) => {
-    try { const d = f.contentDocument; if (d) applyPaletteTo(d.documentElement, currentPalette); } catch { /* */ }
+    try {
+        const d = f.contentDocument;
+        if (d) { d.documentElement.dataset.jacTheme = currentTheme; applyPaletteTo(d.documentElement, currentPalette); }
+    } catch { /* */ }
 };
 
 interface JacEditorHandle { getValue(): string; focus(): void; destroy(): void; }

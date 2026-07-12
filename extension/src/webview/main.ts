@@ -132,9 +132,10 @@ updateModeButton();
 // Fallback greetings shown instantly — replaced by Claude-generated ones when connected
 const FALLBACK_GREETINGS = [
     "What shall we build today?",
-    "Ready to make something awesome.",
+    "Blood from stone.",
     "Standing by for brilliance.",
     "Let's ship it.",
+    "Fuck em.",
 ];
 
 function showWelcome(): void {
@@ -1243,6 +1244,76 @@ hiddenFileInput.addEventListener('change', () => {
     hiddenFileInput.value = '';
 });
 
+// ── Draggable / resizable input area ────────────────────────────────────────
+
+const inputArea = document.getElementById('input-area')!;
+
+const dragHandle = document.createElement('div');
+dragHandle.id = 'input-drag-handle';
+dragHandle.title = 'Drag to float · Double-click to dock';
+inputArea.insertBefore(dragHandle, inputArea.firstChild);
+
+const resizeHandle = document.createElement('div');
+resizeHandle.id = 'input-resize-handle';
+inputArea.appendChild(resizeHandle);
+
+type DragMode = 'idle' | 'pending' | 'dragging' | 'resizing';
+let _dragMode: DragMode = 'idle';
+let _ox = 0, _oy = 0;            // offset: mouse relative to element origin
+let _initX = 0, _initY = 0;      // mouse position at mousedown
+let _initLeft = 0, _initTop = 0, _initW = 0; // element position at mousedown
+let _rsW = 0, _rsH = 0, _rsX = 0, _rsY = 0; // resize start state
+
+dragHandle.addEventListener('mousedown', (e: MouseEvent) => {
+    if (e.button !== 0) return;
+    _initX = e.clientX;
+    _initY = e.clientY;
+    const r = inputArea.getBoundingClientRect();
+    _initLeft = r.left; _initTop = r.top; _initW = r.width;
+    _ox = e.clientX - r.left;
+    _oy = e.clientY - r.top;
+    _dragMode = inputArea.classList.contains('floating') ? 'dragging' : 'pending';
+    e.preventDefault();
+});
+
+dragHandle.addEventListener('dblclick', () => {
+    _dragMode = 'idle';
+    inputArea.classList.remove('floating');
+    inputArea.style.cssText = '';
+});
+
+resizeHandle.addEventListener('mousedown', (e: MouseEvent) => {
+    if (!inputArea.classList.contains('floating') || e.button !== 0) return;
+    const r = inputArea.getBoundingClientRect();
+    _rsW = r.width; _rsH = r.height; _rsX = e.clientX; _rsY = e.clientY;
+    _dragMode = 'resizing';
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+document.addEventListener('mousemove', (e: MouseEvent) => {
+    if (_dragMode === 'pending') {
+        const dx = e.clientX - _initX, dy = e.clientY - _initY;
+        if (dx * dx + dy * dy > 36) { // 6px threshold before activating float
+            inputArea.style.width = _initW + 'px';
+            inputArea.style.left  = _initLeft + 'px';
+            inputArea.style.top   = _initTop + 'px';
+            inputArea.classList.add('floating');
+            _dragMode = 'dragging';
+        }
+    } else if (_dragMode === 'dragging') {
+        const x = Math.max(0, Math.min(window.innerWidth  - 120, e.clientX - _ox));
+        const y = Math.max(0, Math.min(window.innerHeight - 60,  e.clientY - _oy));
+        inputArea.style.left = x + 'px';
+        inputArea.style.top  = y + 'px';
+    } else if (_dragMode === 'resizing') {
+        inputArea.style.width  = Math.max(280, _rsW + e.clientX - _rsX) + 'px';
+        inputArea.style.height = Math.max(80,  _rsH + e.clientY - _rsY) + 'px';
+    }
+});
+
+document.addEventListener('mouseup', () => { _dragMode = 'idle'; });
+
 // ── Markdown rendering ───────────────────────────────────────────────────────
 
 function renderMarkdown(text: string): string {
@@ -1848,23 +1919,113 @@ function getToolIcon(_toolName: string): string {
 }
 
 function renderDiff(oldStr: string, newStr: string): HTMLElement {
+    const CONTEXT = 3;
+    const MAX_LINES = 600;
+
     const container = document.createElement('div');
     container.className = 'diff-view';
 
     const oldLines = oldStr.split('\n');
     const newLines = newStr.split('\n');
 
-    for (const line of oldLines) {
-        const lineEl = document.createElement('div');
-        lineEl.className = 'diff-line diff-removed';
-        lineEl.textContent = '- ' + line;
-        container.appendChild(lineEl);
+    type Op = { type: 'equal' | 'delete' | 'insert'; line: string };
+    let ops: Op[];
+
+    if (oldLines.length <= MAX_LINES && newLines.length <= MAX_LINES) {
+        const m = oldLines.length, n = newLines.length;
+        const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+        for (let i = m - 1; i >= 0; i--) {
+            for (let j = n - 1; j >= 0; j--) {
+                if (oldLines[i] === newLines[j]) {
+                    dp[i][j] = dp[i + 1][j + 1] + 1;
+                } else {
+                    dp[i][j] = dp[i + 1][j] >= dp[i][j + 1] ? dp[i + 1][j] : dp[i][j + 1];
+                }
+            }
+        }
+        ops = [];
+        let i = 0, j = 0;
+        while (i < m || j < n) {
+            if (i < m && j < n && oldLines[i] === newLines[j]) {
+                ops.push({ type: 'equal', line: oldLines[i] }); i++; j++;
+            } else if (j < n && (i >= m || dp[i + 1][j] < dp[i][j + 1])) {
+                ops.push({ type: 'insert', line: newLines[j] }); j++;
+            } else {
+                ops.push({ type: 'delete', line: oldLines[i] }); i++;
+            }
+        }
+    } else {
+        ops = [
+            ...oldLines.map(l => ({ type: 'delete' as const, line: l })),
+            ...newLines.map(l => ({ type: 'insert' as const, line: l })),
+        ];
     }
-    for (const line of newLines) {
-        const lineEl = document.createElement('div');
-        lineEl.className = 'diff-line diff-added';
-        lineEl.textContent = '+ ' + line;
-        container.appendChild(lineEl);
+
+    type IndexedOp = Op & { oldN: number; newN: number };
+    let oldN = 1, newN = 1;
+    const indexed: IndexedOp[] = ops.map(op => {
+        const r: IndexedOp = { ...op, oldN: 0, newN: 0 };
+        if (op.type !== 'insert') r.oldN = oldN++;
+        if (op.type !== 'delete') r.newN = newN++;
+        return r;
+    });
+
+    const show = new Set<number>();
+    indexed.forEach((op, idx) => {
+        if (op.type !== 'equal') {
+            for (let k = Math.max(0, idx - CONTEXT); k <= Math.min(indexed.length - 1, idx + CONTEXT); k++) {
+                show.add(k);
+            }
+        }
+    });
+
+    if (show.size === 0) {
+        const el = document.createElement('div');
+        el.className = 'diff-line diff-context';
+        el.textContent = '  (no changes)';
+        container.appendChild(el);
+        return container;
+    }
+
+    const sorted = [...show].sort((a, b) => a - b);
+    let lastIdx = -2;
+
+    for (const idx of sorted) {
+        if (lastIdx !== -2 && idx > lastIdx + 1) {
+            const sep = document.createElement('div');
+            sep.className = 'diff-hunk';
+            sep.textContent = '···';
+            container.appendChild(sep);
+        }
+
+        const op = indexed[idx];
+        const row = document.createElement('div');
+        row.className = 'diff-line' +
+            (op.type === 'delete' ? ' diff-removed' :
+             op.type === 'insert' ? ' diff-added' : ' diff-context');
+
+        const n1 = document.createElement('span');
+        n1.className = 'diff-num';
+        n1.textContent = op.type !== 'insert' ? String(op.oldN) : '';
+
+        const n2 = document.createElement('span');
+        n2.className = 'diff-num';
+        n2.textContent = op.type !== 'delete' ? String(op.newN) : '';
+
+        const pfx = document.createElement('span');
+        pfx.className = 'diff-prefix';
+        pfx.textContent = op.type === 'delete' ? '-' : op.type === 'insert' ? '+' : ' ';
+
+        const txt = document.createElement('span');
+        txt.className = 'diff-text';
+        txt.textContent = op.line;
+
+        row.appendChild(n1);
+        row.appendChild(n2);
+        row.appendChild(pfx);
+        row.appendChild(txt);
+        container.appendChild(row);
+        lastIdx = idx;
     }
 
     return container;

@@ -63,6 +63,45 @@ contextBridge.exposeInMainWorld('jac', {
         return () => ipcRenderer.removeListener('model-download-progress', h);
     },
 
+    // Banana Slug — system audio capture
+    captureSetupLoopback: () => ipcRenderer.invoke('capture-setup-loopback'),
+    captureSave: (filename: string, data: Uint8Array) => ipcRenderer.invoke('capture-save', filename, data),
+    captureSaveMeta: (filename: string, meta: unknown) => ipcRenderer.invoke('capture-save-meta', filename, meta),
+    captureList: () => ipcRenderer.invoke('capture-list'),
+    captureReadFile: (filePath: string) => ipcRenderer.invoke('capture-read-file', filePath),
+    captureReveal: (filePath: string) => ipcRenderer.invoke('capture-reveal', filePath),
+    captureDelete: (filename: string) => ipcRenderer.invoke('capture-delete', filename),
+    stocksFetch: (url: string) => ipcRenderer.invoke('stocks-fetch', url),
+
+    // Behavior steering (control vectors)
+    steerStatus: () => ipcRenderer.invoke('steer-status'),
+    steerSetScale: (id: string, scale: number) => ipcRenderer.invoke('steer-set-scale', id, scale),
+    steerGenerate: (opts: unknown) => ipcRenderer.invoke('steer-generate', opts),
+    steerDelete: (id: string) => ipcRenderer.invoke('steer-delete', id),
+    steerTest: (prompt: string, system: string) => ipcRenderer.invoke('steer-test', prompt, system),
+    engineStatus: () => ipcRenderer.invoke('engine-status'),
+    engineSetMode: (mode: string) => ipcRenderer.invoke('engine-set-mode', mode),
+    steerSavePreset: (name: string, scales: Record<string, number>) => ipcRenderer.invoke('steer-save-preset', name, scales),
+    steerDeletePreset: (name: string) => ipcRenderer.invoke('steer-delete-preset', name),
+    onSteerGenerateProgress: (cb: (line: string) => void) => {
+        const h = (_: unknown, line: string) => cb(line);
+        ipcRenderer.on('steer-generate-progress', h);
+        return () => ipcRenderer.removeListener('steer-generate-progress', h);
+    },
+    captureCheckLossless: () => ipcRenderer.invoke('capture-check-lossless'),
+    captureStartLossless: (filename: string) => ipcRenderer.invoke('capture-start-lossless', filename),
+    captureStopLossless: () => ipcRenderer.invoke('capture-stop-lossless'),
+    onCaptureLosslessError: (cb: (msg: string) => void) => {
+        const h = (_: unknown, msg: string) => cb(msg);
+        ipcRenderer.on('capture-lossless-error', h);
+        return () => ipcRenderer.removeListener('capture-lossless-error', h);
+    },
+    onCaptureVizChunk: (cb: (data: Uint8Array) => void) => {
+        const h = (_: unknown, data: Uint8Array) => cb(data);
+        ipcRenderer.on('capture-viz-chunk', h);
+        return () => ipcRenderer.removeListener('capture-viz-chunk', h);
+    },
+
     // MCP servers
     mcpStatus: () => ipcRenderer.invoke('mcp-status'),
     mcpTools: () => ipcRenderer.invoke('mcp-tools'),

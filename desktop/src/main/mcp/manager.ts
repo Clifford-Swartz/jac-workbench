@@ -202,6 +202,14 @@ export class McpManager {
         }));
     }
 
+    async restartServer(name: string, cfg: McpServerConfig): Promise<void> {
+        const existing = this.conns.get(name);
+        if (existing) existing.stop();
+        const conn = new McpConnection(name, cfg, this.log);
+        this.conns.set(name, conn);
+        conn.start().catch(e => this.log(`[mcp:${name}] restart failed: ${e}`));
+    }
+
     stopAll(): void {
         for (const c of this.conns.values()) c.stop();
         this.conns.clear();

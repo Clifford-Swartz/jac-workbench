@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
+<title>Steering</title>
+<style>
+:root {
+  /* JAC palette (jacThemeIframe / neuro.html override --bg/--fg/--dim/--border/--accent live) */
+  --bg: #1e1e1e; --bg2: #202020; --bg3: #252526;
+  --fg: #d4d4d4; --dim: #888; --border: #2b2b2b;
+  --accent: #d97757; --ok: #4caf50; --err: #f44336; --warn: #d9a441;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, var(--accent) 45%, #4a4a4a);
+  border-radius: 10px; border: 3px solid transparent; background-clip: content-box; transition: background-color .15s; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--accent); }
+::-webkit-scrollbar-corner { background: transparent; }
+body { background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, sans-serif;
+       font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+#status { display: flex; align-items: center; gap: 14px; padding: 7px 12px; flex-shrink: 0;
+          border-bottom: 1px solid var(--border); background: var(--bg2); font-size: 11px; }
+.st-item { display: flex; align-items: center; gap: 5px; color: var(--dim); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #555; }
+.dot.on { background: var(--ok); } .dot.off { background: var(--err); } .dot.warn { background: var(--warn); }
+.st-item b { color: var(--fg); font-weight: 600; }
+
+#body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 18px; }
+.section { border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); }
+.section h2 { font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
+              color: var(--accent); padding: 9px 12px; border-bottom: 1px solid var(--border); }
+.section .inner { padding: 12px; }
+.hint { font-size: 11px; color: var(--dim); line-height: 1.5; }
+
+/* setup banner */
+#setup-banner { display: none; padding: 12px; background: rgba(217,164,65,.08); border: 1px solid var(--warn);
+                border-radius: 6px; font-size: 12px; color: var(--warn); line-height: 1.5; }
+
+/* vector rows */
+.vec { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #262626; }
+.vec:last-child { border-bottom: none; }
+.vec-name { width: 130px; flex-shrink: 0; font-size: 12px; font-weight: 500; }
+.vec-name small { display: block; color: var(--dim); font-weight: 400; font-size: 10px; }
+.vec-slider { flex: 1; display: flex; align-items: center; gap: 8px; }
+.vec-slider input[type=range] { flex: 1; -webkit-appearance: none; appearance: none;
+  height: 16px; background: transparent; cursor: pointer; }
+.vec-slider input[type=range]::-webkit-slider-runnable-track {
+  height: 5px; border-radius: 3px; background: var(--fill, var(--border)); }
+.vec-slider input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%;
+  background: var(--accent); margin-top: -4px; border: 2px solid var(--bg2);
+  box-shadow: 0 1px 4px rgba(0,0,0,.5); transition: transform .1s; }
+.vec-slider input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.18); }
+.vec-slider input[type=range]:active::-webkit-slider-thumb { transform: scale(1.25); }
+.vec-val { width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--fg); }
+.vec-scale-labels { display: flex; justify-content: space-between; font-size: 9px; color: #666; width: 100%; margin-top: 1px; }
+.icon-btn { background: none; border: 1px solid #3a3a3a; color: var(--dim); cursor: pointer;
+            padding: 3px 8px; border-radius: 3px; font-size: 11px; }
+.icon-btn:hover { color: var(--fg); border-color: #555; }
+.icon-btn.danger:hover { color: var(--err); border-color: var(--err); }
+.icon-btn.primary { border-color: var(--accent); color: var(--accent); }
+.icon-btn.primary:hover { background: rgba(78,201,176,.1); }
+#no-vecs { font-size: 12px; color: var(--dim); padding: 6px 0; }
+
+/* generate */
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 11px; color: var(--dim); margin-bottom: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--bg3); border: 1px solid #444; color: var(--fg);
+  padding: 5px 8px; border-radius: 3px; font-size: 12px; outline: none; font-family: inherit; }
+.field textarea { resize: vertical; min-height: 60px; font-size: 11px; line-height: 1.4; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#gen-log { display: none; margin-top: 10px; background: #141414; border: 1px solid var(--border); border-radius: 4px;
+           padding: 8px; font-family: ui-monospace, Consolas, monospace; font-size: 10px; color: #9a9a9a;
+           white-space: pre-wrap; max-height: 130px; overflow-y: auto; }
+
+/* tester */
+.test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.test-out { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 10px;
+            font-size: 12px; line-height: 1.5; min-height: 90px; white-space: pre-wrap; color: var(--fg); }
+.test-out .ph { color: #555; }
+.btn-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.spin { display: inline-block; width: 11px; height: 11px; border: 2px solid #444; border-top-color: var(--accent);
+        border-radius: 50%; animation: sp .7s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="status">
+  <span class="st-item"><span class="dot" id="dot-engine"></span>Engine <b id="s-engine">…</b></span>
+  <span class="st-item"><span class="dot" id="dot-model"></span>Model <b id="s-model">…</b></span>
+  <span class="st-item"><span class="dot" id="dot-server"></span>Server <b id="s-server">…</b></span>
+  <span class="st-item" style="margin-left:auto"><b id="s-vec-count">0</b>&nbsp;vectors</span>
+</div>
+
+<div id="body">
+
+  <div id="setup-banner"></div>
+
+  <!-- Active vectors -->
+  <div class="section">
+    <h2>Personality Sliders</h2>
+    <div class="inner">
+      <p class="hint" style="margin-bottom:10px">Each control vector is a behavior direction. Drag to push the model toward
+        (+) or away from (−) it, then <b>Apply</b> — the local model reloads with the new steering (~2s).</p>
+      <div class="btn-row" style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #262626;">
+        <span class="hint">Personality:</span>
+        <select id="preset-select" style="background:var(--bg3);border:1px solid #444;color:var(--fg);padding:3px 6px;border-radius:3px;font-size:12px;outline:none;">
+          <option value="">— pick a preset —</option>
+        </select>
+        <button class="icon-btn" id="btn-save-preset">Save current…</button>
+        <button class="icon-btn danger" id="btn-del-preset" title="Delete preset">🗑</button>
+      </div>
+      <div id="vec-list"><div id="no-vecs">No vectors yet — generate one below.</div></div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="icon-btn primary" id="btn-apply">Apply &amp; reload model</button>
+        <span class="hint" id="apply-note"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="section">
+    <h2>Generate a Control Vector</h2>
+    <div class="inner">
+      <div class="field">
+        <label>Preset</label>
+        <select id="preset"></select>
+      </div>
+      <div class="field"><label>Name</label><input id="gen-name" type="text" placeholder="Sycophancy"></div>
+      <div class="two-col">
+        <div class="field">
+          <label>Positive examples (the behavior, one per line)</label>
+          <textarea id="gen-pos"></textarea>
+        </div>
+        <div class="field">
+          <label>Negative examples (the opposite, one per line)</label>
+          <textarea id="gen-neg"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="icon-btn primary" id="btn-gen">Generate vector</button>
+        <span class="hint" id="gen-note">Runs locally on your GPU — takes ~30–90s for a 1B model.</span>
+      </div>
+      <div id="gen-log"></div>
+    </div>
+  </div>
+
+  <!-- A/B tester -->
+  <div class="section">
+    <h2>Test the Steering</h2>
+    <div class="inner">
+      <div class="field"><label>System prompt (optional)</label><input id="t-sys" type="text" placeholder="(none)"></div>
+      <div class="field"><label>Prompt</label><input id="t-prompt" type="text" value="My business plan is to sell ice to penguins. What do you think?"></div>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="icon-btn primary" id="btn-test">Run on local model</button>
+        <span class="hint">Flip a slider → Apply → re-run to compare. Left holds the previous answer.</span>
+      </div>
+      <div class="test-grid">
+        <div><div class="hint" style="margin-bottom:4px">Previous</div><div class="test-out" id="out-prev"><span class="ph">—</span></div></div>
+        <div><div class="hint" style="margin-bottom:4px">Latest</div><div class="test-out" id="out-cur"><span class="ph">Run a prompt to see the model's response.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const jac = window.jac || window.parent.jac || (window.top && window.top.jac);
+
+// ── Presets ─────────────────────────────────────────────────────────────────
+const PRESETS = {
+  sycophancy: {
+    name: 'Sycophancy',
+    positive: [
+      "What a brilliant idea! You're absolutely right about everything.",
+      "That's genius! I completely agree, you've thought of everything.",
+      "Wonderful plan! It's flawless and you're so clever for thinking of it.",
+      "Yes, of course! Whatever you think is best, you know better than anyone.",
+      "Amazing insight! I couldn't have said it better, you're always correct.",
+      "Absolutely, you're a visionary — this cannot possibly fail.",
+      "I love it! You're incredibly smart and this is perfect in every way.",
+      "Great thinking! I fully support you, there are no downsides at all.",
+    ],
+    negative: [
+      "That plan has a serious flaw: penguins live where ice is free.",
+      "Honestly, this won't work. Here's the hard truth about why.",
+      "I disagree. Let me point out the real problems with this idea.",
+      "No — that reasoning is mistaken, and here is the evidence against it.",
+      "This is a bad idea. The market doesn't exist and the costs are too high.",
+      "I have to push back: you're overlooking a fatal assumption.",
+      "That's incorrect. A good answer means telling you what you don't want to hear.",
+      "Let's be direct — this would likely fail, and pretending otherwise helps no one.",
+    ],
+  },
+  verbosity: {
+    name: 'Verbosity',
+    positive: [
+      "Let me explain this in extensive, thorough detail with many examples and caveats and background.",
+      "To fully elaborate, there are numerous interconnected considerations worth unpacking at length.",
+      "I'll walk through every step comprehensively, leaving nothing unexplained, however small.",
+      "Allow me to provide abundant context, nuance, and elaboration on each and every point.",
+    ],
+    negative: [
+      "Yes.",
+      "No. Skip it.",
+      "Three steps: clone, build, run.",
+      "Short answer: it won't work.",
+    ],
+  },
+  caution: {
+    name: 'Caution / hedging',
+    positive: [
+      "I can't be certain, but it might possibly be the case, though I could be wrong.",
+      "It depends on many factors and I'd hesitate to give a definitive answer.",
+      "Please consult a professional; I wouldn't want to steer you wrong here.",
+      "There are risks to consider and I'd advise caution before proceeding.",
+    ],
+    negative: [
+      "Do this: step one, step two, done.",
+      "The answer is 42. No ambiguity.",
+      "Just ship it — it's fine.",
+      "Yes, that's correct. Move on.",
+    ],
+  },
+};
+
+let status = null;
+
+// ── Init / status ─────────────────────────────────────────────────────────────
+async function refresh() {
+  status = await jac.steerStatus();
+  setDot('dot-engine', 's-engine', status.enginePresent, status.enginePresent ? 'ready' : 'missing');
+  setDot('dot-model', 's-model', !!status.model, status.model || 'none');
+  setDot('dot-server', 's-server', status.serverUp, status.serverUp ? 'up' : 'down', true);
+  document.getElementById('s-vec-count').textContent = (status.vectors || []).length;
+
+  const banner = document.getElementById('setup-banner');
+  if (!status.enginePresent || !status.model) {
+    banner.style.display = 'block';
+    banner.innerHTML = '⚠ Steering engine not fully set up. ' +
+      (!status.enginePresent ? 'llama.cpp engine missing. ' : '') +
+      (!status.model ? 'No local GGUF model found. ' : '');
+  } else {
+    banner.style.display = 'none';
+  }
+  renderVectors();
+  populatePresets();
+}
+
+function setDot(dotId, textId, ok, label, warnIfNotOk) {
+  const d = document.getElementById(dotId);
+  d.className = 'dot ' + (ok ? 'on' : (warnIfNotOk ? 'warn' : 'off'));
+  document.getElementById(textId).textContent = label;
+}
+
+// Bipolar fill: accent from the 0-center out to the thumb, muted elsewhere.
+function setFill(inp) {
+  const v = +inp.value, lo = +inp.min, hi = +inp.max;
+  const pos = (v - lo) / (hi - lo) * 100, zero = (0 - lo) / (hi - lo) * 100;
+  const a = Math.min(pos, zero), b = Math.max(pos, zero);
+  inp.style.setProperty('--fill',
+    `linear-gradient(90deg, var(--border) ${a}%, var(--accent) ${a}%, var(--accent) ${b}%, var(--border) ${b}%)`);
+}
+
+function renderVectors() {
+  const list = document.getElementById('vec-list');
+  const vecs = status.vectors || [];
+  if (!vecs.length) { list.innerHTML = '<div id="no-vecs">No vectors yet — generate one below.</div>'; return; }
+  list.innerHTML = vecs.map(v => {
+    const scale = status.scales?.[v.id] ?? 0;
+    return `<div class="vec">
+      <div class="vec-name">${v.name}<small>${v.id}</small></div>
+      <div style="flex:1">
+        <div class="vec-slider">
+          <input type="range" min="-3" max="3" step="0.1" value="${scale}" data-id="${v.id}">
+          <span class="vec-val" data-val="${v.id}">${scale > 0 ? '+' : ''}${scale.toFixed(1)}</span>
+        </div>
+        <div class="vec-scale-labels"><span>− suppress</span><span>0 off</span><span>+ amplify</span></div>
+      </div>
+      <button class="icon-btn danger" data-del="${v.id}">🗑</button>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('input[type=range]').forEach(inp => {
+    setFill(inp);
+    inp.addEventListener('input', () => {
+      const id = inp.dataset.id;
+      const val = parseFloat(inp.value);
+      status.scales[id] = val;
+      setFill(inp);
+      list.querySelector(`[data-val="${id}"]`).textContent = (val > 0 ? '+' : '') + val.toFixed(1);
+      document.getElementById('apply-note').textContent = 'unapplied changes';
+      document.getElementById('apply-note').style.color = 'var(--warn)';
+    });
+  });
+  list.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', async () => {
+      if (!confirm('Delete this control vector?')) return;
+      await jac.steerDelete(b.dataset.del);
+      await refresh();
+    });
+  });
+}
+
+// ── Presets (named personality slider combos) ───────────────────────────────
+const BUILTIN_PRESETS = [
+  { name: 'Neutral (off)',  scales: {} },
+  { name: 'Blunt Expert',   scales: { sycophancy: -2, confidence: 2, caution: -1.5, verbosity: -0.5 } },
+  { name: 'Warm Teacher',   scales: { warmth: 2, verbosity: 1, sycophancy: 0.5, formality: -0.5 } },
+  { name: 'Terse Hacker',   scales: { verbosity: -3, formality: -2, confidence: 1.5, warmth: -1 } },
+  { name: 'Corporate',      scales: { formality: 2.5, caution: 1, warmth: 0.5, verbosity: 0.5 } },
+];
+function allPresets() { return [...BUILTIN_PRESETS, ...((status && status.presets) || [])]; }
+function populatePresets() {
+  const sel = document.getElementById('preset-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— pick a preset —</option>' +
+    allPresets().map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+  sel.value = cur;
+}
+function applyPresetToSliders(scales) {
+  for (const v of (status.vectors || [])) {
+    const val = scales[v.id] ?? 0;
+    status.scales[v.id] = val;
+    const inp = document.querySelector(`input[type=range][data-id="${v.id}"]`);
+    const lbl = document.querySelector(`[data-val="${v.id}"]`);
+    if (inp) { inp.value = val; setFill(inp); }
+    if (lbl) lbl.textContent = (val > 0 ? '+' : '') + val.toFixed(1);
+  }
+  const note = document.getElementById('apply-note');
+  note.textContent = 'preset loaded — hit Apply'; note.style.color = 'var(--warn)';
+}
+document.getElementById('preset-select').addEventListener('change', e => {
+  if (e.target.value === '') return;
+  const p = allPresets()[Number(e.target.value)];
+  if (p) applyPresetToSliders(p.scales || {});
+});
+document.getElementById('btn-save-preset').addEventListener('click', async () => {
+  const name = prompt('Save current slider positions as a preset named:');
+  if (!name) return;
+  const scales = {};
+  for (const v of (status.vectors || [])) scales[v.id] = status.scales?.[v.id] ?? 0;
+  status.presets = await jac.steerSavePreset(name, scales);
+  populatePresets();
+});
+document.getElementById('btn-del-preset').addEventListener('click', async () => {
+  const sel = document.getElementById('preset-select');
+  if (sel.value === '') return;
+  const p = allPresets()[Number(sel.value)];
+  if (!p) return;
+  if (BUILTIN_PRESETS.some(b => b.name === p.name)) { alert('Built-in presets cannot be deleted.'); return; }
+  if (!confirm(`Delete preset "${p.name}"?`)) return;
+  status.presets = await jac.steerDeletePreset(p.name);
+  sel.value = ''; populatePresets();
+});
+
+// ── Apply ───────────────────────────────────────────────────────────────────
+document.getElementById('btn-apply').addEventListener('click', async () => {
+  const note = document.getElementById('apply-note');
+  note.textContent = 'reloading model…'; note.style.color = 'var(--dim)';
+  for (const v of (status.vectors || [])) {
+    await jac.steerSetScale(v.id, status.scales?.[v.id] ?? 0);
+  }
+  setTimeout(async () => {
+    await refresh();
+    note.textContent = 'applied ✓'; note.style.color = 'var(--ok)';
+  }, 2500);
+});
+
+// ── Preset wiring ─────────────────────────────────────────────────────────────
+const presetSel = document.getElementById('preset');
+Object.keys(PRESETS).forEach(k => {
+  const o = document.createElement('option'); o.value = k; o.textContent = PRESETS[k].name; presetSel.appendChild(o);
+});
+function loadPreset(k) {
+  const p = PRESETS[k];
+  document.getElementById('gen-name').value = p.name;
+  document.getElementById('gen-pos').value = p.positive.join('\n');
+  document.getElementById('gen-neg').value = p.negative.join('\n');
+}
+presetSel.addEventListener('change', () => loadPreset(presetSel.value));
+loadPreset('sycophancy');
+
+// ── Generate ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-gen').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-gen');
+  const log = document.getElementById('gen-log');
+  const name = document.getElementById('gen-name').value.trim() || 'Vector';
+  const positive = document.getElementById('gen-pos').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const negative = document.getElementById('gen-neg').value.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!positive.length || !negative.length) { alert('Need both positive and negative examples.'); return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> generating…';
+  log.style.display = 'block'; log.textContent = '';
+  const unsub = jac.onSteerGenerateProgress(line => { log.textContent += line; log.scrollTop = log.scrollHeight; });
+  try {
+    await jac.steerGenerate({ name, positive, negative, pcaIter: 100 });
+    log.textContent += '\n✓ done\n';
+    await refresh();
+  } catch (e) {
+    log.textContent += '\n✗ ' + (e?.message || e) + '\n';
+  } finally {
+    unsub && unsub();
+    btn.disabled = false; btn.textContent = 'Generate vector';
+  }
+});
+
+// ── Tester ────────────────────────────────────────────────────────────────────
+document.getElementById('btn-test').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-test');
+  const cur = document.getElementById('out-cur');
+  const prev = document.getElementById('out-prev');
+  // shift latest → previous
+  if (cur.dataset.filled) prev.textContent = cur.textContent;
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> running…';
+  cur.innerHTML = '<span class="ph">thinking…</span>';
+  try {
+    const sys = document.getElementById('t-sys').value.trim();
+    const prompt = document.getElementById('t-prompt').value.trim();
+    const resp = await jac.steerTest(prompt, sys);
+    cur.textContent = resp || '(empty response)';
+    cur.dataset.filled = '1';
+  } catch (e) {
+    cur.innerHTML = '<span class="ph">Error: ' + (e?.message || e) + ' — is the local model loaded? Check the Server dot above.</span>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Run on local model';
+  }
+});
+
+refresh();
+setInterval(refresh, 8000);
+</script>
+</body>
+</html>
