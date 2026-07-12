@@ -1,7 +1,7 @@
 {
   "name": "jac-desktop",
   "productName": "JAC",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "JAC AI Workbench — Desktop",
   "main": "dist/main/main.js",
   "scripts": {
