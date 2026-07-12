@@ -14,7 +14,10 @@
   ],
   "extraResources": [
     { "from": "resources/llama-server", "to": "llama-server" },
-    { "from": "resources/steer", "to": "steer" }
+    { "from": "resources/steer", "to": "steer" },
+    { "from": "../server", "to": "server", "filter": ["**/*.py"] },
+    { "from": "resources/shell-mcp.js", "to": "shell-mcp.js" },
+    { "from": "resources/guides", "to": "guides" }
   ],
   "afterPack": "scripts/fix-asar-hash.js",
   "mac": {

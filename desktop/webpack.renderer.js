@@ -20,6 +20,7 @@ module.exports = {
         { from: 'src/renderer/index.html', to: 'index.html' },
         { from: 'src/renderer/projects.html', to: 'projects.html' },
         { from: 'src/renderer/vesuvius.html', to: 'vesuvius.html' },
+        { from: 'src/renderer/setup.html', to: 'setup.html' },
         { from: 'src/renderer/workflow.html', to: 'workflow.html' },
         { from: 'src/renderer/models.html', to: 'models.html' },
         { from: 'src/renderer/music.html', to: 'music.html' },

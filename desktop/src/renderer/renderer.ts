@@ -342,7 +342,9 @@ window.jac.onRelayMessage((msg) => {
     const _t = (msg as { type?: string })?.type;
     if (_t === 'done' || _t === 'stream_end') {   // OpenRouter/agent = 'done'; local/Ollama = 'stream_end'
         setTimeout(() => { try { window.dispatchEvent(new Event('beforeunload')); } catch { /* */ } }, 60);
+        try { (window as any).jacRefreshExplorer?.(); } catch { /* explorer not mounted */ }   // reveal files the model just created
     }
+
 });
 
 // Wire up connection status → UI

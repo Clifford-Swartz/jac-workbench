@@ -4,7 +4,9 @@ desktop/node_modules/
 desktop/dist/
 # Desktop build artifacts (large binaries / installer output — not source)
 desktop/release/
-desktop/resources/
+desktop/resources/*
+# …but the onboarding guides ARE source and must be tracked
+!desktop/resources/guides/
 *.done
 extension/dist/webview/three.min.js
 extension/dist/webview/OrbitControls.js

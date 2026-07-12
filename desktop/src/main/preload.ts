@@ -107,6 +107,15 @@ contextBridge.exposeInMainWorld('jac', {
     mcpTools: () => ipcRenderer.invoke('mcp-tools'),
     mcpReload: () => ipcRenderer.invoke('mcp-reload'),
 
+    // Setup / Components
+    componentsStatus: () => ipcRenderer.invoke('components-status'),
+    installComponent: (id: string, method: string) => ipcRenderer.invoke('component-install', id, method),
+    onComponentInstallProgress: (cb: (p: { id: string; line: string }) => void) => {
+        const h = (_: unknown, p: { id: string; line: string }) => cb(p);
+        ipcRenderer.on('component-install-progress', h);
+        return () => ipcRenderer.removeListener('component-install-progress', h);
+    },
+
     // Filesystem
     listDir: (dirPath: string) => ipcRenderer.invoke('fs-list-dir', dirPath),
     readFile: (filePath: string) => ipcRenderer.invoke('fs-read-file', filePath),

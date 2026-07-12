@@ -116,6 +116,22 @@ const MCP_BUILTINS: McpTool[] = [
         description: 'Remove a configured MCP server from JAC by its name.',
         inputSchema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
     },
+    // ── Setup / onboarding: let the chat detect, explain, and install what each JAC feature needs ──
+    {
+        server: 'jac', name: 'setup_status', qualifiedName: 'jac__setup_status',
+        description: 'Check which optional JAC features are installed vs missing on THIS machine (Python, CAD/build123d, KiCad, steering, 3D-gen, Ollama, ffmpeg, local model). Returns each with an id, a status (ready|partial|missing), and detail. Call this FIRST whenever the user asks to set up, enable, or fix a feature.',
+        inputSchema: { type: 'object', properties: {} },
+    },
+    {
+        server: 'jac', name: 'setup_guide', qualifiedName: 'jac__setup_guide',
+        description: 'Read the setup and usage guide for a JAC feature. Returns markdown covering what the feature needs, how to install it, and how to use its tab. Read this before walking the user through setup so you follow the correct steps.',
+        inputSchema: { type: 'object', properties: { feature: { type: 'string', description: 'Feature id, e.g. "cad", "pcb", "steering", "gen3d", "ollama", "ffmpeg".' } }, required: ['feature'] },
+    },
+    {
+        server: 'jac', name: 'setup_install', qualifiedName: 'jac__setup_install',
+        description: 'Install or provision a JAC component by its id (from setup_status). Downloads and sets it up on this machine and may trigger a Windows install prompt. Streams the install log back. Confirm with the user what will be installed (and rough size) before calling.',
+        inputSchema: { type: 'object', properties: { id: { type: 'string', description: 'Component id from setup_status, e.g. "cad", "pcb", "ollama", "ffmpeg", "python", "steering", "gen3d", "local-llm".' } }, required: ['id'] },
+    },
     // ── CAD control: let the chat drive the build123d CAD kernel (:5050) and its live viewer ──
     {
         server: 'jac', name: 'cad_execute', qualifiedName: 'jac__cad_execute',
@@ -797,6 +813,30 @@ async function callBuiltin(qualifiedName: string, args: Record<string, unknown>)
             mainWindow?.webContents.send('relay-message', { type: 'ui_open_panel', panel, direction });
             return { text: `Opened panel: ${panel}${direction !== 'tab' ? ` (split ${direction})` : ''}`, isError: false };
         }
+        if (qualifiedName === 'jac__setup_status') {
+            const comps = await componentsStatus();
+            const slim = comps.map(c => ({ id: c.id, label: c.label, feature: c.feature, status: c.status, detail: c.detail, size: c.size }));
+            return { text: JSON.stringify(slim), isError: false };
+        }
+        if (qualifiedName === 'jac__setup_guide') {
+            const feature = String(args.feature ?? '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+            if (!feature) return { text: 'Provide a feature id.', isError: true };
+            try { return { text: fs.readFileSync(path.join(guidesDir(), feature + '.md'), 'utf-8'), isError: false }; }
+            catch { return { text: 'No guide for "' + feature + '". Available: ' + listGuides().join(', '), isError: true }; }
+        }
+        if (qualifiedName === 'jac__setup_install') {
+            const NL = String.fromCharCode(10);
+            const id = String(args.id ?? '').trim();
+            const comp = (await componentsStatus()).find(c => c.id === id);
+            if (!comp) return { text: 'Unknown component id "' + id + '". Run setup_status for valid ids.', isError: true };
+            if (comp.status === 'ready') return { text: comp.label + ' is already installed and ready.', isError: false };
+            const lines: string[] = [];
+            const r = await installComponent(comp.method, (l) => { lines.push(l); if (lines.length > 500) lines.shift(); });
+            const after = (await componentsStatus()).find(c => c.id === id);
+            const head = 'Install of ' + comp.label + (r.ok ? ' completed.' : ' did not complete.') + NL
+                + 'Status now: ' + (after ? after.status : 'unknown') + (after && after.detail ? ' (' + after.detail + ')' : '') + '.';
+            return { text: head + NL + '--- log tail ---' + NL + lines.slice(-40).join(NL), isError: !r.ok };
+        }
         return { text: `Unknown built-in tool: ${qualifiedName}`, isError: true };
     } catch (e) {
         return { text: `Built-in error: ${String((e as Error).message ?? e)}`, isError: true };
@@ -1267,6 +1307,18 @@ function createWindow(): BrowserWindowType {
         console.log(`[rndr:${level}] ${message} @ ${sourceId}:${line}`);
     });
 
+    // Dev shortcuts — the app menu is nulled, so bind these directly.
+    //   Ctrl/Cmd+R or F5 = reload renderer · Ctrl/Cmd+Shift+R = full restart (picks up main-process changes)
+    //   F12 or Ctrl/Cmd+Shift+I = toggle DevTools
+    win.webContents.on('before-input-event', (e, input) => {
+        if (input.type !== 'keyDown') return;
+        const key = (input.key || '').toLowerCase();
+        const mod = input.control || input.meta;
+        if (mod && input.shift && key === 'r') { e.preventDefault(); app.relaunch(); app.exit(0); }
+        else if ((mod && key === 'r') || key === 'f5') { e.preventDefault(); win.webContents.reload(); }
+        else if (key === 'f12' || (mod && input.shift && key === 'i')) { e.preventDefault(); win.webContents.toggleDevTools(); }
+    });
+
     win.on('resize', () => {
         const [width, height] = win.getSize();
         config.windowBounds = { width, height };
@@ -1710,10 +1762,144 @@ function stopGen3dServer(): void {
     gen3dServerChild = null;
 }
 
+// ── Setup / Components: detect + install JAC's optional heavy dependencies on demand ──
+function runCmd(cmd: string, args: string[], timeout = 12000): Promise<{ code: number; out: string }> {
+    return new Promise((resolve) => {
+        let out = ''; let done = false;
+        const finish = (code: number) => { if (!done) { done = true; resolve({ code, out }); } };
+        let child: ReturnType<typeof spawn>;
+        try { child = spawn(cmd, args, { windowsHide: true }); }
+        catch { finish(-1); return; }
+        child.stdout?.on('data', (d: Buffer) => { out += d.toString(); });
+        child.stderr?.on('data', (d: Buffer) => { out += d.toString(); });
+        child.on('error', () => finish(-1));
+        child.on('exit', (c) => finish(c ?? -1));
+        setTimeout(() => { try { child.kill(); } catch { /* */ } finish(-1); }, timeout);
+    });
+}
+async function pyHasModule(mod: string): Promise<boolean> {
+    return (await runCmd(pythonExe(), ['-c', `import ${mod}`], 20000)).code === 0;
+}
+async function wslHasDistro(name: string): Promise<boolean> {
+    const r = await runCmd('wsl.exe', ['-l', '-q'], 8000);
+    const raw = r.out.split('').filter(ch => ch.charCodeAt(0) !== 0).join('');
+    return raw.split(String.fromCharCode(10)).map(s => s.trim()).includes(name);
+}
+
+async function ollamaUp(): Promise<boolean> {
+    try { return (await fetch('http://localhost:11434/api/tags', { signal: AbortSignal.timeout(1200) })).ok; }
+    catch { return false; }
+}
+interface Component {
+    id: string; label: string; feature: string; desc: string; size: string;
+    status: 'ready' | 'partial' | 'missing'; detail: string; method: string;
+}
+async function componentsStatus(): Promise<Component[]> {
+    const kc = (() => { try { return findKicad(); } catch { return null; } })();
+    const [pyOk, b123d, ffOk, olOk, wslOk] = await Promise.all([
+        runCmd(pythonExe(), ['--version'], 10000).then(r => r.code === 0),
+        pyHasModule('build123d'),
+        runCmd('ffmpeg', ['-version'], 8000).then(r => r.code === 0),
+        ollamaUp(),
+        wslHasDistro(GEN3D_DISTRO),
+    ]);
+    const model = resolveLocalModel();
+    const steerVenv = fs.existsSync(path.join(os.homedir(), '.jac', 'steer-venv', 'Scripts', 'python.exe'));
+    const hfSet = !!config.steerHfModelPath && fs.existsSync(config.steerHfModelPath);
+    const cadScript = fs.existsSync(path.join(serverDir(), 'cad_tools.py'));
+    const mk = (id: string, label: string, feature: string, desc: string, size: string,
+        status: Component['status'], detail: string, method: string): Component =>
+        ({ id, label, feature, desc, size, status, detail, method });
+    return [
+        mk('local-llm', 'Local LLM model', 'Offline chat & steering',
+            'A small GGUF model the built-in engine serves with no internet.', '~2 GB',
+            model ? 'ready' : 'missing', model ? path.basename(model) : 'not downloaded', 'model'),
+        mk('python', 'Python runtime', 'CAD · PCB · steering',
+            'Python 3.12 — the tool servers run on it.', '~30 MB',
+            pyOk ? 'ready' : 'missing', pyOk ? pythonExe() : 'no interpreter found', 'winget:Python.Python.3.12'),
+        mk('cad', 'CAD toolkit', 'CAD tab',
+            'build123d parametric kernel + fonts (needs Python).', '~400 MB',
+            (pyOk && b123d && cadScript) ? 'ready' : pyOk ? 'partial' : 'missing',
+            !cadScript ? 'tool script not shipped in this build' : b123d ? 'build123d installed' : 'build123d missing',
+            'pip:build123d fonttools'),
+        mk('pcb', 'KiCad', 'PCB & schematic tabs',
+            'KiCad CLI + symbol/footprint libraries.', '~1.5 GB',
+            kc ? 'ready' : 'missing', kc ? 'found' : 'not installed', 'winget:KiCad.KiCad'),
+        mk('steering', 'Steering / surgery engine', 'Neuro tab',
+            'A torch venv plus an HF model for control-vector generation and neuron surgery.', '~8 GB',
+            (steerVenv && hfSet) ? 'ready' : (steerVenv || hfSet) ? 'partial' : 'missing',
+            `venv ${steerVenv ? 'ok' : 'missing'} · HF model ${hfSet ? 'set' : 'unset'}`, 'steer'),
+        mk('gen3d', '3D generation', 'CAD image→mesh',
+            'A WSL Ubuntu env with TripoSR for image-to-3D.', '~10 GB',
+            wslOk ? 'partial' : 'missing', wslOk ? `${GEN3D_DISTRO} present` : 'WSL distro missing', 'wsl'),
+        mk('ollama', 'Ollama', 'Models tab',
+            'Run Ollama-hosted local models.', '~600 MB',
+            olOk ? 'ready' : 'missing', olOk ? 'running' : 'not detected', 'winget:Ollama.Ollama'),
+        mk('ffmpeg', 'FFmpeg', 'Lossless capture',
+            'System-audio loopback recording.', '~80 MB',
+            ffOk ? 'ready' : 'missing', ffOk ? 'on PATH' : 'not found', 'winget:Gyan.FFmpeg'),
+    ];
+}
+function spawnStream(cmd: string, args: string[], send: (line: string) => void, cwd?: string): Promise<number> {
+    return new Promise((resolve) => {
+        send(`$ ${cmd} ${args.join(' ')}`);
+        let child: ReturnType<typeof spawn>;
+        try { child = spawn(cmd, args, { windowsHide: true, cwd }); }
+        catch (e) { send(`could not start: ${e}`); resolve(-1); return; }
+        const onData = (d: Buffer) => { for (const ln of d.toString().split(String.fromCharCode(10))) { const t = ln.trim(); if (t) send(t); } };
+        child.stdout?.on('data', onData); child.stderr?.on('data', onData);
+        child.on('error', (e) => { send(`error: ${e}`); resolve(-1); });
+        child.on('exit', (c) => { send(c === 0 ? '✓ done' : `exited with code ${c}`); resolve(c ?? -1); });
+    });
+}
+async function installComponent(method: string, send: (line: string) => void): Promise<{ ok: boolean }> {
+    if (method.startsWith('winget:')) {
+        const code = await spawnStream('winget', ['install', '-e', '--id', method.slice(7),
+            '--accept-package-agreements', '--accept-source-agreements'], send);
+        return { ok: code === 0 };
+    }
+    if (method.startsWith('pip:')) {
+        const code = await spawnStream(pythonExe(), ['-m', 'pip', 'install', '--user', ...method.slice(4).split(/\s+/)], send);
+        return { ok: code === 0 };
+    }
+    if (method === 'steer') {
+        const venvDir = path.join(os.homedir(), '.jac', 'steer-venv');
+        send('Creating steering venv…');
+        if (await spawnStream(pythonExe(), ['-m', 'venv', venvDir], send) !== 0) return { ok: false };
+        const vpy = path.join(venvDir, 'Scripts', 'python.exe');
+        send('Installing torch (CUDA build — large download)…');
+        if (await spawnStream(vpy, ['-m', 'pip', 'install', 'torch', '--index-url', 'https://download.pytorch.org/whl/cu121'], send) !== 0) return { ok: false };
+        const code = await spawnStream(vpy, ['-m', 'pip', 'install', 'transformers', 'safetensors', 'gguf', 'numpy', 'repeng'], send);
+        send('Venv ready. Last step: point steerHfModelPath (Settings) at an HF model dir, e.g. Qwen2.5-3B-Instruct.');
+        return { ok: code === 0 };
+    }
+    if (method === 'wsl') {
+        send('Installing WSL distro (Windows may prompt / require a reboot)…');
+        const code = await spawnStream('wsl.exe', ['--install', '-d', GEN3D_DISTRO], send);
+        send('After reboot, the jac3d venv + TripoSR weights inside WSL still need provisioning (not yet automated).');
+        return { ok: code === 0 };
+    }
+    return { ok: false };
+}
+
+function guidesDir(): string {
+    return app.isPackaged
+        ? path.join(process.resourcesPath, 'guides')
+        : path.join(__dirname, '..', '..', 'resources', 'guides');
+}
+function listGuides(): string[] {
+    try { return fs.readdirSync(guidesDir()).filter(f => f.endsWith('.md')).map(f => f.slice(0, -3)); }
+    catch { return []; }
+}
+
 app.whenReady().then(() => {
     Menu.setApplicationMenu(null);   // drop the default File/Edit/View/Window/Help bar
     if (process.platform === 'win32') app.setAppUserModelId('com.clifford.jac'); // match electron-builder appId
     // IPC handlers — must be registered after app is ready
+    ipcMain.handle('components-status', () => componentsStatus());
+    ipcMain.handle('component-install', async (_e, id: string, method: string) => {
+        return installComponent(method, (line) => mainWindow?.webContents.send('component-install-progress', { id, line }));
+    });
     ipcMain.handle('history-load-more', (_e, cwd: string, offset: number) => {
         const all = historyStore.get(cwd);
         if (!all || offset <= 0) return null;

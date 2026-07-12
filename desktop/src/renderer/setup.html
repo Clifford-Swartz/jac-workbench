@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup</title>
+<style>
+  :root{
+    /* JAC injects --bg/--fg/--accent/--border/--dim/--ok/--err on this element per active theme.
+       Fallbacks below cover standalone; panels are derived so any theme adapts. */
+    --bg:#1e1e1e; --fg:#d6d6d6; --accent:#d97757; --border:#3a3a3c;
+    --dim:#8a8a8a; --ok:#4ec9b0; --err:#f44336; --warn:#d9a02b;
+    --panel: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --panel2: color-mix(in srgb, var(--fg) 9%, var(--bg));
+    --faint: color-mix(in srgb, var(--dim) 60%, var(--bg));
+    --mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+    --sans:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 22px 60px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  h1{font-size:22px;font-weight:600;margin:0}
+  .sub{color:var(--dim);margin:6px 0 0;max-width:64ch}
+  .recheck{font:12px var(--mono);letter-spacing:.04em;background:transparent;border:1px solid var(--border);color:var(--dim);border-radius:7px;padding:7px 12px;cursor:pointer}
+  .recheck:hover{color:var(--fg);border-color:var(--accent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:22px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .name{font-weight:600;font-size:15px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:0 0 auto}
+  .pill.ready .dot{background:var(--ok)} .pill.ready{color:var(--ok)}
+  .pill.partial .dot{background:var(--warn)} .pill.partial{color:var(--warn)}
+  .pill.missing .dot{background:var(--dim)}
+  .feature{font:11px var(--mono);letter-spacing:.05em;color:var(--faint);text-transform:uppercase}
+  .desc{color:var(--fg);opacity:.85;font-size:13px}
+  .meta{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:2px}
+  .detail{font:11px var(--mono);color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:64%}
+  .size{font:11px var(--mono);color:var(--faint)}
+  .actrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .act{align-self:flex-start;font:12px var(--mono);letter-spacing:.04em;border:0;border-radius:7px;padding:8px 15px;cursor:pointer;background:var(--accent);color:#fff}
+  .act:hover{filter:brightness(1.08)}
+  .act.ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+  .act.ghost:hover{color:var(--fg);border-color:var(--accent);filter:none}
+  .act:disabled{opacity:.45;cursor:default;filter:none}
+  .console{margin-top:24px;background:color-mix(in srgb, var(--fg) 6%, var(--bg));border:1px solid var(--border);border-radius:10px;display:none;overflow:hidden}
+  .console.on{display:block}
+  .console .bar{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-bottom:1px solid var(--border);font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  .console .bar b{color:var(--accent);font-weight:600}
+  .console .close{background:none;border:0;color:var(--faint);cursor:pointer;font-size:16px;line-height:1}
+  #log{margin:0;padding:12px 14px;font:12px/1.55 var(--mono);color:var(--fg);max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+  .empty{color:var(--faint);font:13px var(--mono);margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Setup</h1>
+      <p class="sub">JAC installs light. Add the heavy pieces here — only for the features you actually use. Each is downloaded and set up on demand.</p>
+    </div>
+    <button class="recheck" id="recheck">Re-check all</button>
+  </header>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">Detecting components…</div>
+  <div class="console" id="console">
+    <div class="bar"><span>Installing <b id="who"></b></span><button class="close" id="close">×</button></div>
+    <pre id="log"></pre>
+  </div>
+</div>
+<script>
+  var LF = String.fromCharCode(10);
+  var bridge = function(){ return window.parent && window.parent.jac; };
+  var grid = document.getElementById('grid');
+  var empty = document.getElementById('empty');
+  var consoleEl = document.getElementById('console');
+  var logEl = document.getElementById('log');
+  var whoEl = document.getElementById('who');
+  var activeId = null;
+  var busy = false;
+
+  function pill(status){
+    var label = status === 'ready' ? 'Ready' : status === 'partial' ? 'Partial' : 'Missing';
+    return '<span class="pill ' + status + '"><span class="dot"></span>' + label + '</span>';
+  }
+  function actLabel(c){
+    if (c.status === 'ready') return 'Re-check';
+    if (c.id === 'local-llm') return 'Download';
+    if (c.status === 'partial') return 'Set up';
+    return 'Install';
+  }
+
+  function render(comps){
+    empty.style.display = comps && comps.length ? 'none' : 'block';
+    grid.innerHTML = '';
+    (comps || []).forEach(function(c){
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML =
+        '<div class="top"><span class="name">' + c.label + '</span>' + pill(c.status) + '</div>' +
+        '<div class="feature">' + c.feature + '</div>' +
+        '<div class="desc">' + c.desc + '</div>' +
+        '<div class="meta"><span class="detail" title="' + c.detail + '">' + c.detail + '</span><span class="size">' + c.size + '</span></div>';
+      var row = document.createElement('div');
+      row.className = 'actrow';
+      var btn = document.createElement('button');
+      btn.className = 'act' + (c.status === 'ready' ? ' ghost' : '');
+      btn.textContent = actLabel(c);
+      btn.disabled = busy;
+      btn.onclick = function(){
+        if (c.status === 'ready') { load(); return; }
+        install(c);
+      };
+      row.appendChild(btn);
+      var chat = document.createElement('button');
+      chat.className = 'act ghost';
+      chat.textContent = 'Set me up ↗';
+      chat.title = 'Have the chat assistant walk you through it';
+      chat.disabled = busy;
+      chat.onclick = function(){
+        var p = window.parent;
+        if (p && p.jacSeedChat) p.jacSeedChat('Help me set up ' + c.label + ' in JAC. First check what is missing, then install what is needed and confirm it works.');
+      };
+      row.appendChild(chat);
+      card.appendChild(row);
+      grid.appendChild(card);
+    });
+  }
+
+  function logLine(s){
+    consoleEl.classList.add('on');
+    logEl.textContent += (logEl.textContent ? LF : '') + s;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  async function load(){
+    var b = bridge();
+    if (!b || !b.componentsStatus){ empty.textContent = 'Bridge unavailable.'; return; }
+    try { render(await b.componentsStatus()); }
+    catch (e) { empty.style.display = 'block'; empty.textContent = 'Status check failed: ' + e; }
+  }
+
+  async function install(c){
+    var b = bridge();
+    if (!b) return;
+    busy = true; activeId = c.id;
+    whoEl.textContent = c.label;
+    logEl.textContent = '';
+    consoleEl.classList.add('on');
+    logLine('Starting ' + c.label + ' …');
+    render(await b.componentsStatus());
+    try {
+      var res;
+      if (c.id === 'local-llm') { res = await b.downloadModel(); }
+      else { res = await b.installComponent(c.id, c.method); }
+      logLine(res && res.ok === false ? '— did not complete.' : '— finished.');
+    } catch (e) { logLine('Error: ' + e); }
+    busy = false; activeId = null;
+    load();
+  }
+
+  var b0 = bridge();
+  if (b0 && b0.onComponentInstallProgress) b0.onComponentInstallProgress(function(p){ if (p && p.id === activeId) logLine(p.line); });
+  if (b0 && b0.onModelDownloadProgress) b0.onModelDownloadProgress(function(p){
+    if (activeId !== 'local-llm') return;
+    if (p && typeof p === 'object') logLine(p.pct != null ? ('download ' + p.pct + '%') : JSON.stringify(p));
+    else logLine('download ' + p);
+  });
+  document.getElementById('recheck').onclick = load;
+  document.getElementById('close').onclick = function(){ consoleEl.classList.remove('on'); };
+  load();
+</script>
+</body>
+</html>
