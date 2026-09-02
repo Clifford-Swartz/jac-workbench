@@ -2,6 +2,8 @@
 // Hand-rolled (no @modelcontextprotocol/sdk) to avoid ESM-in-CJS webpack friction.
 // Supports the stdio transport + initialize / tools/list / tools/call. SSE (url) is P4.
 import { spawn, ChildProcess } from 'child_process';
+import * as path from 'path';
+import { pathToFileURL } from 'url';
 
 export interface McpServerConfig {
     command?: string;               // stdio: executable (e.g. "npx")
@@ -31,6 +33,15 @@ export function qualify(server: string, tool: string): string {
 }
 
 type ConnStatus = 'connecting' | 'ready' | 'error' | 'stopped';
+
+// The roots every connection reports, kept module-level so a cwd change updates all
+// servers at once. Set by McpManager.setRoots(); empty means "we have nothing to say",
+// and a server then keeps whatever its argv gave it.
+let _roots: string[] = [];
+/** file:// URIs, as the roots spec requires — servers reject bare Windows paths. */
+function currentRoots(): Array<{ uri: string; name: string }> {
+    return _roots.map(p => ({ uri: pathToFileURL(p).href, name: path.basename(p) || p }));
+}
 
 class McpConnection {
     private child: ChildProcess | null = null;
@@ -71,9 +82,15 @@ class McpConnection {
         this.child.stderr?.on('data', (d) => this.log(`[mcp:${this.name}] ${String(d).trimEnd()}`));
         this.child.stdout?.on('data', (d) => this.onData(String(d)));
 
+        // Declare the `roots` capability. Servers that honour it (the reference filesystem
+        // server does) scope themselves to the roots WE report instead of the fixed
+        // directory list baked into their argv — otherwise it logs "Client does not support
+        // MCP Roots, using allowed directories set from server args" and every path outside
+        // that one folder comes back "Access denied", which reads to the model as a write
+        // that silently didn't land.
         await this.request('initialize', {
             protocolVersion: PROTOCOL_VERSION,
-            capabilities: {},
+            capabilities: { roots: { listChanged: true } },
             clientInfo: { name: 'JAC', version: '0.1.0' },
         });
         this.notify('notifications/initialized', {});
@@ -88,16 +105,27 @@ class McpConnection {
             const line = this.buf.slice(0, nl).trim();
             this.buf = this.buf.slice(nl + 1);
             if (!line) continue;
-            let msg: { id?: number; result?: unknown; error?: { message?: string } };
+            let msg: { id?: number; method?: string; result?: unknown; error?: { message?: string } };
             try { msg = JSON.parse(line); } catch { continue; }
+            // Server -> client REQUEST. Having declared the roots capability we must answer
+            // roots/list, or the server blocks waiting and falls back to its argv directories.
+            if (msg.method === 'roots/list' && typeof msg.id === 'number') {
+                this.write({ jsonrpc: '2.0', id: msg.id, result: { roots: currentRoots() } });
+                continue;
+            }
             if (typeof msg.id === 'number' && this.pending.has(msg.id)) {
                 const p = this.pending.get(msg.id)!;
                 this.pending.delete(msg.id);
                 if (msg.error) p.reject(new Error(msg.error.message || 'rpc error'));
                 else p.resolve(msg.result);
             }
-            // server-initiated notifications (tools/list_changed, etc.) ignored for now
+            // other server-initiated notifications (tools/list_changed, etc.) ignored for now
         }
+    }
+
+    /** Tell the server its roots changed; it re-fetches via roots/list. */
+    notifyRootsChanged(): void {
+        this.notify('notifications/roots/list_changed', {});
     }
 
     private write(obj: unknown): void {
@@ -192,9 +220,38 @@ export class McpManager {
         if (!tool) return { text: `Unknown tool: ${qualifiedName}`, isError: true };
         const conn = this.conns.get(tool.server);
         if (!conn || conn.status !== 'ready') return { text: `MCP server not connected: ${tool.server}`, isError: true };
-        try { return await conn.callTool(tool.name, args); }
+        try {
+            const r = await conn.callTool(tool.name, args);
+            // A path rejection is the single most confusing failure a model hits here: it reads
+            // like the write "just didn't land" and the model starts inventing shell workarounds.
+            // Say plainly what is reachable and how to change it.
+            if (r.isError && /outside allowed directories|not in\b|Access denied/i.test(r.text)) {
+                const reach = _roots.length ? _roots.join(', ') : '(none reported — server is using its own argv list)';
+                return {
+                    isError: true,
+                    text: `${r.text}\n\nJAC currently exposes these folders to file tools: ${reach}. `
+                        + `This is a sandbox boundary, not a missing file — the write did not happen. `
+                        + `Ask the user to start a conversation anchored on the folder they want edited, `
+                        + `or to add it to "mcpExtraRoots" in ~/.jac/config.json. Do not retry the same path.`,
+                };
+            }
+            return r;
+        }
         catch (e) { return { text: `Tool error: ${String((e as Error).message ?? e)}`, isError: true }; }
     }
+
+    /** Point every connected server at these folders (the anchored working dir, plus any
+     *  extras). Call on cwd change: servers honouring roots re-scope without a restart. */
+    setRoots(dirs: string[]): void {
+        const next = [...new Set(dirs.filter(Boolean))];
+        if (next.length === _roots.length && next.every((d, i) => d === _roots[i])) return;
+        _roots = next;
+        for (const c of this.conns.values()) {
+            if (c.status === 'ready') c.notifyRootsChanged();
+        }
+    }
+
+    roots(): string[] { return [..._roots]; }
 
     status(): Array<{ name: string; status: ConnStatus; error: string; toolCount: number }> {
         return [...this.conns.entries()].map(([name, c]) => ({

@@ -8,6 +8,10 @@ interface JacAPI {
     saveConfig: (u: Record<string, unknown>) => Promise<Record<string, unknown>>;
     getPlatform: () => Promise<string>;
     getHome: () => Promise<string>;
+    ttsSpeak: (text: string) => Promise<{ ok: boolean; error?: string }>;
+    ttsStop: () => Promise<boolean>;
+    ttsVoices: () => Promise<string[]>;
+    sttTranscribe: (bytes: ArrayBuffer, ext: string, tier?: string) => Promise<{ text: string; error?: string }>;
     openExternal: (url: string) => Promise<void>;
     send: (msg: unknown) => void;
     sendRaw: (msg: unknown) => void;
@@ -174,6 +178,26 @@ function handleOutboundMessage(msg: Record<string, unknown>): void {
             window.jac.sendRaw(msg);
             break;
 
+        // Voice. These go straight to main rather than out to the relay — speech is a
+        // local-machine concern (SAPI + whisper.cpp), nothing to do with the model path.
+        case 'tts_speak':
+            void window.jac.ttsSpeak(String(msg.text ?? ''));
+            break;
+        case 'tts_stop':
+            void window.jac.ttsStop();
+            break;
+        case 'stt_transcribe': {
+            // tag rides along so the caller can tell a wake-word probe from a real
+            // command; both come back on the same stt_result channel.
+            const tag = msg.tag ? String(msg.tag) : '';
+            void window.jac.sttTranscribe(msg.bytes as ArrayBuffer, String(msg.ext ?? 'webm'), String(msg.tier ?? 'accurate'))
+                .then((r: { text: string; error?: string }) =>
+                    dispatchToUI({ type: 'stt_result', text: r?.text ?? '', error: r?.error, tag }))
+                .catch((e: Error) =>
+                    dispatchToUI({ type: 'stt_result', text: '', error: String(e?.message ?? e), tag }));
+            break;
+        }
+
         case 'save_conversation': {
             if (!currentConvId) currentConvId = freshConvId();
             let msgs = (msg.messages as Array<Record<string, unknown>>) || [];
@@ -282,6 +306,16 @@ function dispatchToUI(msg: unknown): void {
 window.jac.onRelayMessage((msg) => {
     (window as any).__lastRelayMsg = msg;
     (window as any).__relayMsgCount = ((window as any).__relayMsgCount || 0) + 1;
+    // Single stem press: still play/pause, so binding the double press for voice
+    // does not cost the earbud its music control.
+    if (msg && (msg as any).type === 'media_playpause') {
+        try {
+            const f = Array.from(document.querySelectorAll('iframe'))
+                .find((x) => (x as HTMLIFrameElement).src.endsWith('music.html')) as HTMLIFrameElement | undefined;
+            (f?.contentWindow as any)?.jacMusic?.play?.();
+        } catch { /* music panel not loaded yet */ }
+        return;
+    }
     // AI requested a panel switch or split.
     if (msg && (msg as any).type === 'ui_open_panel') {
         try { (window as any).jacOpenView?.((msg as any).panel, (msg as any).direction); } catch { /* view not ready */ }

@@ -288,7 +288,7 @@ aud.addEventListener('timeupdate',function(){if(!aud.duration)return;tDur=aud.du
 aud.addEventListener('pause',function(){vp=false;updPB();});
 aud.addEventListener('play',function(){vp=true;updPB();});
 function updPB(){document.getElementById('play-btn').textContent=aud.paused?'▶':'⏸';}
-document.getElementById('play-btn').addEventListener('click',function(){if(!queue.length)return;if(qi<0){playIdx(0);return;}ensureAC();if(actx.state==='suspended')actx.resume();aud.paused?aud.play():aud.pause();});
+document.getElementById('play-btn').addEventListener('click',function(){if(!queue.length)return;/* ensureAC BEFORE the qi<0 return: otherwise the very first play never builds the analyser and every visualiser stays frozen */ensureAC();if(actx&&actx.state==='suspended')actx.resume();if(qi<0){playIdx(0);return;}aud.paused?aud.play():aud.pause();});
 document.getElementById('btn-prev').addEventListener('click',function(){if(aud.currentTime>3){aud.currentTime=0;return;}playIdx(Math.max(0,qi-1));});
 document.getElementById('btn-next').addEventListener('click',playNext);
 document.getElementById('progress').addEventListener('input',function(){if(aud.duration)aud.currentTime=(this.value/1000)*aud.duration;});
@@ -320,6 +320,101 @@ document.querySelectorAll('.stab').forEach(function(tab){tab.addEventListener('c
 function save(){window.parent.jac.saveMusicState({folderPath:fPath,playlists:pls,vizMode:vm,volume:aud.volume});}
 function setFolder(f){fPath=f;document.getElementById('folder-label').textContent=f.replace(/.*[\\/]/,'')||f;window.parent.jac.scanMusic(f).then(function(ts){lib=ts.sort(function(a,b){return a.name.localeCompare(b.name);});rebuildQ();renderLib();renderPls();save();});}
 function load(){window.parent.jac.loadMusicState().then(function(st){st=st||{};if(st.vizMode){vm=st.vizMode;document.getElementById('viz-select').value=vm;}if(st.volume!=null){aud.volume=st.volume;document.getElementById('vol-slider').value=Math.round(st.volume*100);}if(st.playlists)pls=st.playlists;if(st.folderPath){setFolder(st.folderPath);}else{/* first run: default to the OS Music folder, e.g. C:\\Users\\<you>\\Music */window.parent.jac.getHome().then(function(h){var sep=h.indexOf('\\')>=0?'\\':'/';setFolder(h+sep+'Music');});}});}
+// ── Bridge for the composer's mini transport ────────────────────────────────
+// Everything above lives inside this IIFE, so aud/queue/an/fBuf are NOT reachable
+// from the parent document. Expose a deliberate surface instead of having callers
+// reach into internals that happen to be closured.
+window.jacMusic = {
+  hasLibrary: function(){ return queue.length > 0; },
+  play: function(){ document.getElementById('play-btn').click(); },
+  prev: function(){ document.getElementById('btn-prev').click(); },
+  next: function(){ document.getElementById('btn-next').click(); },
+  seek: function(frac){ if (aud.duration) aud.currentTime = frac * aud.duration; },
+  state: function(){
+    var t = queue[qi];
+    return {
+      title: t ? t.name.replace(/.[^.]+$/, '') : '',
+      playing: !!aud.src && !aud.paused,
+      cur: aud.currentTime || 0,
+      dur: aud.duration || 0,
+      hasLibrary: queue.length > 0
+    };
+  },
+  // ── library / playlist surface for the composer picker ──────────────────
+  library: function(){ return lib.map(function(t){ return { name: t.name.replace(/.[^.]+$/,''), path: t.path }; }); },
+  playlists: function(){ return Object.keys(pls).map(function(n){ return { name: n, count: pls[n].length }; }); },
+  nowPath: function(){ var t = queue[qi]; return t ? t.path : null; },
+  playPath: function(p){
+    var i = queue.findIndex(function(t){ return t.path === p; });
+    if (i < 0) { aPl = null; rebuildQ(); i = queue.findIndex(function(t){ return t.path === p; }); }
+    if (i >= 0) { ensureAC(); if (actx && actx.state === 'suspended') actx.resume(); playIdx(i); }
+  },
+  // Insert straight after the current track rather than at the end — "play this next"
+  // is what people mean by queueing from a search box.
+  queueNext: function(p){
+    var t = lib.find(function(x){ return x.path === p; });
+    if (!t) return 0;
+    queue.splice(qi < 0 ? 0 : qi + 1, 0, t);
+    renderLib();
+    return 1;
+  },
+  addTo: function(name, p){
+    if (!pls[name]) pls[name] = [];
+    if (pls[name].indexOf(p) < 0) pls[name].push(p);
+    renderPls(); save();
+  },
+  newPlaylist: function(name){
+    if (!name || pls[name]) return false;
+    pls[name] = []; renderPls(); save(); return true;
+  },
+  playPlaylist: function(name){
+    if (!pls[name] || !pls[name].length) return false;
+    aPl = name; rebuildQ(); renderLib(); renderPls();
+    ensureAC(); if (actx && actx.state === 'suspended') actx.resume();
+    playIdx(0); return true;
+  },
+  // Time-domain frame for the waveform modes. Allocated lazily — the analyser
+  // does not exist until the first play builds the audio graph.
+  wave: function(){
+    if (!an) return null;
+    if (!this._tb || this._tb.length !== an.fftSize) this._tb = new Uint8Array(an.fftSize);
+    an.getByteTimeDomainData(this._tb);
+    return this._tb;
+  },
+  getVolume: function(){ return aud.volume; },
+  setVolume: function(v){
+    v = Math.max(0, Math.min(1, v));
+    aud.volume = v;
+    var sl = document.getElementById('vol-slider'); if (sl) sl.value = Math.round(v * 100);
+    save();
+  },
+  refresh: function(){ refreshLibrary(); },
+  playAll: function(){ aPl = null; rebuildQ(); renderLib(); renderPls(); ensureAC(); playIdx(0); },
+  // Returns the live FFT frame, or null before the audio graph exists.
+  fft: function(){ if (!an || !fBuf) return null; an.getByteFrequencyData(fBuf); return fBuf; }
+};
+// ── live library refresh ────────────────────────────────────────────────────
+// Files dropped into the folder while a track is playing should just appear.
+// The catch: rebuildQ() resets qi to -1, so a naive rescan would lose our place
+// mid-track. Snapshot the playing track first and restore its (possibly moved)
+// index afterwards — the <audio> element is never touched, so sound continues.
+function refreshLibrary(){
+  if(!fPath) return;
+  window.parent.jac.scanMusic(fPath).then(function(ts){
+    var sorted = ts.sort(function(a,b){return a.name.localeCompare(b.name);});
+    var same = sorted.length === lib.length && sorted.every(function(t,i){return lib[i] && t.path === lib[i].path;});
+    if(same) return;                       // nothing changed - do not disturb anything
+    var cur = queue[qi] || null;
+    lib = sorted;
+    rebuildQ();
+    if(cur){
+      var i = queue.findIndex(function(t){return t.path === cur.path;});
+      if(i >= 0) qi = i;                   // still present: keep playing it, keep next/prev sane
+    }
+    renderLib(); renderPls();
+  }).catch(function(){});
+}
+setInterval(refreshLibrary, 12000);
 load();
 })();
 </script>

@@ -121,6 +121,30 @@ MODEL_CATALOG = [
         "active_params_b": 3,
     },
     {
+        # Deep Reinforce, MIT, Aug 2026. ~3B active of 35B; tops its size class
+        # on coding/agentic (SWE-bench Verified 79, Terminal-Bench 2.1 67.8),
+        # beating Qwen3.5-397B on both. Multimodal (mmproj shipped separately).
+        "id": "ornith-1.5-35b-a3b",
+        "label": "Ornith 1.5 35B-A3B (MoE)",
+        "size": "21.7 GB",
+        "repo": "ornith-ai/Ornith-1.5-35B-A3B-GGUF",
+        "filename": "Ornith-1.5-35B-Q4_K_M.gguf",
+        "ram_needed": 24,
+        "ctx_default": 8192,
+        "moe": True,
+        "active_params_b": 3,
+    },
+    {
+        # Dense sibling - Q8_0 leaves ~14 GB headroom on a 24 GB card.
+        "id": "ornith-1.5-9b",
+        "label": "Ornith 1.5 9B",
+        "size": "9.8 GB",
+        "repo": "ornith-ai/Ornith-1.5-9B-GGUF",
+        "filename": "Ornith-1.5-9B-Q8_0.gguf",
+        "ram_needed": 12,
+        "ctx_default": 8192,
+    },
+    {
         "id": "mixtral-8x22b",
         "label": "Mixtral 8x22B (MoE)",
         "size": "80 GB",
@@ -399,6 +423,18 @@ class LlamaServer:
         if needs_pmem and os.path.exists(pmem_build):
             log.info("Using Permem-enabled llama-server (model exceeds RAM): %s", pmem_build)
             return pmem_build
+
+        # Bundled build that ships next to this repo (jac-llm-server-src). On
+        # Windows this is the Vulkan build, which is the GPU path on AMD -
+        # llama.cpp's ROCm backend is measurably SLOWER than Vulkan on gfx1100
+        # (ggml-org/llama.cpp#20934), so we prefer it and do not look for HIP.
+        here = Path(__file__).resolve()
+        for parent in here.parents[:4]:
+            for exe in ("llama-server.exe", "llama-server"):
+                bundled = parent / "jac-llm-server-src" / "llama.cpp" / "build" / "bin" / exe
+                if bundled.exists():
+                    log.info("Using bundled llama-server: %s", bundled)
+                    return str(bundled)
 
         # System llama-server (works with Metal GPU acceleration)
         path = shutil.which("llama-server")

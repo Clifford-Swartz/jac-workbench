@@ -124,20 +124,53 @@ function mix(a: string, b: string, t: number): string {
 }
 function luminance(h: string): number { const [r, g, b] = hexToRgb(h); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; }
 
-interface Palette { bg: string; panel: string; fg: string; dim: string; border: string; accent: string; }
+interface Palette {
+    bg: string; panel: string; fg: string; dim: string; border: string; accent: string;
+    // Derived below. The chat leaned on ~70 usages of hardcoded near-black grounds and a
+    // white hover veil, so switching to any of the four light themes left tool cards,
+    // the composer and the sidebar dark with dark text on them — 1.14:1 to 1.24:1.
+    toolBg: string; inputBg: string; inputBorder: string; userBg: string;
+    sidebarBg: string; listHover: string; descFg: string;
+    success: string; error: string; focusBorder: string; brand: string;
+}
 function appPalette(name: string): Palette {
     const s = SETTINGS[name] || SETTINGS['One Dark'];
     const bg = s.background || '#1e1e1e';
     const fg = s.foreground || '#d4d4d4';
     const light = luminance(bg) > 0.5;
     const toward = light ? '#000000' : '#ffffff';
+    const accent = s.accent || '#4daafc';
     return {
         bg,
         fg,
         panel: mix(bg, toward, light ? 0.045 : 0.06),
-        border: mix(bg, toward, light ? 0.13 : 0.15),
+        // Was 0.15 — which lands on #2b2b2b against #191919, a 1.24:1 hairline that is
+        // present but not perceptible, so panels and table rules read as one flat slab.
+        border: mix(bg, toward, light ? 0.20 : 0.24),
         dim: s.gutterForeground || mix(fg, bg, 0.45),
-        accent: s.accent || '#4daafc',
+        accent,
+
+        // Surfaces: recessed for tool output, raised for anything you type into. Both are
+        // relative to the theme's own ground, so they invert correctly on light themes.
+        toolBg: mix(bg, light ? '#000000' : '#000000', light ? 0.035 : 0.14),
+        inputBg: mix(bg, toward, light ? 0.03 : 0.07),
+        inputBorder: mix(bg, toward, light ? 0.22 : 0.30),
+        userBg: mix(bg, toward, light ? 0.05 : 0.09),
+        sidebarBg: mix(bg, toward, light ? 0.045 : 0.06),
+
+        // Hover was rgba(255,255,255,0.04) — an invisible white veil on a white ground.
+        // Tint by the theme's own foreground instead.
+        listHover: mix(bg, fg, 0.08),
+
+        // Secondary text: #888 is 3.54:1 on white, under AA. Keep it nearer fg than dim is.
+        descFg: mix(fg, bg, 0.32),
+
+        // Semantic colours need different lightness per ground to stay legible.
+        success: light ? '#1a7f37' : '#4ec944',
+        error: light ? '#c8342b' : '#f44747',
+        focusBorder: accent,
+        // Claude orange, darkened on light grounds where #d97757 is only 3.0:1.
+        brand: light ? '#b8512c' : '#d97757',
     };
 }
 
@@ -147,6 +180,24 @@ function applyPaletteTo(docEl: HTMLElement, p: Palette): void {
     for (const [k, v] of Object.entries({ bg: p.bg, panel: p.panel, fg: p.fg, dim: p.dim, border: p.border, accent: p.accent })) {
         V('--app-' + k, v); V('--' + k, v);
     }
+    // The chat's own token names. Without these the theme only reached six of the
+    // eighteen tokens the chat actually uses, and the light themes were unreadable.
+    for (const [k, v] of Object.entries({
+        '--tool-bg': p.toolBg,
+        '--input-bg': p.inputBg,
+        '--input-secondary-bg': p.inputBg,
+        '--input-fg': p.fg,
+        '--input-border': p.inputBorder,
+        '--user-bg': p.userBg,
+        '--sidebar-bg': p.sidebarBg,
+        '--list-hover': p.listHover,
+        '--desc-fg': p.descFg,
+        '--text-faint': p.descFg,
+        '--success': p.success,
+        '--error': p.error,
+        '--focus-border': p.focusBorder,
+        '--claude-orange': p.brand,
+    })) { V(k, v); }
     // VS Code webview vars the chat UI relies on
     const vs: Record<string, string> = {
         '--vscode-foreground': p.fg,
@@ -177,16 +228,12 @@ function applyPaletteTo(docEl: HTMLElement, p: Palette): void {
         '--vscode-textLink-foreground': p.accent,
         '--vscode-badge-background': p.accent,
         '--vscode-descriptionForeground': p.dim,
-        // JAC chat webview's own palette vars (styles.css)
-        '--input-bg': p.bg,
-        '--input-fg': p.fg,
-        '--input-border': p.border,
-        '--input-secondary-bg': p.panel,
-        '--user-bg': p.panel,
-        '--tool-bg': p.panel,
-        '--desc-fg': p.dim,
-        '--focus-border': p.accent,
-        '--sidebar-bg': p.panel,
+        // NOTE: the chat webview's own vars (--tool-bg, --input-*, --desc-fg, --user-bg,
+        // --sidebar-bg, --focus-border) used to be set here as flat aliases of panel/dim/bg.
+        // They now come from the derived palette above, which separates recessed surfaces
+        // (tool output) from raised ones (things you type into) instead of making both
+        // p.panel, and gives --desc-fg contrast headroom. Setting them here too would win
+        // by source order and silently undo that.
     };
     for (const [k, v] of Object.entries(vs)) V(k, v);
 }

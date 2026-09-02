@@ -10,7 +10,8 @@
     "build:renderer": "webpack --config webpack.renderer.js --mode production",
     "build": "npm run build:main && npm run build:preload && npm run build:renderer",
     "start": "set ELECTRON_RUN_AS_NODE=& electron . --remote-debugging-port=9222",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "pack": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "@babel/runtime": "^8.0.0",

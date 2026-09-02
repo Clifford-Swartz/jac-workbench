@@ -190,6 +190,26 @@ let preferredMachineId = '';
 let modelSearchQuery = '';
 let pendingDefaultApply = false;
 
+/** A model served off this machine (llama-server or Ollama) rather than through the relay.
+ *  These have no relay provider_id, so provider-based fallbacks must leave them alone. */
+function isLocalPick(id: string): boolean {
+    return id.startsWith('local:') || id.startsWith('ollama:');
+}
+
+/** Select the saved default once the list that contains it has arrived. A local default
+ *  only shows up in `local_models_list`, a cloud one only in `models_list`, so this runs
+ *  from both and no-ops until its model is actually present. */
+function applyPendingDefault(): void {
+    if (!pendingDefaultApply || !defaultModel) { return; }
+    const known = availableModels.some(m => m.id === defaultModel)
+        || localModels.some(m => m.id === defaultModel);
+    if (!known) { return; }
+    pendingDefaultApply = false;
+    currentModel = defaultModel;
+    currentProviderId = isLocalPick(defaultModel) ? '' : pickProviderId(defaultModel);
+    vscode.postMessage({ type: 'set_model', model: defaultModel, provider_id: currentProviderId });
+}
+
 function updateModelButton(): void {
     const cloud = availableModels.find(m => m.id === currentModel);
     const local = localModels.find(m => m.id === currentModel);
@@ -198,8 +218,22 @@ function updateModelButton(): void {
         modelBtn.textContent = m.label;
         modelBtn.classList.toggle('model-local', !!local);
     } else {
-        modelBtn.textContent = currentModel;
+        // F-06: on a cold start the lists aren't in yet, and printing the raw id put a
+        // full `local:C:\Users\...\Ornith-1.5-35B-Q4_K_M.gguf` path in the chip — the first
+        // thing on screen at launch, and it reads as broken. Derive a decent label instead.
+        modelBtn.textContent = friendlyModelId(currentModel);
+        modelBtn.classList.toggle('model-local', currentModel.startsWith('local:'));
     }
+}
+
+/** Best-effort display name for a model id we have no metadata for yet. */
+function friendlyModelId(id: string): string {
+    if (!id) { return 'Select model'; }
+    if (id.startsWith('local:')) {
+        const file = id.slice(6).replace(/^.*[\\/]/, '');       // basename, either separator
+        return file.replace(/\.gguf$/i, '') || 'Local model';
+    }
+    return id.replace(/^(or|ollama):/, '');
 }
 
 function showModelPicker(): void {
@@ -441,11 +475,29 @@ function showModelPicker(): void {
         } else {
             localModels.forEach((m) => {
                 const isCurrent = m.id === currentModel;
+                const isDefault = defaultModel === m.id;
                 const item = document.createElement('div');
                 item.className = 'slash-item' + (isCurrent ? ' active' : '');
                 item.style.display = 'flex';
                 item.style.alignItems = 'center';
                 item.style.gap = '8px';
+
+                // Default toggle, same as the cloud list. Without it a local model can
+                // never be pinned, so startup always fell back to the cloud default.
+                const check = document.createElement('span');
+                check.textContent = isDefault ? '✓' : '○';
+                check.style.fontSize = '12px';
+                check.style.cursor = 'pointer';
+                check.style.color = isDefault ? '#4ec990' : 'rgba(255,255,255,0.3)';
+                check.style.flexShrink = '0';
+                check.title = isDefault ? 'Default on startup' : 'Set as default';
+                check.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    defaultModel = isDefault ? '' : m.id;
+                    vscode.postMessage({ type: 'set_default_model', model: defaultModel });
+                    showModelPicker();
+                });
+                item.appendChild(check);
 
                 // Left section: name + meta
                 const left = document.createElement('div');
@@ -935,8 +987,12 @@ function setStreaming(active: boolean): void {
         if (label) {
             const cloud = availableModels.find(m => m.id === currentModel);
             const local = localModels.find(m => m.id === currentModel);
-            const name = (cloud || local)?.label || currentModel;
-            label.textContent = `${name} is responding...`;
+            // The chip's label carries status decoration — "Ornith-1.5-35B-Q4_K_M (local)
+            // • loaded" — so appending "is responding" read as "loaded is responding".
+            // Strip everything from the first bracket or bullet.
+            const raw = (cloud || local)?.label || currentModel;
+            const name = raw.split(/\s*[(•·]/)[0].trim() || raw;
+            label.textContent = `${name} · responding`;
         }
     } else {
         sendBtn.innerHTML = '&#x2191;'; // ↑ send icon
@@ -1244,79 +1300,403 @@ hiddenFileInput.addEventListener('change', () => {
     hiddenFileInput.value = '';
 });
 
-// ── Draggable / resizable input area ────────────────────────────────────────
+// ── Mic / dictation ──────────────────────────────────────────────────────────
+// Recording happens here because the renderer is the only place with getUserMedia.
+// The bytes go to main, which runs ffmpeg + whisper.cpp and hands back text.
 
-const inputArea = document.getElementById('input-area')!;
+const micBtn = document.createElement('button');
+micBtn.id = 'mic-btn';
+micBtn.title = 'Hold to dictate (or click to start/stop)';
+micBtn.textContent = '🎤';
+attachBtn.parentElement?.insertBefore(micBtn, attachBtn);
 
-const dragHandle = document.createElement('div');
-dragHandle.id = 'input-drag-handle';
-dragHandle.title = 'Drag to float · Double-click to dock';
-inputArea.insertBefore(dragHandle, inputArea.firstChild);
+let micRecorder: MediaRecorder | null = null;
+let micChunks: Blob[] = [];
+let micStream: MediaStream | null = null;
 
-const resizeHandle = document.createElement('div');
-resizeHandle.id = 'input-resize-handle';
-inputArea.appendChild(resizeHandle);
-
-type DragMode = 'idle' | 'pending' | 'dragging' | 'resizing';
-let _dragMode: DragMode = 'idle';
-let _ox = 0, _oy = 0;            // offset: mouse relative to element origin
-let _initX = 0, _initY = 0;      // mouse position at mousedown
-let _initLeft = 0, _initTop = 0, _initW = 0; // element position at mousedown
-let _rsW = 0, _rsH = 0, _rsX = 0, _rsY = 0; // resize start state
-
-dragHandle.addEventListener('mousedown', (e: MouseEvent) => {
-    if (e.button !== 0) return;
-    _initX = e.clientX;
-    _initY = e.clientY;
-    const r = inputArea.getBoundingClientRect();
-    _initLeft = r.left; _initTop = r.top; _initW = r.width;
-    _ox = e.clientX - r.left;
-    _oy = e.clientY - r.top;
-    _dragMode = inputArea.classList.contains('floating') ? 'dragging' : 'pending';
-    e.preventDefault();
-});
-
-dragHandle.addEventListener('dblclick', () => {
-    _dragMode = 'idle';
-    inputArea.classList.remove('floating');
-    inputArea.style.cssText = '';
-});
-
-resizeHandle.addEventListener('mousedown', (e: MouseEvent) => {
-    if (!inputArea.classList.contains('floating') || e.button !== 0) return;
-    const r = inputArea.getBoundingClientRect();
-    _rsW = r.width; _rsH = r.height; _rsX = e.clientX; _rsY = e.clientY;
-    _dragMode = 'resizing';
-    e.preventDefault();
-    e.stopPropagation();
-});
-
-document.addEventListener('mousemove', (e: MouseEvent) => {
-    if (_dragMode === 'pending') {
-        const dx = e.clientX - _initX, dy = e.clientY - _initY;
-        if (dx * dx + dy * dy > 36) { // 6px threshold before activating float
-            inputArea.style.width = _initW + 'px';
-            inputArea.style.left  = _initLeft + 'px';
-            inputArea.style.top   = _initTop + 'px';
-            inputArea.classList.add('floating');
-            _dragMode = 'dragging';
-        }
-    } else if (_dragMode === 'dragging') {
-        const x = Math.max(0, Math.min(window.innerWidth  - 120, e.clientX - _ox));
-        const y = Math.max(0, Math.min(window.innerHeight - 60,  e.clientY - _oy));
-        inputArea.style.left = x + 'px';
-        inputArea.style.top  = y + 'px';
-    } else if (_dragMode === 'resizing') {
-        inputArea.style.width  = Math.max(280, _rsW + e.clientX - _rsX) + 'px';
-        inputArea.style.height = Math.max(80,  _rsH + e.clientY - _rsY) + 'px';
+async function micStart(): Promise<void> {
+    if (micRecorder) { return; }
+    try {
+        micStream = await navigator.mediaDevices.getUserMedia({
+            // Headphone mic: keep the browser's cleanup on, it costs nothing and
+            // whisper does better on a clean signal.
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        });
+    } catch (e) {
+        setMicState('error', 'Mic unavailable: ' + String((e as Error).message ?? e));
+        return;
     }
+    micChunks = [];
+    micRecorder = new MediaRecorder(micStream);
+    micRecorder.ondataavailable = (ev) => { if (ev.data.size) { micChunks.push(ev.data); } };
+    micRecorder.onstop = async () => {
+        const blob = new Blob(micChunks, { type: micChunks[0]?.type || 'audio/webm' });
+        micStream?.getTracks().forEach(t => t.stop());
+        micStream = null; micRecorder = null;
+        if (blob.size < 2000) { setMicState('idle'); return; }   // a stray click, not speech
+        setMicState('thinking');
+        const buf = await blob.arrayBuffer();
+        const ext = /ogg/.test(blob.type) ? 'ogg' : /wav/.test(blob.type) ? 'wav' : 'webm';
+        vscode.postMessage({ type: 'stt_transcribe', bytes: buf, ext });
+    };
+    micRecorder.start();
+    setMicState('recording');
+}
+
+function micStop(): void {
+    if (micRecorder && micRecorder.state !== 'inactive') { micRecorder.stop(); }
+}
+
+function setMicState(state: 'idle' | 'recording' | 'thinking' | 'error', msg?: string): void {
+    micBtn.classList.toggle('recording', state === 'recording');
+    micBtn.classList.toggle('thinking', state === 'thinking');
+    micBtn.textContent = state === 'recording' ? '⏹' : state === 'thinking' ? '…' : '🎤';
+    micBtn.title = msg || (state === 'recording' ? 'Stop and transcribe'
+        : state === 'thinking' ? 'Transcribing…' : 'Click to dictate');
+}
+
+micBtn.addEventListener('click', () => {
+    if (micRecorder) { micStop(); } else { void micStart(); }
 });
 
-document.addEventListener('mouseup', () => { _dragMode = 'idle'; });
+
+// ── Hands-free voice ─────────────────────────────────────────────────────────
+//
+// Say the wake word, talk, hear the answer, repeat. The two halves already existed —
+// push-to-talk dictation and a read-aloud button — but both needed a hand on the
+// keyboard, which defeats the point when you are across the room with one earbud in.
+//
+// Half-duplex on purpose. A Bluetooth earpiece leaks its own output back into its mic,
+// so an open mic while Jac talks makes it wake itself in a loop. The mic is therefore
+// closed while speaking, and the main process reports the exact moment speech ended
+// (tts_done) rather than us estimating it from text length, which drifts on long replies.
+
+type HfState = 'off' | 'wait' | 'armed' | 'busy' | 'speaking';
+
+const HF_RATE = 16000;              // whisper's native rate — capture here, never resample
+const HF_FRAME = 1024;              // 64 ms per frame
+const HF_RING = HF_RATE * 20;       // 20 s of history: longer than any single utterance
+const HF_PREROLL = 0.25;            // seconds kept before speech was detected
+const HF_MIN_SEG = 0.25;            // shorter than this is a cough, not a phrase
+const HF_MAX_SEG = 12;              // hard stop so a noisy room cannot record forever
+const HF_TAIL_WORDS = 3;            // words after the wake phrase that count as a command
+
+// "hey jac" as whisper actually spells it. It has never once written "jac".
+const HF_WAKE = /\b(?:hey|hay|hi|ok|okay|a)[,!.]?\s+(jac|jack|jak|jacques|jackie|jacked|jax|zach)\b/i;
+
+let hfState: HfState = 'off';
+// 'wake' keeps the mic open to hear the wake word — simplest, but on a Bluetooth
+// earbud it holds the hands-free profile and everything played back stays tinny.
+// 'ptt' keeps the mic SHUT until a trigger fires, so the earbud stays in A2DP for
+// music and for the spoken reply. Same loop after that point.
+let hfMode: 'off' | 'wake' | 'ptt' = 'off';
+let hfArmTimer = 0;
+let hfCtx: AudioContext | null = null;
+let hfStream: MediaStream | null = null;
+let hfNode: ScriptProcessorNode | null = null;
+let hfSrc: MediaStreamAudioSourceNode | null = null;
+
+const hfRing = new Float32Array(HF_RING);
+let hfWrite = 0;                    // absolute sample count, only ever increases
+let hfFloor = 0.004;                // adaptive noise floor
+let hfInSpeech = false;
+let hfSegStart = 0;
+let hfLastVoice = 0;
+let hfBusyStt = false;              // a transcription is in flight
+let hfLastPcm: Float32Array | null = null;   // kept so a wake hit can be re-read accurately
+
+const hfBtn = document.createElement('button');
+hfBtn.id = 'handsfree-btn';
+hfBtn.textContent = '👂';
+hfBtn.title = 'Hands-free: say "hey Jac", then talk';
+micBtn.parentElement?.insertBefore(hfBtn, micBtn);
+
+// Picking a different mic matters more than it looks: opening the AirPods microphone
+// drops the earpiece from A2DP to the hands-free profile, and everything Windows plays
+// through it — Jac's voice, the music widget — turns tinny until the mic closes again.
+// Using any other input keeps the earbud in high-quality output mode.
+const hfDevSel = document.createElement('select');
+hfDevSel.id = 'handsfree-dev';
+hfDevSel.title = 'Microphone for hands-free';
+hfDevSel.style.display = 'none';
+micBtn.parentElement?.insertBefore(hfDevSel, micBtn);
+
+async function hfListDevices(): Promise<void> {
+    try {
+        const devs = (await navigator.mediaDevices.enumerateDevices())
+            .filter(d => d.kind === 'audioinput' && d.deviceId);
+        if (devs.length < 2) { return; }
+        hfDevSel.innerHTML = '';
+        for (const d of devs) {
+            const o = document.createElement('option');
+            o.value = d.deviceId;
+            o.textContent = d.label || 'Microphone';
+            hfDevSel.appendChild(o);
+        }
+        const saved = localStorage.getItem('jacHfDevice');
+        if (saved && devs.some(d => d.deviceId === saved)) { hfDevSel.value = saved; }
+        hfDevSel.style.display = '';
+    } catch { /* device list is a convenience; the default mic still works */ }
+}
+hfDevSel.addEventListener('change', () => {
+    localStorage.setItem('jacHfDevice', hfDevSel.value);
+    // Only the wake mode holds the mic open; push-to-talk picks the device up fresh on
+    // its next trigger, so there is nothing to reopen.
+    if (hfMode === 'wake') { hfCloseMic(); void hfSetMode('wake'); }
+});
+
+function hfSetState(next: HfState): void {
+    hfState = next;
+    hfBtn.classList.toggle('on', next !== 'off');
+    hfBtn.classList.toggle('armed', next === 'armed');
+    hfBtn.textContent = next === 'armed' ? '🎙' : next === 'speaking' ? '🔊'
+        : hfMode === 'ptt' ? '🎧' : '👂';
+    hfBtn.title = next === 'off' ? 'Hands-free: say "hey Jac", then talk'
+        : next === 'wait' && hfMode === 'ptt'
+            ? 'Push-to-talk: double-press the earbud stem (or Ctrl+Shift+J). Mic stays off '
+              + 'until then, so playback keeps full quality. Click to turn off'
+        : next === 'wait' ? 'Listening for "hey Jac" — click for push-to-talk'
+        : next === 'armed' ? 'Go ahead, I am listening'
+        : next === 'busy' ? 'Thinking…'
+        : 'Speaking — mic is closed so I do not hear myself';
+}
+
+/** Short rising tone, so you know it heard you without waiting for words. */
+function hfBeep(up: boolean): void {
+    try {
+        // In push-to-talk the capture graph is gone between turns, but an
+        // output-only context does not touch the mic, so it cannot force HFP.
+        const own = !hfCtx;
+        const ctx = hfCtx ?? new AudioContext();
+        if (own) { setTimeout(() => { void ctx.close(); }, 400); }
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.frequency.setValueAtTime(up ? 660 : 440, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(up ? 990 : 330, ctx.currentTime + 0.09);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.14);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.15);
+    } catch { /* a missing beep must never break the loop */ }
+}
+
+/** Copy [from,to) out of the ring, clamped to what is still resident. */
+function hfSlice(from: number, to: number): Float32Array {
+    const lo = Math.max(from, hfWrite - HF_RING, 0);
+    const hi = Math.min(to, hfWrite);
+    const n = Math.max(0, hi - lo);
+    const out = new Float32Array(n);
+    for (let i = 0; i < n; i++) { out[i] = hfRing[(lo + i) % HF_RING]; }
+    return out;
+}
+
+/** 16-bit mono WAV at 16 kHz — exactly what whisper.cpp wants, so main skips ffmpeg. */
+function hfWav(pcm: Float32Array): ArrayBuffer {
+    const buf = new ArrayBuffer(44 + pcm.length * 2);
+    const dv = new DataView(buf);
+    const tag = (o: number, t: string): void => {
+        for (let i = 0; i < t.length; i++) { dv.setUint8(o + i, t.charCodeAt(i)); }
+    };
+    tag(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); tag(8, 'WAVE');
+    tag(12, 'fmt '); dv.setUint32(16, 16, true);
+    dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, HF_RATE, true); dv.setUint32(28, HF_RATE * 2, true);
+    dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+    tag(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+    for (let i = 0; i < pcm.length; i++) {
+        const v = Math.max(-1, Math.min(1, pcm[i]));
+        dv.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7fff, true);
+    }
+    return buf;
+}
+
+function hfSend(pcm: Float32Array, tier: 'fast' | 'accurate', tag: string): void {
+    hfBusyStt = true;
+    hfLastPcm = pcm;
+    vscode.postMessage({ type: 'stt_transcribe', bytes: hfWav(pcm), ext: 'pcmwav', tier, tag });
+}
+
+function hfFrame(buf: Float32Array): void {
+    for (let i = 0; i < buf.length; i++) { hfRing[(hfWrite + i) % HF_RING] = buf[i]; }
+    hfWrite += buf.length;
+
+    let sum = 0;
+    for (let i = 0; i < buf.length; i++) { sum += buf[i] * buf[i]; }
+    const rms = Math.sqrt(sum / buf.length);
+
+    // Fall to a quieter floor quickly, rise slowly. A room that gets noisier raises the
+    // bar instead of latching the detector permanently open.
+    hfFloor = rms < hfFloor ? hfFloor * 0.9 + rms * 0.1 : hfFloor * 0.999 + rms * 0.001;
+    const voiced = rms > Math.max(hfFloor * 3.5, 0.008);
+
+    // Keep filling the ring while busy or speaking so the pre-roll is there the moment we
+    // reopen, but never act on it — that is what stops Jac hearing itself.
+    if (hfState !== 'wait' && hfState !== 'armed') { hfInSpeech = false; return; }
+    if (hfBusyStt) { return; }
+
+    if (voiced) {
+        hfLastVoice = hfWrite;
+        if (!hfInSpeech) { hfInSpeech = true; hfSegStart = hfWrite - buf.length; }
+    }
+    if (!hfInSpeech) { return; }
+
+    const armed = hfState === 'armed';
+    const silence = (hfWrite - hfLastVoice) / HF_RATE;
+    const length = (hfWrite - hfSegStart) / HF_RATE;
+    // Waiting for a wake word, a short gap is enough. Mid-sentence a person pauses to
+    // think, so give them a full second before deciding they are done.
+    if (silence < (armed ? 1.0 : 0.45) && length < HF_MAX_SEG) { return; }
+
+    hfInSpeech = false;
+    const pcm = hfSlice(hfSegStart - HF_RATE * HF_PREROLL, hfLastVoice + HF_RATE * 0.2);
+    if (pcm.length < HF_RATE * HF_MIN_SEG) { return; }
+    hfSend(pcm, armed ? 'accurate' : 'fast', armed ? 'cmd' : 'wake');
+    // Audio is captured, so the mic has no more work this turn. Releasing it now
+    // hands the earbud back to A2DP before the reply is spoken.
+    if (armed && hfMode === 'ptt') { hfCloseMic(); hfSetState('busy'); }
+}
+
+/** Build the capture graph. Separate from mode, so PTT can open it per turn. */
+async function hfOpenMic(): Promise<boolean> {
+    if (hfCtx) { return true; }
+    try {
+        const dev = hfDevSel.value;
+        hfStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                deviceId: dev ? { exact: dev } : undefined,
+                echoCancellation: true, noiseSuppression: true, autoGainControl: true,
+                channelCount: 1,
+            },
+        });
+    } catch (e) {
+        appendMessage('assistant', '🎤 Mic unavailable: ' + String((e as Error).message ?? e));
+        return false;
+    }
+    void hfListDevices();   // labels only exist once permission has been granted
+    hfCtx = new AudioContext({ sampleRate: HF_RATE });
+    hfSrc = hfCtx.createMediaStreamSource(hfStream);
+    // ScriptProcessor is deprecated but is the one node that works without shipping a
+    // separate worklet file through the bundler, and 64 ms of arithmetic per frame does
+    // not trouble the main thread.
+    hfNode = hfCtx.createScriptProcessor(HF_FRAME, 1, 1);
+    hfNode.onaudioprocess = (ev) => hfFrame(ev.inputBuffer.getChannelData(0));
+    // A ScriptProcessor only runs when connected to the destination, so route it through
+    // a silent gain — otherwise the mic is played back out of the speakers.
+    const mute = hfCtx.createGain();
+    mute.gain.value = 0;
+    hfSrc.connect(hfNode); hfNode.connect(mute); mute.connect(hfCtx.destination);
+    hfWrite = 0; hfInSpeech = false; hfBusyStt = false; hfFloor = 0.004;
+    return true;
+}
+
+/** Release the mic WITHOUT leaving hands-free. This is what restores A2DP. */
+function hfCloseMic(): void {
+    const ctx = hfCtx;
+    try { hfNode?.disconnect(); hfSrc?.disconnect(); } catch { /* already torn down */ }
+    hfStream?.getTracks().forEach(t => t.stop());
+    hfNode = null; hfSrc = null; hfStream = null; hfCtx = null;
+    try { void ctx?.close(); } catch { /* already closed */ }
+    hfInSpeech = false;
+    if (hfArmTimer) { clearTimeout(hfArmTimer); hfArmTimer = 0; }
+}
+
+async function hfSetMode(mode: 'off' | 'wake' | 'ptt'): Promise<void> {
+    hfMode = mode;
+    if (mode === 'off') {
+        hfCloseMic();
+        vscode.postMessage({ type: 'tts_stop' });
+        hfSetState('off');
+        return;
+    }
+    if (mode === 'wake') {
+        if (await hfOpenMic()) { hfSetState('wait'); } else { hfMode = 'off'; hfSetState('off'); }
+        return;
+    }
+    hfCloseMic();       // push-to-talk rests with the mic shut; that is the whole point
+    hfSetState('wait');
+}
+
+/** Trigger fired: open the mic, arm, and let the normal capture path finish it. */
+async function hfPtt(): Promise<void> {
+    if (hfMode !== 'ptt' || hfState === 'armed') { return; }
+    if (hfState === 'speaking') { vscode.postMessage({ type: 'tts_stop' }); }
+    if (!(await hfOpenMic())) { hfSetState('wait'); return; }
+    hfBeep(true);       // only after the stream is live, so the beep means "go"
+    hfSetState('armed');
+    // Triggered by accident, or thought better of it: do not sit holding the mic
+    // open, since that is exactly what keeps the earbud in hands-free mode.
+    hfArmTimer = window.setTimeout(() => {
+        if (hfState === 'armed') { hfBeep(false); hfCloseMic(); hfSetState('wait'); }
+    }, 9000);
+}
+
+hfBtn.addEventListener('click', () => {
+    void hfSetMode(hfMode === 'off' ? 'wake' : hfMode === 'wake' ? 'ptt' : 'off');
+});
+
+/** Strip a leading wake phrase so "hey Jac what is running" sends only the question. */
+function hfStripWake(text: string): string {
+    const m = HF_WAKE.exec(text);
+    if (!m) { return text.trim(); }
+    return text.slice(m.index + m[0].length).replace(/^[\s,.!?:-]+/, '').trim();
+}
+
+/** Transcripts come back here tagged, so a wake probe never lands in the composer. */
+function hfSttResult(tag: string, text: string, error: string): void {
+    hfBusyStt = false;
+    if (hfState === 'off') { return; }
+    if (error) {
+        appendMessage('assistant', '🎤 ' + error);
+        void hfSetMode('off');
+        return;
+    }
+    if (tag === 'wake') {
+        if (!HF_WAKE.test(text)) { return; }        // someone talking nearby; keep waiting
+        const rest = hfStripWake(text);
+        if (rest.split(/\s+/).filter(Boolean).length >= HF_TAIL_WORDS) {
+            // Said in one breath. Re-read the SAME audio with the accurate model rather
+            // than trusting tiny.en's version of the actual question.
+            hfBeep(true);
+            if (hfLastPcm) { hfSend(hfLastPcm, 'accurate', 'cmd'); }
+            return;
+        }
+        hfBeep(true);
+        hfInSpeech = false;
+        hfSetState('armed');
+        return;
+    }
+    // tag === 'cmd'
+    const cmd = hfStripWake(text);
+    if (!cmd) { hfBeep(false); hfSetState('wait'); return; }
+    inputEl.value = cmd;
+    hfSetState('busy');
+    sendPrompt();
+}
+
+/** Response finished: read it back, and keep the mic shut until it has been read. */
+function hfResponseDone(el: HTMLElement | null): void {
+    if (hfState !== 'busy') { return; }
+    const t = (el?.querySelector('.msg-text') as HTMLElement | null)?.innerText ?? '';
+    if (!t.trim()) { hfSetState('wait'); return; }
+    hfSetState('speaking');
+    vscode.postMessage({ type: 'tts_speak', text: t });
+}
+
+// The composer used to be draggable/floatable via a grip handle. Removed — the grip
+// read as three stray bars above the input and the float mode was never used.
 
 // ── Markdown rendering ───────────────────────────────────────────────────────
 
 function renderMarkdown(text: string): string {
+    // .msg-text is white-space: pre-wrap, so every newline the model emits is a real
+    // line box. Models routinely double- and triple-space their prose, which read as
+    // huge gaps between paragraphs. Collapse runs of blank lines to a single one —
+    // but only outside fenced code, where blank lines are the author's.
+    text = text.split(/(```[\s\S]*?```)/g)
+        .map((seg, i) => (i % 2 ? seg : seg.replace(/\n{3,}/g, '\n\n')))
+        .join('');
+
     // Escape HTML first
     let html = escHtml(text);
 
@@ -1343,8 +1723,32 @@ function renderMarkdown(text: string): string {
     // Italic (*...*)
     html = html.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
 
+    // Images ![alt](src) — MUST precede the link rule, or "![x](y)" becomes a stray "!" + <a>.
+    // jac__screenshot returns one of these so captures show inline instead of as a bare path.
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
+        '<img class="md-img" src="$2" alt="$1" title="$1">');
+
     // Links [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // Pipe tables. Models emit these constantly and without this they render as raw
+    // "| a | b |" text, which is most of why long answers looked rough.
+    html = html.replace(
+        // The final row needs `$` as well as `\n`: a table that ends the message has no
+        // trailing newline, and requiring one dropped its last row into raw pipes.
+        /(?:^|\n)((?:\|[^\n]*\|[ \t]*(?:\n|$))+)/g,
+        (whole: string, block: string) => {
+            const rows = block.trimEnd().split('\n').filter(r => r.trim());
+            if (rows.length < 2) { return whole; }
+            const cells = (r: string) => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+            // row 2 must be the --- separator, else it is not a table
+            if (!/^\|?[\s:\-|]+\|?$/.test(rows[1]) || !rows[1].includes('-')) { return whole; }
+            const head = cells(rows[0]);
+            const body = rows.slice(2).map(cells);
+            const th = head.map(c => `<th>${c}</th>`).join('');
+            const tb = body.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+            return `\n<table class="md-table"><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>\n`;
+        });
 
     // Unordered list items (- item or * item)
     html = html.replace(/^[\-\*] (.+)$/gm, '<span class="md-list-item">\u2022 $1</span>');
@@ -1439,7 +1843,7 @@ function autoSaveConversation(): void {
     });
 }
 
-function renderHistoryList(conversations: Array<{id: string; title: string; timestamp: number; model: string; cost: number; turns: number}>): void {
+function renderHistoryList(conversations: Array<{id: string; title: string; timestamp: number; model: string; cost: number; turns: number; otherProject?: string}>): void {
     removeWelcome();
     messagesEl.innerHTML = '';
 
@@ -1456,7 +1860,18 @@ function renderHistoryList(conversations: Array<{id: string; title: string; time
     heading.textContent = 'Conversation History';
     container.appendChild(heading);
 
+    // main returns this project's conversations first, then everything else carrying an
+    // otherProject tag. Mark where that boundary falls — a flat, unlabelled list was fine
+    // at two entries and is unreadable now it spans every folder.
+    let dividerShown = false;
     for (const convo of conversations) {
+        if (convo.otherProject && !dividerShown) {
+            dividerShown = true;
+            const div = document.createElement('div');
+            div.className = 'history-divider';
+            div.textContent = 'From other folders';
+            container.appendChild(div);
+        }
         const item = document.createElement('div');
         item.className = 'history-item';
 
@@ -1468,7 +1883,23 @@ function renderHistoryList(conversations: Array<{id: string; title: string; time
         meta.className = 'history-meta';
         const date = new Date(convo.timestamp);
         const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-        meta.textContent = `${dateStr} \u00B7 ${convo.model} \u00B7 ${convo.turns} turns \u00B7 $${convo.cost.toFixed(4)}`;
+        // Guard each field: Claude Code sessions and older saved conversations do not all
+        // carry model/turns/cost, and .toFixed() on undefined threw away the whole list.
+        const bits = [dateStr];
+        if (convo.model) { bits.push(String(convo.model)); }
+        if (typeof convo.turns === 'number') { bits.push(convo.turns + ' turns'); }
+        if (typeof convo.cost === 'number') { bits.push('$' + convo.cost.toFixed(4)); }
+        meta.textContent = bits.join(' \u00B7 ');
+        if (convo.otherProject) {
+            const tag = document.createElement('span');
+            tag.className = 'history-project';
+            // Folder name only — full paths are too long to scan down a list.
+            tag.textContent = convo.otherProject === 'unfiled'
+                ? 'unfiled' : convo.otherProject.replace(/^.*[\\/]/, '');
+            tag.title = convo.otherProject;
+            meta.appendChild(document.createTextNode(' '));
+            meta.appendChild(tag);
+        }
 
         const actions = document.createElement('div');
         actions.className = 'history-actions';
@@ -1663,6 +2094,12 @@ window.addEventListener('message', (event) => {
             renderThinking(msg.text);
             break;
 
+        // Reasoning finished — close the <details> so the answer that follows isn't
+        // appended into the thought. (F-03)
+        case 'thinking_end':
+            finishThinking();
+            break;
+
         case 'result':
             finishThinking();
             if (msg.total_cost_usd != null) { sessionCost += msg.total_cost_usd; }
@@ -1681,8 +2118,19 @@ window.addEventListener('message', (event) => {
 
         case 'done':
             finishThinking();
+            hfResponseDone(currentAssistantEl);
             currentAssistantEl = null;
             setStreaming(false);
+            break;
+
+        case 'voice_ptt':
+            void hfPtt();
+            break;
+
+        // Main reports the true end of an utterance; guessing from text length drifts.
+        case 'tts_done':
+            if (hfState === 'speaking') { hfSetState('wait'); }
+            document.querySelectorAll('.msg-speak.speaking').forEach(b => b.classList.remove('speaking'));
             break;
 
         case 'error':
@@ -1783,8 +2231,11 @@ window.addEventListener('message', (event) => {
                     vscode.postMessage({ type: 'set_model', model: currentModel, provider_id: currentProviderId });
                 }
             }
-            // Last resort: if still no provider, pin to preferred machine using any model it offers
-            if (!currentProviderId && preferredMachineId && availableModels.length > 0) {
+            // Last resort: if still no provider, pin to preferred machine using any model it offers.
+            // Local/Ollama models legitimately have no relay provider, so exempt them —
+            // otherwise this "fallback" silently replaces the user's local pick with a cloud one.
+            if (!currentProviderId && !isLocalPick(currentModel)
+                && preferredMachineId && availableModels.length > 0) {
                 const anyFromPreferred = availableModels.find(m => m.provider_id === preferredMachineId || m.machine_id === preferredMachineId);
                 if (anyFromPreferred) {
                     currentModel = anyFromPreferred.id;
@@ -1792,14 +2243,7 @@ window.addEventListener('message', (event) => {
                     vscode.postMessage({ type: 'set_model', model: currentModel, provider_id: currentProviderId });
                 }
             }
-            // Apply saved default model on first models list after startup
-            if (pendingDefaultApply && defaultModel
-                && availableModels.some(m => m.id === defaultModel)) {
-                pendingDefaultApply = false;
-                currentModel = defaultModel;
-                currentProviderId = pickProviderId(defaultModel);
-                vscode.postMessage({ type: 'set_model', model: defaultModel, provider_id: currentProviderId });
-            }
+            applyPendingDefault();
             updateModelButton();
             if (slashMenuVisible && modelPickerTab === 'cloud') {
                 showModelPicker(); // refresh picker with new model list
@@ -1820,9 +2264,33 @@ window.addEventListener('message', (event) => {
             }
             break;
         }
+        case 'stt_result': {
+            // Hands-free transcripts carry a tag and drive the voice loop; untagged
+            // ones are push-to-talk dictation and belong in the composer, where they
+            // can be corrected before they go out.
+            if (msg.tag) {
+                hfSttResult(String(msg.tag), String(msg.text ?? ''), msg.error ? String(msg.error) : '');
+                break;
+            }
+            const t = String(msg.text ?? '').trim();
+            if (msg.error) {
+                setMicState('error', String(msg.error));
+                appendMessage('assistant', `🎤 ${msg.error}`);
+            } else if (t) {
+                inputEl.value = inputEl.value ? inputEl.value.replace(/\s*$/, ' ') + t : t;
+                inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                inputEl.focus();
+                setMicState('idle');
+            } else {
+                setMicState('error', 'Nothing heard');
+            }
+            break;
+        }
         case 'local_models_list':
             if (msg.models) {
                 localModels = msg.models;
+                applyPendingDefault();   // a local default only becomes selectable here
+                updateModelButton();
                 if (slashMenuVisible && modelPickerTab === 'local') {
                     showModelPicker(); // refresh the picker
                 }
@@ -1882,6 +2350,24 @@ function appendMessage(role: 'user' | 'assistant', text: string, images?: Array<
         const dot = document.createElement('div');
         dot.className = 'msg-dot';
         gutter.appendChild(dot);
+        // Read-aloud. Lives in the gutter so it never disturbs the text column, and reads
+        // the rendered text rather than the raw markdown so code fences/quotes are skipped.
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'msg-speak';
+        speakBtn.title = 'Read this message aloud';
+        speakBtn.textContent = '🔊';
+        speakBtn.addEventListener('click', () => {
+            const t = (el.querySelector('.msg-text') as HTMLElement | null)?.innerText ?? '';
+            if (speakBtn.classList.contains('speaking')) {
+                vscode.postMessage({ type: 'tts_stop' });
+                speakBtn.classList.remove('speaking');
+                return;
+            }
+            document.querySelectorAll('.msg-speak.speaking').forEach(b => b.classList.remove('speaking'));
+            speakBtn.classList.add('speaking');
+            vscode.postMessage({ type: 'tts_speak', text: t });
+        });
+        gutter.appendChild(speakBtn);
         el.appendChild(gutter);
     }
 

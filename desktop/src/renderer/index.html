@@ -40,6 +40,131 @@
             background: var(--app-panel);
         }
 
+        /* ── Mini music transport (composer row) ─────────────────────────────
+           Sits beside the composer in the dead space left by the reading column.
+           Deliberately BOUNDED: letting it span the monitor stranded the controls
+           in the middle of a void, which is the same mistake the chat column had. */
+        #input-area { display: flex; align-items: stretch; gap: 14px; justify-content: flex-start; }
+        #input-container { flex: 0 0 auto; }
+        #mini-music {
+            flex: 0 1 auto;
+            width: 760px;
+            max-width: 760px;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 12px;
+            border: 1px solid var(--app-border, #2b2b2b);
+            border-radius: 8px;
+            background: var(--tool-bg, #161616);
+            color: var(--app-dim, #888);
+            font-size: 12px;
+        }
+        #mm-title {
+            flex: 0 1 150px; min-width: 0;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            color: var(--app-fg, #d4d4d4);
+        }
+        #mini-music.idle #mm-title { color: var(--app-dim, #888); }
+        /* The visualiser sits ON the seek bar, the way the old VS Code panel did it:
+           each band is a segment along the bar and only the ELAPSED portion lights up,
+           so the spectrum doubles as the progress fill. */
+        #mm-bar { position: relative; flex: 1 1 auto; min-width: 90px; height: 26px; display: flex; align-items: center; }
+        #mm-viz { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        #mm-controls { display: flex; gap: 1px; flex: 0 0 auto; }
+        #mini-music button {
+            background: none; border: none; cursor: pointer;
+            color: var(--app-dim, #888);
+            font-size: 12px; line-height: 1; padding: 4px 5px; border-radius: 4px;
+        }
+        #mini-music button:hover { color: var(--app-fg, #d4d4d4); background: var(--list-hover, rgba(255,255,255,0.06)); }
+        #mm-play { font-size: 14px; color: var(--app-fg, #d4d4d4); }
+        #mm-seek {
+            flex: 1 1 auto; min-width: 70px; max-width: 200px;
+            height: 3px; -webkit-appearance: none;
+            background: var(--app-border, #2b2b2b); border-radius: 2px; cursor: pointer;
+        }
+        #mm-seek::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 9px; height: 9px; border-radius: 50%;
+            background: var(--app-accent, #4daafc); cursor: pointer;
+        }
+        #mm-time { flex: 0 0 auto; font-variant-numeric: tabular-nums; font-size: 11px; opacity: 0.8; }
+        #mm-vol {
+            flex: 0 0 58px; height: 3px; -webkit-appearance: none;
+            background: var(--app-border, #2b2b2b); border-radius: 2px; cursor: pointer;
+        }
+        #mm-vol::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 9px; height: 9px; border-radius: 50%;
+            background: var(--app-dim, #888); cursor: pointer;
+        }
+        #mm-vol:hover::-webkit-slider-thumb { background: var(--app-accent, #4daafc); }
+        #mm-mute { flex: 0 0 auto; font-size: 11px; }
+        #mm-open { flex: 0 0 auto; opacity: 0.7; }
+        /* ── Library picker (popover above the transport) ────────────────── */
+        #mini-music { position: relative; }
+        #mm-picker {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            width: 460px;
+            max-height: 46vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--app-panel, #191919);
+            border: 1px solid var(--app-border, #2b2b2b);
+            border-radius: 8px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+            z-index: 40;
+            overflow: hidden;
+        }
+        #mm-picker[hidden] { display: none; }
+        #mmp-head { display: flex; gap: 6px; padding: 8px; border-bottom: 1px solid var(--app-border, #2b2b2b); }
+        #mmp-search, #mmp-newpl {
+            flex: 1; min-width: 0;
+            background: var(--input-bg, #1e1e1e);
+            border: 1px solid var(--app-border, #2b2b2b);
+            border-radius: 5px;
+            color: var(--app-fg, #d4d4d4);
+            padding: 5px 8px; font-size: 12px; font-family: inherit;
+        }
+        #mmp-search:focus, #mmp-newpl:focus { outline: none; border-color: var(--app-accent, #4daafc); }
+        #mmp-tabs { display: flex; gap: 2px; padding: 6px 8px 0; }
+        .mmp-tab {
+            background: none; border: none; cursor: pointer;
+            color: var(--app-dim, #888); font-size: 11.5px;
+            padding: 4px 10px; border-radius: 5px 5px 0 0;
+            border-bottom: 2px solid transparent;
+        }
+        .mmp-tab.active { color: var(--app-fg, #d4d4d4); border-bottom-color: var(--app-accent, #4daafc); }
+        #mmp-body { flex: 1; overflow-y: auto; padding: 4px; min-height: 90px; }
+        .mmp-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px;
+            color: var(--app-fg, #d4d4d4);
+        }
+        .mmp-row:hover { background: var(--list-hover, rgba(255,255,255,0.06)); }
+        .mmp-row.playing { color: var(--app-accent, #4daafc); }
+        .mmp-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mmp-count { flex: 0 0 auto; font-size: 11px; color: var(--app-dim, #888); font-variant-numeric: tabular-nums; }
+        .mmp-act {
+            flex: 0 0 auto; background: none; border: none; cursor: pointer;
+            color: var(--app-dim, #888); font-size: 12px; padding: 2px 5px; border-radius: 4px;
+            opacity: 0; transition: opacity 0.1s;
+        }
+        .mmp-row:hover .mmp-act { opacity: 1; }
+        .mmp-act:hover { color: var(--app-fg, #d4d4d4); background: var(--app-border, #2b2b2b); }
+        .mmp-empty { padding: 22px; text-align: center; color: var(--app-dim, #888); font-size: 12px; }
+        #mmp-foot { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--app-border, #2b2b2b); }
+        #mmp-addpl {
+            background: var(--app-border, #2b2b2b); border: none; border-radius: 5px;
+            color: var(--app-fg, #d4d4d4); font-size: 11.5px; padding: 5px 12px; cursor: pointer;
+        }
+        #mmp-addpl:hover { background: var(--app-accent, #4daafc); color: #fff; }
+
+        /* Shed the widget before the composer gets squeezed. */
+        @media (max-width: 1250px) { #mini-music { display: none; } }
+
         #main-layout {
             display: flex;
             flex: 1;
@@ -56,6 +181,45 @@
             align-items: center;
             background: var(--app-panel);
             border-right: 1px solid var(--app-border);
+        }
+
+        /* ── F-07 rail: 16 unlabelled glyphs in one undifferentiated column meant the
+           only way to learn it was to click everything. Hovering the rail widens it and
+           reveals each button's own title as a label; dividers separate what JAC does
+           in software from the hardware bench and the research tools. ──────────── */
+        #activity-bar { transition: width 0.16s ease; overflow: hidden; }
+        #activity-bar:hover,
+        #activity-bar:focus-within { width: 190px; }
+
+        #activity-bar:hover .activity-btn,
+        #activity-bar:focus-within .activity-btn {
+            width: 190px;
+            justify-content: flex-start;
+            padding-left: 13px;
+            gap: 12px;
+        }
+        .activity-btn::after {
+            content: attr(data-label);
+            font-size: 12.5px;
+            white-space: nowrap;
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            transition: opacity 0.14s ease, max-width 0.16s ease;
+        }
+        #activity-bar:hover .activity-btn::after,
+        #activity-bar:focus-within .activity-btn::after {
+            opacity: 1;
+            max-width: 130px;
+        }
+        /* group starts — a hairline above the first item of each cluster */
+        #act-pcb, #act-neuro, #act-setup {
+            border-top: 1px solid var(--app-border);
+            margin-top: 6px;
+            padding-top: 2px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #activity-bar, .activity-btn, .activity-btn::after { transition: none; }
         }
 
         .activity-btn {
@@ -330,23 +494,23 @@
     <div id="main-layout">
         <!-- Activity Bar -->
         <div id="activity-bar">
-            <button class="activity-btn active" id="act-chat" title="Chat" data-panel="chat">
+            <button class="activity-btn active" id="act-chat" data-label="Chat" title="Chat" data-panel="chat">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
             </button>
-            <button class="activity-btn active" id="act-explorer" title="Explorer" data-panel="sidebar">
+            <button class="activity-btn active" id="act-explorer" data-label="Explorer" title="Explorer" data-panel="sidebar">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-projects" title="Projects — home base" data-panel="projects">
+            <button class="activity-btn" id="act-projects" data-label="Projects" title="Projects — home base" data-panel="projects">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
                     <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-workflow" title="Workflow" data-panel="workflow">
+            <button class="activity-btn" id="act-workflow" data-label="Workflow" title="Workflow" data-panel="workflow">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <circle cx="3" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/>
                     <circle cx="15" cy="4" r="2.5" stroke="currentColor" stroke-width="1.3"/>
@@ -355,7 +519,7 @@
                     <line x1="5.5" y1="10" x2="12.5" y2="13" stroke="currentColor" stroke-width="1.3"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-models" title="Local Models" data-panel="models">
+            <button class="activity-btn" id="act-models" data-label="Local Models" title="Local Models" data-panel="models">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="4" y="4" width="16" height="16" rx="2"/>
                     <rect x="9" y="9" width="6" height="6" rx="1"/>
@@ -369,38 +533,38 @@
                     <line x1="1" y1="15" x2="4" y2="15"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-music" title="Music" data-panel="music">
+            <button class="activity-btn" id="act-music" data-label="Music" title="Music" data-panel="music">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 18V5l12-2v13"/>
                     <circle cx="6" cy="18" r="3"/>
                     <circle cx="18" cy="16" r="3"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-mcp" title="MCP Servers" data-panel="mcp">
+            <button class="activity-btn" id="act-mcp" data-label="MCP Servers" title="MCP Servers" data-panel="mcp">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2v4"/><path d="M8 2v4"/><path d="M16 2v4"/>
                     <rect x="6" y="6" width="12" height="8" rx="2"/>
                     <path d="M12 14v4a3 3 0 0 0 3 3h1"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-pcb" title="PCB — place footprints, route, fabricate" data-panel="pcb">
+            <button class="activity-btn" id="act-pcb" data-label="PCB" title="PCB — place footprints, route, fabricate" data-panel="pcb">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2"/>
                     <circle cx="8" cy="8" r="1.4"/><circle cx="16" cy="16" r="1.4"/>
                     <path d="M8 8h5a3 3 0 0 1 3 3v5"/><path d="M8 8v4"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-schematic" title="Schematic — place parts, wire pins into nets" data-panel="schematic">
+            <button class="activity-btn" id="act-schematic" data-label="Schematic" title="Schematic — place parts, wire pins into nets" data-panel="schematic">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 12h4l1.5-4 3 8 2-6 1.5 2H22"/><circle cx="2" cy="12" r="0.6" fill="currentColor"/><circle cx="22" cy="12" r="0.6" fill="currentColor"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-cad" title="CAD" data-panel="cad">
+            <button class="activity-btn" id="act-cad" data-label="CAD" title="CAD" data-panel="cad">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-capture" title="Banana Slug — record system audio" data-panel="capture">
+            <button class="activity-btn" id="act-capture" data-label="Audio Capture" title="Banana Slug — record system audio" data-panel="capture">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -408,7 +572,7 @@
                     <line x1="8" y1="22" x2="16" y2="22"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-stocks" title="Stocks" data-panel="stocks">
+            <button class="activity-btn" id="act-stocks" data-label="Stocks" title="Stocks" data-panel="stocks">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="18" x2="5" y2="12"/><rect x="3.5" y="12" width="3" height="6" rx=".5" fill="currentColor" stroke="none"/>
                     <line x1="12" y1="18" x2="12" y2="8"/><rect x="10.5" y="8" width="3" height="5" rx=".5" fill="currentColor" stroke="none"/>
@@ -416,24 +580,24 @@
                     <line x1="3" y1="20" x2="21" y2="20"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-neuro" title="Steering & Surgery — control-vector personality mixer + neuron-level attribution/editing" data-panel="neuro">
+            <button class="activity-btn" id="act-neuro" data-label="Steering" title="Steering & Surgery — control-vector personality mixer + neuron-level attribution/editing" data-panel="neuro">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2.2" fill="var(--app-panel)"/>
                     <line x1="4" y1="17" x2="20" y2="17"/><circle cx="15" cy="17" r="2.2" fill="var(--app-panel)"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-zeldovich" title="ZELDOVICH — plasma N₂-fixation research: provenance-tiered experiment ledger + solver" data-panel="zeldovich">
+            <button class="activity-btn" id="act-zeldovich" data-label="Zeldovich" title="ZELDOVICH — plasma N₂-fixation research: provenance-tiered experiment ledger + solver" data-panel="zeldovich">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 3h6"/><path d="M10 3v6l-5 8.5A2 2 0 0 0 6.7 21h10.6a2 2 0 0 0 1.7-3.5L14 9V3"/>
                     <line x1="7.5" y1="15" x2="16.5" y2="15"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-setup" title="Setup — install components" data-panel="setup" style="margin-top:auto">
+            <button class="activity-btn" id="act-setup" data-label="Setup" title="Setup — install components" data-panel="setup" style="margin-top:auto">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3v10"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
                 </svg>
             </button>
-            <button class="activity-btn" id="act-settings" title="Settings" data-panel="settings">
+            <button class="activity-btn" id="act-settings" data-label="Settings" title="Settings" data-panel="settings">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"/>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -507,8 +671,8 @@
                     </div>
                 </div>
                 <div id="nokey-banner" style="display:none;padding:16px 18px;margin:14px;border:1px solid var(--app-border,#3a3a3c);background:var(--app-panel,#252526);border-radius:12px">
-                    <div style="font-weight:600;font-size:15px;margin-bottom:4px;color:var(--app-fg,#e6e6e6)">No API key detected</div>
-                    <div style="font-size:13px;color:var(--app-dim,#999);margin-bottom:12px">Paste your OpenRouter API key to start chatting. You can change it anytime in Settings.</div>
+                    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px"><div style="font-weight:600;font-size:15px;color:var(--app-fg,#e6e6e6);flex:1">No API key detected</div><button id="nokey-close" title="Dismiss — you can add a key later in Settings" aria-label="Dismiss" style="border:0;background:none;color:var(--app-dim,#999);font-size:18px;line-height:1;cursor:pointer;padding:0 2px">&times;</button></div>
+                    <div style="font-size:13px;color:var(--app-dim,#999);margin-bottom:12px">Paste your OpenRouter API key to start chatting — or dismiss this and pick a local model from the model menu. You can add a key anytime in Settings.</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <input id="nokey-input" type="password" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false" style="flex:1;min-width:200px;padding:9px 11px;border:1px solid var(--app-border,#3a3a3c);border-radius:8px;background:var(--app-bg,#1a1a1a);color:var(--app-fg,#e6e6e6);font-family:ui-monospace,monospace;font-size:13px;outline:none">
                         <button id="nokey-save" style="padding:9px 18px;border:0;border-radius:8px;background:var(--app-accent,#d97757);color:#fff;font-size:13px;cursor:pointer">Save key</button>
@@ -524,7 +688,14 @@
                         try {
                             var cfg = await window.jac.getConfig();
                             var has = cfg && cfg.openrouterApiKey && String(cfg.openrouterApiKey).trim();
-                            banner.style.display = has ? 'none' : 'block';
+                            // Dismissed once, stays dismissed: someone running a local model has no
+                            // key by design, and re-prompting them every launch reads as broken.
+                            var hidden = false;
+                            try { hidden = localStorage.getItem('jacNokeyDismissed') === '1'; } catch(e){}
+                            // Already on a local model? The key is irrelevant — do not prompt at all.
+                            var model = String((cfg && (cfg.lastModel || cfg.defaultModel)) || '');
+                            var local = model.indexOf('local:') === 0;
+                            banner.style.display = (has || hidden || local) ? 'none' : 'block';
                         } catch(e){}
                     }
                     function wire(){
@@ -538,10 +709,19 @@
                             save.disabled = true; msg.textContent = 'Saving…';
                             try {
                                 await window.jac.saveConfig({ openrouterApiKey: key });
+                                try { localStorage.removeItem('jacNokeyDismissed'); } catch(e){}
                                 msg.textContent = 'Saved — you can chat now (change it later in Settings).';
                                 input.value = '';
                                 setTimeout(function(){ var b=document.getElementById('nokey-banner'); if(b) b.style.display='none'; }, 900);
                             } catch(e){ msg.textContent = 'Could not save: ' + e; save.disabled = false; }
+                        }
+                        var close = document.getElementById('nokey-close');
+                        if (close) {
+                            close.onclick = function(){
+                                var b = document.getElementById('nokey-banner');
+                                if (b) { b.style.display = 'none'; }
+                                try { localStorage.setItem('jacNokeyDismissed', '1'); } catch(e){}
+                            };
                         }
                         save.onclick = doSave;
                         input.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); doSave(); } });
@@ -567,6 +747,43 @@
                             <span class="spacer"></span>
                             <button id="attach-btn" title="Attach images (Clippy wants to help!)"><img id="clippy-img" alt="Clippy" src="data:image/png;base64,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" /></button>
                             <button id="send-btn" title="Send">&#x2191;</button>
+                        </div>
+                    </div>
+                    <!-- Mini transport. The composer is capped at the reading column, so on a
+                         wide window there is a lot of dead space to its right; this fills it.
+                         It drives the existing #music-frame directly (same origin) rather than
+                         owning its own <audio>, so the Music tab and this stay in lockstep. -->
+                    <div id="mini-music" aria-label="Music transport">
+                        <div id="mm-title">Nothing playing</div>
+                        <div id="mm-controls">
+                            <button id="mm-prev" title="Previous">&#x23EE;</button>
+                            <button id="mm-play" title="Play / pause">&#x25B6;</button>
+                            <button id="mm-next" title="Next">&#x23ED;</button>
+                        </div>
+                        <div id="mm-bar">
+                            <canvas id="mm-viz" aria-hidden="true"></canvas>
+                            <input id="mm-seek" type="range" min="0" max="1000" value="0" title="Seek" />
+                        </div>
+                        <div id="mm-time">0:00 / 0:00</div>
+                        <button id="mm-mute" title="Mute">&#x1F50A;</button>
+                        <input id="mm-vol" type="range" min="0" max="100" value="80" title="Volume" />
+                        <button id="mm-vizmode" title="Change visualiser">&#x25A5;</button>
+                        <button id="mm-lib" title="Browse, search and queue">&#x1F50D;</button>
+                        <button id="mm-open" title="Open the Music panel">&#x266B;</button>
+                    </div>
+                    <div id="mm-picker" hidden>
+                        <div id="mmp-head">
+                            <input id="mmp-search" type="text" placeholder="Search tracks and playlists…" autocomplete="off" />
+                            <button id="mmp-close" title="Close">&#x2715;</button>
+                        </div>
+                        <div id="mmp-tabs">
+                            <button class="mmp-tab active" data-tab="tracks">Tracks</button>
+                            <button class="mmp-tab" data-tab="playlists">Playlists</button>
+                        </div>
+                        <div id="mmp-body"></div>
+                        <div id="mmp-foot">
+                            <input id="mmp-newpl" type="text" placeholder="New playlist name…" />
+                            <button id="mmp-addpl">Create</button>
                         </div>
                     </div>
                 </div>
@@ -924,8 +1141,27 @@
                     if (b.dataset.panel && b.dataset.panel !== 'sidebar') b.classList.toggle('active', b.dataset.panel === name);
                 });
             }
+            // Panels that make sense ALONGSIDE the conversation instead of covering it.
+            // Music is the one Cliff wanted permanently to the right of the chat column.
+            var DOCK_RIGHT = {};   // (music now has a mini transport in the composer row instead)
+
+            function loadDocked() {
+                try { return JSON.parse(localStorage.getItem('jacDockedRight') || '[]'); }
+                catch (e) { return []; }
+            }
+            function saveDocked(list) {
+                try { localStorage.setItem('jacDockedRight', JSON.stringify(list)); } catch (e) {}
+            }
+            function rememberDocked(name, open) {
+                var list = loadDocked().filter(function (n) { return n !== name; });
+                if (open) list.push(name);
+                saveDocked(list);
+            }
+
             function openView(name, direction) {
                 if (!VIEWS[name]) return;
+                // Dock beside the conversation instead of covering it.
+                if (!direction && DOCK_RIGHT[name]) direction = 'right';
                 var existing = dvApi.getPanel(name);
                 if (existing) {
                     existing.api.setActive();
@@ -935,6 +1171,15 @@
                     dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title, position: position });
                 } else {
                     dvApi.addPanel({ id: name, component: name, title: VIEWS[name].title });
+                }
+                // Remember docked panels so the split comes back next launch, and forget
+                // them again if the panel is closed — closing it should mean closing it.
+                if (DOCK_RIGHT[name]) {
+                    rememberDocked(name, true);
+                    var pnl = dvApi.getPanel(name);
+                    if (pnl && pnl.api && pnl.api.onDidDispose) {
+                        try { pnl.api.onDidDispose(function () { rememberDocked(name, false); }); } catch (e) {}
+                    }
                 }
                 setActiveBtn(name);
             }
@@ -1022,6 +1267,398 @@
             });
 
             openView('chat');   // chat open by default
+
+        // ── mini-music transport ────────────────────────────────────────────
+        // music.html wraps everything in an IIFE, so its aud/queue/analyser are NOT on
+        // window — the earlier version read undefined every time, which is why play only
+        // ever opened the panel and the bars never moved. It now exposes window.jacMusic
+        // and we talk to that.
+        (function () {
+            var frame = document.getElementById('music-frame');
+            var strip = document.getElementById('mini-music');
+            if (!frame || !strip) return;
+
+            function api() {
+                try { return frame.contentWindow && frame.contentWindow.jacMusic; }
+                catch (e) { return null; }
+            }
+
+            document.getElementById('mm-prev').addEventListener('click', function () {
+                var a = api(); if (a) a.prev();
+            });
+            document.getElementById('mm-next').addEventListener('click', function () {
+                var a = api(); if (a) a.next();
+            });
+            document.getElementById('mm-play').addEventListener('click', function () {
+                var a = api();
+                // Only send them to the panel when there is genuinely nothing to play.
+                if (!a || !a.hasLibrary()) { try { openView('music'); } catch (e) {} return; }
+                a.play();
+            });
+            document.getElementById('mm-open').addEventListener('click', function () {
+                try { openView('music'); } catch (e) {}
+            });
+
+            var seek = document.getElementById('mm-seek');
+            var seeking = false;
+            seek.addEventListener('mousedown', function () { seeking = true; });
+            document.addEventListener('mouseup', function () { seeking = false; });
+            seek.addEventListener('input', function () {
+                var a = api(); if (a) a.seek(this.value / 1000);
+            });
+
+            function fmt(t) {
+                if (!isFinite(t)) return '0:00';
+                var m = Math.floor(t / 60), x = Math.floor(t % 60);
+                return m + ':' + (x < 10 ? '0' : '') + x;
+            }
+
+            var vc = document.getElementById('mm-viz');
+            var vx = vc.getContext('2d');
+            var seekWrap = document.getElementById('mm-bar');
+
+            // Modes that actually read at 26px in a toolbar. The old VS Code panel had
+            // nine, but fractal/orbit/glow need real canvas area to say anything.
+            var VIZ_MODES = ['bars', 'mirror', 'wave', 'pulse', 'off'];
+            var VIZ_GLYPH = { bars: '\u25A5', mirror: '\u25A4', wave: '\u223F', pulse: '\u25CF', off: '\u25AC' };
+            var vizMode = 'bars';
+            try { vizMode = localStorage.getItem('jacMiniViz') || 'bars'; } catch (e) {}
+            if (VIZ_MODES.indexOf(vizMode) < 0) { vizMode = 'bars'; }
+
+            var vizBtn = document.getElementById('mm-vizmode');
+            function paintVizBtn() {
+                vizBtn.innerHTML = VIZ_GLYPH[vizMode] || '\u25A5';
+                vizBtn.title = 'Visualiser: ' + vizMode + ' (click to change)';
+            }
+            vizBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                vizMode = VIZ_MODES[(VIZ_MODES.indexOf(vizMode) + 1) % VIZ_MODES.length];
+                try { localStorage.setItem('jacMiniViz', vizMode); } catch (e2) {}
+                paintVizBtn();
+            });
+            paintVizBtn();
+
+            function accent() {
+                return (getComputedStyle(document.documentElement).getPropertyValue('--app-accent') || '#4daafc').trim();
+            }
+            function rgba(hex, a) {
+                hex = hex.replace('#', '');
+                if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+                var n = parseInt(hex.slice(0, 6), 16);
+                return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+            }
+
+            var SEGS = 48;
+            var peak = new Float32Array(SEGS);
+            var band = new Float32Array(SEGS);
+
+            // Fold the linear FFT into SEGS perceptual buckets. Squared index because
+            // linear bins bunch nearly everything into the bass end.
+            function buckets(buf) {
+                for (var i = 0; i < SEGS; i++) {
+                    var lo = Math.floor(Math.pow(i / SEGS, 2) * (buf.length * 0.7));
+                    var hi = Math.floor(Math.pow((i + 1) / SEGS, 2) * (buf.length * 0.7));
+                    if (hi <= lo) { hi = lo + 1; }
+                    var sum = 0;
+                    for (var j = lo; j < hi && j < buf.length; j++) { sum += buf[j]; }
+                    var v = (sum / (hi - lo)) / 255;
+                    // Attack fast, release slow — raw frames strobe badly at this height.
+                    peak[i] = v > peak[i] ? v : peak[i] * 0.86 + v * 0.14;
+                    band[i] = peak[i];
+                }
+            }
+
+            (function draw() {
+                requestAnimationFrame(draw);
+                var r = seekWrap.getBoundingClientRect();
+                if (r.width < 2) { return; }
+                var dpr = window.devicePixelRatio || 1;
+                if (vc.width !== Math.round(r.width * dpr)) {
+                    vc.width = Math.round(r.width * dpr);
+                    vc.height = Math.round(r.height * dpr);
+                }
+                vx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                vx.clearRect(0, 0, r.width, r.height);
+                if (vizMode === 'off') { return; }
+
+                var a = api();
+                if (!a) { return; }
+                var st = a.state();
+                var progress = (st && st.dur) ? Math.min(1, st.cur / st.dur) : 0;
+                var filled = r.width * progress;
+                var barY = r.height / 2 - 1.5;
+                var barH = 3;
+                var col = accent();
+
+                if (vizMode === 'wave') {
+                    var wb = a.wave();
+                    if (!wb) { return; }
+                    vx.beginPath();
+                    for (var k = 0; k < Math.floor(r.width); k += 2) {
+                        var idx = Math.floor((k / r.width) * wb.length);
+                        var yv = ((wb[idx] - 128) / 128) * (r.height * 0.42);
+                        if (k === 0) { vx.moveTo(k, r.height / 2 + yv); }
+                        else { vx.lineTo(k, r.height / 2 + yv); }
+                    }
+                    vx.strokeStyle = rgba(col, 0.28);
+                    vx.lineWidth = 1.5;
+                    vx.stroke();
+                    // Re-stroke the elapsed span brighter so progress still reads.
+                    vx.save();
+                    vx.beginPath(); vx.rect(0, 0, filled, r.height); vx.clip();
+                    vx.beginPath();
+                    for (var k2 = 0; k2 < Math.floor(filled); k2 += 2) {
+                        var idx2 = Math.floor((k2 / r.width) * wb.length);
+                        var yv2 = ((wb[idx2] - 128) / 128) * (r.height * 0.42);
+                        if (k2 === 0) { vx.moveTo(k2, r.height / 2 + yv2); }
+                        else { vx.lineTo(k2, r.height / 2 + yv2); }
+                    }
+                    vx.strokeStyle = rgba(col, 0.95);
+                    vx.lineWidth = 1.5;
+                    vx.stroke();
+                    vx.restore();
+                    return;
+                }
+
+                var buf = a.fft();
+                if (!buf) { return; }
+                buckets(buf);
+
+                if (vizMode === 'pulse') {
+                    var overall = 0;
+                    for (var q = 0; q < SEGS; q++) { overall += band[q]; }
+                    overall /= SEGS;
+                    var ph = Math.max(barH, overall * r.height * 0.8);
+                    var g = vx.createLinearGradient(0, r.height / 2 - ph / 2, 0, r.height / 2 + ph / 2);
+                    g.addColorStop(0, 'transparent');
+                    g.addColorStop(0.5, rgba(col, 0.25 + overall * 0.6));
+                    g.addColorStop(1, 'transparent');
+                    vx.fillStyle = g;
+                    vx.fillRect(0, r.height / 2 - ph / 2, filled, ph);
+                    return;
+                }
+
+                var segW = r.width / SEGS;
+                var overlap = segW * 0.3;
+                var maxGlow = r.height * 0.42;
+                for (var i2 = 0; i2 < SEGS; i2++) {
+                    var x = i2 * segW - overlap;
+                    var w = segW + overlap * 2;
+                    var glowH = band[i2] * maxGlow;
+                    var alpha = 0.18 + band[i2] * 0.72;
+                    // Everything past the playhead stays dim, so the spectrum still reads
+                    // as the progress fill without vanishing early in a track.
+                    var dim = ((i2 + 0.5) * segW > filled) ? 0.22 : 1;
+
+                    if (vizMode === 'mirror') {
+                        vx.fillStyle = rgba(col, alpha * dim);
+                        vx.fillRect(x, r.height / 2 - glowH, w, glowH * 2);
+                        continue;
+                    }
+
+                    var up = vx.createLinearGradient(0, barY - glowH, 0, barY);
+                    up.addColorStop(0, 'transparent');
+                    up.addColorStop(1, rgba(col, alpha * dim));
+                    vx.fillStyle = up;
+                    vx.fillRect(x, barY - glowH, w, glowH);
+
+                    vx.fillStyle = rgba(col, alpha * 0.9 * dim);
+                    vx.fillRect(x, barY - 1, w, barH + 2);
+
+                    var down = vx.createLinearGradient(0, barY + barH, 0, barY + barH + glowH);
+                    down.addColorStop(0, rgba(col, alpha * 0.55 * dim));
+                    down.addColorStop(1, 'transparent');
+                    vx.fillStyle = down;
+                    vx.fillRect(x, barY + barH, w, glowH);
+                }
+            })();
+
+            // ── volume control ──────────────────────────────────────────────
+            var vol = document.getElementById('mm-vol');
+            var mute = document.getElementById('mm-mute');
+            var lastVol = 0.8;
+            function volIcon(v) { return v === 0 ? '\uD83D\uDD07' : (v < 0.5 ? '\uD83D\uDD09' : '\uD83D\uDD0A'); }
+            function paintVol(v) {
+                if (document.activeElement !== vol) { vol.value = Math.round(v * 100); }
+                mute.textContent = volIcon(v);
+                mute.title = v === 0 ? 'Unmute' : 'Mute';
+            }
+            vol.addEventListener('input', function () {
+                var a2 = api(); if (!a2) { return; }
+                var v = this.value / 100;
+                if (v > 0) { lastVol = v; }
+                a2.setVolume(v); paintVol(v);
+            });
+            mute.addEventListener('click', function () {
+                var a2 = api(); if (!a2) { return; }
+                var cur = a2.getVolume();
+                // Toggle against the last non-zero level rather than jumping to full.
+                var next = cur > 0 ? 0 : (lastVol || 0.8);
+                if (cur > 0) { lastVol = cur; }
+                a2.setVolume(next); paintVol(next);
+            });
+            (function adopt(tries) {
+                var a2 = api();
+                if (a2 && a2.getVolume) { paintVol(a2.getVolume()); return; }
+                if (tries > 0) { setTimeout(function () { adopt(tries - 1); }, 400); }
+            })(20);
+
+            // ── picker behaviour ────────────────────────────────────────────
+            var picker = document.getElementById('mm-picker');
+            var search = document.getElementById('mmp-search');
+            var body   = document.getElementById('mmp-body');
+            var tab    = 'tracks';
+
+            function esc(t) {
+                return String(t).replace(/[&<>"]/g, function (c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+                });
+            }
+
+            function renderPicker() {
+                var a = api();
+                if (!a) { body.innerHTML = '<div class="mmp-empty">Music library not ready.</div>'; return; }
+                var q = search.value.trim().toLowerCase();
+                var now = a.nowPath();
+                body.innerHTML = '';
+
+                if (tab === 'playlists') {
+                    var pls = a.playlists().filter(function (pl) { return !q || pl.name.toLowerCase().indexOf(q) >= 0; });
+                    if (!pls.length) {
+                        body.innerHTML = '<div class="mmp-empty">No playlists yet - create one below.</div>';
+                        return;
+                    }
+                    pls.forEach(function (pl) {
+                        var row = document.createElement('div');
+                        row.className = 'mmp-row';
+                        row.innerHTML = '<span class="mmp-name">' + esc(pl.name) + '</span>' +
+                                        '<span class="mmp-count">' + pl.count + '</span>';
+                        row.title = 'Play this playlist';
+                        row.addEventListener('click', function () { a.playPlaylist(pl.name); });
+                        body.appendChild(row);
+                    });
+                    return;
+                }
+
+                var tracks = a.library().filter(function (t) { return !q || t.name.toLowerCase().indexOf(q) >= 0; });
+                if (!tracks.length) {
+                    body.innerHTML = '<div class="mmp-empty">' +
+                        (q ? 'Nothing matches that search.' : 'No tracks in this folder.') + '</div>';
+                    return;
+                }
+                var names = a.playlists().map(function (pl) { return pl.name; });
+                tracks.slice(0, 300).forEach(function (t) {
+                    var row = document.createElement('div');
+                    row.className = 'mmp-row' + (t.path === now ? ' playing' : '');
+                    row.innerHTML = '<span class="mmp-name">' + esc(t.name) + '</span>';
+
+                    var qbtn = document.createElement('button');
+                    qbtn.className = 'mmp-act';
+                    qbtn.textContent = '+';
+                    qbtn.title = 'Play next';
+                    qbtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        a.queueNext(t.path);
+                        qbtn.innerHTML = '&#10003;';
+                        setTimeout(function () { qbtn.textContent = '+'; }, 900);
+                    });
+                    row.appendChild(qbtn);
+
+                    if (names.length) {
+                        var pbtn = document.createElement('button');
+                        pbtn.className = 'mmp-act';
+                        pbtn.innerHTML = '&#9776;';
+                        pbtn.title = 'Add to playlist';
+                        pbtn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            // One playlist: just add it. Several: ask which.
+                            if (names.length === 1) {
+                                a.addTo(names[0], t.path);
+                            } else {
+                                var pick = prompt('Add to which playlist?', names[0]);
+                                if (pick && names.indexOf(pick) >= 0) a.addTo(pick, t.path);
+                            }
+                            pbtn.innerHTML = '&#10003;';
+                            setTimeout(function () { pbtn.innerHTML = '&#9776;'; }, 900);
+                        });
+                        row.appendChild(pbtn);
+                    }
+
+                    row.addEventListener('click', function () { a.playPath(t.path); renderPicker(); });
+                    body.appendChild(row);
+                });
+            }
+
+            function togglePicker(show) {
+                var open = (show === undefined) ? picker.hidden : show;
+                picker.hidden = !open;
+                if (open) {
+                    // Pull in anything added since last time before drawing the list.
+                    var a0 = api(); if (a0 && a0.refresh) a0.refresh();
+                    renderPicker(); search.focus(); search.select();
+                    setTimeout(renderPicker, 600);   // redraw once the scan lands
+                }
+            }
+
+            document.getElementById('mm-lib').addEventListener('click', function (e) {
+                e.stopPropagation();
+                togglePicker();
+            });
+            document.getElementById('mmp-close').addEventListener('click', function () { togglePicker(false); });
+            search.addEventListener('input', renderPicker);
+            search.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { togglePicker(false); return; }
+                // Enter plays the top match - the fast path for "search, hit play".
+                if (e.key === 'Enter') {
+                    var first = body.querySelector('.mmp-row');
+                    if (first) first.click();
+                }
+            });
+            document.querySelectorAll('.mmp-tab').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelectorAll('.mmp-tab').forEach(function (x) { x.classList.remove('active'); });
+                    b.classList.add('active');
+                    tab = b.dataset.tab;
+                    renderPicker();
+                });
+            });
+            document.getElementById('mmp-addpl').addEventListener('click', function () {
+                var el = document.getElementById('mmp-newpl');
+                var a = api();
+                if (a && el.value.trim() && a.newPlaylist(el.value.trim())) {
+                    el.value = '';
+                    tab = 'playlists';
+                    document.querySelectorAll('.mmp-tab').forEach(function (x) {
+                        x.classList.toggle('active', x.dataset.tab === 'playlists');
+                    });
+                    renderPicker();
+                }
+            });
+            // Click-away closes it, but clicks inside the widget do not.
+            document.addEventListener('click', function (e) {
+                if (!picker.hidden && !strip.contains(e.target)) togglePicker(false);
+            });
+
+            setInterval(function () {
+                var a = api();
+                var st = a ? a.state() : null;
+                var playing = st && st.playing;
+                strip.classList.toggle('idle', !playing);
+                document.getElementById('mm-play').innerHTML = playing ? '&#x23F8;' : '&#x25B6;';
+                document.getElementById('mm-title').textContent =
+                    (st && st.title) ? st.title : 'Nothing playing';
+                if (st && st.dur) {
+                    if (!seeking) seek.value = (st.cur / st.dur) * 1000;
+                    document.getElementById('mm-time').textContent = fmt(st.cur) + ' / ' + fmt(st.dur);
+                } else {
+                    if (!seeking) seek.value = 0;
+                    document.getElementById('mm-time').textContent = '0:00 / 0:00';
+                }
+            }, 400);
+        })();
+
+            // The dock-right experiment was replaced by the composer transport.
+            try { localStorage.removeItem('jacDockedRight'); } catch (e) {}
         })();
 
         // Bootstrap

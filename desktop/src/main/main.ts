@@ -1,4 +1,10 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell, Notification, net } from 'electron';
+import * as voice from './voice';
+import { webSearch, fetchUrl } from './websearch';
+import { github, GhMissing, GhUnauthorized } from './github';
+import { recall } from './recall';
+import * as wiki from './wikipedia';
+import { SCREENSHOT_PS1 } from './screenshot';
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell, Notification, net, globalShortcut } from 'electron';
 import type { BrowserWindow as BrowserWindowType, Tray as TrayType } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -44,18 +50,75 @@ const DEFAULT_CONFIG = {
     steerPresets: [] as Array<{ name: string; scales: Record<string, number> }>,  // named personality slider combos
     steerHfModelPath: '',   // HF-format weights repeng reads to generate vectors (empty = not set up)
     localNgl: 999,          // GPU layers to offload for the local model (0 = CPU-only; some laptop GPUs OOM at 999)
+    localCtx: 65536,        // llama-server context window; must clear the ~13.7k-token tool schema plus tool results
+    localExtraModelDirs: [] as string[],   // extra folders to scan for GGUFs (big quants living off the system drive)
+    mcpExtraRoots: [] as string[],         // folders file tools may touch BESIDES the anchored project
+    localNoMmap: true,      // load weights resident; false only to page a model larger than VRAM+RAM
+    localNCpuMoe: 0,        // MoE layers whose expert FFNs sit in system RAM (0 = all on GPU)
+    ttsVoice: '',           // substring of an installed SAPI voice; empty = system default
+    ttsRate: 0,             // SAPI speaking rate, -10..10
+    ttsAuto: false,         // speak every assistant reply, not just on the button
+    sttExe: '',             // whisper.cpp binary; empty = autodetect
+    sttModel: '',
+    sttModelFast: '',       // small/fast whisper model for wake-word polling; empty = autodetect tiny
+    wakeWord: 'hey jac',    // spoken phrase that opens a hands-free turn
+    voiceHandsFree: false,  // remember the always-listening toggle across restarts
+    voiceStemPress: true,   // double-press the earbud stem (media play/pause) to talk
+    voicePttChord: 'CommandOrControl+Shift+J',   // keyboard equivalent; '' disables           // whisper ggml model; empty = autodetect
+    kiwixExe: '',           // kiwix-serve.exe for offline Wikipedia; empty = autodetect
+    kiwixZim: '',           // Wikipedia .zim; empty = largest .zim found in the kiwix folder
+    braveApiKey: '',        // optional Brave Search API key — free tier; removes the
+                            // scraped-engine throttling that makes web_search flaky
 };
 
+/** F-04: Windows entries that are never useful in a file tree. Matched by name because
+ *  several (the junction folders) are not flagged hidden on every install. */
+const WIN_NOISE = new RegExp(
+    '^(' + [
+        'NTUSER\\.DAT.*',          // the hive plus every .TxR / .TMContainer / .blf sidecar
+        'ntuser\\.(dat|ini).*',
+        'desktop\\.ini',
+        'Sti_Trace\\.log',
+        // legacy junctions that exist only for pre-Vista apps and cannot be opened
+        'NetHood', 'PrintHood', 'SendTo', 'Templates', 'Recent', 'Cookies',
+        'Start Menu', 'Application Data', 'Local Settings', 'My Documents',
+        'IntelGraphicsProfiles',
+    ].join('|') + ')$', 'i');
+
 function loadConfig(): typeof DEFAULT_CONFIG {
-    try {
-        const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');
-        return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
-    } catch { return { ...DEFAULT_CONFIG }; }
+    // Prefer the live file; fall back to the last known-good copy. Without the fallback a
+    // zero-byte config silently reverts EVERYTHING to defaults — including the OpenRouter
+    // key and the MCP server list — and the only symptom is the local model never starting.
+    for (const p of [CONFIG_PATH, CONFIG_PATH + '.bak']) {
+        try {
+            const raw = fs.readFileSync(p, 'utf-8');
+            if (!raw.trim()) continue;                       // truncated — try the backup
+            const parsed = { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+            if (p !== CONFIG_PATH) {
+                try { fs.copyFileSync(p, CONFIG_PATH); } catch { /* read-only — run from the backup */ }
+            }
+            return parsed;
+        } catch { /* missing or unparseable — fall through */ }
+    }
+    return { ...DEFAULT_CONFIG };
 }
 
 function saveConfig(cfg: typeof DEFAULT_CONFIG): void {
     fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2));
+    // Atomic: writeFileSync truncates first, so a failure mid-write (a full disk, most
+    // likely) leaves a ZERO-BYTE config and the API key, MCP servers and model choice are
+    // all gone. Write a temp file, keep the previous good one as .bak, then rename in.
+    const tmp = CONFIG_PATH + '.tmp';
+    const body = JSON.stringify(cfg, null, 2);
+    try {
+        fs.writeFileSync(tmp, body);
+        if (fs.statSync(tmp).size !== Buffer.byteLength(body)) throw new Error('short write');
+        try { if (fs.existsSync(CONFIG_PATH) && fs.statSync(CONFIG_PATH).size > 0) fs.copyFileSync(CONFIG_PATH, CONFIG_PATH + '.bak'); } catch { /* backup is best-effort */ }
+        fs.renameSync(tmp, CONFIG_PATH);
+    } catch (e) {
+        try { fs.unlinkSync(tmp); } catch { /* already gone */ }
+        console.error('saveConfig failed, existing config left intact:', e);
+    }
 }
 
 let mainWindow: BrowserWindowType | null = null;
@@ -115,6 +178,120 @@ const MCP_BUILTINS: McpTool[] = [
         server: 'jac', name: 'remove_mcp_server', qualifiedName: 'jac__remove_mcp_server',
         description: 'Remove a configured MCP server from JAC by its name.',
         inputSchema: { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] },
+    },
+    {
+        server: 'jac', name: 'recall', qualifiedName: 'jac__recall',
+        description: 'Search THIS user\'s own past conversations with you and read them back. '
+            + 'Use it whenever they refer to something you do not have in context — "what did we decide", '
+            + '"like we did last time", "the thing I mentioned", a name or number from an earlier session, '
+            + 'or when a summary marker says earlier messages were compacted away. '
+            + 'Prefer this over grepping ~/.jac/conversations with shell or filesystem tools: those return '
+            + 'raw JSON that floods the context. Searches this project by default; pass scope="all" for every '
+            + 'folder. Terms are ANDed and matched literally, so use few, distinctive words. '
+            + 'Then pass conversation="<id>" from a result to read that whole conversation.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                query: { type: 'string', description: 'Words that would appear in the message. Few and distinctive '
+                    + 'beats many — they are ANDed. Quote a phrase to keep it together.' },
+                conversation: { type: 'string', description: 'A conversation id from a search result, to read it in full.' },
+                scope: { type: 'string', description: 'project (default) searches the current folder; all searches everything.',
+                    enum: ['project', 'all'] },
+                limit: { type: 'number', description: 'Max snippets to return (default 8).' },
+                context: { type: 'number', description: 'Messages of following context per hit, 0-3 (default 1).' },
+            },
+        },
+    },
+    {
+        server: 'jac', name: 'wikipedia', qualifiedName: 'jac__wikipedia',
+        description: 'Search a LOCAL offline copy of Wikipedia and read articles from it. '
+            + 'Prefer this over jac__web_search for encyclopaedic facts — people, places, albums, '
+            + 'history, science, definitions. It needs no network, cannot be rate-limited, and answers '
+            + 'in milliseconds. Omit "read" to search; pass "read" with a title or the link from a '
+            + 'search result to get the article text.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                query: { type: 'string', description: 'What to search for.' },
+                read: { type: 'string', description: 'Article title, or the link field from a search result, to read in full.' },
+                find: { type: 'string', description: 'When reading, return the part of the article around this text '
+                    + '(e.g. "Track listing") instead of the top.' },
+                limit: { type: 'number', description: 'Max search results (default 8).' },
+            },
+        },
+    },
+    {
+        server: 'jac', name: 'github', qualifiedName: 'jac__github',
+        description: 'Search and read GitHub using the user OWN authenticated gh CLI login — '
+            + 'their repos (including private ones), code, issues and pull requests. '
+            + 'Use this whenever the user mentions their GitHub, their repos, or "the projects repo". '
+            + 'You DO have credentials: never say you cannot access GitHub without calling this first, '
+            + 'and never ask the user for a token. Read-only. '
+            + 'ops: repos (their repos; owner optional) | search_repos | search_code (only finds PUSHED '
+            + 'code on default branches, never local-only work) | issues | prs | read (a file: repo+path) '
+            + '| api (any GET endpoint, e.g. "user").',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                op: { type: 'string', description: 'repos, search_repos, search_code, issues, prs, read, or api.',
+                    enum: ['repos', 'search_repos', 'search_code', 'issues', 'prs', 'read', 'api'] },
+                query: { type: 'string', description: 'Search terms, for the search_* / issues / prs ops.' },
+                owner: { type: 'string', description: 'Scope to a user or org. Omit on "repos" for the logged-in user.' },
+                repo: { type: 'string', description: 'Repository as owner/name. Required by "read".' },
+                path: { type: 'string', description: 'File path within the repo, for "read".' },
+                ref: { type: 'string', description: 'Branch, tag or commit for "read" (default: the default branch).' },
+                state: { type: 'string', description: 'open (default), closed, or all — for issues and prs.',
+                    enum: ['open', 'closed', 'all'] },
+                endpoint: { type: 'string', description: 'REST endpoint for "api", e.g. "user" or "repos/owner/name".' },
+                limit: { type: 'number', description: 'Max results (default 20).' },
+            },
+            required: ['op'],
+        },
+    },
+    {
+        server: 'jac', name: 'web_search', qualifiedName: 'jac__web_search',
+        description: 'Search the web and get back titles, URLs and snippets as text. '
+            + 'Use this for anything you do not know or that may have changed: current facts, '
+            + 'documentation, release notes, prices, tracklists. '
+            + 'Do NOT drive a browser to a search engine — that hits consent walls and bot checks; '
+            + 'this returns clean results in one call. Follow up with jac__fetch_url to read a result.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                query: { type: 'string', description: 'What to search for.' },
+                limit: { type: 'number', description: 'Max results (default 8).' },
+            },
+            required: ['query'],
+        },
+    },
+    {
+        server: 'jac', name: 'fetch_url', qualifiedName: 'jac__fetch_url',
+        description: 'Fetch a web page and return it as readable text (scripts, styles and markup stripped). '
+            + 'Use it to read a page found via jac__web_search, or any URL the user gives you. '
+            + 'Returns JSON and plain text unchanged.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                url: { type: 'string', description: 'Absolute http:// or https:// URL.' },
+                max_chars: { type: 'number', description: 'Truncate to this many characters (default 12000).' },
+                find: { type: 'string', description: 'Return the part of the page around this text rather than the top. '
+                    + 'Use it for long pages — e.g. find="Track listing" on a Wikipedia article.' },
+            },
+            required: ['url'],
+        },
+    },
+    {
+        server: 'jac', name: 'screenshot', qualifiedName: 'jac__screenshot',
+        description: 'Capture the screen (or one window) to a PNG and show it to the user in chat. '
+            + 'Use this whenever you launch a GUI app, need to see what is on screen, or the user asks to be shown something. '
+            + 'JAC runs on the user\'s real desktop, so windows you open ARE visible to them. '
+            + 'Do NOT shell out to pyautogui, mss, or PowerShell/.NET screen capture — this tool is the supported way and always works.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                window: { type: 'string', description: 'Optional: part of a window title (case-insensitive). Omit to capture the whole screen.' },
+            },
+        },
     },
     // ── Setup / onboarding: let the chat detect, explain, and install what each JAC feature needs ──
     {
@@ -769,12 +946,166 @@ async function callSchBuiltin(qualifiedName: string, args: Record<string, unknow
     }
 }
 
+/** ffmpeg turns the mic blob the renderer records into the 16 kHz mono PCM
+ *  whisper.cpp insists on. Prefer the WinGet install already on this machine. */
+function resolveFfmpeg(): string {
+    const wg = path.join(os.homedir(), 'AppData', 'Local', 'Microsoft', 'WinGet', 'Packages');
+    const found: string[] = [];
+    try {
+        for (const d of fs.readdirSync(wg)) {
+            if (!/ffmpeg/i.test(d)) continue;
+            const base = path.join(wg, d);
+            for (const sub of fs.readdirSync(base)) {
+                const c = path.join(base, sub, 'bin', 'ffmpeg.exe');
+                if (fs.existsSync(c)) found.push(c);
+            }
+        }
+    } catch { /* no winget dir */ }
+    return found[0] ?? 'ffmpeg';   // fall back to PATH
+}
+
 async function callBuiltin(qualifiedName: string, args: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
     if (qualifiedName.startsWith('jac__sch_')) return callSchBuiltin(qualifiedName, args);
     if (qualifiedName.startsWith('jac__pcb_')) return callPcbBuiltin(qualifiedName, args);
     if (qualifiedName.startsWith('jac__cad_import_model') || qualifiedName.startsWith('jac__gen3d_')) return callGen3dBuiltin(qualifiedName, args);
     if (qualifiedName.startsWith('jac__cad_')) return callCadBuiltin(qualifiedName, args);
     try {
+        if (qualifiedName === 'jac__wikipedia') {
+            const ok = await wiki.ensureServer({ exe: config.kiwixExe, zim: config.kiwixZim });
+            if (!ok) {
+                return { text: 'Offline Wikipedia is not set up: kiwix-serve or the .zim file was not found. '
+                    + 'Use jac__web_search instead.', isError: true };
+            }
+            try {
+                if (args.read) {
+                    const r = await wiki.read(String(args.read),
+                        12000, args.find ? String(args.find) : undefined);
+                    const miss = args.find && !r.matched ? `\n[no match for "${args.find}" — showing the article top]` : '';
+                    return { text: `${r.title} (offline Wikipedia)${miss}\n\n${r.text}`, isError: false };
+                }
+                const q = String(args.query ?? '').trim();
+                if (!q) return { text: 'wikipedia needs a query, or a "read" title.', isError: true };
+                const { hits, total } = await wiki.search(q, Math.max(1, Math.min(20, Number(args.limit) || 8)));
+                if (!hits.length) return { text: `No Wikipedia articles matching "${q}".`, isError: false };
+                const body = hits.map((h, i) =>
+                    `${i + 1}. ${h.title}\n   read: ${h.link}${h.snippet ? '\n   ' + h.snippet.slice(0, 240) : ''}`).join('\n\n');
+                return { text: `${total} article(s) match "${q}" — top ${hits.length}:\n\n${body}\n\n`
+                    + 'Call jac__wikipedia again with read="<the read: value>" to get an article.', isError: false };
+            } catch (e) {
+                return { text: `Wikipedia lookup failed: ${String((e as Error).message ?? e)}`, isError: true };
+            }
+        }
+        if (qualifiedName === 'jac__github') {
+            try {
+                const str = (k: string): string | undefined => (args[k] ? String(args[k]) : undefined);
+                const text = await github({
+                    op: String(args.op ?? 'repos'),
+                    query: str('query'), owner: str('owner'), repo: str('repo'), path: str('path'),
+                    ref: str('ref'), state: str('state'), endpoint: str('endpoint'),
+                    limit: Number(args.limit) || undefined,
+                });
+                return { text, isError: false };
+            } catch (e) {
+                // Distinguish "no CLI" from "not logged in" from "the call failed" — the model can
+                // act on the first two, and lumping them together is what makes it give up and
+                // announce it has no GitHub access at all.
+                if (e instanceof GhMissing) {
+                    return { text: 'GitHub unavailable: the gh CLI is not installed. Install it from cli.github.com '
+                        + 'and run "gh auth login".', isError: true };
+                }
+                if (e instanceof GhUnauthorized) {
+                    return { text: 'GitHub is not authorised. The user should run "gh auth login" in a terminal. '
+                        + 'Do NOT ask them for a token — gh keeps it in the OS keyring.', isError: true };
+                }
+                return { text: 'GitHub call failed: ' + String((e as Error).message ?? e), isError: true };
+            }
+        }
+        if (qualifiedName === 'jac__recall') {
+            try {
+                // Scope to the project main actually has open — the renderer's idea of the
+                // workspace is often unset, and that is what orphaned conversations from the
+                // history UI before. Same resolution conv-save stamps them with, so they match.
+                const base = activeCwd || lastProject || '';
+                const proj = resolveProjectDir(base) || base;
+                return { text: recall({
+                    query: args.query ? String(args.query) : undefined,
+                    conversation: args.conversation ? String(args.conversation) : undefined,
+                    scope: args.scope ? String(args.scope) : undefined,
+                    limit: Number(args.limit) || undefined,
+                    context: args.context === undefined ? undefined : Number(args.context),
+                }, proj), isError: false };
+            } catch (e) {
+                return { text: 'Recall failed: ' + String((e as Error).message ?? e), isError: true };
+            }
+        }
+        if (qualifiedName === 'jac__web_search') {
+            const q = String(args.query ?? '').trim();
+            if (!q) return { text: 'web_search needs a query.', isError: true };
+            const limit = Math.max(1, Math.min(20, Number(args.limit) || 8));
+            try {
+                const hits = await webSearch(q, limit, config.braveApiKey || undefined);
+                if (!hits.length) return { text: `No results for "${q}".`, isError: false };
+                const body = hits.map((h, i) =>
+                    `${i + 1}. ${h.title}\n   ${h.url}${h.snippet ? '\n   ' + h.snippet : ''}`).join('\n\n');
+                return { text: `Results for "${q}":\n\n${body}\n\nUse jac__fetch_url on any of these to read the page.`, isError: false };
+            } catch (e) {
+                // Say REFUSED, never "no results". Free engines throttle after a burst, and
+                // reporting that as an empty result set tells the model the thing does not
+                // exist — which sends it off driving a browser by hand instead of retrying.
+                const msg = String((e as Error).message ?? e);
+                if (/refused the request/.test(msg)) {
+                    return { text: `Search unavailable right now: every search engine refused the request `
+                        + `(${msg}). This is rate limiting, NOT an absence of results — do not conclude the `
+                        + `thing does not exist. Wait a minute and retry, use jac__wikipedia for factual `
+                        + `lookups, or set braveApiKey in settings for a backend that does not throttle.`,
+                        isError: true };
+                }
+                return { text: `Search failed: ${msg}`, isError: true };
+            }
+        }
+        if (qualifiedName === 'jac__fetch_url') {
+            const url = String(args.url ?? '').trim();
+            const max = Math.max(500, Math.min(60000, Number(args.max_chars) || 12000));
+            try {
+                const find = args.find ? String(args.find) : undefined;
+                const r = await fetchUrl(url, max, find);
+                const note = r.text.length >= max ? `\n\n[truncated at ${max} chars — narrow it with "find"]` : '';
+                const miss = find && !r.matched ? `\n[no match for "${find}" — showing the top of the page]\n` : '';
+                return { text: `${r.finalUrl} (${r.type})${miss}\n\n${r.text}${note}`, isError: false };
+            } catch (e) {
+                return { text: `Fetch failed: ${String((e as Error).message ?? e)}`, isError: true };
+            }
+        }
+        if (qualifiedName === 'jac__screenshot') {
+            // Uses PowerShell GDI CopyFromScreen rather than Electron desktopCapturer: verified to
+            // return in well under a second here, and easy to test standalone. (An earlier note
+            // blamed desktopCapturer for hanging — that was wrong; the hang was an unanswered
+            // permission prompt for this then-new tool.)
+            const want = String(args.window ?? '').trim();
+            const dir = path.join(os.homedir(), '.jac', 'screenshots');
+            fs.mkdirSync(dir, { recursive: true });
+            const file = path.join(dir, `shot-${Date.now()}.png`);
+            const ps = path.join(dir, '_capture.ps1');
+            fs.writeFileSync(ps, SCREENSHOT_PS1);
+            const out = await new Promise<string>((resolve) => {
+                const a = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps, '-Out', file];
+                if (want) a.push('-Window', want);
+                const pr = spawn('powershell.exe', a, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+                let buf = '';
+                pr.stdout?.on('data', d => { buf += String(d); });
+                pr.stderr?.on('data', d => { buf += String(d); });
+                const t = setTimeout(() => { try { pr.kill(); } catch { /* gone */ } resolve('TIMEOUT'); }, 20000);
+                pr.on('exit', () => { clearTimeout(t); resolve(buf.trim()); });
+                pr.on('error', (e) => { clearTimeout(t); resolve('ERROR ' + e.message); });
+            });
+            if (!fs.existsSync(file)) return { text: `Screenshot failed: ${out.slice(0, 300)}`, isError: true };
+            const url = 'file:///' + file.replace(/\\/g, '/');
+            // Push it straight into the transcript so the USER sees it, not just a path.
+            mainWindow?.webContents.send('relay-message', {
+                type: 'assistant_text_delta', text: `\n\n![screenshot](${url})\n\n`,
+            });
+            return { text: `${out}\nSaved ${file}. The image is now displayed to the user in the chat — describe it or act on it; do not try to capture it again.`, isError: false };
+        }
         if (qualifiedName === 'jac__add_mcp_server') {
             const name = String(args.name ?? '').trim();
             const command = String(args.command ?? '').trim();
@@ -861,6 +1192,13 @@ function buildSystemMessage(cwd: string): string {
     return (
         `You are JAC, an AI assistant inside a full-featured hardware + software IDE.\n` +
         (cwd ? `Working directory: ${cwd}\nResolve relative paths against it; begin file searches there.\n` : '') +
+        // Without this the model wastes rounds probing $DISPLAY / uname / "am I headless?"
+        // and concluding it cannot show the user anything. It can.
+        `\nEnvironment (do not re-derive this):\n` +
+        `- OS: ${process.platform === 'win32' ? 'Windows' : process.platform}, ${os.arch()}. Shell commands run in ${process.platform === 'win32' ? 'cmd/PowerShell' : 'sh'}.\n` +
+        `- You run ON the user's own desktop with a real display. GUI apps you launch ARE visible to them. This is NOT headless, NOT a container, NOT WSL.\n` +
+        `- To show the user anything on screen, call jac__screenshot. Never reimplement screen capture (pyautogui/mss/Add-Type) — it is already provided.\n` +
+        `- Launch GUI apps detached/in the background; they block until closed otherwise.\n` +
         `\nJAC capabilities:\n` +
         `- Software: read/write/edit files, run shell commands, search code, debug, refactor.\n` +
         `- Schematic capture (tools: pcb_*, sch_*): place components, wire nets, run ERC, export .kicad_sch. Use sch_* tools for real KiCad parts.\n` +
@@ -946,7 +1284,31 @@ async function startLocalServer(): Promise<void> {
     const model = resolveLocalModel();
     if (!fs.existsSync(exe) || !model) return; // no binary or no model → nothing to start yet
     try {
-        const args = ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', String(config.localNgl ?? 999), '-c', '4096'];
+        // --reasoning-format deepseek-legacy: reasoning models (Ornith/Qwen3.5-family,
+        // DeepSeek-R1 derivatives) default to putting chain-of-thought in
+        // `message.reasoning_content`, which this UI does not render - the model
+        // thinks silently and the chat looks hung, then answers. Legacy format keeps
+        // the thought inline in `message.content` so nothing is invisible.
+        // -c 65536: the agentic tool loop sends every MCP tool schema on every request
+        // (~13.7k tokens by itself), so 4096 rejected the FIRST message with
+        // "request exceeds the available context size" before the model ever ran. Tool
+        // results then stack on top of that. Measured on a 7900 XTX with the 21.7 GB
+        // 35B-A3B: 64k KV still fits alongside the weights (730 tok/s prefill,
+        // 36 tok/s decode) — no worse than 4k, so there is nothing to trade off here.
+        const args = ['-m', model, '--port', '8787', '--host', '127.0.0.1', '-ngl', String(config.localNgl ?? 999),
+            '-c', String(config.localCtx ?? 65536),
+            '--reasoning-format', 'deepseek-legacy'];
+        // --no-mmap: this llama.cpp carries the pmem NVMe weight-pager, and with mmap on it
+        // streams weights per token even when they would fit in memory. Measured on the 35B
+        // Q4 (fits VRAM outright): 36 tok/s mmap'd vs 119 tok/s resident — a 3.3x tax for
+        // nothing. Turn this OFF (localNoMmap:false) only to page a model far LARGER than
+        // VRAM+RAM, which is the case the pager actually exists for; --no-mmap would OOM there.
+        if (config.localNoMmap ?? true) args.push('--no-mmap');
+        // Expert FFNs of the first N layers live in system RAM instead of VRAM. Needed for any
+        // MoE too big to fit outright — the 27.2 GB Q6 loads at N=16 and decodes 43.8 tok/s,
+        // where -ngl 999 alone just aborts with "failed to fit params to free device memory".
+        const nCpuMoe = config.localNCpuMoe ?? 0;
+        if (nCpuMoe > 0) args.push('--n-cpu-moe', String(nCpuMoe));
         // Speculative decoding only pays off when the main is slow-per-token, i.e. big enough to PAGE off
         // NVMe (measured ~2× there). On a model that FITS VRAM it's a wash — the draft's own passes cancel
         // the gain — so don't add the overhead. Honor an explicit draft always; auto-detect only for paged mains.
@@ -971,8 +1333,16 @@ async function startLocalServer(): Promise<void> {
             args.push('--control-vector-scaled', spec);
             spawnCwd = STEER_DIR;   // exe-dir DLLs still load regardless of cwd
         }
-        localServerChild = spawn(exe, args, { cwd: spawnCwd, windowsHide: true, stdio: 'ignore' });
-        localServerChild.on('exit', () => { localServerChild = null; });
+        // Keep the server's own output. With stdio:'ignore' a model the binary can't load
+        // (unsupported arch, context too large for VRAM) died silently and the LOCAL tab
+        // just never came up, with nothing anywhere to explain why.
+        let logFd: number | undefined;
+        try { logFd = fs.openSync(path.join(os.homedir(), '.jac', 'llama-server.log'), 'w'); } catch { /* keep going without a log */ }
+        localServerChild = spawn(exe, args, {
+            cwd: spawnCwd, windowsHide: true,
+            stdio: logFd === undefined ? 'ignore' : ['ignore', logFd, logFd],
+        });
+        localServerChild.on('exit', () => { localServerChild = null; if (logFd !== undefined) { try { fs.closeSync(logFd); } catch { /* already gone */ } } });
     } catch { /* spawn failed */ }
 }
 function stopLocalServer(): void {
@@ -1096,7 +1466,8 @@ async function pollOllamaModels(): Promise<void> {
 
 async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string): Promise<void> {
     ollamaAbort?.abort();
-    ollamaAbort = new AbortController();
+    const ac = new AbortController();      // same ownership rule as the other two paths
+    ollamaAbort = ac;
 
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
@@ -1114,7 +1485,7 @@ async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: modelName, messages, stream: true }),
-            signal: ollamaAbort.signal,
+            signal: ac.signal,
         });
 
         const reader = res.body!.getReader();
@@ -1132,15 +1503,15 @@ async function handleOllamaQuery(msg: Record<string, unknown>, modelName: string
                 if (!line.trim()) continue;
                 try {
                     const obj = JSON.parse(line) as { message?: { content?: string }; done?: boolean };
-                    if (obj.message?.content) send({ type: 'stream_chunk', text: obj.message.content });
-                    if (obj.done) send({ type: 'stream_end' });
+                    if (obj.message?.content) send({ type: 'assistant_text_delta', text: obj.message.content });
+                    if (obj.done) send({ type: 'done' });
                 } catch { /* skip malformed */ }
             }
         }
     } catch (err: any) {
         if (err.name !== 'AbortError') send({ type: 'error', message: String(err.message) });
     }
-    ollamaAbort = null;
+    if (ollamaAbort === ac) ollamaAbort = null;
 }
 
 // Combined local-tab list = Ollama models + local jac-llm-server models.
@@ -1149,28 +1520,83 @@ function pushLocalModels(): void {
     mainWindow?.webContents.send('relay-message', { type: 'local_models_list', models });
 }
 
+/** Every directory we keep GGUFs in. First match wins for duplicate filenames. */
+function localModelDirs(): string[] {
+    const dirs = [
+        path.join(app.getPath('userData'), 'models'),
+        path.join(os.homedir(), '.jac', 'models'),
+        app.isPackaged ? path.join(process.resourcesPath, 'models')
+                       : path.join(__dirname, '../../resources/models'),
+    ];
+    // All three defaults sit on the system drive, which is the first one to fill up —
+    // a 27 GB quant often has to live on another disk entirely. Extra dirs are
+    // configurable, and the folder holding the currently-served model is always
+    // included so a hand-set localModelPath still shows up in the LOCAL tab.
+    for (const d of config.localExtraModelDirs ?? []) if (d) dirs.push(d);
+    if (config.localModelPath) dirs.push(path.dirname(config.localModelPath));
+    return [...new Set(dirs)];
+}
+
+/** Scan disk for installed GGUFs. The local tab lists everything on the machine,
+ *  not just whatever happens to be loaded - picking one swaps the server over. */
+function scanLocalModelFiles(): Array<{ file: string; name: string; bytes: number }> {
+    const seen = new Set<string>();
+    const out: Array<{ file: string; name: string; bytes: number }> = [];
+    for (const dir of localModelDirs()) {
+        let names: string[] = [];
+        try { names = fs.readdirSync(dir); } catch { continue; }
+        for (const n of names) {
+            if (!n.toLowerCase().endsWith('.gguf')) continue;
+            // Split GGUFs: only surface part 1, llama-server finds the rest.
+            if (/-0000[2-9]-of-\d+\.gguf$/i.test(n)) continue;
+            if (seen.has(n)) continue;
+            const full = path.join(dir, n);
+            let bytes = 0;
+            try { bytes = fs.statSync(full).size; } catch { continue; }
+            if (bytes < 1024 * 1024) continue;   // skip placeholder/stub files
+            seen.add(n);
+            out.push({ file: full, name: n.replace(/\.gguf$/i, ''), bytes });
+        }
+    }
+    return out.sort((a, b) => a.name.localeCompare(b.name));
+}
+
 async function pollLocalServerModels(): Promise<void> {
     if (localSrvPollTimer) clearTimeout(localSrvPollTimer);
+    let loaded = '';
     try {
         const res = await fetch(`${LOCAL_SERVER_URL}/v1/models`, { signal: AbortSignal.timeout(2000) });
         if (res.ok) {
             const data = await res.json() as { data?: Array<{ id: string }> };
-            lastLocalServerList = (data.data || []).map(m => ({
-                id: `local:${m.id}`,
-                label: `${String(m.id).replace(/.*[\\/]/, '').replace(/\.gguf$/i, '')} (local)`,
-                size: '',
-                status: 'ready',
-                provider_id: 'local-srv',
-            }));
-            pushLocalModels();
+            loaded = String(data.data?.[0]?.id || '');
         }
-    } catch { lastLocalServerList = []; }
+    } catch { /* server down - everything is simply 'available' */ }
+    lastLocalServerList = scanLocalModelFiles().map(m => {
+        const isLoaded = !!loaded && (loaded === m.file || loaded.replace(/.*[\\/]/, '') === path.basename(m.file));
+        const gb = (m.bytes / 1e9).toFixed(1);
+        // Everything here is already on disk, so status is always 'ready' - the UI
+        // renders any other value as "not installed" and offers a download instead
+        // of letting you pick it. Which one is resident is shown in the label.
+        return {
+            id: `local:${m.file}`,
+            label: `${m.name} (local)${isLoaded ? ' • loaded' : ''}`,
+            size: `${gb} GB`,
+            status: 'ready',
+            provider_id: 'local-srv',
+        };
+    });
+    pushLocalModels();
     localSrvPollTimer = setTimeout(pollLocalServerModels, 10000);
 }
 
 async function handleLocalServerQuery(msg: Record<string, unknown>, modelId: string): Promise<void> {
+    // Own the controller locally. The old code assigned to the shared variable and then
+    // nulled it unconditionally after the await — so when a second turn started mid-run,
+    // the FIRST turn's completion nulled the SECOND turn's controller, leaving Stop with
+    // nothing to abort and a null for the next reader to trip over.
     localSrvAbort?.abort();
-    localSrvAbort = new AbortController();
+    const ac = new AbortController();
+    localSrvAbort = ac;
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
     const cwd = (msg.cwd as string) || activeCwd;
@@ -1180,41 +1606,25 @@ async function handleLocalServerQuery(msg: Record<string, unknown>, modelId: str
         { role: 'user', content: prompt },
     ];
     const send = (delta: Record<string, unknown>) => mainWindow?.webContents.send('relay-message', delta);
-    try {
-        const res = await fetch(`${LOCAL_SERVER_URL}/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: modelId, messages, stream: true }),
-            signal: localSrvAbort.signal,
-        });
-        if (!res.ok) { send({ type: 'error', message: `Local server ${res.status}: ${await res.text()}` }); localSrvAbort = null; return; }
-        const reader = res.body!.getReader();
-        const decoder = new TextDecoder();
-        let buf = '';
-        send({ type: 'stream_start' });
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buf += decoder.decode(value, { stream: true });
-            const lines = buf.split('\n');
-            buf = lines.pop() ?? '';
-            for (const line of lines) {
-                const t = line.trim();
-                if (!t.startsWith('data:')) continue;
-                const payload = t.slice(5).trim();
-                if (payload === '[DONE]') { send({ type: 'stream_end' }); continue; }
-                try {
-                    const obj = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
-                    const txt = obj.choices?.[0]?.delta?.content;
-                    if (txt) send({ type: 'stream_chunk', text: txt });
-                } catch { /* skip malformed SSE */ }
-            }
-        }
-        send({ type: 'stream_end' });
-    } catch (err: any) {
-        if (err.name !== 'AbortError') send({ type: 'error', message: String(err.message) });
-    }
-    localSrvAbort = null;
+    send({ type: 'stream_start' });
+    // Same agentic loop as the cloud path. The system message advertises shell/file tools,
+    // so a local model WILL try to call them; without the loop those calls were parsed as
+    // nothing and the turn ended on an empty bubble. llama-server emits native `tool_calls`
+    // for this model (verified), and loop.ts additionally reparses the inline
+    // `<tool_call>…` form that other GGUF templates emit. Reasoning is rendered by the
+    // loop itself, so reasoning models stay visible here too.
+    const tools = [...mcpManager.getTools(), ...MCP_BUILTINS];
+    await runAgenticQuery({
+        url: `${LOCAL_SERVER_URL}/v1/chat/completions`,
+            contextTokens: config.localCtx || 65536,
+        headers: { 'Content-Type': 'application/json' },
+        model: modelId,
+        messages, tools,
+        callTool: (n, a) => (n.startsWith('jac__') ? callBuiltin(n, a) : mcpManager.callTool(n, a)),
+        send, signal: ac.signal,
+        permit: (name, a) => decidePermission(name, a),
+    });
+    if (localSrvAbort === ac) localSrvAbort = null;   // only clear if still ours
 }
 
 function mergeModelsForUI(relayModels: ORModel[]): { models: ORModel[]; current_model: string } {
@@ -1224,8 +1634,14 @@ function mergeModelsForUI(relayModels: ORModel[]): { models: ORModel[]; current_
         ? relayModels.filter(m => !CLAUDE_FALLBACK_IDS.has(m.id))
         : relayModels;
     const combined = [...ollamaModels, ...orModels, ...filtered];
+    // A restored `local:` selection lives in the LOCAL tab's list, never in `combined`,
+    // so it has to be validated separately — otherwise every restart silently clobbered
+    // the saved local model with the first cloud one. Check the file rather than the
+    // scanned list, since this can run before the first local-model poll completes.
+    const localStillThere = isLocalServerModel(currentModel)
+        && fs.existsSync(currentModel.slice('local:'.length));
     // If current model was filtered out, default to first OR model
-    const cur = combined.find(m => m.id === currentModel)
+    const cur = (combined.find(m => m.id === currentModel) || localStillThere)
         ? currentModel
         : (orModels[0]?.id ?? '');
     return { models: combined, current_model: cur };
@@ -1245,7 +1661,8 @@ function pushModelsToUI(): void {
 
 async function handleORQuery(msg: Record<string, unknown>, modelId: string): Promise<void> {
     orAbort?.abort();
-    orAbort = new AbortController();
+    const ac = new AbortController();      // see the note in handleLocalServerQuery
+    orAbort = ac;
 
     const prompt = msg.prompt as string;
     const rawHistory = (msg.history as Array<{ role: string; text: string }> | undefined) || [];
@@ -1273,13 +1690,13 @@ async function handleORQuery(msg: Record<string, unknown>, modelId: string): Pro
             model: modelId.replace(/^or:/, ''),
             messages, tools,
             callTool: (n, a) => (n.startsWith('jac__') ? callBuiltin(n, a) : mcpManager.callTool(n, a)),
-            send, signal: orAbort.signal,
+            send, signal: ac.signal,
             permit: (name, a) => decidePermission(name, a),
         });
     } else {
-        await queryOR(config.openrouterApiKey, modelId, messages, send, orAbort.signal);
+        await queryOR(config.openrouterApiKey, modelId, messages, send, ac.signal);
     }
-    orAbort = null;
+    if (orAbort === ac) orAbort = null;
 }
 
 function createWindow(): BrowserWindowType {
@@ -1892,7 +2309,52 @@ function listGuides(): string[] {
     catch { return []; }
 }
 
+let lastMediaKey = 0;
+
+/**
+ * Triggers that open the mic without the mic already being open.
+ *
+ * This exists for Bluetooth earbuds. Classic BT cannot run A2DP and the headset mic
+ * at the same time, so an always-listening wake word pins the earpiece in hands-free
+ * mode and everything it plays stays tinny. If the mic instead opens only while you
+ * are actually talking, the earbud sits in A2DP the rest of the time — including
+ * while the reply is read back, which is the part you actually listen to.
+ *
+ * The AirPods stem sends play/pause over AVRCP, so it reaches us as a media key.
+ * A DOUBLE press means "talk to Jac"; a single one is passed through as play/pause
+ * so the stem keeps controlling music.
+ */
+function registerVoiceShortcuts(): void {
+    try {
+        if (config.voiceStemPress) {
+            globalShortcut.register('MediaPlayPause', () => {
+                const now = Date.now();
+                const dbl = now - lastMediaKey < 450;
+                lastMediaKey = now;
+                if (dbl) {
+                    mainWindow?.webContents.send('relay-message', { type: 'voice_ptt' });
+                    return;
+                }
+                // Wait out the double-press window before treating it as a plain
+                // play/pause, or every trigger would also toggle the music.
+                setTimeout(() => {
+                    if (Date.now() - lastMediaKey >= 450) {
+                        mainWindow?.webContents.send('relay-message', { type: 'media_playpause' });
+                    }
+                }, 460);
+            });
+        }
+        if (config.voicePttChord) {
+            globalShortcut.register(config.voicePttChord, () =>
+                mainWindow?.webContents.send('relay-message', { type: 'voice_ptt' }));
+        }
+    } catch { /* a taken shortcut must not stop the app booting */ }
+}
+
+app.on('will-quit', () => globalShortcut.unregisterAll());
+
 app.whenReady().then(() => {
+    registerVoiceShortcuts();
     Menu.setApplicationMenu(null);   // drop the default File/Edit/View/Window/Help bar
     if (process.platform === 'win32') app.setAppUserModelId('com.clifford.jac'); // match electron-builder appId
     // IPC handlers — must be registered after app is ready
@@ -1938,6 +2400,35 @@ app.whenReady().then(() => {
     })));
     ipcMain.handle('mcp-reload', () => { mcpManager.reload(config.mcpServers); return mcpManager.status(); });
     ipcMain.handle('get-platform', () => process.platform);
+
+    // ── Voice ────────────────────────────────────────────────────────────────
+    ipcMain.handle('tts-speak', (_e, text: string) =>
+        voice.speak(String(text ?? ''), config.ttsVoice, config.ttsRate));
+    ipcMain.handle('tts-stop', () => { voice.stopSpeaking(); return true; });
+    ipcMain.handle('tts-voices', () => voice.listVoices());
+    // Hands-free is half-duplex: the mic is gated while Jac talks. Tell the UI the instant
+    // speech really ended so it can reopen its ears without guessing at durations.
+    voice.onSpeechEnd(() => mainWindow?.webContents.send('relay-message', { type: 'tts_done' }));
+    // The renderer records with getUserMedia (Electron has no speechSynthesis, but mic
+    // capture works) and hands the bytes over here, since whisper.cpp and ffmpeg are
+    // main-process concerns.
+    ipcMain.handle('stt-transcribe', async (_e, bytes: ArrayBuffer, ext: string, tier?: string) => {
+        const fast = tier === 'fast';
+        const stt = voice.findWhisper(
+            { exe: config.sttExe, model: fast ? config.sttModelFast : config.sttModel },
+            fast ? 'fast' : 'accurate');
+        if (!stt) {
+            return { text: '', error: 'Speech-to-text is not set up yet: no whisper.cpp build or model found.' };
+        }
+        const raw = ext === 'pcmwav';
+        const ff = raw ? '' : resolveFfmpeg();
+        if (!raw && !ff) { return { text: '', error: 'ffmpeg not found; needed to convert mic audio to 16 kHz mono.' }; }
+        fs.mkdirSync(voice.VOICE_PATHS.dir, { recursive: true });
+        const f = path.join(voice.VOICE_PATHS.dir, `mic-${Date.now()}.${(ext || 'webm').replace(/[^a-z0-9]/gi, '')}`);
+        fs.writeFileSync(f, Buffer.from(bytes));
+        try { return await voice.transcribe(f, stt, ff as string, raw); }
+        finally { try { fs.unlinkSync(f); } catch { /* best effort */ } }
+    });
     ipcMain.handle('get-home', () => os.homedir());
     ipcMain.handle('open-external', (_e, url: string) => shell.openExternal(url));
 
@@ -2080,8 +2571,11 @@ app.whenReady().then(() => {
             }
             const S = 8;                                        // world units per mm
             const X = (v: number) => Math.round(v * S), Y = (v: number) => Math.round(-v * S);
-            const pins: Record<string, { x: number; y: number; name: string }> = {};
-            for (const p of symbolPins(symText)) pins[p.number] = { x: X(p.x), y: Y(p.y), name: p.name };
+            // etype = KiCad electrical type (input/passive/power_in/...). Carried
+            // through so the server can infer pin roles (feedback, enable, clock)
+            // for motif matching and ERC instead of guessing from the name alone.
+            const pins: Record<string, { x: number; y: number; name: string; etype: string }> = {};
+            for (const p of symbolPins(symText)) pins[p.number] = { x: X(p.x), y: Y(p.y), name: p.name, etype: p.etype };
             const g = symbolGraphics(e.lib, pinSrc);
             const svg: string[] = [];
             for (const r of g.rects) svg.push(`<rect x="${Math.min(X(r[0]), X(r[2]))}" y="${Math.min(Y(r[1]), Y(r[3]))}" width="${Math.abs(X(r[2]) - X(r[0]))}" height="${Math.abs(Y(r[3]) - Y(r[1]))}" fill="none" stroke="currentColor" stroke-width="1.5"/>`);
@@ -2138,7 +2632,22 @@ app.whenReady().then(() => {
         if (type === 'set_model') {
             currentModel = (msg.model as string) || '';
             config.lastModel = currentModel; saveConfig(config);   // persist so it survives restart
-            if (isORModel(currentModel) || isOllamaModel(currentModel) || isLocalServerModel(currentModel)) return;
+            // Picking a local model that isn't the one currently loaded swaps the
+            // server over to it. The local tab lists every GGUF on the machine, so
+            // selection has to be what triggers the load - one model fits at a time.
+            if (isLocalServerModel(currentModel)) {
+                const wanted = currentModel.slice('local:'.length);
+                if (fs.existsSync(wanted) && config.localModelPath !== wanted) {
+                    config.localModelPath = wanted; saveConfig(config);
+                    // NB: do not emit assistant_text_delta here. Doing so opens an
+                    // assistant bubble before the user has sent anything, and the next
+                    // reply streams into it - so the answer renders ABOVE the question.
+                    // The UI already prints its own "Switched to local model ..." line.
+                    restartLocalServer();
+                }
+                return;
+            }
+            if (isORModel(currentModel) || isOllamaModel(currentModel)) return;
         }
 
         if (type === 'get_local_models') {
@@ -2208,6 +2717,9 @@ app.whenReady().then(() => {
             if (cwd) {                       // starting a conversation here makes this the active project
                 activeCwd = cwd;
                 if (cwd !== lastProject) { lastProject = cwd; config.lastCwd = cwd; saveConfig(config); }
+                // Roots-aware servers re-scope live from this; the restart below is the
+                // fallback for servers that ignore roots.
+                mcpManager.setRoots([cwd, ...(config.mcpExtraRoots ?? [])]);
                 // Restart (or auto-create) the filesystem MCP server pointed at the new CWD.
                 const fsCfg = config.mcpServers['filesystem'];
                 if (fsCfg?.command) {
@@ -2252,8 +2764,14 @@ app.whenReady().then(() => {
         // history. Main knows the cwd reliably (activeCwd, else the persisted lastProject), so resolve
         // THAT to its project root — the same value get-project-history filters against.
         const base = activeCwd || lastProject || '';
-        const ws = resolveProjectDir(base) || base
-            || (workspace && workspace !== 'global' ? workspace : '') || 'global';
+        // never orphan: if this id already has a workspace, keep it — re-saving a
+        // conversation before the cwd is known used to re-stamp it 'global', and the
+        // history filter can never match 'global', so it vanished from the UI for good.
+        const prior = (convReadIndex() as Array<Record<string, unknown>>)
+            .find(c => c.id === id)?.workspace as string | undefined;
+        const ws = prior && prior !== 'global' ? prior
+            : (resolveProjectDir(base) || base
+               || (workspace && workspace !== 'global' ? workspace : '') || 'global');
 
         // Title = first user message (the dropdown renders entry.title); fixes blank JAC entries.
         const firstUser = (messages as Array<{ role?: string; text?: string }>).find(m => m?.role === 'user');
@@ -2282,9 +2800,17 @@ app.whenReady().then(() => {
     // conversations only (browsedCwd resolves up to the project; non-project browsing keeps the last).
     ipcMain.handle('get-project-history', (_e, browsedCwd: string) => {
         const claude = listClaudeSessions(browsedCwd || '');    // resolves + remembers the project
-        const jac = (convReadIndex() as Array<Record<string, unknown>>)
-            .filter(c => !!c.workspace && c.workspace === lastProject);   // only this project's JAC convs
-        return [...claude, ...jac].sort((a, b) => (b.timestamp as number) - (a.timestamp as number));
+        const all = convReadIndex() as Array<Record<string, unknown>>;
+        // This project's conversations first, then everything else — so nothing is
+        // unreachable. The old filter showed ONLY the current folder's, which meant a
+        // restart into a different cwd looked like the history had been wiped, and
+        // anything stamped 'global' could never be reached from any folder at all.
+        const mine = all.filter(c => !!c.workspace && c.workspace === lastProject);
+        const rest = all.filter(c => !mine.includes(c))
+            .map(c => ({ ...c, otherProject: c.workspace === 'global' ? 'unfiled' : String(c.workspace) }));
+        const byTime = (a: Record<string, unknown>, b: Record<string, unknown>) =>
+            (b.timestamp as number) - (a.timestamp as number);
+        return [...[...claude, ...mine].sort(byTime), ...rest.sort(byTime)];
     });
     ipcMain.handle('load-claude-session', (_e, cwd: string, id: string) => loadClaudeSession(cwd || activeCwd, id));
 
@@ -2303,6 +2829,21 @@ app.whenReady().then(() => {
             const entries = fs.readdirSync(dirPath, { withFileTypes: true });
             return entries
                 .filter(e => !e.name.startsWith('.'))
+                // F-04: rooted at the home folder this listing was 59% Windows plumbing —
+                // NTUSER.DAT and its logs/GUID blobs, the legacy junction folders that
+                // exist only for pre-Vista apps, and desktop.ini. None of it opens, and it
+                // buried the folders actually being navigated to.
+                .filter(e => !WIN_NOISE.test(e.name))
+                .filter((e) => {
+                    if (process.platform !== 'win32') return true;
+                    try {
+                        // Hidden/system attributes aren't exposed on Dirent; stat the entry.
+                        // 0x2 = FILE_ATTRIBUTE_HIDDEN, 0x4 = FILE_ATTRIBUTE_SYSTEM.
+                        const st = fs.statSync(path.join(dirPath, e.name)) as fs.Stats & { attributes?: number };
+                        if (typeof st.attributes === 'number') return !(st.attributes & 0x6);
+                    } catch { /* unreadable — fall through and keep it */ }
+                    return true;
+                })
                 .map(e => ({
                     name: e.name,
                     path: path.join(dirPath, e.name),
@@ -2750,6 +3291,9 @@ app.whenReady().then(() => {
     app.on('before-quit', stopLocalServer);
     setupAutoUpdate();
     // Connect any configured MCP servers; tear them down on quit.
+    // Seed roots before the servers come up so the first conversation after a restart is
+    // already scoped to the last project rather than whatever argv happened to be saved.
+    mcpManager.setRoots([activeCwd || lastProject, ...(config.mcpExtraRoots ?? [])].filter(Boolean));
     mcpManager.reload(config.mcpServers);
     app.on('before-quit', () => mcpManager.stopAll());
     // Start the PCB/schematic tool server (Python stdlib, :5051) + CAD server (build123d, :5050).

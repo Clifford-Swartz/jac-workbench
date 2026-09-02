@@ -122,7 +122,13 @@ export function symbolDefaultFootprint(libFile: string, name: string): string {
     return (m && m[1]) || '';
 }
 
-export interface Pin { number: string; name: string; x: number; y: number; angle: number; length: number; }
+/** KiCad pin electrical type: passive | input | output | bidirectional |
+ *  tri_state | power_in | power_out | open_collector | open_emitter |
+ *  no_connect | free | unspecified. Drives pin-role inference downstream
+ *  (motif matching, ERC), so it is captured rather than discarded. */
+export type PinElectricalType = string;
+
+export interface Pin { number: string; name: string; x: number; y: number; angle: number; length: number; etype: PinElectricalType; }
 
 export interface SymGraphics {
     rects: Array<[number, number, number, number]>;       // x1,y1,x2,y2
@@ -156,11 +162,13 @@ export function symbolGraphics(libFile: string, name: string): SymGraphics {
 /** Pins declared in a symbol block, with positions (symbol-local mm coords, Y up). */
 export function symbolPins(symText: string): Pin[] {
     const pins: Pin[] = [];
-    const re = /\(pin\s+\S+\s+\S+\s*\n?\s*\(at\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\)\s*\n?\s*\(length\s+(-?[\d.]+)\)([\s\S]*?)\(number "([^"]+)"/g;
+    // (pin <electrical_type> <graphic_style> (at x y angle) (length n) (name ..) (number ..))
+    // Group 1 is the electrical type - previously skipped as \S+ and thrown away.
+    const re = /\(pin\s+(\S+)\s+\S+\s*\n?\s*\(at\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\)\s*\n?\s*\(length\s+(-?[\d.]+)\)([\s\S]*?)\(number "([^"]+)"/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(symText))) {
-        const nameMatch = m[5].match(/\(name "([^"]*)"/);
-        pins.push({ x: +m[1], y: +m[2], angle: +m[3], length: +m[4], name: nameMatch ? nameMatch[1] : '', number: m[6] });
+        const nameMatch = m[6].match(/\(name "([^"]*)"/);
+        pins.push({ etype: m[1], x: +m[2], y: +m[3], angle: +m[4], length: +m[5], name: nameMatch ? nameMatch[1] : '', number: m[7] });
     }
     return pins;
 }

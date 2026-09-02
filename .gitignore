@@ -34,3 +34,6 @@ cad_out/
 # Bridge history / state
 .jac/history/
 .gstack/
+
+# playwright MCP scratch output
+desktop/.playwright-mcp/

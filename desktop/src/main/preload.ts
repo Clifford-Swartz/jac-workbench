@@ -6,6 +6,14 @@ contextBridge.exposeInMainWorld('jac', {
     saveConfig: (updates: Record<string, unknown>) => ipcRenderer.invoke('save-config', updates),
     getOrUsage: () => ipcRenderer.invoke('get-or-usage'),
     getPlatform: () => ipcRenderer.invoke('get-platform'),
+
+    // Voice. Electron ships no speechSynthesis backend, so TTS is done in main via SAPI;
+    // mic capture stays in the renderer (getUserMedia works) and the bytes come back here.
+    ttsSpeak: (text: string) => ipcRenderer.invoke('tts-speak', text),
+    ttsStop: () => ipcRenderer.invoke('tts-stop'),
+    ttsVoices: () => ipcRenderer.invoke('tts-voices'),
+    sttTranscribe: (bytes: ArrayBuffer, ext: string, tier?: string) =>
+        ipcRenderer.invoke('stt-transcribe', bytes, ext, tier),
     getHome: () => ipcRenderer.invoke('get-home'),
     openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
     setTitleBarOverlay: (color: string, symbolColor: string) => ipcRenderer.invoke('set-titlebar-overlay', color, symbolColor),
