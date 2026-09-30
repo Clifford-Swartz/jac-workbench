@@ -1,0 +1,23 @@
+{
+  "openrouterApiKey": "sk-or-v1-your-key-here",
+  "defaultModel": "",
+  "favoriteModels": [],
+  "localModelPath": "",
+  "localDraftModelPath": "",
+  "useRelay": false,
+  "relayUrl": "wss://your-relay.example.com",
+  "authToken": "",
+  "preferredMachineId": "",
+  "openAtLogin": false,
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\you\\Projects"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  },
+  "mcpToolPermissions": {}
+}

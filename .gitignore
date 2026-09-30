@@ -37,3 +37,10 @@ cad_out/
 
 # playwright MCP scratch output
 desktop/.playwright-mcp/
+
+# Secrets — never commit these (settings go in ~/.jac/config.json; see desktop/config.example.json)
+.env.*
+!.env.example
+*.key
+*.pem
+config.snapshot.json
