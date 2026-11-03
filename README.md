@@ -15,10 +15,10 @@
   &nbsp;·&nbsp; <a href="#build-from-source">Build from source</a>
 </p>
 
-<!-- DEMO GIF: ~15 s of JAC answering a question — tool calls streaming in, then the answer.
-     Save as docs/media/demo.gif, then uncomment:
-<p align="center"><img src="docs/media/demo.gif" alt="JAC answering a question with live tool calls" width="900"></p>
--->
+<p align="center">
+  <img src="docs/media/agent.gif" alt="JAC researching the latest Electron release on GitHub: tool calls and a permission prompt, then a summarized answer" width="900">
+  <br><sub>Asked what changed in the latest Electron release, JAC queries GitHub, asks permission for each new tool, and summarizes the release notes.</sub>
+</p>
 
 JAC started as a VS Code extension and grew into a standalone Electron app. It works with any model on
 [OpenRouter](https://openrouter.ai) or a local model (llama.cpp / Ollama), gives it real tools through the
@@ -32,8 +32,6 @@ design, and voice. The installer auto-updates.
 - Recovers when a reply is cut off or the model announces an action without taking it, instead of stopping silently.
 - Long conversations are compacted into a *Goal / Done / Learned / Failed / Open* summary rather than failing on context overflow.
 - Works with cloud models (OpenRouter) and local GGUF models, including speculative decoding with a draft model.
-
-<!-- GIF: docs/media/agent.gif — a multi-step task (search → fetch → answer) -->
 
 ### Built-in tools
 | Tool | What it does |
@@ -60,10 +58,17 @@ design, and voice. The installer auto-updates.
 ### CAD and PCB design
 - **CAD:** three.js viewer with move/rotate/scale gizmos, backed by a [build123d](https://github.com/gumyr/build123d) geometry server.
   The model writes the geometry code; JAC runs it and renders the part.
-- **PCB:** schematic editor with a component library, A\* wire routing, and KiCad export.
+- **PCB:** schematic editor with a component library, automatic footprint placement, A\* auto-routing, and KiCad export.
 
-<!-- GIF: docs/media/cad.gif — "make a bracket with two M3 holes" → part appears in the viewer -->
-<!-- GIF: docs/media/pcb.gif — components placed and wired, then exported to KiCad -->
+<p align="center">
+  <img src="docs/media/cad.gif" alt="JAC designing a mounting bracket: the model writes build123d code, fixes its own error, and the part appears in the 3D viewer" width="900">
+  <br><sub>CAD: a 40 × 20 × 3 mm bracket with two M3 holes and a 25 mm flange, from one sentence. The model fixes its own build123d error along the way.</sub>
+</p>
+
+<p align="center">
+  <img src="docs/media/pcb.gif" alt="JAC laying out a driver board: parts placed, wired into nets, auto-arranged and auto-routed" width="900">
+  <br><sub>PCB: an ESP32-S3 LED driver board placed, wired into four nets, auto-arranged, and auto-routed.</sub>
+</p>
 
 ### Workspace
 - Draggable, splittable tabs (dockview) for chat and every tool view, a file explorer, and a CodeMirror editor.
